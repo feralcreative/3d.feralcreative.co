@@ -1,0 +1,43 @@
+// Breakpoint Mixins
+$breakpoints: (
+  "xs": 480px,
+  "sm": 640px,
+  "md": 768px,
+  "lg": 1024px,
+  "xl": 1280px,
+  "xxl": 1536px,
+);
+
+@mixin breakpoint($size) {
+  @if map-has-key($breakpoints, $size) {
+    @media (min-width: map-get($breakpoints, $size)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint '#{$size}' not found. Available breakpoints: #{map-keys($breakpoints)}";
+  }
+}
+
+@mixin breakpoint-max($size) {
+  @if map-has-key($breakpoints, $size) {
+    $max-width: map-get($breakpoints, $size) - 1px;
+    @media (max-width: $max-width) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint '#{$size}' not found. Available breakpoints: #{map-keys($breakpoints)}";
+  }
+}
+
+@mixin breakpoint-between($min, $max) {
+  @if map-has-key($breakpoints, $min) and map-has-key($breakpoints, $max) {
+    $min-width: map-get($breakpoints, $min);
+    $max-width: map-get($breakpoints, $max) - 1px;
+    @media (min-width: $min-width) and (max-width: $max-width) {
+      @content;
+    }
+  } @else {
+    @warn "One or both breakpoints not found. Available breakpoints: #{map-keys($breakpoints)}";
+  }
+}
+

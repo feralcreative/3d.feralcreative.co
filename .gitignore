@@ -237,3 +237,4 @@ Icon?
 **/_deprecated
 **/.syncthing*
 **/.sync-conflict*
+**/.secrets/*

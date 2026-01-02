@@ -3,41 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Printer Stream</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <title>Feral Creative: 3D Printer Stream</title>
+    <meta name="description" content="Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://3d.feralcreative.co/">
+    <meta property="og:title" content="Feral Creative: 3D Printer Stream">
+    <meta property="og:description" content="Live stream of Feral Creative FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
+    <meta property="og:image" content="https://3d.feralcreative.co/images/feral-3d.png">
 
-        .stream-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            background-color: #000;
-        }
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://3d.feralcreative.co/">
+    <meta property="twitter:title" content="Feral Creative: 3D Printer Stream">
+    <meta property="twitter:description" content="Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
+    <meta property="twitter:image" content="https://3d.feralcreative.co/images/feral-3d.png">
 
-        .stream-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-    </style>
+    <link rel="stylesheet" href="./styles/css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Configuration and Auth -->
+    <script src="./config.js"></script>
+    <script src="./auth.js"></script>
 </head>
 <body>
-    <div class="stream-container">
-        <img src="https://3d.feralcreative.co/?action=stream" 
-             alt="3D Printer Stream" 
-             class="stream-image">
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-container">
+            <img class="login-logo" src="./images/feral-lockup.svg" alt="">
+            <h1>3D Printer Stream</h1>
+            <p>Sign in with your Google account to view the stream</p>
+            <div id="google-signin-button"></div>
+            <div id="error-message" class="error-message"></div>
+        </div>
     </div>
+
+    <!-- Hamburger Menu (shown when authenticated) -->
+    <div id="hamburger-menu" class="hamburger-menu">
+        <button id="hamburger-btn" class="hamburger-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div id="menu-dropdown" class="menu-dropdown">
+
+            <nav class="menu-links">
+                <p class="eyebrow">Printer</p>
+                <a href="https://www.flashforge.com/products/adventurer-5m-pro-3d-printer" target="_blank" rel="noopener noreferrer">ForceForge Adv 5M Pro</a>
+                <p class="eyebrow">Currently Printing:</p>
+                <a href="https://3dgo.app/models/cults3d/tools-and-nuzzle-mount-for-flashforge-adventurer-5m-pro" target="_blank" rel="noopener noreferrer">Tool and Nozzle Caddy</a>
+
+                <!-- Add your menu links here -->
+
+                <!-- Example: <a href="/settings">Settings</a> -->
+
+                <!-- Example: <a href="/help">Help</a> -->
+            </nav>
+            <hr>
+            <div class="user-info">
+                <span id="user-email"></span>
+            </div>
+            <button onclick="auth.signOut()" class="sign-out-btn">Sign Out</button>
+        </div>
+    </div>
+
+    <!-- Stream Container (shown when authenticated) -->
+    <div id="stream-container" class="stream-container">
+        <a href="http://feralcreative.co" target="_blank" rel="noopener noreferrer"><img class="corner" src="./images/feral-corner-bottom-right@2x.png" alt="Feral Creative"></a>
+        <img id="stream-image" src="" alt="3D Printer Stream" class="stream-image">
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const dropdown = document.getElementById('menu-dropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (event) {
+            const menu = document.getElementById('hamburger-menu');
+            const dropdown = document.getElementById('menu-dropdown');
+            if (menu && !menu.contains(event.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+    </script>
 </body>
 </html>
-
