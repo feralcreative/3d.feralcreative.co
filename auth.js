@@ -3,6 +3,7 @@ class GoogleAuth {
   constructor() {
     this.user = null;
     this.isInitialized = false;
+    this.streamUrlSet = false;
   }
 
   // Initialize Google Sign-In
@@ -127,14 +128,27 @@ class GoogleAuth {
       hamburgerMenu.style.display = "block";
       userEmail.textContent = this.user.email;
 
-      // Set the appropriate stream URL based on environment
-      const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      streamImage.src = isLocalhost ? CONFIG.STREAM_URL.DEV : CONFIG.STREAM_URL.PROD;
+      // Set the appropriate stream URL based on environment (only once)
+      if (!this.streamUrlSet) {
+        const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const streamUrl = isLocalhost ? CONFIG.STREAM_URL.DEV : CONFIG.STREAM_URL.PROD;
+
+        // Set up error handler to show offline image
+        streamImage.onerror = function () {
+          this.src = "./images/offline.jpg";
+          this.onerror = null; // Prevent infinite loop
+        };
+
+        streamImage.src = streamUrl;
+        this.streamUrlSet = true;
+      }
     } else {
       // User is signed out
       loginScreen.style.display = "flex";
       streamContainer.style.display = "none";
       hamburgerMenu.style.display = "none";
+      streamImage.src = ""; // Clear the stream URL
+      this.streamUrlSet = false;
     }
   }
 

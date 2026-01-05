@@ -15,22 +15,24 @@ const CONFIG = {
   // Leave empty array [] to allow any Google account
   // Examples:
   ALLOWED_EMAILS: [
+    "@feralcreative.co",
     "ziadezzat@gmail.com",
     "rhobbs007@gmail.com",
-    "@feralcreative.co",
     "ziadandrebecca@gmail.com",
-    "dslavik@gmail.com",
+    "zmezzat@gmail.com",
     "brian.donnellan@gmail.com",
+    "aschur@gmail.com",
+    "dslavik@gmail.com",
     "dylan.seidner@gmail.com",
     "dizzydezidee@gmail.com",
     "tess.evans@gmail.com",
     "tyler.phelps@gmail.com",
-    "zmezzat@gmail.com",
     "daveablees@gmail.com",
     "ohbandit@gmail.com",
     "connormstock@gmail.com",
     "epdale@gmail.com",
-    "@ziad.af",
+    "jpenick@gmail.com",
+    "melanie.sensarn@gmail.com",
   ],
 
   // Stream URL configuration
