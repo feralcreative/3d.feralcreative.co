@@ -264,6 +264,7 @@ Icon?
 **/.sync-conflict*
 **/.secrets/*
 **/docs/*
+**/console.txt
 
 # Vite build output
 dist/
