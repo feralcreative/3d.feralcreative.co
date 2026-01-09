@@ -150,6 +150,9 @@ utils/deploy/prod.sh
 utils/deploy/deploy-utils.sh
 utils/deploy/deploy-printer-proxy.sh
 
+# Development logs and console output
+CONSOLE.txt
+
 # Documentation with sensitive data
 _AI_AGENT_PRIMER.md
 docs/nas-configuration.md
