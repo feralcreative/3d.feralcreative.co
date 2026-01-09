@@ -8,17 +8,17 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://3d.feralcreative.co/">
-    <meta property="og:title" content="Feral Creative: 3D Printer Stream">
-    <meta property="og:description" content="Live stream of Feral Creative FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
-    <meta property="og:image" content="https://3d.feralcreative.co/images/feral-3d.png">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:title" content="3D Printer Stream">
+    <meta property="og:description" content="Live stream of FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
+    <meta property="og:image" content="https://yourdomain.com/images/feral-3d.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://3d.feralcreative.co/">
-    <meta property="twitter:title" content="Feral Creative: 3D Printer Stream">
-    <meta property="twitter:description" content="Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
-    <meta property="twitter:image" content="https://3d.feralcreative.co/images/feral-3d.png">
+    <meta property="twitter:url" content="https://yourdomain.com/">
+    <meta property="twitter:title" content="3D Printer Stream">
+    <meta property="twitter:description" content="Live stream of FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
+    <meta property="twitter:image" content="https://yourdomain.com/images/feral-3d.png">
 
     <link rel="stylesheet" href="./styles/css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +30,8 @@
 
     <!-- Configuration and Auth -->
     <script src="./config.js"></script>
+    <script src="./logger.js"></script>
+    <script src="./printer.js"></script>
     <script src="./auth.js"></script>
 </head>
 <body>
@@ -57,11 +59,6 @@
             <nav class="menu-links">
                 <p class="eyebrow">Printer</p>
                 <a href="https://www.flashforge.com/products/adventurer-5m-pro-3d-printer" target="_blank" rel="noopener noreferrer">ForceForge Adv 5M Pro</a>
-                <p class="eyebrow">Currently Printing:</p>
-                <a href="https://www.thingiverse.com/thing:3346069" target="_blank" rel="noopener noreferrer">Filament Swatches</a>
-
-                <!-- <a href="https://www.thingiverse.com/thing:6657413" target="_blank" rel="noopener noreferrer">Bed Scraper</a> -->
-
 
                 <!-- Add your menu links here -->
 
@@ -79,8 +76,84 @@
 
     <!-- Stream Container (shown when authenticated) -->
     <div id="stream-container" class="stream-container">
-        <a href="http://feralcreative.co" target="_blank" rel="noopener noreferrer"><img class="corner" src="./images/feral-corner-bottom-right@2x.png" alt="Feral Creative"></a>
+        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer"><img class="corner" src="./images/feral-corner-bottom-right@2x.png" alt="Your Brand"></a>
         <img id="stream-image" src="" alt="3D Printer Stream" class="stream-image">
+
+        <!-- Printer Status Overlay -->
+        <div id="printer-status" class="printer-status">
+            <button id="status-toggle" class="status-toggle" aria-label="Toggle printer status">
+                <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+            </button>
+
+            <div class="status-content">
+                <div class="status-header">
+                    <h2 id="printer-name">FlashForge Adventurer 5M Pro</h2>
+                    <span id="printer-state" class="status-badge">Connecting...</span>
+                </div>
+
+                <div class="status-grid">
+
+                    <!-- Current Project Section -->
+                    <div class="status-section">
+                        <h3>Current Project</h3>
+                        <div class="status-item">
+                            <a id="project-link" class="value project-link" href="#" target="_blank" rel="noopener noreferrer">--</a>
+                        </div>
+                    </div>
+
+                    <!-- Temperature Section -->
+                    <div class="status-section">
+                        <h3>Temperatures</h3>
+                        <div class="status-item">
+                            <span class="label">Nozzle:</span>
+                            <span id="temp-nozzle" class="value">--°C</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Bed:</span>
+                            <span id="temp-bed" class="value">--°C</span>
+                        </div>
+                    </div>
+
+                    <!-- Job Progress Section -->
+                    <div class="status-section">
+                        <h3>Current Job</h3>
+                        <div class="status-item">
+                            <span class="label">File:</span>
+                            <span id="job-file" class="value">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Progress:</span>
+                            <span id="job-progress" class="value">--%</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Time Left:</span>
+                            <span id="job-time" class="value">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Material Section -->
+                    <div class="status-section">
+                        <h3>Material</h3>
+                        <div class="status-item">
+                            <span class="label">Type:</span>
+                            <span id="material-type" class="value">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Color:</span>
+                            <span id="material-color" class="value">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -96,6 +169,14 @@
             if (menu && !menu.contains(event.target)) {
                 dropdown.classList.remove('open');
             }
+        });
+
+        // Toggle printer status overlay
+        const statusToggle = document.getElementById('status-toggle');
+        const printerStatus = document.getElementById('printer-status');
+
+        statusToggle.addEventListener('click', function () {
+            printerStatus.classList.toggle('collapsed');
         });
     </script>
 </body>

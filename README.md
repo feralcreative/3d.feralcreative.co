@@ -2,6 +2,8 @@
 
 Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer with real-time status overlay and Google OAuth authentication.
 
+screenshot.jpg
+
 ## Features
 
 - **Live MJPEG Stream** - Real-time video from Synology Surveillance Station
@@ -27,7 +29,7 @@ This starts the **Vite dev server** on <http://localhost:5501>
 
 Visit: <http://localhost:5501>
 
-**Note:** In production, the printer API is accessed through a reverse proxy at `https://3dprinter.feralcreative.co` which routes to the Docker container running `printer-proxy-server.js` on port 6199.
+**Note:** In production, the printer API is accessed through a reverse proxy at `https://printer.yourdomain.com` which routes to the Docker container running `printer-proxy-server.js` on port 6199.
 
 ### Production Build
 
@@ -172,8 +174,8 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/p
 
 After deployment, the application is accessible at:
 
-- **Direct**: <http://nas.feralcreative.co:6198>
-- **Production**: <https://3d.feralcreative.co> (via reverse proxy)
+- **Direct**: <http://your-nas-hostname:6198>
+- **Production**: <https://yourdomain.com> (via reverse proxy)
 
 ### Troubleshooting
 
@@ -181,10 +183,10 @@ After deployment, the application is accessible at:
 
 ```bash
 # Test SSH connection
-ssh -p 33725 ziad@nas.feralcreative.co "echo 'Connection successful'"
+ssh -p YOUR_SSH_PORT user@your-nas-hostname "echo 'Connection successful'"
 
 # If prompted for password, add your SSH key
-ssh-copy-id -p 33725 ziad@nas.feralcreative.co
+ssh-copy-id -p YOUR_SSH_PORT user@your-nas-hostname
 ```
 
 **Docker Build Issues:**
@@ -222,7 +224,7 @@ docker images 3d-printer-stream:latest
 ## Project Structure
 
 ```text
-3d.feralcreative.co/
+3d-printer-stream/
 ├── index.html                  # Main application page
 ├── auth.js                     # Google OAuth authentication
 ├── printer.js                  # Printer API client
