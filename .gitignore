@@ -153,6 +153,13 @@ utils/deploy/deploy-printer-proxy.sh
 # Documentation with sensitive data
 _AI_AGENT_PRIMER.md
 docs/nas-configuration.md
+docs/deployment-checklist.md
+QUICK_START.md
+DEPLOYMENT.md
+PRINTER_SETUP.md
+REMOVAL_COMPLETE.md
+MAKE_PUBLIC_CHECKLIST.md
+SECURITY_REVIEW.md
 
 # Backup and archive files
 *.bak

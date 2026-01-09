@@ -25,7 +25,7 @@ This document explains how to configure Google OAuth 2.0 authentication for the 
 2. Give it a name (e.g., "3D Printer Stream")
 3. Add **Authorized JavaScript origins**:
    - For local development: `http://localhost:5501`
-   - For production: `https://3d.feralcreative.co` (or your actual domain)
+   - For production: `https://yourdomain.com` (your actual domain)
 4. You don't need to add redirect URIs for this implementation
 5. Click **Create**
 6. Copy the **Client ID** (it will look like `xxxxx-xxxxx.apps.googleusercontent.com`)
@@ -35,15 +35,16 @@ This document explains how to configure Google OAuth 2.0 authentication for the 
 1. Open `config.js` in your project
 2. Replace `YOUR_CLIENT_ID_HERE.apps.googleusercontent.com` with your actual Client ID
 3. (Optional) Configure email restrictions:
+
    ```javascript
    // Allow only specific email addresses
-   ALLOWED_EMAILS: ['ziad@feralcreative.co']
-   
+   ALLOWED_EMAILS: ["user@example.com"];
+
    // Or allow any email from a domain
-   ALLOWED_EMAILS: ['@feralcreative.co']
-   
+   ALLOWED_EMAILS: ["@yourdomain.com"];
+
    // Or allow any Google account (leave empty)
-   ALLOWED_EMAILS: []
+   ALLOWED_EMAILS: [];
    ```
 
 ## Step 4: Test Locally
@@ -72,15 +73,18 @@ This document explains how to configure Google OAuth 2.0 authentication for the 
 ## Troubleshooting
 
 ### "Access denied" error
+
 - Check that your email is in the `ALLOWED_EMAILS` list (if configured)
 - Verify the email restrictions in `config.js`
 
 ### Sign-in button doesn't appear
+
 - Check browser console for errors
 - Verify your Client ID is correct in `config.js`
 - Make sure the current domain is in Authorized JavaScript origins
 
 ### "redirect_uri_mismatch" error
+
 - This shouldn't happen with this implementation, but if it does:
 - Verify the domain in Authorized JavaScript origins matches exactly (including http/https)
 - Clear browser cache and try again
@@ -91,4 +95,3 @@ This document explains how to configure Google OAuth 2.0 authentication for the 
 - `auth.js` - Authentication logic and session management
 - `config.js` - OAuth Client ID configuration
 - `styles/scss/main.scss` - Styles for login screen and user info bar
-
