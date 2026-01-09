@@ -141,6 +141,19 @@ wp-config-local.php
 .htaccess.backup
 .htpasswd
 
+# Project-specific sensitive files
+config.js
+printer-proxy-server.js
+
+# Deployment scripts with sensitive server information
+utils/deploy/prod.sh
+utils/deploy/deploy-utils.sh
+utils/deploy/deploy-printer-proxy.sh
+
+# Documentation with sensitive data
+_AI_AGENT_PRIMER.md
+docs/nas-configuration.md
+
 # Backup and archive files
 *.bak
 *.backup
@@ -238,3 +251,8 @@ Icon?
 **/.syncthing*
 **/.sync-conflict*
 **/.secrets/*
+
+# Vite build output
+dist/
+node_modules/
+package-lock.json
