@@ -1,0 +1,15 @@
+services:
+  3d-printer-stream:
+    image: 3d-printer-stream:latest
+    container_name: 3d-printer-stream
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /volume1/web/3d-printer-stream/data:/app/data
+    environment:
+      - NODE_ENV=production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

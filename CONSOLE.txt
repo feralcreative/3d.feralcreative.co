@@ -1,0 +1,46 @@
+printer.js:39 [PRINTER] Initializing connection...
+printer.js:40 [PRINTER] Base URL: https://3dprinter.feralcreative.co
+printer.js:41 [PRINTER] Serial: SNMOME9201982
+printer.js:74 [PRINTER] Fetching printer info from: https://3dprinter.feralcreative.co/product
+printer.js:75 [PRINTER] Request body: {serialNumber: 'SNMOME9201982', checkCode: '7a385286'}
+logger.js:188 📊 Event logged: session_restored {event: 'session_restored', sessionId: '1767987663184-kyqf9c34i', timestamp: '2026-01-09T19:41:03.233Z', user: {…}, data: {…}}
+printer.js:85 [PRINTER] Response status: 200
+printer.js:92 [PRINTER] Raw response data: {code: 0, message: 'Success', product: {…}}
+printer.js:96 [PRINTER] Extracted product data: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+printer.js:45 [PRINTER] Received info: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+printer.js:50 [PRINTER] Connected to printer. Info: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+auth.js:200 Printer connected successfully
+printer.js:203 [PRINTER] Getting all status...
+printer.js:74 [PRINTER] Fetching printer info from: https://3dprinter.feralcreative.co/product
+printer.js:75 [PRINTER] Request body: {serialNumber: 'SNMOME9201982', checkCode: '7a385286'}
+printer.js:117 [PRINTER] Fetching machine info from: https://3dprinter.feralcreative.co/detail
+printer.js:118 [PRINTER] Request body: {serialNumber: 'SNMOME9201982', checkCode: '7a385286'}
+printer.js:85 [PRINTER] Response status: 200
+printer.js:128 [PRINTER] Response status: 200
+printer.js:92 [PRINTER] Raw response data: {code: 0, message: 'Success', product: {…}}
+printer.js:96 [PRINTER] Extracted product data: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+printer.js:135 [PRINTER] Raw machine info response: {code: 0, message: 'Success', product: {…}}
+printer.js:139 [PRINTER] Extracted detail data: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+printer.js:150 [PRINTER] Mapped machine info: {Status: 'unknown', NozzleTemp: 0, BedTemp: 0, MaterialType: '--', MaterialColor: '--'}
+printer.js:160 [PRINTER] Job info: {FileName: '--', Progress: 0, TimeRemaining: 0}
+printer.js:206 [PRINTER] All status - printerInfo: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+printer.js:207 [PRINTER] All status - machineInfo: {Status: 'unknown', NozzleTemp: 0, BedTemp: 0, MaterialType: '--', MaterialColor: '--'}
+printer.js:208 [PRINTER] All status - jobInfo: {FileName: '--', Progress: 0, TimeRemaining: 0}
+printer.js:220 [PRINTER] Returning status: {printer: {…}, machine: {…}, job: {…}, isConnected: true, timestamp: '2026-01-09T19:41:03.266Z'}
+printer.js:203 [PRINTER] Getting all status...
+printer.js:74 [PRINTER] Fetching printer info from: https://3dprinter.feralcreative.co/product
+ [PRINTER] Request body: {serialNumber: 'SNMOME9201982', checkCode: '7a385286'}
+ [PRINTER] Fetching machine info from: https://3dprinter.feralcreative.co/detail
+ [PRINTER] Request body: {serialNumber: 'SNMOME9201982', checkCode: '7a385286'}
+ [PRINTER] Response status: 200
+ [PRINTER] Raw machine info response: {code: 0, message: 'Success', product: {…}}
+ [PRINTER] Extracted detail data: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+ [PRINTER] Mapped machine info: {Status: 'unknown', NozzleTemp: 0, BedTemp: 0, MaterialType: '--', MaterialColor: '--'}
+ [PRINTER] Job info: {FileName: '--', Progress: 0, TimeRemaining: 0}
+ [PRINTER] Response status: 200
+ [PRINTER] Raw response data: {code: 0, message: 'Success', product: {…}}
+ [PRINTER] Extracted product data: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+ [PRINTER] All status - printerInfo: {chamberTempCtrlState: 0, externalFanCtrlState: 1, internalFanCtrlState: 1, lightCtrlState: 1, nozzleTempCtrlState: 1, …}
+ [PRINTER] All status - machineInfo: {Status: 'unknown', NozzleTemp: 0, BedTemp: 0, MaterialType: '--', MaterialColor: '--'}
+ [PRINTER] All status - jobInfo: {FileName: '--', Progress: 0, TimeRemaining: 0}
+ [PRINTER] Returning status: {printer: {…}, machine: {…}, job: {…}, isConnected: true, timestamp: '2026-01-09T19:41:08.281Z'}

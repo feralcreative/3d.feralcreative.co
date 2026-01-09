@@ -2,7 +2,7 @@
 
 Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer with real-time status overlay and Google OAuth authentication.
 
-screenshot.jpg
+![Screenshot of https://3d.feralcreative.co](/images/screenshot.jpg)
 
 ## Features
 

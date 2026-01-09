@@ -42,6 +42,11 @@ class GoogleAuth {
       // Store in session
       sessionStorage.setItem("user", JSON.stringify(this.user));
 
+      // Log the login event
+      if (window.activityLogger) {
+        window.activityLogger.logLogin(this.user);
+      }
+
       // Update UI
       this.onAuthStateChanged();
     } catch (error) {
@@ -99,6 +104,12 @@ class GoogleAuth {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       this.user = JSON.parse(storedUser);
+
+      // Log session restoration
+      if (window.activityLogger) {
+        window.activityLogger.logEvent("session_restored", {}, this.user);
+      }
+
       this.onAuthStateChanged();
       return true;
     }
@@ -107,6 +118,11 @@ class GoogleAuth {
 
   // Sign out
   signOut() {
+    // Log the logout event
+    if (window.activityLogger && this.user) {
+      window.activityLogger.logLogout(this.user);
+    }
+
     this.user = null;
     sessionStorage.removeItem("user");
     google.accounts.id.disableAutoSelect();
@@ -141,6 +157,9 @@ class GoogleAuth {
 
         streamImage.src = streamUrl;
         this.streamUrlSet = true;
+
+        // Initialize printer status monitoring
+        this.initPrinterStatus();
       }
     } else {
       // User is signed out
@@ -149,6 +168,149 @@ class GoogleAuth {
       hamburgerMenu.style.display = "none";
       streamImage.src = ""; // Clear the stream URL
       this.streamUrlSet = false;
+
+      // Stop printer status monitoring
+      if (window.printerStatus) {
+        window.printerStatus.stopUpdates();
+      }
+    }
+  }
+
+  // Initialize printer status monitoring
+  initPrinterStatus() {
+    // Check if printer configuration is set
+    if (!CONFIG.PRINTER || !CONFIG.PRINTER.IP || CONFIG.PRINTER.IP === "192.168.1.XXX") {
+      console.warn("Printer configuration not set. Please update config.js with your printer details.");
+      this.updatePrinterUI({
+        isConnected: false,
+        error: "Printer not configured",
+      });
+      return;
+    }
+
+    // Initialize static project information from config
+    this.initProjectInfo();
+
+    // Create printer status instance
+    window.printerStatus = new PrinterStatus(CONFIG.PRINTER.IP, CONFIG.PRINTER.SERIAL, CONFIG.PRINTER.CHECK_CODE);
+
+    // Initialize connection
+    window.printerStatus.initialize().then((connected) => {
+      if (connected) {
+        console.log("Printer connected successfully");
+        // Start automatic updates
+        window.printerStatus.startUpdates(CONFIG.PRINTER.UPDATE_INTERVAL, (status) => {
+          this.updatePrinterUI(status);
+        });
+      } else {
+        console.error("Failed to connect to printer");
+        this.updatePrinterUI({
+          isConnected: false,
+          error: "Connection failed",
+        });
+      }
+    });
+  }
+
+  // Initialize project information from config
+  initProjectInfo() {
+    const projectLink = document.getElementById("project-link");
+    if (CONFIG.PRINTER.CURRENT_PROJECT && CONFIG.PRINTER.CURRENT_PROJECT.NAME) {
+      projectLink.textContent = CONFIG.PRINTER.CURRENT_PROJECT.NAME;
+      projectLink.href = CONFIG.PRINTER.CURRENT_PROJECT.URL || "#";
+    }
+  }
+
+  // Update printer status UI
+  updatePrinterUI(status) {
+    // Update printer name
+    const printerName = document.getElementById("printer-name");
+    if (status.printer && status.printer.Name) {
+      printerName.textContent = status.printer.Name;
+    }
+
+    // Update printer state badge
+    const printerState = document.getElementById("printer-state");
+    if (!status.isConnected) {
+      printerState.textContent = status.error || "Offline";
+      printerState.className = "status-badge error";
+      return;
+    }
+
+    // Determine printer state from machine info
+    if (status.machine && status.machine.Status) {
+      const machineStatus = status.machine.Status;
+      if (machineStatus.includes("PRINTING") || machineStatus.includes("WORKING")) {
+        printerState.textContent = "Printing";
+        printerState.className = "status-badge printing";
+      } else if (machineStatus.includes("READY") || machineStatus.includes("IDLE")) {
+        printerState.textContent = "Ready";
+        printerState.className = "status-badge idle";
+      } else {
+        printerState.textContent = machineStatus;
+        printerState.className = "status-badge";
+      }
+    }
+
+    // Update temperatures
+    if (status.machine) {
+      const tempNozzle = document.getElementById("temp-nozzle");
+      const tempBed = document.getElementById("temp-bed");
+
+      if (status.machine.NozzleTemp !== undefined) {
+        tempNozzle.textContent = `${Math.round(status.machine.NozzleTemp)}°C`;
+      }
+      if (status.machine.BedTemp !== undefined) {
+        tempBed.textContent = `${Math.round(status.machine.BedTemp)}°C`;
+      }
+    }
+
+    // Update job information
+    if (status.job) {
+      const jobFile = document.getElementById("job-file");
+      const jobProgress = document.getElementById("job-progress");
+      const jobTime = document.getElementById("job-time");
+
+      if (status.job.FileName) {
+        jobFile.textContent = status.job.FileName;
+      }
+      if (status.job.Progress !== undefined) {
+        jobProgress.textContent = `${Math.round(status.job.Progress)}%`;
+      }
+      if (status.job.TimeRemaining !== undefined) {
+        jobTime.textContent = this.formatTime(status.job.TimeRemaining);
+      }
+    }
+
+    // Update material information
+    if (status.machine) {
+      const materialType = document.getElementById("material-type");
+      const materialColor = document.getElementById("material-color");
+
+      if (status.machine.MaterialType) {
+        materialType.textContent = status.machine.MaterialType;
+      }
+
+      // Use filament color from config if available, otherwise use API value
+      if (CONFIG.PRINTER.FILAMENT && CONFIG.PRINTER.FILAMENT.COLOR) {
+        materialColor.textContent = CONFIG.PRINTER.FILAMENT.COLOR;
+      } else if (status.machine.MaterialColor) {
+        materialColor.textContent = status.machine.MaterialColor;
+      }
+    }
+  }
+
+  // Format time in seconds to human-readable format
+  formatTime(seconds) {
+    if (!seconds || seconds < 0) return "--";
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
     }
   }
 

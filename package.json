@@ -1,0 +1,27 @@
+{
+  "name": "3d-printer-stream",
+  "version": "1.0.0",
+  "description": "Feral Creative 3D Printer Live Stream with Status Overlay",
+  "type": "module",
+  "scripts": {
+    "dev": "npx vite --host",
+    "build": "npx vite build",
+    "preview": "npx vite preview",
+    "proxy": "node server.js",
+    "start": "npm run proxy & npm run dev"
+  },
+  "keywords": [
+    "flashforge",
+    "3d-printer",
+    "stream"
+  ],
+  "author": "Ziad",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.22.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

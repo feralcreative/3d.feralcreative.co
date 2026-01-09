@@ -213,3 +213,222 @@ body {
   // brightness: 1 is normal, >1 brightens, <1 darkens
   filter: contrast(1) saturate(1) brightness(1);
 }
+
+// Printer Status Overlay
+.printer-status {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  color: white;
+  font-family: $font-primary;
+  max-width: 500px;
+  z-index: 900;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(136, 0, 136, 0.3);
+  transition: all 0.3s ease;
+
+  // Collapsed state
+  &.collapsed {
+    padding: 0;
+    max-width: 3rem;
+    max-height: 3rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+
+    .status-content {
+      opacity: 0;
+      visibility: hidden;
+      max-height: 0;
+      overflow: hidden;
+    }
+
+    .status-toggle {
+      .info-icon {
+        transform: rotate(0deg);
+      }
+    }
+  }
+
+  .status-toggle {
+    position: absolute;
+    top: 0rem;
+    right: 0rem;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: $color-fpo;
+    }
+
+    .close-icon,
+    .info-icon {
+      width: 1rem;
+      height: 1rem;
+      color: white;
+      transition: opacity 0.2s ease;
+      position: absolute;
+    }
+
+    .close-icon {
+      opacity: 1;
+    }
+
+    .info-icon {
+      opacity: 0;
+    }
+  }
+
+  &.collapsed .status-toggle {
+    position: static;
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    background: rgba(255, 0, 255, 0.2);
+
+    &:hover {
+      background: rgba(255, 0, 255, 0.3);
+    }
+
+    .close-icon {
+      opacity: 0;
+    }
+
+    .info-icon {
+      opacity: 1;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  .status-content {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: rgba(white, 0.75);
+      margin: 0;
+      padding-right: 2em;
+    }
+  }
+
+  #project-link {
+    color: white;
+    text-decoration: underline;
+    &:hover {
+      color: $color-fpo;
+    }
+  }
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255, 0, 255, 0.1);
+    color: $color-fpo;
+    border: 1px solid $color-fpo;
+
+    &.printing {
+      background: rgba(0, 255, 0, 0.1);
+      color: #0f0;
+      border-color: #0f0;
+    }
+
+    &.idle {
+      background: rgba(255, 255, 0, 0.1);
+      color: #ff0;
+      border-color: #ff0;
+    }
+
+    &.error {
+      background: rgba(255, 0, 0, 0.2);
+      color: #f00;
+      border-color: #f00;
+    }
+  }
+
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+
+    //@ Medium screens and up
+    @include breakpoint(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .status-section {
+    h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2 5rem;
+    }
+  }
+
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .value {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: white;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  // Responsive adjustments
+  //@ Small screens
+  @include breakpoint(xs) {
+    max-width: calc(100vw - 2rem);
+  }
+
+  //@ Medium screens and up
+  @include breakpoint(md) {
+    max-width: 600px;
+  }
+}
