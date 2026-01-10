@@ -9,9 +9,56 @@ Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer with rea
 - **Live MJPEG Stream** - Real-time video from Synology Surveillance Station
 - **Google OAuth Authentication** - Secure access with email whitelisting
 - **Real-time Printer Status** - Temperature, progress, and print information overlay
+- **3D Model Viewer** - View current print model in 3D by clicking the filename
 - **Responsive Design** - Works on desktop and mobile devices
 - **Dev Mode** - Bypass authentication on localhost for development
 - **Docker Deployment** - Containerized deployment to Synology NAS
+
+## 3D Model Viewer
+
+The application includes an interactive 3D model viewer that allows you to view the current print model in 3D.
+
+### How to Use
+
+1. **Place Model Files**: Add your STL files to the `public/models/` directory
+2. **Match Filenames**: The STL filename (without extension) must match the job filename reported by the printer
+   - Example: If printer shows `test-cube.3mf`, place file as `public/models/test-cube.stl`
+3. **Click to View**: When a print is active, click the filename in the printer status overlay to open the 3D viewer
+
+### File Format
+
+The viewer displays **STL files only**. The application automatically converts the printer's filename (e.g., `.3mf` from Orca Slicer) to `.stl` format:
+
+- Printer reports: `my-model.3mf`
+- Viewer looks for: `public/models/my-model.stl`
+
+**Note**: You must export/save your original STL file with the same base filename as your sliced file.
+
+### Viewer Controls
+
+- **Rotate**: Click and drag with left mouse button
+- **Zoom**: Scroll wheel or pinch gesture
+- **Pan**: Right-click and drag (or two-finger drag on trackpad)
+- **Close**: Click the X button, press ESC, or click outside the modal
+
+### Example Workflow
+
+```bash
+# 1. You have an STL file
+my-awesome-print.stl
+
+# 2. Slice it in Orca Slicer, which creates
+my-awesome-print.3mf
+
+# 3. Send to printer (printer shows "my-awesome-print.3mf")
+
+# 4. Place your original STL in the models directory
+cp my-awesome-print.stl public/models/
+
+# 5. Click the filename in the web interface to view the 3D model
+```
+
+**Note**: The viewer automatically strips the extension and looks for a `.stl` file. If the file is not found, an error message will be displayed.
 
 ## Quick Start
 

@@ -32,6 +32,7 @@
     <script src="./config.js"></script>
     <script src="./logger.js"></script>
     <script src="./printer.js"></script>
+    <script type="module" src="./viewer-3d.js"></script>
     <script src="./auth.js"></script>
 </head>
 <body>
@@ -56,17 +57,10 @@
         </button>
         <div id="menu-dropdown" class="menu-dropdown">
 
-            <nav class="menu-links">
-                <p class="eyebrow">Printer</p>
-                <a href="https://www.flashforge.com/products/adventurer-5m-pro-3d-printer" target="_blank" rel="noopener noreferrer">ForceForge Adv 5M Pro</a>
+            <!-- <nav class="menu-links">
 
-                <!-- Add your menu links here -->
 
-                <!-- Example: <a href="/settings">Settings</a> -->
-
-                <!-- Example: <a href="/help">Help</a> -->
-            </nav>
-            <hr>
+            </nav> -->
             <div class="user-info">
                 <span id="user-email"></span>
             </div>
@@ -105,7 +99,24 @@
                     <div class="status-section">
                         <h3>Current Project</h3>
                         <div class="status-item">
-                            <a id="project-link" class="value project-link" href="#" target="_blank" rel="noopener noreferrer">--</a>
+
+                            <span id="job-file" class="value">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Weight:</span>
+                            <span id="material-weight" class="value">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Infill:</span>
+                            <span id="material-infill" class="value">--%</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Material:</span>
+                            <span id="material-type" class="value">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Color:</span>
+                            <span id="material-color" class="value">--</span>
                         </div>
                     </div>
 
@@ -124,36 +135,58 @@
 
                     <!-- Job Progress Section -->
                     <div class="status-section">
-                        <h3>Current Job</h3>
-                        <div class="status-item">
-                            <span class="label">File:</span>
-                            <span id="job-file" class="value">--</span>
-                        </div>
+                        <h3>Print Progress</h3>
+
+
                         <div class="status-item">
                             <span class="label">Progress:</span>
                             <span id="job-progress" class="value">--%</span>
                         </div>
                         <div class="status-item">
+                            <span class="label">Speed:</span>
+                            <span id="print-speed" class="value">--</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Layer:</span>
+                            <span id="job-layer" class="value">--</span>
+                        </div>
+                        <div class="status-item">
                             <span class="label">Time Left:</span>
                             <span id="job-time" class="value">--</span>
                         </div>
+                        <div class="status-item">
+                            <span class="label">Elapsed:</span>
+                            <span id="job-duration" class="value">--</span>
+                        </div>
                     </div>
 
-                    <!-- Material Section -->
+                    <!-- Printer Info Section -->
                     <div class="status-section">
-                        <h3>Material</h3>
+                        <h3>Printer Info</h3>
                         <div class="status-item">
-                            <span class="label">Type:</span>
-                            <span id="material-type" class="value">--</span>
+                            <span class="label">Nozzle:</span>
+                            <span id="nozzle-model" class="value">--</span>
+                        </div>
+
+                        <div class="status-item">
+                            <span class="label">Door:</span>
+                            <span id="door-status" class="value">--</span>
                         </div>
                         <div class="status-item">
-                            <span class="label">Color:</span>
-                            <span id="material-color" class="value">--</span>
+                            <span class="label">Light:</span>
+                            <span id="light-status" class="value">--</span>
                         </div>
                     </div>
+
+
+
+
                 </div>
             </div>
         </div>
+
+        <!-- 3D Model Viewer Modal -->
+        <div id="model-viewer-modal" class="model-viewer-modal" style="display: none;"></div>
     </div>
 
     <script>

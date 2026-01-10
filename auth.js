@@ -214,11 +214,8 @@ class GoogleAuth {
 
   // Initialize project information from config
   initProjectInfo() {
-    const projectLink = document.getElementById("project-link");
-    if (CONFIG.PRINTER.CURRENT_PROJECT && CONFIG.PRINTER.CURRENT_PROJECT.NAME) {
-      projectLink.textContent = CONFIG.PRINTER.CURRENT_PROJECT.NAME;
-      projectLink.href = CONFIG.PRINTER.CURRENT_PROJECT.URL || "#";
-    }
+    // No longer needed - project info is now shown via the job filename
+    // which is updated dynamically in updatePrinterUI
   }
 
   // Update printer status UI
@@ -252,16 +249,28 @@ class GoogleAuth {
       }
     }
 
-    // Update temperatures
+    // Update temperatures with targets
     if (status.machine) {
       const tempNozzle = document.getElementById("temp-nozzle");
       const tempBed = document.getElementById("temp-bed");
 
       if (status.machine.NozzleTemp !== undefined) {
-        tempNozzle.textContent = `${Math.round(status.machine.NozzleTemp)}°C`;
+        const current = Math.round(status.machine.NozzleTemp);
+        const target = status.machine.NozzleTargetTemp ? Math.round(status.machine.NozzleTargetTemp) : null;
+        if (target && target > 0) {
+          tempNozzle.innerHTML = `<span class="temp-current">${current}°C</span> <span class="temp-separator">/</span> <span class="temp-target">${target}°C</span>`;
+        } else {
+          tempNozzle.textContent = `${current}°C`;
+        }
       }
       if (status.machine.BedTemp !== undefined) {
-        tempBed.textContent = `${Math.round(status.machine.BedTemp)}°C`;
+        const current = Math.round(status.machine.BedTemp);
+        const target = status.machine.BedTargetTemp ? Math.round(status.machine.BedTargetTemp) : null;
+        if (target && target > 0) {
+          tempBed.innerHTML = `<span class="temp-current">${current}°C</span> <span class="temp-separator">/</span> <span class="temp-target">${target}°C</span>`;
+        } else {
+          tempBed.textContent = `${current}°C`;
+        }
       }
     }
 
@@ -270,32 +279,113 @@ class GoogleAuth {
       const jobFile = document.getElementById("job-file");
       const jobProgress = document.getElementById("job-progress");
       const jobTime = document.getElementById("job-time");
+      const jobDuration = document.getElementById("job-duration");
+      const jobLayer = document.getElementById("job-layer");
 
-      if (status.job.FileName) {
-        jobFile.textContent = status.job.FileName;
+      if (status.job.FileName && status.job.FileName !== "--") {
+        // Create clickable link for the filename
+        jobFile.innerHTML = `<a href="#" class="model-viewer-link" data-filename="${status.job.FileName}">${status.job.FileName}</a>`;
+
+        // Add click event listener to the link
+        const link = jobFile.querySelector(".model-viewer-link");
+        if (link) {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const fileName = e.target.getAttribute("data-filename");
+            if (window.modelViewer) {
+              window.modelViewer.openModal(fileName);
+            }
+          });
+        }
+      } else {
+        jobFile.textContent = "--";
       }
+
       if (status.job.Progress !== undefined) {
         jobProgress.textContent = `${Math.round(status.job.Progress)}%`;
       }
       if (status.job.TimeRemaining !== undefined) {
         jobTime.textContent = this.formatTime(status.job.TimeRemaining);
       }
+      if (status.job.PrintDuration !== undefined) {
+        jobDuration.textContent = this.formatTime(status.job.PrintDuration);
+      }
+      if (status.job.PrintLayer !== undefined && status.job.TargetPrintLayer !== undefined) {
+        if (status.job.TargetPrintLayer > 0) {
+          jobLayer.textContent = `${status.job.PrintLayer} / ${status.job.TargetPrintLayer}`;
+        } else {
+          jobLayer.textContent = "--";
+        }
+      }
     }
 
     // Update material information
-    if (status.machine) {
+    if (status.machine || status.job) {
       const materialType = document.getElementById("material-type");
       const materialColor = document.getElementById("material-color");
+      const materialWeight = document.getElementById("material-weight");
+      const materialInfill = document.getElementById("material-infill");
 
-      if (status.machine.MaterialType) {
+      if (status.machine && status.machine.MaterialType) {
         materialType.textContent = status.machine.MaterialType;
       }
 
       // Use filament color from config if available, otherwise use API value
       if (CONFIG.PRINTER.FILAMENT && CONFIG.PRINTER.FILAMENT.COLOR) {
         materialColor.textContent = CONFIG.PRINTER.FILAMENT.COLOR;
-      } else if (status.machine.MaterialColor) {
+      } else if (status.machine && status.machine.MaterialColor) {
         materialColor.textContent = status.machine.MaterialColor;
+      }
+
+      // Update material weight and infill
+      if (status.job) {
+        if (status.job.EstimatedWeight !== undefined && status.job.EstimatedWeight > 0) {
+          materialWeight.textContent = `${status.job.EstimatedWeight.toFixed(1)}g`;
+        } else {
+          materialWeight.textContent = "--";
+        }
+
+        if (status.job.FillAmount !== undefined && status.job.FillAmount > 0) {
+          materialInfill.textContent = `${status.job.FillAmount}%`;
+        } else {
+          materialInfill.textContent = "--";
+        }
+      }
+    }
+
+    // Update printer info
+    if (status.machine) {
+      const nozzleModel = document.getElementById("nozzle-model");
+      const printSpeed = document.getElementById("print-speed");
+      const doorStatus = document.getElementById("door-status");
+      const lightStatus = document.getElementById("light-status");
+
+      if (status.machine.NozzleModel) {
+        nozzleModel.textContent = status.machine.NozzleModel;
+      }
+
+      if (status.machine.CurrentPrintSpeed !== undefined && status.machine.CurrentPrintSpeed > 0) {
+        printSpeed.textContent = `${status.machine.CurrentPrintSpeed} mm/s`;
+      } else {
+        printSpeed.textContent = "--";
+      }
+
+      if (status.machine.DoorStatus) {
+        doorStatus.textContent = status.machine.DoorStatus === "open" ? "Open" : "Closed";
+      }
+
+      if (status.machine.LightStatus) {
+        lightStatus.textContent = status.machine.LightStatus === "open" ? "On" : "Off";
+      }
+
+      // Update cumulative statistics (if element exists)
+      const cumulativeTime = document.getElementById("cumulative-time");
+      if (cumulativeTime) {
+        if (status.machine.CumulativePrintTime !== undefined && status.machine.CumulativePrintTime > 0) {
+          cumulativeTime.textContent = `${status.machine.CumulativePrintTime}h`;
+        } else {
+          cumulativeTime.textContent = "--";
+        }
       }
     }
   }

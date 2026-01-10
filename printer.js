@@ -142,9 +142,17 @@ class PrinterStatus {
       this.machineInfo = {
         Status: detail.status || "unknown",
         NozzleTemp: detail.rightTemp || detail.leftTemp || 0,
+        NozzleTargetTemp: detail.rightTargetTemp || detail.leftTargetTemp || 0,
         BedTemp: detail.platTemp || 0,
+        BedTargetTemp: detail.platTargetTemp || 0,
         MaterialType: detail.rightFilamentType || detail.leftFilamentType || "--",
         MaterialColor: "--", // API doesn't provide color
+        NozzleModel: detail.nozzleModel || "--",
+        NozzleStyle: detail.nozzleStyle !== undefined ? detail.nozzleStyle : "--",
+        DoorStatus: detail.doorStatus || "--",
+        LightStatus: detail.lightStatus || "--",
+        CurrentPrintSpeed: detail.currentPrintSpeed || 0,
+        CumulativePrintTime: detail.cumulativePrintTime || 0,
       };
 
       console.log("[PRINTER] Mapped machine info:", this.machineInfo);
@@ -155,6 +163,11 @@ class PrinterStatus {
         FileName: detail.printFileName || "--",
         Progress: detail.printProgress ? Math.round(detail.printProgress * 100) : 0,
         TimeRemaining: detail.estimatedTime ? Math.round(detail.estimatedTime) : 0,
+        PrintDuration: detail.printDuration ? Math.round(detail.printDuration) : 0,
+        PrintLayer: detail.printLayer || 0,
+        TargetPrintLayer: detail.targetPrintLayer || 0,
+        EstimatedWeight: detail.estimatedRightWeight || 0,
+        FillAmount: detail.fillAmount || 0,
       };
 
       console.log("[PRINTER] Job info:", this.jobInfo);
