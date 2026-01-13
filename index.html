@@ -31,6 +31,7 @@
     <!-- Configuration and Auth -->
     <script src="./config.js"></script>
     <script src="./logger.js"></script>
+    <script src="./notifications.js"></script>
     <script src="./printer.js"></script>
     <script type="module" src="./viewer-3d.js"></script>
     <script src="./auth.js"></script>
@@ -40,7 +41,7 @@
     <!-- Login Screen -->
     <div id="login-screen" class="login-screen">
         <div class="login-container">
-            <img class="login-logo" src="./images/feral-lockup.svg" alt="">
+            <img class="login-logo" src="/images/feral-lockup.svg" alt="">
             <h1>3D Printer Stream</h1>
             <p>Sign in with your Google account to view the stream</p>
             <div id="google-signin-button"></div>
@@ -70,7 +71,7 @@
 
     <!-- Stream Container (shown when authenticated) -->
     <div id="stream-container" class="stream-container">
-        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer"><img class="corner" src="./images/feral-corner-bottom-right@2x.png" alt="Your Brand"></a>
+        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer"><img class="corner" src="/images/feral-corner-bottom-right@2x.png" alt="Your Brand"></a>
         <img id="stream-image" src="" alt="3D Printer Stream" class="stream-image">
 
         <!-- Printer Status Overlay -->
@@ -114,10 +115,11 @@
                             <span class="label">Material:</span>
                             <span id="material-type" class="value">--</span>
                         </div>
-                        <div class="status-item">
+
+                        <!-- <div class="status-item">
                             <span class="label">Color:</span>
                             <span id="material-color" class="value">--</span>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Temperature Section -->

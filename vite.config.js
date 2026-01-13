@@ -22,7 +22,7 @@ export default defineConfig({
       name: "copy-js-files",
       closeBundle() {
         // Copy JavaScript files that are loaded via script tags
-        const filesToCopy = ["config.js", "logger.js", "printer.js", "auth.js"];
+        const filesToCopy = ["config.js", "logger.js", "notifications.js", "printer.js", "auth.js"];
         filesToCopy.forEach((file) => {
           try {
             copyFileSync(resolve(file), resolve("dist", file));

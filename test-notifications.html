@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Slack Notifications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #4A154B;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #611f69;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔔 Slack Notification Test</h1>
+    <p>Click the buttons below to test different notification types:</p>
+    
+    <div>
+        <button onclick="testPrintStarted()">🟢 Test Print Started</button>
+        <button onclick="testPrintCompleted()">✅ Test Print Completed</button>
+        <button onclick="testProgress()">📊 Test Progress (50%)</button>
+        <button onclick="testPrintPaused()">⏸️ Test Print Paused</button>
+        <button onclick="testPrintFailed()">❌ Test Print Failed</button>
+    </div>
+    
+    <div id="status" class="status"></div>
+
+    <script src="./config.js"></script>
+    <script src="./notifications.js"></script>
+    <script>
+        // Initialize notification service
+        const notificationService = new NotificationService(
+            CONFIG.SLACK.WEBHOOK_URL,
+            CONFIG.SLACK
+        );
+
+        // Mock printer status data
+        const mockStatus = {
+            printer: {
+                Name: "FlashForge Adventurer 5M Pro"
+            },
+            machine: {
+                Status: "PRINTING",
+                NozzleTemp: 220,
+                NozzleTargetTemp: 220,
+                BedTemp: 60,
+                BedTargetTemp: 60,
+                MaterialType: "PLA"
+            },
+            job: {
+                FileName: "test-benchy.3mf",
+                Progress: 50,
+                TimeRemaining: 1800,
+                PrintDuration: 3600,
+                PrintLayer: 125,
+                TargetPrintLayer: 250,
+                EstimatedWeight: 13.5,
+                FillAmount: 15
+            }
+        };
+
+        function showStatus(message, isSuccess = true) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + (isSuccess ? 'success' : 'error');
+        }
+
+        async function testPrintStarted() {
+            showStatus('Sending print started notification...');
+            const result = await notificationService.notifyPrintStarted(mockStatus);
+            if (result) {
+                showStatus('✅ Print started notification sent! Check your Slack channel.');
+            } else {
+                showStatus('❌ Failed to send notification. Check console for errors.', false);
+            }
+        }
+
+        async function testPrintCompleted() {
+            showStatus('Sending print completed notification...');
+            const completedStatus = {
+                ...mockStatus,
+                job: { ...mockStatus.job, Progress: 100, TimeRemaining: 0 }
+            };
+            const result = await notificationService.notifyPrintCompleted(completedStatus);
+            if (result) {
+                showStatus('✅ Print completed notification sent! Check your Slack channel.');
+            } else {
+                showStatus('❌ Failed to send notification. Check console for errors.', false);
+            }
+        }
+
+        async function testProgress() {
+            showStatus('Sending progress notification...');
+            const result = await notificationService.notifyProgress(mockStatus, 50);
+            if (result) {
+                showStatus('✅ Progress notification sent! Check your Slack channel.');
+            } else {
+                showStatus('❌ Failed to send notification. Check console for errors.', false);
+            }
+        }
+
+        async function testPrintPaused() {
+            showStatus('Sending print paused notification...');
+            const pausedStatus = {
+                ...mockStatus,
+                machine: { ...mockStatus.machine, Status: "PAUSED" }
+            };
+            const result = await notificationService.notifyPrintPaused(pausedStatus);
+            if (result) {
+                showStatus('✅ Print paused notification sent! Check your Slack channel.');
+            } else {
+                showStatus('❌ Failed to send notification. Check console for errors.', false);
+            }
+        }
+
+        async function testPrintFailed() {
+            showStatus('Sending print failed notification...');
+            const failedStatus = {
+                ...mockStatus,
+                job: { ...mockStatus.job, Progress: 35 }
+            };
+            const result = await notificationService.notifyPrintFailed(failedStatus);
+            if (result) {
+                showStatus('✅ Print failed notification sent! Check your Slack channel.');
+            } else {
+                showStatus('❌ Failed to send notification. Check console for errors.', false);
+            }
+        }
+
+        // Show initial status
+        showStatus('Ready to test notifications. Click a button above.');
+    </script>
+</body>
+</html>
+

@@ -27,8 +27,64 @@ class PrinterStatus {
     this.printerInfo = null;
     this.machineInfo = null;
     this.jobInfo = null;
+    this.lastValidJobInfo = null; // Cache for last valid print data
     this.updateInterval = null;
     this.onStatusUpdate = null;
+
+    // State tracking for notifications
+    this.previousState = null;
+    this.previousProgress = 0;
+    this.previousFileName = null;
+    this.milestonesSent = new Set(); // Track which progress milestones we've sent
+
+    // TEMPORARY: Initialize with test data to demonstrate caching feature
+    // TODO: Remove this after testing
+    this.lastValidJobInfo = {
+      FileName: "test-benchy.3mf",
+      Progress: 100,
+      TimeRemaining: 0,
+      PrintDuration: 7245, // 2 hours 45 seconds
+      PrintLayer: 250,
+      TargetPrintLayer: 250,
+      EstimatedWeight: 13.5,
+      FillAmount: 15,
+    };
+    console.log("[PRINTER] Initialized with test cache data:", this.lastValidJobInfo);
+  }
+
+  /**
+   * Parse machine state from status string
+   * Maps the raw status string to a human-readable machine state
+   */
+  parseMachineState(status) {
+    if (!status) return "Unknown";
+
+    const statusLower = status.toLowerCase();
+
+    // Map status strings to machine states based on FlashForge API documentation
+    if (statusLower.includes("ready") || statusLower.includes("idle")) {
+      return "Ready";
+    } else if (statusLower.includes("printing") || statusLower.includes("working")) {
+      return "Printing";
+    } else if (statusLower.includes("heating") || statusLower.includes("preheat")) {
+      return "Heating";
+    } else if (statusLower.includes("pausing")) {
+      return "Pausing";
+    } else if (statusLower.includes("paused")) {
+      return "Paused";
+    } else if (statusLower.includes("calibrat")) {
+      return "Calibrating";
+    } else if (statusLower.includes("cancel")) {
+      return "Cancelled";
+    } else if (statusLower.includes("complet") || statusLower.includes("finish")) {
+      return "Completed";
+    } else if (statusLower.includes("error")) {
+      return "Error";
+    } else if (statusLower.includes("busy")) {
+      return "Busy";
+    } else {
+      return status; // Return original if no match
+    }
   }
 
   /**
@@ -141,6 +197,7 @@ class PrinterStatus {
       // Map the actual API response to expected format
       this.machineInfo = {
         Status: detail.status || "unknown",
+        MachineState: this.parseMachineState(detail.status),
         NozzleTemp: detail.rightTemp || detail.leftTemp || 0,
         NozzleTargetTemp: detail.rightTargetTemp || detail.leftTargetTemp || 0,
         BedTemp: detail.platTemp || 0,
@@ -171,6 +228,21 @@ class PrinterStatus {
       };
 
       console.log("[PRINTER] Job info:", this.jobInfo);
+
+      // Cache valid job data for display when printer goes idle
+      // Only cache if we have a valid filename and some progress
+      if (this.jobInfo.FileName && this.jobInfo.FileName !== "--") {
+        // Check if this is a new print (different filename)
+        const isNewPrint = !this.lastValidJobInfo || this.lastValidJobInfo.FileName !== this.jobInfo.FileName;
+
+        if (isNewPrint) {
+          console.log("[PRINTER] New print detected:", this.jobInfo.FileName);
+        }
+
+        // Always update cache with current job data when we have a valid filename
+        this.lastValidJobInfo = { ...this.jobInfo };
+        console.log("[PRINTER] Cached job info:", this.lastValidJobInfo);
+      }
 
       return this.machineInfo;
     } catch (error) {
@@ -254,8 +326,124 @@ class PrinterStatus {
    */
   async updateStatus() {
     const status = await this.getAllStatus();
+
+    // Detect state changes for notifications
+    this.detectStateChanges(status);
+
     if (this.onStatusUpdate) {
       this.onStatusUpdate(status);
+    }
+  }
+
+  /**
+   * Detect state changes and trigger notifications
+   */
+  detectStateChanges(status) {
+    if (!status || !status.machine || !status.job) {
+      return;
+    }
+
+    const currentState = status.machine.Status;
+    const currentProgress = status.job.Progress || 0;
+    const currentFileName = status.job.FileName;
+
+    // Check if this is a new print (different file)
+    if (currentFileName && currentFileName !== "--" && currentFileName !== this.previousFileName) {
+      console.log("[PRINTER] New print detected:", currentFileName);
+      this.previousFileName = currentFileName;
+      this.milestonesSent.clear(); // Reset milestones for new print
+    }
+
+    // Detect state transitions
+    if (this.previousState !== currentState) {
+      console.log(`[PRINTER] State changed: ${this.previousState} → ${currentState}`);
+
+      // Print started (idle/ready → printing)
+      if (
+        currentState === "PRINTING" &&
+        (this.previousState === "READY" || this.previousState === "IDLE" || this.previousState === null)
+      ) {
+        this.onPrintStarted(status);
+      }
+
+      // Print completed (printing → ready/idle with 100% progress)
+      if (
+        (currentState === "READY" || currentState === "IDLE") &&
+        this.previousState === "PRINTING" &&
+        this.previousProgress >= 99
+      ) {
+        this.onPrintCompleted(status);
+      }
+
+      // Print paused
+      if (currentState === "PAUSED" && this.previousState === "PRINTING") {
+        this.onPrintPaused(status);
+      }
+
+      // Print failed/cancelled (printing → ready/idle with low progress)
+      if (
+        (currentState === "READY" || currentState === "IDLE") &&
+        this.previousState === "PRINTING" &&
+        this.previousProgress < 99 &&
+        this.previousProgress > 0
+      ) {
+        this.onPrintFailed(status);
+      }
+
+      this.previousState = currentState;
+    }
+
+    // Check for progress milestones (25%, 50%, 75%)
+    if (currentState === "PRINTING" && currentProgress > 0) {
+      const milestones = [25, 50, 75];
+      for (const milestone of milestones) {
+        if (currentProgress >= milestone && this.previousProgress < milestone) {
+          if (!this.milestonesSent.has(milestone)) {
+            this.onProgressMilestone(status, milestone);
+            this.milestonesSent.add(milestone);
+          }
+        }
+      }
+    }
+
+    this.previousProgress = currentProgress;
+  }
+
+  /**
+   * Event handlers for state changes (to be overridden or used with callbacks)
+   */
+  onPrintStarted(status) {
+    console.log("[PRINTER] Print started:", status.job.FileName);
+    if (window.notificationService) {
+      window.notificationService.notifyPrintStarted(status);
+    }
+  }
+
+  onPrintCompleted(status) {
+    console.log("[PRINTER] Print completed:", status.job.FileName);
+    if (window.notificationService) {
+      window.notificationService.notifyPrintCompleted(status);
+    }
+  }
+
+  onProgressMilestone(status, milestone) {
+    console.log(`[PRINTER] Progress milestone: ${milestone}%`);
+    if (window.notificationService) {
+      window.notificationService.notifyProgress(status, milestone);
+    }
+  }
+
+  onPrintPaused(status) {
+    console.log("[PRINTER] Print paused");
+    if (window.notificationService) {
+      window.notificationService.notifyPrintPaused(status);
+    }
+  }
+
+  onPrintFailed(status) {
+    console.log("[PRINTER] Print failed/cancelled");
+    if (window.notificationService) {
+      window.notificationService.notifyPrintFailed(status);
     }
   }
 

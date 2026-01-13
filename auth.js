@@ -39,8 +39,8 @@ class GoogleAuth {
         credential: response.credential,
       };
 
-      // Store in session
-      sessionStorage.setItem("user", JSON.stringify(this.user));
+      // Store in localStorage for persistent login
+      localStorage.setItem("user", JSON.stringify(this.user));
 
       // Log the login event
       if (window.activityLogger) {
@@ -99,9 +99,9 @@ class GoogleAuth {
     });
   }
 
-  // Check if user is already signed in (from session)
+  // Check if user is already signed in (from localStorage)
   checkSession() {
-    const storedUser = sessionStorage.getItem("user");
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
       this.user = JSON.parse(storedUser);
 
@@ -124,7 +124,7 @@ class GoogleAuth {
     }
 
     this.user = null;
-    sessionStorage.removeItem("user");
+    localStorage.removeItem("user");
     google.accounts.id.disableAutoSelect();
     this.onAuthStateChanged();
   }
@@ -151,7 +151,7 @@ class GoogleAuth {
 
         // Set up error handler to show offline image
         streamImage.onerror = function () {
-          this.src = "./images/offline.jpg";
+          this.src = "/images/offline.jpg";
           this.onerror = null; // Prevent infinite loop
         };
 
@@ -191,6 +191,14 @@ class GoogleAuth {
     // Initialize static project information from config
     this.initProjectInfo();
 
+    // Initialize notification service
+    if (CONFIG.SLACK && CONFIG.SLACK.WEBHOOK_URL) {
+      window.notificationService = new NotificationService(CONFIG.SLACK.WEBHOOK_URL, CONFIG.SLACK);
+      console.log("[NOTIFICATIONS] Slack notifications enabled");
+    } else {
+      console.warn("[NOTIFICATIONS] Slack webhook not configured");
+    }
+
     // Create printer status instance
     window.printerStatus = new PrinterStatus(CONFIG.PRINTER.IP, CONFIG.PRINTER.SERIAL, CONFIG.PRINTER.CHECK_CODE);
 
@@ -206,7 +214,7 @@ class GoogleAuth {
         console.error("Failed to connect to printer");
         this.updatePrinterUI({
           isConnected: false,
-          error: "Connection failed",
+          error: "Offline",
         });
       }
     });
@@ -249,29 +257,63 @@ class GoogleAuth {
       }
     }
 
-    // Update temperatures with targets
+    // Update temperatures with targets and heating indicators
     if (status.machine) {
       const tempNozzle = document.getElementById("temp-nozzle");
       const tempBed = document.getElementById("temp-bed");
+      const TEMP_THRESHOLD = 5; // degrees C - consider "at temp" when within this range
 
       if (status.machine.NozzleTemp !== undefined) {
         const current = Math.round(status.machine.NozzleTemp);
         const target = status.machine.NozzleTargetTemp ? Math.round(status.machine.NozzleTargetTemp) : null;
+
         if (target && target > 0) {
-          tempNozzle.innerHTML = `<span class="temp-current">${current}°C</span> <span class="temp-separator">/</span> <span class="temp-target">${target}°C</span>`;
+          const isHeating = current < target - TEMP_THRESHOLD;
+          const atTemp = Math.abs(current - target) <= TEMP_THRESHOLD;
+          const heatingIcon = isHeating ? '<span class="heating-icon">🔥</span>' : "";
+          const tempClass = atTemp ? "temp-at-target" : isHeating ? "temp-heating" : "";
+
+          tempNozzle.innerHTML = `${heatingIcon}<span class="temp-current ${tempClass}">${current}°C</span> <span class="temp-separator">/</span> <span class="temp-target">${target}°C</span>`;
         } else {
           tempNozzle.textContent = `${current}°C`;
         }
       }
+
       if (status.machine.BedTemp !== undefined) {
         const current = Math.round(status.machine.BedTemp);
         const target = status.machine.BedTargetTemp ? Math.round(status.machine.BedTargetTemp) : null;
+
         if (target && target > 0) {
-          tempBed.innerHTML = `<span class="temp-current">${current}°C</span> <span class="temp-separator">/</span> <span class="temp-target">${target}°C</span>`;
+          const isHeating = current < target - TEMP_THRESHOLD;
+          const atTemp = Math.abs(current - target) <= TEMP_THRESHOLD;
+          const heatingIcon = isHeating ? '<span class="heating-icon">🔥</span>' : "";
+          const tempClass = atTemp ? "temp-at-target" : isHeating ? "temp-heating" : "";
+
+          tempBed.innerHTML = `${heatingIcon}<span class="temp-current ${tempClass}">${current}°C</span> <span class="temp-separator">/</span> <span class="temp-target">${target}°C</span>`;
         } else {
           tempBed.textContent = `${current}°C`;
         }
       }
+    }
+
+    // Determine if printer is idle and we should use cached data
+    const printerIsIdle =
+      status.machine &&
+      (status.machine.Status.toLowerCase().includes("ready") || status.machine.Status.toLowerCase().includes("idle"));
+    const currentJobEmpty = !status.job || !status.job.FileName || status.job.FileName === "--";
+
+    console.log("[UI] Cache check - printerIsIdle:", printerIsIdle, "currentJobEmpty:", currentJobEmpty);
+    console.log("[UI] status.machine:", status.machine);
+    console.log("[UI] status.job:", status.job);
+    console.log("[UI] window.printerStatus.lastValidJobInfo:", window.printerStatus?.lastValidJobInfo);
+
+    // Use cached data if printer is idle and current job is empty
+    let displayJob = status.job;
+    if (printerIsIdle && currentJobEmpty && window.printerStatus && window.printerStatus.lastValidJobInfo) {
+      console.log("[UI] ✅ Printer idle, using cached job data:", window.printerStatus.lastValidJobInfo);
+      displayJob = window.printerStatus.lastValidJobInfo;
+    } else {
+      console.log("[UI] ❌ Not using cache - conditions not met");
     }
 
     // Update job information
@@ -282,9 +324,9 @@ class GoogleAuth {
       const jobDuration = document.getElementById("job-duration");
       const jobLayer = document.getElementById("job-layer");
 
-      if (status.job.FileName && status.job.FileName !== "--") {
+      if (displayJob.FileName && displayJob.FileName !== "--") {
         // Create clickable link for the filename
-        jobFile.innerHTML = `<a href="#" class="model-viewer-link" data-filename="${status.job.FileName}">${status.job.FileName}</a>`;
+        jobFile.innerHTML = `<a href="#" class="model-viewer-link" data-filename="${displayJob.FileName}">${displayJob.FileName}</a>`;
 
         // Add click event listener to the link
         const link = jobFile.querySelector(".model-viewer-link");
@@ -301,18 +343,18 @@ class GoogleAuth {
         jobFile.textContent = "--";
       }
 
-      if (status.job.Progress !== undefined) {
-        jobProgress.textContent = `${Math.round(status.job.Progress)}%`;
+      if (displayJob.Progress !== undefined) {
+        jobProgress.textContent = `${Math.round(displayJob.Progress)}%`;
       }
-      if (status.job.TimeRemaining !== undefined) {
-        jobTime.textContent = this.formatTime(status.job.TimeRemaining);
+      if (displayJob.TimeRemaining !== undefined) {
+        jobTime.textContent = this.formatTime(displayJob.TimeRemaining);
       }
-      if (status.job.PrintDuration !== undefined) {
-        jobDuration.textContent = this.formatTime(status.job.PrintDuration);
+      if (displayJob.PrintDuration !== undefined) {
+        jobDuration.textContent = this.formatTime(displayJob.PrintDuration);
       }
-      if (status.job.PrintLayer !== undefined && status.job.TargetPrintLayer !== undefined) {
-        if (status.job.TargetPrintLayer > 0) {
-          jobLayer.textContent = `${status.job.PrintLayer} / ${status.job.TargetPrintLayer}`;
+      if (displayJob.PrintLayer !== undefined && displayJob.TargetPrintLayer !== undefined) {
+        if (displayJob.TargetPrintLayer > 0) {
+          jobLayer.textContent = `${displayJob.PrintLayer} / ${displayJob.TargetPrintLayer}`;
         } else {
           jobLayer.textContent = "--";
         }
@@ -331,22 +373,25 @@ class GoogleAuth {
       }
 
       // Use filament color from config if available, otherwise use API value
-      if (CONFIG.PRINTER.FILAMENT && CONFIG.PRINTER.FILAMENT.COLOR) {
-        materialColor.textContent = CONFIG.PRINTER.FILAMENT.COLOR;
-      } else if (status.machine && status.machine.MaterialColor) {
-        materialColor.textContent = status.machine.MaterialColor;
+      if (materialColor) {
+        if (CONFIG.PRINTER.FILAMENT && CONFIG.PRINTER.FILAMENT.COLOR) {
+          materialColor.textContent = CONFIG.PRINTER.FILAMENT.COLOR;
+        } else if (status.machine && status.machine.MaterialColor) {
+          materialColor.textContent = status.machine.MaterialColor;
+        }
       }
 
-      // Update material weight and infill
-      if (status.job) {
-        if (status.job.EstimatedWeight !== undefined && status.job.EstimatedWeight > 0) {
-          materialWeight.textContent = `${status.job.EstimatedWeight.toFixed(1)}g`;
+      // Update material weight and infill - use displayJob if available
+      const jobDataForMaterial = displayJob || status.job;
+      if (jobDataForMaterial) {
+        if (jobDataForMaterial.EstimatedWeight !== undefined && jobDataForMaterial.EstimatedWeight > 0) {
+          materialWeight.textContent = `${jobDataForMaterial.EstimatedWeight.toFixed(1)}g`;
         } else {
           materialWeight.textContent = "--";
         }
 
-        if (status.job.FillAmount !== undefined && status.job.FillAmount > 0) {
-          materialInfill.textContent = `${status.job.FillAmount}%`;
+        if (jobDataForMaterial.FillAmount !== undefined && jobDataForMaterial.FillAmount > 0) {
+          materialInfill.textContent = `${jobDataForMaterial.FillAmount}%`;
         } else {
           materialInfill.textContent = "--";
         }

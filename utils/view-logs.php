@@ -9,10 +9,11 @@
  */
 
 // Configuration
-define('LOG_DIR', '/volume1/web/3d.feralcreative.co/logs');
+// Use /app/logs in Docker container, fallback to NAS path if not in container
+define('LOG_DIR', file_exists('/app/logs') ? '/app/logs' : '/volume1/web/3d.feralcreative.co/logs');
 
 // Simple authentication (change this password!)
-define('ADMIN_PASSWORD', 'your_secure_password_here');
+define('ADMIN_PASSWORD', '12345');
 
 // Check authentication
 session_start();
@@ -33,9 +34,12 @@ if (isset($_GET['logout'])) {
 }
 
 // Get action
-$action = $_GET['action'] ?? 'list';
+$action = $_GET['action'] ?? 'all';
 
 switch ($action) {
+    case 'all':
+        showAllLogs();
+        break;
     case 'list':
         showLogList();
         break;
@@ -49,7 +53,7 @@ switch ($action) {
         downloadLog($_GET['file'] ?? '');
         break;
     default:
-        showLogList();
+        showAllLogs();
 }
 
 function showLoginForm() {
@@ -79,10 +83,29 @@ function showLoginForm() {
     <?php
 }
 
-function showLogList() {
+function showAllLogs() {
     $files = glob(LOG_DIR . '/activity-*.jsonl');
     rsort($files); // Most recent first
-    
+
+    // Load all logs from all files
+    $allLogs = [];
+    foreach ($files as $file) {
+        $lines = file($file, FILE_IGNORE_NEW_LINES);
+        foreach ($lines as $line) {
+            $log = json_decode($line);
+            if ($log) {
+                $allLogs[] = $log;
+            }
+        }
+    }
+
+    // Sort by timestamp, most recent first
+    usort($allLogs, function($a, $b) {
+        $timeA = strtotime($a->timestamp ?? '');
+        $timeB = strtotime($b->timestamp ?? '');
+        return $timeB - $timeA;
+    });
+
     ?>
     <!DOCTYPE html>
     <html>
@@ -90,8 +113,94 @@ function showLogList() {
         <title>Activity Logs</title>
         <style>
             body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; }
+            .container { max-width: 1600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; }
+            h1 { color: #333; }
+            .nav { margin-bottom: 1rem; }
+            .nav a { color: #007bff; text-decoration: none; margin-right: 1rem; }
+            .nav a:hover { text-decoration: underline; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9em; }
+            th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background: #f8f9fa; font-weight: 600; position: sticky; top: 0; }
+            tr:hover { background: #f8f9fa; }
+            .event-login { color: #28a745; font-weight: 600; }
+            .event-logout { color: #dc3545; font-weight: 600; }
+            .event-heartbeat { color: #6c757d; }
+            .logout { float: right; }
+            .timestamp { white-space: nowrap; }
+            .email { font-family: monospace; font-size: 0.85em; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Activity Logs <a href="?logout=1" class="logout">Logout</a></h1>
+            <div class="nav">
+                <a href="?action=all">All Logs</a>
+                <a href="?action=list">By Date</a>
+                <a href="?action=stats&file=all">Statistics</a>
+            </div>
+            <p>Total entries: <?= count($allLogs) ?></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Event</th>
+                        <th>User</th>
+                        <th>Name</th>
+                        <th>Session ID</th>
+                        <th>Duration</th>
+                        <th>IP Address</th>
+                        <th>Browser</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($allLogs as $log):
+                        $eventClass = 'event-' . ($log->event ?? 'unknown');
+                        $timestamp = date('Y-m-d H:i:s', strtotime($log->timestamp ?? ''));
+                        $email = $log->user->email ?? 'N/A';
+                        $name = $log->user->name ?? 'N/A';
+                        $sessionId = substr($log->sessionId ?? 'N/A', 0, 12) . '...';
+                        $duration = isset($log->sessionDurationFormatted) ? $log->sessionDurationFormatted : (isset($log->sessionDuration) ? $log->sessionDuration . 's' : '-');
+                        $ip = $log->server->ip ?? 'N/A';
+                        $browser = isset($log->browser->browser) ? $log->browser->browser . ' ' . ($log->browser->browserVersion ?? '') : 'N/A';
+                        $location = isset($log->geolocation->city) ? $log->geolocation->city . ', ' . ($log->geolocation->country ?? '') : 'N/A';
+                    ?>
+                    <tr>
+                        <td class="timestamp"><?= htmlspecialchars($timestamp) ?></td>
+                        <td class="<?= $eventClass ?>"><?= strtoupper($log->event ?? 'UNKNOWN') ?></td>
+                        <td class="email"><?= htmlspecialchars($email) ?></td>
+                        <td><?= htmlspecialchars($name) ?></td>
+                        <td><?= htmlspecialchars($sessionId) ?></td>
+                        <td><?= htmlspecialchars($duration) ?></td>
+                        <td><?= htmlspecialchars($ip) ?></td>
+                        <td><?= htmlspecialchars($browser) ?></td>
+                        <td><?= htmlspecialchars($location) ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>
+    <?php
+}
+
+function showLogList() {
+    $files = glob(LOG_DIR . '/activity-*.jsonl');
+    rsort($files); // Most recent first
+
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Activity Logs - By Date</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; }
             .container { max-width: 1200px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; }
             h1 { color: #333; }
+            .nav { margin-bottom: 1rem; }
+            .nav a { color: #007bff; text-decoration: none; margin-right: 1rem; }
+            .nav a:hover { text-decoration: underline; }
             table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
             th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #ddd; }
             th { background: #f8f9fa; font-weight: 600; }
@@ -103,6 +212,10 @@ function showLogList() {
     <body>
         <div class="container">
             <h1>Activity Logs <a href="?logout=1" class="logout">Logout</a></h1>
+            <div class="nav">
+                <a href="?action=all">All Logs</a>
+                <a href="?action=list">By Date</a>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -112,7 +225,7 @@ function showLogList() {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($files as $file): 
+                    <?php foreach ($files as $file):
                         $filename = basename($file);
                         $size = filesize($file);
                         $sizeFormatted = formatBytes($size);

@@ -257,7 +257,10 @@ class ModelViewer {
     // Close button
     const closeButton = this.modalElement.querySelector(".model-viewer-close");
     if (closeButton) {
-      closeButton.addEventListener("click", () => this.closeModal());
+      closeButton.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent click from bubbling to document
+        this.closeModal();
+      });
     }
 
     // Toolbar buttons
@@ -274,6 +277,8 @@ class ModelViewer {
     // ESC key
     const escHandler = (e) => {
       if (e.key === "Escape" && this.isOpen) {
+        e.stopPropagation(); // Prevent event from bubbling
+        e.preventDefault(); // Prevent default ESC behavior
         this.closeModal();
       }
     };
@@ -282,9 +287,18 @@ class ModelViewer {
     // Backdrop click (click outside modal content)
     this.modalElement.addEventListener("click", (e) => {
       if (e.target === this.modalElement) {
+        e.stopPropagation(); // Prevent click from bubbling to document
         this.closeModal();
       }
     });
+
+    // Prevent clicks on modal content from bubbling to backdrop
+    const modalContent = this.modalElement.querySelector(".model-viewer-content");
+    if (modalContent) {
+      modalContent.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent clicks inside modal from reaching backdrop handler
+      });
+    }
   }
 
   /**

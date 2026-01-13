@@ -28,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Configuration
-define('LOG_DIR', '/volume1/web/3d.feralcreative.co/logs');
+// Use /app/logs in Docker container, fallback to NAS path if not in container
+define('LOG_DIR', file_exists('/app/logs') ? '/app/logs' : '/volume1/web/3d.feralcreative.co/logs');
 define('MAX_LOG_SIZE', 10 * 1024 * 1024); // 10MB per file
 
 // Ensure log directory exists
@@ -83,4 +84,3 @@ echo json_encode([
     'timestamp' => date('c'),
     'event' => $logData['event'] ?? 'unknown',
 ]);
-

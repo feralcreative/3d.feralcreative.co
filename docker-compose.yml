@@ -6,6 +6,7 @@ services:
     network_mode: host
     volumes:
       - /volume1/web/3d-printer-stream/data:/app/data
+      - /volume1/web/3d-printer-stream/logs:/app/logs
     environment:
       - NODE_ENV=production
     logging:

@@ -301,6 +301,7 @@ docker images 3d-printer-stream:latest
 - **Authentication**: Google Sign-In API (OAuth 2.0)
 - **Video Stream**: MJPEG from Synology Surveillance Station
 - **Printer API**: FlashForge Adventurer 5M Pro HTTP API
+- **3D Model Viewer**: [Online 3D Viewer](https://github.com/kovacsv/online3dviewer) by Viktor Kovacs
 - **Printer Proxy**: Node.js + Express (runs in Docker on port 6199)
 - **Deployment**: Docker + Docker Compose on Synology NAS
 - **Reverse Proxy**: Synology (printer.yourdomain.com → localhost:6199)
@@ -348,6 +349,21 @@ The FlashForge printer's HTTP API doesn't support CORS, preventing direct browse
 - Runs on the same network as the printer
 - Provides verbose logging for troubleshooting
 - Validates and routes requests to the correct printer endpoints
+
+## Acknowledgments
+
+This project uses the [FlashForge TypeScript API](https://github.com/GhostTypes/ff-5mp-api-ts) by GhostTypes as a reference for understanding the FlashForge Adventurer 5M Pro HTTP API. The API was created through reverse-engineering the communication between FlashForge printers and their official software.
+
+The FlashForge TypeScript API provides:
+
+- Comprehensive documentation of the HTTP and TCP protocols used by FlashForge printers
+- Support for Adventurer 5M/5M Pro, 5X, and legacy Adventurer 3/4 models
+- Full job control (start, stop, pause, resume)
+- File management and upload capabilities
+- Real-time printer status and job information
+- LED control and direct G-code execution
+
+While this project implements its own lightweight proxy server for browser compatibility, the FlashForge TypeScript API documentation was invaluable for understanding the printer's communication protocol.
 
 ## License
 
