@@ -20,6 +20,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.22.1",
+    "form-data": "^4.0.5",
+    "multer": "^2.0.2",
+    "node-stl": "^0.7.3",
     "online-3d-viewer": "^0.18.0"
   },
   "devDependencies": {

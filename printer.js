@@ -38,9 +38,8 @@ class PrinterStatus {
     this.milestonesSent = new Set(); // Track which progress milestones we've sent
 
     // TEMPORARY: Initialize with test data to demonstrate caching feature
-    // TODO: Remove this after testing
     this.lastValidJobInfo = {
-      FileName: "test-benchy.3mf",
+      FileName: "no-model-loaded.3mf",
       Progress: 100,
       TimeRemaining: 0,
       PrintDuration: 7245, // 2 hours 45 seconds

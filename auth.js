@@ -74,6 +74,44 @@ class GoogleAuth {
     });
   }
 
+  // Check if user has upload permissions
+  canUpload(email) {
+    // If no upload restrictions configured, deny by default for security
+    if (!CONFIG.UPLOAD_ALLOWED_EMAILS || CONFIG.UPLOAD_ALLOWED_EMAILS.length === 0) {
+      return false;
+    }
+
+    // Check against upload allowed emails/domains
+    return CONFIG.UPLOAD_ALLOWED_EMAILS.some((allowed) => {
+      if (allowed.startsWith("@")) {
+        // Domain check
+        return email.endsWith(allowed);
+      } else {
+        // Exact email check
+        return email === allowed;
+      }
+    });
+  }
+
+  // Check if user has access to advanced features
+  hasAdvancedFeatures(email) {
+    // If no advanced features list configured, deny by default
+    if (!CONFIG.ADVANCED_FEATURES || CONFIG.ADVANCED_FEATURES.length === 0) {
+      return false;
+    }
+
+    // Check against advanced features allowed emails/domains
+    return CONFIG.ADVANCED_FEATURES.some((allowed) => {
+      if (allowed.startsWith("@")) {
+        // Domain check
+        return email.endsWith(allowed);
+      } else {
+        // Exact email check
+        return email === allowed;
+      }
+    });
+  }
+
   // Parse JWT token
   parseJwt(token) {
     const base64Url = token.split(".")[1];
@@ -84,7 +122,7 @@ class GoogleAuth {
         .map((c) => {
           return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
         })
-        .join("")
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   }
@@ -136,6 +174,8 @@ class GoogleAuth {
     const hamburgerMenu = document.getElementById("hamburger-menu");
     const userEmail = document.getElementById("user-email");
     const streamImage = document.getElementById("stream-image");
+    const uploadBtn = document.getElementById("upload-btn");
+    const prepFilamentBtn = document.getElementById("prep-filament-btn");
 
     if (this.user) {
       // User is signed in
@@ -143,6 +183,24 @@ class GoogleAuth {
       streamContainer.style.display = "flex";
       hamburgerMenu.style.display = "block";
       userEmail.textContent = this.user.email;
+
+      // Show/hide upload button based on permissions
+      if (uploadBtn) {
+        if (this.canUpload(this.user.email)) {
+          uploadBtn.style.display = "flex";
+        } else {
+          uploadBtn.style.display = "none";
+        }
+      }
+
+      // Show/hide filament change prep button based on advanced features access
+      if (prepFilamentBtn) {
+        if (this.hasAdvancedFeatures(this.user.email)) {
+          prepFilamentBtn.style.display = "flex";
+        } else {
+          prepFilamentBtn.style.display = "none";
+        }
+      }
 
       // Set the appropriate stream URL based on environment (only once)
       if (!this.streamUrlSet) {
@@ -325,15 +383,17 @@ class GoogleAuth {
       const jobLayer = document.getElementById("job-layer");
 
       if (displayJob.FileName && displayJob.FileName !== "--") {
-        // Create clickable link for the filename
-        jobFile.innerHTML = `<a href="#" class="model-viewer-link" data-filename="${displayJob.FileName}">${displayJob.FileName}</a>`;
+        // Create "View Model" button with 3D rotation icon
+        jobFile.innerHTML = `<button class="view-model-btn" data-filename="${displayJob.FileName}">
+          View <span class="material-icons">3d_rotation</span> Model
+        </button>`;
 
-        // Add click event listener to the link
-        const link = jobFile.querySelector(".model-viewer-link");
-        if (link) {
-          link.addEventListener("click", (e) => {
+        // Add click event listener to the button
+        const button = jobFile.querySelector(".view-model-btn");
+        if (button) {
+          button.addEventListener("click", (e) => {
             e.preventDefault();
-            const fileName = e.target.getAttribute("data-filename");
+            const fileName = e.currentTarget.getAttribute("data-filename");
             if (window.modelViewer) {
               window.modelViewer.openModal(fileName);
             }

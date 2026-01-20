@@ -10,6 +10,7 @@ Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer with rea
 - **Google OAuth Authentication** - Secure access with email whitelisting
 - **Real-time Printer Status** - Temperature, progress, and print information overlay
 - **3D Model Viewer** - View current print model in 3D by clicking the filename
+- **File Upload with STL Repair** - Upload files directly to printer with automatic STL repair using ADMesh
 - **Responsive Design** - Works on desktop and mobile devices
 - **Dev Mode** - Bypass authentication on localhost for development
 - **Docker Deployment** - Containerized deployment to Synology NAS
@@ -59,6 +60,115 @@ cp my-awesome-print.stl public/models/
 ```
 
 **Note**: The viewer automatically strips the extension and looks for a `.stl` file. If the file is not found, an error message will be displayed.
+
+## STL File Upload & Repair
+
+The application includes a built-in file upload system with automatic STL repair functionality powered by ADMesh.
+
+### Features
+
+- **Drag & Drop Upload** - Upload STL, 3MF, GX, and GCODE files directly to the printer
+- **Automatic STL Repair** - Fixes common issues in STL files before printing:
+  - Inverted normals (faces pointing the wrong direction)
+  - Non-manifold edges (edges shared by more than two faces)
+  - Holes in the mesh
+  - Incorrect normal values
+- **Optional Repair** - Toggle automatic repair on/off per upload
+- **Print Options** - Start printing immediately and/or level bed before printing
+- **File Validation** - Checks file type and size (max 500MB)
+- **Progress Feedback** - Real-time status updates during upload and repair
+
+### Installation Requirements
+
+ADMesh must be installed on the server running the printer proxy:
+
+```bash
+# On macOS (development)
+brew install admesh
+
+# On Linux (production/Docker)
+apt-get install admesh
+```
+
+**Verify installation:**
+
+```bash
+admesh --version
+# Should output: ADMesh - version 0.98.5 (or similar)
+```
+
+### How to Use
+
+1. **Sign in** to the application with your authorized Google account
+2. **Click the hamburger menu** (three lines) in the top-left corner
+3. **Click "Upload File"** to open the upload modal
+4. **Select or drag & drop** your file (STL, 3MF, GX, or GCODE)
+5. **Configure options:**
+   - ✅ **Automatically repair STL files** (recommended, enabled by default)
+   - ⬜ **Start printing immediately** (optional)
+   - ⬜ **Level bed before printing** (optional)
+6. **Click "Upload"** to send the file to the printer
+
+### What Gets Fixed
+
+ADMesh automatically repairs the following issues in STL files:
+
+- **Inverted Normals**: Ensures all face normals point outward
+- **Non-Manifold Edges**: Fixes edges shared by more than two faces
+- **Holes**: Attempts to close holes in the mesh
+- **Degenerate Facets**: Removes zero-area triangles
+- **Normal Values**: Recalculates normal vectors for accuracy
+
+### Troubleshooting
+
+#### "ADMesh not installed" Error
+
+**Cause**: ADMesh is not installed or not in the system PATH
+
+**Solution**:
+
+```bash
+# Install ADMesh
+brew install admesh  # macOS
+# or
+apt-get install admesh  # Linux
+
+# Verify installation
+which admesh
+admesh --version
+```
+
+#### Upload Fails with "Invalid file type"
+
+**Cause**: File extension is not supported
+
+**Solution**: Only these file types are supported:
+
+- `.stl` - STL files (ASCII or binary)
+- `.3mf` - 3MF files (from Orca Slicer, PrusaSlicer, etc.)
+- `.gx` - FlashForge proprietary format
+- `.gcode` - Standard G-code files
+
+#### Repair Takes Too Long
+
+**Cause**: Large or complex STL files can take time to repair
+
+**Solution**:
+
+- Wait for the repair to complete (usually < 30 seconds)
+- For very large files, consider disabling automatic repair
+- Simplify the model in your CAD software before exporting
+
+#### File Uploads But Doesn't Appear on Printer
+
+**Cause**: Printer may not have received the file or is busy
+
+**Solution**:
+
+- Check printer status overlay for errors
+- Verify printer is connected to the network
+- Try uploading again
+- Check printer's local file list on the printer's touchscreen
 
 ## Quick Start
 

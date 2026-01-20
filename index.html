@@ -25,6 +25,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <!-- Google Sign-In API -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -58,10 +61,25 @@
         </button>
         <div id="menu-dropdown" class="menu-dropdown">
 
-            <!-- <nav class="menu-links">
-
-
-            </nav> -->
+            <nav class="menu-links">
+                <button id="upload-btn" class="menu-btn" onclick="openUploadModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload File
+                </button>
+                <button id="prep-filament-btn" class="menu-btn" onclick="prepForFilamentChange()" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    Prep for Filament Change
+                </button>
+            </nav>
+            <hr>
             <div class="user-info">
                 <span id="user-email"></span>
             </div>
@@ -191,6 +209,62 @@
         <div id="model-viewer-modal" class="model-viewer-modal" style="display: none;"></div>
     </div>
 
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="upload-modal" style="display: none;">
+        <div class="upload-modal-content">
+            <div class="upload-modal-header">
+                <h2>Upload File to Printer</h2>
+                <button class="upload-modal-close" onclick="closeUploadModal()">&times;</button>
+            </div>
+            <div class="upload-modal-body">
+                <div class="upload-dropzone" id="upload-dropzone">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Drag & drop your file here or click to browse</p>
+                    <p class="upload-hint">Supported: STL, 3MF, GX, GCODE (max 500MB)</p>
+                    <input type="file" id="file-input" accept=".stl,.3mf,.gx,.gcode" style="display: none;">
+                </div>
+
+                <div id="file-info" class="file-info" style="display: none;">
+                    <p><strong>Selected file:</strong> <span id="file-name"></span></p>
+                    <p><strong>Size:</strong> <span id="file-size"></span></p>
+                </div>
+
+                <div class="upload-options">
+                    <label class="upload-checkbox">
+                        <input type="checkbox" id="auto-repair" checked>
+                        <span>Automatically repair STL files</span>
+                    </label>
+                    <label class="upload-checkbox">
+                        <input type="checkbox" id="start-print">
+                        <span>Start printing immediately</span>
+                    </label>
+                    <label class="upload-checkbox">
+                        <input type="checkbox" id="level-before-print">
+                        <span>Level bed before printing</span>
+                    </label>
+                </div>
+
+                <div id="upload-status" class="upload-status" style="display: none;">
+                    <div class="upload-progress">
+                        <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                    </div>
+                    <p id="upload-status-text">Uploading...</p>
+                </div>
+
+                <div id="upload-error" class="upload-error" style="display: none;"></div>
+                <div id="upload-success" class="upload-success" style="display: none;"></div>
+            </div>
+            <div class="upload-modal-footer">
+                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button class="btn btn-primary" id="upload-submit-btn" onclick="submitUpload()" disabled>Upload</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleMenu() {
             const dropdown = document.getElementById('menu-dropdown');
@@ -212,6 +286,213 @@
 
         statusToggle.addEventListener('click', function () {
             printerStatus.classList.toggle('collapsed');
+        });
+
+        // Upload Modal Functions
+        let selectedFile = null;
+
+        function openUploadModal() {
+            document.getElementById('upload-modal').style.display = 'flex';
+            // Close hamburger menu
+            document.getElementById('menu-dropdown').classList.remove('open');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('upload-modal').style.display = 'none';
+            resetUploadForm();
+        }
+
+        function resetUploadForm() {
+            selectedFile = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-info').style.display = 'none';
+            document.getElementById('upload-status').style.display = 'none';
+            document.getElementById('upload-error').style.display = 'none';
+            document.getElementById('upload-success').style.display = 'none';
+            document.getElementById('upload-submit-btn').disabled = true;
+            document.getElementById('upload-progress-bar').style.width = '0%';
+        }
+
+        // File input handling
+        const dropzone = document.getElementById('upload-dropzone');
+        const fileInput = document.getElementById('file-input');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            const allowedExtensions = ['.stl', '.3mf', '.gx', '.gcode'];
+            const fileName = file.name.toLowerCase();
+            const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+
+            if (!hasValidExtension) {
+                showError('Invalid file type. Please select an STL, 3MF, GX, or GCODE file.');
+                return;
+            }
+
+            if (file.size > 500 * 1024 * 1024) {
+                showError('File too large. Maximum size is 500MB.');
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            document.getElementById('file-info').style.display = 'block';
+            document.getElementById('upload-submit-btn').disabled = false;
+            document.getElementById('upload-error').style.display = 'none';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        async function submitUpload() {
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('startPrint', document.getElementById('start-print').checked);
+            formData.append('levelBeforePrint', document.getElementById('level-before-print').checked);
+            formData.append('skipRepair', !document.getElementById('auto-repair').checked);
+
+            // Add user email for permission check
+            if (auth && auth.user && auth.user.email) {
+                formData.append('userEmail', auth.user.email);
+            }
+
+            document.getElementById('upload-status').style.display = 'block';
+            document.getElementById('upload-error').style.display = 'none';
+            document.getElementById('upload-success').style.display = 'none';
+            document.getElementById('upload-submit-btn').disabled = true;
+
+            const isSTL = selectedFile.name.toLowerCase().endsWith('.stl');
+            const autoRepair = document.getElementById('auto-repair').checked;
+
+            if (isSTL && autoRepair) {
+                document.getElementById('upload-status-text').textContent = 'Repairing STL file...';
+            } else {
+                document.getElementById('upload-status-text').textContent = 'Uploading...';
+            }
+
+            try {
+                // Determine upload URL based on environment
+                const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const baseUrl = isLocalhost ? CONFIG.PRINTER_PROXY_URL.DEV : CONFIG.PRINTER_PROXY_URL.PROD;
+                const uploadUrl = `${baseUrl}/upload`;
+
+                const response = await fetch(uploadUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.code === 0) {
+                    showSuccess('File uploaded successfully!');
+                    setTimeout(() => {
+                        closeUploadModal();
+                    }, 2000);
+                } else {
+                    showError(result.message || 'Upload failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError('Upload failed: ' + error.message);
+            } finally {
+                document.getElementById('upload-status').style.display = 'none';
+                document.getElementById('upload-submit-btn').disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('upload-error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('upload-success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        // Prep for Filament Change - Advanced Feature
+        async function prepForFilamentChange() {
+            if (!confirm('This will home the printer and move the head to the center for filament change. Continue?')) {
+                return;
+            }
+
+            try {
+                const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const baseUrl = isLocalhost ? CONFIG.PRINTER_PROXY_URL.DEV : CONFIG.PRINTER_PROXY_URL.PROD;
+                const gcodeUrl = `${baseUrl}/gcode`;
+
+                // Get user email for permission check
+                const userEmail = auth && auth.user && auth.user.email ? auth.user.email : null;
+
+                // Send filament change command - server will handle the full sequence
+                console.log('[FILAMENT] Starting filament change sequence...');
+                const response = await fetch(gcodeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        command: 'FILAMENT_CHANGE',
+                        userEmail: userEmail
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.details || 'Failed to execute filament change');
+                }
+
+                const result = await response.json();
+                console.log('[FILAMENT] Response:', result);
+
+                alert('Filament change prep complete!\n\n' +
+                    'The printer has:\n' +
+                    '• Homed all axes\n' +
+                    '• Moved to center position (X110 Y110 Z100)\n\n' +
+                    'The print head is now centered and ready.\n' +
+                    'Use the printer\'s touchscreen to heat and change filament.');
+            } catch (error) {
+                console.error('[FILAMENT] Error:', error);
+                alert('Failed to prep for filament change: ' + error.message);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('upload-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'upload-modal') {
+                closeUploadModal();
+            }
         });
     </script>
 </body>

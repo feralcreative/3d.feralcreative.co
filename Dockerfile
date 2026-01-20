@@ -38,7 +38,10 @@ RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist
 COPY printer-proxy-server.js ./
 
-# Copy PHP utility files
+# Copy utils directory (needed for stl-repair.js and other utilities)
+COPY utils ./utils
+
+# Copy PHP utility files to dist/api
 COPY utils/log.php ./dist/api/
 COPY utils/view-logs.php ./dist/api/
 COPY utils/printer-proxy.php ./dist/api/printer.php
