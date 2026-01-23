@@ -105,9 +105,12 @@ admesh --version
 4. **Select or drag & drop** your file (STL, 3MF, GX, or GCODE)
 5. **Configure options:**
    - ✅ **Automatically repair STL files** (recommended, enabled by default)
-   - ⬜ **Start printing immediately** (optional)
-   - ⬜ **Level bed before printing** (optional)
-6. **Click "Upload"** to send the file to the printer
+   - ⬜ **Send to printer** (disabled by default - if unchecked, will only repair and download)
+     - ⬜ **Start printing immediately** (only if sending to printer)
+     - ⬜ **Level bed before printing** (only if sending to printer)
+6. **Click "Upload"** to process the file
+
+**Default behavior**: The file will be repaired (if STL) and downloaded to your computer. The printer will NOT be touched unless you explicitly check "Send to printer".
 
 ### What Gets Fixed
 
@@ -253,7 +256,6 @@ Update the deployment scripts (`utils/deploy/prod.sh` and `utils/deploy/deploy-u
    ```
 
    This script will:
-
    - Build Docker image locally (linux/amd64 platform)
    - Save and compress the image
    - Transfer image to NAS via SSH
@@ -436,12 +438,10 @@ FlashForge Printer (192.168.1.XXX:8898)
 ### Configuration
 
 1. **Reverse Proxy Rule** (Synology DSM):
-
    - Source: `https://printer.yourdomain.com:443`
    - Destination: `http://localhost:6199`
 
 2. **Docker Container**:
-
    - Image: `3d-printer-stream:latest`
    - Port: 6199 (exposed to host)
    - Runs: `printer-proxy-server.js`

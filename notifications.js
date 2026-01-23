@@ -42,7 +42,8 @@ class NotificationService {
   }
 
   /**
-   * Send notification to Slack
+   * Send notification to Slack via proxy server
+   * This avoids CORS issues by routing through the backend
    */
   async send(message) {
     if (!this.webhookUrl) {
@@ -51,16 +52,22 @@ class NotificationService {
     }
 
     try {
-      const response = await fetch(this.webhookUrl, {
+      // Determine proxy URL based on environment
+      const proxyUrl = window.location.hostname === "localhost" ? "http://localhost:3001/notify" : "/api/notify";
+
+      const response = await fetch(proxyUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(message),
+        body: JSON.stringify({
+          webhookUrl: this.webhookUrl,
+          message: message,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(`Slack API error: ${response.status}`);
+        throw new Error(`Proxy error: ${response.status}`);
       }
 
       console.log("[NOTIFICATIONS] Sent:", message.text || message.blocks?.[0]?.text?.text);
@@ -292,4 +299,3 @@ class NotificationService {
     await this.send(message);
   }
 }
-

@@ -7,6 +7,7 @@ services:
     volumes:
       - /volume1/web/3d-printer-stream/data:/app/data
       - /volume1/web/3d-printer-stream/logs:/app/logs
+      - /volume1/web/3d-printer-stream/public/models:/app/dist/models
     environment:
       - NODE_ENV=production
     logging:

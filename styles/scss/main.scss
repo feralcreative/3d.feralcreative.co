@@ -878,6 +878,15 @@ body {
   &:hover {
     color: white;
   }
+
+  &.upload-checkbox-warning {
+    color: #ffaa00;
+    font-weight: 600;
+
+    &:hover {
+      color: #ffcc00;
+    }
+  }
 }
 
 .upload-status {

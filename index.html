@@ -238,14 +238,21 @@
                         <input type="checkbox" id="auto-repair" checked>
                         <span>Automatically repair STL files</span>
                     </label>
-                    <label class="upload-checkbox">
-                        <input type="checkbox" id="start-print">
-                        <span>Start printing immediately</span>
+                    <hr style="border: 0; border-top: 1px solid #444; margin: 1rem 0;">
+                    <label class="upload-checkbox upload-checkbox-warning">
+                        <input type="checkbox" id="send-to-printer">
+                        <span><strong>Send to printer</strong> (if unchecked, will only repair and download)</span>
                     </label>
-                    <label class="upload-checkbox">
-                        <input type="checkbox" id="level-before-print">
-                        <span>Level bed before printing</span>
-                    </label>
+                    <div id="printer-options" style="display: none; margin-left: 2rem;">
+                        <label class="upload-checkbox">
+                            <input type="checkbox" id="start-print">
+                            <span>Start printing immediately</span>
+                        </label>
+                        <label class="upload-checkbox">
+                            <input type="checkbox" id="level-before-print">
+                            <span>Level bed before printing</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div id="upload-status" class="upload-status" style="display: none;">
@@ -342,6 +349,19 @@
             }
         });
 
+        // Show/hide printer options based on "Send to printer" checkbox
+        document.getElementById('send-to-printer').addEventListener('change', (e) => {
+            const printerOptions = document.getElementById('printer-options');
+            if (e.target.checked) {
+                printerOptions.style.display = 'block';
+            } else {
+                printerOptions.style.display = 'none';
+                // Uncheck printer options when hiding
+                document.getElementById('start-print').checked = false;
+                document.getElementById('level-before-print').checked = false;
+            }
+        });
+
         function handleFileSelect(file) {
             const allowedExtensions = ['.stl', '.3mf', '.gx', '.gcode'];
             const fileName = file.name.toLowerCase();
@@ -374,8 +394,10 @@
         async function submitUpload() {
             if (!selectedFile) return;
 
+            const sendToPrinter = document.getElementById('send-to-printer').checked;
             const formData = new FormData();
             formData.append('file', selectedFile);
+            formData.append('sendToPrinter', sendToPrinter);
             formData.append('startPrint', document.getElementById('start-print').checked);
             formData.append('levelBeforePrint', document.getElementById('level-before-print').checked);
             formData.append('skipRepair', !document.getElementById('auto-repair').checked);
@@ -395,8 +417,10 @@
 
             if (isSTL && autoRepair) {
                 document.getElementById('upload-status-text').textContent = 'Repairing STL file...';
+            } else if (sendToPrinter) {
+                document.getElementById('upload-status-text').textContent = 'Uploading to printer...';
             } else {
-                document.getElementById('upload-status-text').textContent = 'Uploading...';
+                document.getElementById('upload-status-text').textContent = 'Processing file...';
             }
 
             try {
@@ -410,15 +434,36 @@
                     body: formData
                 });
 
-                const result = await response.json();
+                // Check if response is a file download (repair-only mode)
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/octet-stream')) {
+                    // Download the repaired file
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'repaired-file.stl';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(downloadUrl);
 
-                if (response.ok && result.code === 0) {
-                    showSuccess('File uploaded successfully!');
+                    showSuccess('File repaired and downloaded successfully!');
                     setTimeout(() => {
                         closeUploadModal();
                     }, 2000);
                 } else {
-                    showError(result.message || 'Upload failed. Please try again.');
+                    // JSON response (printer upload mode)
+                    const result = await response.json();
+
+                    if (response.ok && (result.code === 0 || result.success)) {
+                        showSuccess(sendToPrinter ? 'File uploaded to printer successfully!' : 'File processed successfully!');
+                        setTimeout(() => {
+                            closeUploadModal();
+                        }, 2000);
+                    } else {
+                        showError(result.message || result.error || 'Upload failed. Please try again.');
+                    }
                 }
             } catch (error) {
                 console.error('Upload error:', error);
