@@ -8,17 +8,17 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:url" content="https://3d.feralcreative.co/">
     <meta property="og:title" content="3D Printer Stream">
     <meta property="og:description" content="Live stream of FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
     <meta property="og:image" content="https://yourdomain.com/images/feral-3d.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://yourdomain.com/">
+    <meta property="twitter:url" content="https://3d.feralcreative./">
     <meta property="twitter:title" content="3D Printer Stream">
     <meta property="twitter:description" content="Live stream of FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
-    <meta property="twitter:image" content="https://yourdomain.com/images/feral-3d.png">
+    <meta property="twitter:image" content="https://3d.feralcreative./images/feral-3d.png">
 
     <link rel="stylesheet" href="./styles/css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +46,7 @@
         <div class="login-container">
             <img class="login-logo" src="/images/feral-lockup.svg" alt="">
             <h1>3D Printer Stream</h1>
-            <p>Sign in with your Google account to view the stream</p>
+            <p>Sign in with your Google account to view the stream.</p>
             <div id="google-signin-button"></div>
             <div id="error-message" class="error-message"></div>
         </div>
@@ -89,7 +89,7 @@
 
     <!-- Stream Container (shown when authenticated) -->
     <div id="stream-container" class="stream-container">
-        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer"><img class="corner" src="/images/feral-corner-bottom-right@2x.png" alt="Your Brand"></a>
+        <a href="https://github.com/feralcreative" target="_blank" rel="noopener noreferrer"><img class="corner" src="/images/feral-corner-bottom-right@2x.png" alt="Your Brand"></a>
         <img id="stream-image" src="" alt="3D Printer Stream" class="stream-image">
 
         <!-- Printer Status Overlay -->
@@ -442,7 +442,19 @@
                     const downloadUrl = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = downloadUrl;
-                    a.download = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'repaired-file.stl';
+
+                    // Parse filename from Content-Disposition header
+                    let filename = 'repaired-file.stl';
+                    const contentDisposition = response.headers.get('content-disposition');
+                    if (contentDisposition) {
+                        // Try to extract filename from header (format: attachment; filename="file.stl")
+                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        if (filenameMatch && filenameMatch[1]) {
+                            filename = filenameMatch[1].replace(/['"]/g, '');
+                        }
+                    }
+                    a.download = filename;
+
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);

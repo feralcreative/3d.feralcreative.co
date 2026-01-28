@@ -300,19 +300,15 @@ class GoogleAuth {
       return;
     }
 
-    // Determine printer state from machine info
-    if (status.machine && status.machine.Status) {
-      const machineStatus = status.machine.Status;
-      if (machineStatus.includes("PRINTING") || machineStatus.includes("WORKING")) {
-        printerState.textContent = "Printing";
-        printerState.className = "status-badge printing";
-      } else if (machineStatus.includes("READY") || machineStatus.includes("IDLE")) {
-        printerState.textContent = "Ready";
-        printerState.className = "status-badge idle";
-      } else {
-        printerState.textContent = machineStatus;
-        printerState.className = "status-badge";
-      }
+    // Use the parsed MachineState from printer.js
+    if (status.machine && status.machine.MachineState) {
+      const state = status.machine.MachineState;
+      printerState.textContent = state;
+      printerState.className = `status-badge ${state.toLowerCase()}`;
+    } else if (status.machine && status.machine.Status) {
+      // Fallback to raw status if MachineState is not available
+      printerState.textContent = status.machine.Status;
+      printerState.className = "status-badge unknown";
     }
 
     // Update temperatures with targets and heating indicators

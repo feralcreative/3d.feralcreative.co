@@ -66,37 +66,12 @@ class ActivityLogger {
     };
   }
 
-  // Get geolocation (if available)
-  async getGeolocation() {
-    return new Promise((resolve) => {
-      if (!navigator.geolocation) {
-        resolve(null);
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-          });
-        },
-        () => {
-          resolve(null);
-        },
-        { timeout: 5000 }
-      );
-    });
-  }
-
   // Log user login
   async logLogin(user) {
     this.sessionStartTime = new Date();
     this.lastActivityTime = new Date();
 
     const browserInfo = this.getBrowserInfo();
-    const geolocation = await this.getGeolocation();
 
     const loginData = {
       event: "login",
@@ -107,7 +82,6 @@ class ActivityLogger {
         name: user.name,
       },
       browser: browserInfo,
-      geolocation: geolocation,
       referrer: document.referrer || "direct",
       url: window.location.href,
     };

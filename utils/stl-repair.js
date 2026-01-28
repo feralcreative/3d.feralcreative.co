@@ -98,12 +98,17 @@ export async function repairSTL(inputPath, outputPath, options = {}) {
   // Get original file size
   const originalSize = await getFileSize(inputPath);
 
-  // Build ADMesh command
+  // Build ADMesh command with aggressive repair options
   // --write-binary-stl: Output as binary STL (more compact)
   // --normal-directions: Fix normals pointing in wrong direction
   // --normal-values: Recalculate normal values
   // --exact: Use exact comparison for degenerate facets
-  const command = `${admeshPath} --write-binary-stl="${outputPath}" --normal-directions --normal-values --exact "${inputPath}"`;
+  // --tolerance: Set tolerance for merging vertices (0.001mm = 1 micron)
+  // --nearby: Merge nearby vertices within tolerance (fixes disconnected edges)
+  // --remove-unconnected: Remove facets with unconnected edges
+  // --fill-holes: Fill holes in the mesh (critical for non-manifold edges)
+  // --iterations: Number of iterations for hole filling (2 passes for thorough repair)
+  const command = `${admeshPath} --write-binary-stl="${outputPath}" --normal-directions --normal-values --exact --tolerance=0.001 --nearby --remove-unconnected --fill-holes --iterations=2 "${inputPath}"`;
 
   if (verbose) {
     console.log(`[STL REPAIR] Running: ${command}`);

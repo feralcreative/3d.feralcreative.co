@@ -400,22 +400,82 @@ body {
     color: $color-fpo;
     border: 1px solid $color-fpo;
 
-    &.printing {
-      background: rgba(0, 255, 0, 0.1);
-      color: #0f0;
-      border-color: #0f0;
-    }
-
+    // Ready/Idle - Yellow
+    &.ready,
     &.idle {
       background: rgba(255, 255, 0, 0.1);
       color: #ff0;
       border-color: #ff0;
     }
 
+    // Printing - Green
+    &.printing {
+      background: rgba(0, 255, 0, 0.1);
+      color: #0f0;
+      border-color: #0f0;
+    }
+
+    // Completed - Bright Green
+    &.completed {
+      background: rgba(0, 255, 0, 0.15);
+      color: #0f0;
+      border-color: #0f0;
+    }
+
+    // Heating - Orange
+    &.heating {
+      background: rgba(255, 165, 0, 0.1);
+      color: #ffa500;
+      border-color: #ffa500;
+    }
+
+    // Calibrating - Blue
+    &.calibrating {
+      background: rgba(0, 150, 255, 0.1);
+      color: #0096ff;
+      border-color: #0096ff;
+    }
+
+    // Pausing - Yellow-Orange
+    &.pausing {
+      background: rgba(255, 200, 0, 0.1);
+      color: #ffc800;
+      border-color: #ffc800;
+    }
+
+    // Paused - Orange
+    &.paused {
+      background: rgba(255, 140, 0, 0.1);
+      color: #ff8c00;
+      border-color: #ff8c00;
+    }
+
+    // Busy - Cyan
+    &.busy {
+      background: rgba(0, 255, 255, 0.1);
+      color: #0ff;
+      border-color: #0ff;
+    }
+
+    // Cancelled - Red
+    &.cancelled {
+      background: rgba(255, 0, 0, 0.15);
+      color: #f00;
+      border-color: #f00;
+    }
+
+    // Error - Red
     &.error {
       background: rgba(255, 0, 0, 0.2);
       color: #f00;
       border-color: #f00;
+    }
+
+    // Unknown - Magenta (default)
+    &.unknown {
+      background: rgba(255, 0, 255, 0.1);
+      color: $color-fpo;
+      border-color: $color-fpo;
     }
   }
 
