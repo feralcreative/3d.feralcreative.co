@@ -13,7 +13,7 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import { access, stat, readFile } from "fs/promises";
-import { constants } from "fs";
+import { constants, unlinkSync } from "fs";
 import NodeStl from "node-stl";
 
 const execAsync = promisify(exec);
@@ -73,17 +73,18 @@ async function getFileSize(filePath) {
 }
 
 /**
- * Repair an STL file using ADMesh
+ * Repair an STL file using ADMesh with progressive repair strategy
  *
  * @param {string} inputPath - Path to the input STL file
  * @param {string} outputPath - Path to save the repaired STL file
  * @param {object} options - Repair options
  * @param {string} options.admeshPath - Path to ADMesh binary (default: 'admesh')
  * @param {boolean} options.verbose - Enable verbose logging (default: false)
+ * @param {string} options.strategy - Repair strategy: 'standard', 'aggressive', 'progressive' (default: 'progressive')
  * @returns {Promise<object>} Repair result with outputPath, originalSize, repairedSize
  */
 export async function repairSTL(inputPath, outputPath, options = {}) {
-  const { admeshPath = "admesh", verbose = false } = options;
+  const { admeshPath = "admesh", verbose = false, strategy = "progressive" } = options;
 
   // Validate input file exists
   if (!(await fileExists(inputPath))) {
@@ -98,36 +99,122 @@ export async function repairSTL(inputPath, outputPath, options = {}) {
   // Get original file size
   const originalSize = await getFileSize(inputPath);
 
-  // Build ADMesh command with aggressive repair options
-  // --write-binary-stl: Output as binary STL (more compact)
-  // --normal-directions: Fix normals pointing in wrong direction
-  // --normal-values: Recalculate normal values
-  // --exact: Use exact comparison for degenerate facets
-  // --tolerance: Set tolerance for merging vertices (0.001mm = 1 micron)
-  // --nearby: Merge nearby vertices within tolerance (fixes disconnected edges)
-  // --remove-unconnected: Remove facets with unconnected edges
-  // --fill-holes: Fill holes in the mesh (critical for non-manifold edges)
-  // --iterations: Number of iterations for hole filling (2 passes for thorough repair)
-  const command = `${admeshPath} --write-binary-stl="${outputPath}" --normal-directions --normal-values --exact --tolerance=0.001 --nearby --remove-unconnected --fill-holes --iterations=2 "${inputPath}"`;
+  let command;
+  let repairAttempts = [];
 
-  if (verbose) {
-    console.log(`[STL REPAIR] Running: ${command}`);
+  if (strategy === "aggressive") {
+    // Aggressive single-pass repair with higher tolerance
+    // Good for models with many small errors
+    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
+    command = `${admeshPath} --write-binary-stl="${outputPath}" --normal-directions --normal-values --exact --tolerance=0.01 --nearby --iterations=5 "${inputPath}"`;
+    repairAttempts.push({ name: "Aggressive", command });
+  } else if (strategy === "standard") {
+    // Standard repair (original approach)
+    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
+    command = `${admeshPath} --write-binary-stl="${outputPath}" --normal-directions --normal-values --exact --tolerance=0.001 --nearby --iterations=2 "${inputPath}"`;
+    repairAttempts.push({ name: "Standard", command });
+  } else {
+    // Progressive repair: try multiple strategies, use the best result
+    // This is the default and most thorough approach
+
+    // Strategy 1: Conservative - tight tolerance, fewer iterations
+    repairAttempts.push({
+      name: "Conservative",
+      command: `${admeshPath} --write-binary-stl="${outputPath}.pass1" --normal-directions --normal-values --exact --tolerance=0.001 --nearby --iterations=2 "${inputPath}"`,
+      outputFile: `${outputPath}.pass1`,
+    });
+
+    // Strategy 2: Moderate - medium tolerance, more iterations
+    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
+    repairAttempts.push({
+      name: "Moderate",
+      command: `${admeshPath} --write-binary-stl="${outputPath}.pass2" --normal-directions --normal-values --exact --tolerance=0.005 --nearby --iterations=4 "${inputPath}"`,
+      outputFile: `${outputPath}.pass2`,
+    });
+
+    // Strategy 3: Aggressive - high tolerance, maximum iterations
+    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
+    repairAttempts.push({
+      name: "Aggressive",
+      command: `${admeshPath} --write-binary-stl="${outputPath}.pass3" --normal-directions --normal-values --exact --tolerance=0.01 --nearby --iterations=6 "${inputPath}"`,
+      outputFile: `${outputPath}.pass3`,
+    });
   }
 
-  try {
-    const { stdout, stderr } = await execAsync(command);
-
-    if (verbose && stdout) {
-      console.log(`[STL REPAIR] ADMesh output:\n${stdout}`);
+  if (strategy === "progressive") {
+    // Run all repair strategies and pick the best one
+    if (verbose) {
+      console.log(`[STL REPAIR] Using progressive repair strategy with ${repairAttempts.length} passes`);
     }
 
-    if (stderr && verbose) {
-      console.log(`[STL REPAIR] ADMesh stderr:\n${stderr}`);
+    let bestResult = null;
+    let bestDisconnectedCount = Infinity;
+
+    for (const attempt of repairAttempts) {
+      try {
+        if (verbose) {
+          console.log(`[STL REPAIR] Trying ${attempt.name} repair...`);
+          console.log(`[STL REPAIR] Command: ${attempt.command}`);
+        }
+
+        const { stdout, stderr } = await execAsync(attempt.command);
+
+        // Parse the output to count disconnected facets
+        const disconnectedMatch = stdout.match(/Total disconnected facets\s*:\s*\d+\s+(\d+)/);
+        const disconnectedCount = disconnectedMatch ? parseInt(disconnectedMatch[1], 10) : Infinity;
+
+        if (verbose) {
+          console.log(`[STL REPAIR] ${attempt.name} result: ${disconnectedCount} disconnected facets`);
+        }
+
+        // Keep track of the best result
+        if (disconnectedCount < bestDisconnectedCount) {
+          bestDisconnectedCount = disconnectedCount;
+          bestResult = {
+            name: attempt.name,
+            outputFile: attempt.outputFile,
+            stdout,
+            stderr,
+            disconnectedCount,
+          };
+        }
+
+        // If we achieved a perfect repair, stop trying
+        if (disconnectedCount === 0) {
+          if (verbose) {
+            console.log(`[STL REPAIR] Perfect repair achieved with ${attempt.name} strategy!`);
+          }
+          break;
+        }
+      } catch (error) {
+        if (verbose) {
+          console.warn(`[STL REPAIR] ${attempt.name} repair failed:`, error.message);
+        }
+        // Continue to next strategy
+      }
     }
 
-    // Verify output file was created
-    if (!(await fileExists(outputPath))) {
-      throw new Error(`ADMesh failed to create output file: ${outputPath}`);
+    if (!bestResult) {
+      throw new Error("All repair strategies failed");
+    }
+
+    // Use the best result
+    if (verbose) {
+      console.log(
+        `[STL REPAIR] Best result: ${bestResult.name} with ${bestResult.disconnectedCount} disconnected facets`,
+      );
+      console.log(`[STL REPAIR] ADMesh output:\n${bestResult.stdout}`);
+    }
+
+    // Copy the best result to the final output path
+    const { copyFile } = await import("fs/promises");
+    await copyFile(bestResult.outputFile, outputPath);
+
+    // Clean up temporary files
+    for (const attempt of repairAttempts) {
+      if (attempt.outputFile && (await fileExists(attempt.outputFile))) {
+        unlinkSync(attempt.outputFile);
+      }
     }
 
     // Get repaired file size
@@ -139,17 +226,59 @@ export async function repairSTL(inputPath, outputPath, options = {}) {
       originalSize,
       repairedSize,
       sizeDifference: repairedSize - originalSize,
-      admeshOutput: stdout,
+      admeshOutput: bestResult.stdout,
+      strategy: bestResult.name,
+      disconnectedFacets: bestResult.disconnectedCount,
     };
-  } catch (error) {
-    console.error("[STL REPAIR] Error:", error.message);
-
-    // Provide more helpful error messages
-    if (error.message.includes("command not found")) {
-      throw new Error("ADMesh not found in PATH. Install with: brew install admesh");
+  } else {
+    // Single-strategy repair (standard or aggressive)
+    if (verbose) {
+      console.log(`[STL REPAIR] Running: ${command}`);
     }
 
-    throw new Error(`STL repair failed: ${error.message}`);
+    try {
+      const { stdout, stderr } = await execAsync(command);
+
+      if (verbose && stdout) {
+        console.log(`[STL REPAIR] ADMesh output:\n${stdout}`);
+      }
+
+      if (stderr && verbose) {
+        console.log(`[STL REPAIR] ADMesh stderr:\n${stderr}`);
+      }
+
+      // Verify output file was created
+      if (!(await fileExists(outputPath))) {
+        throw new Error(`ADMesh failed to create output file: ${outputPath}`);
+      }
+
+      // Get repaired file size
+      const repairedSize = await getFileSize(outputPath);
+
+      // Parse disconnected facets count
+      const disconnectedMatch = stdout.match(/Total disconnected facets\s*:\s*\d+\s+(\d+)/);
+      const disconnectedCount = disconnectedMatch ? parseInt(disconnectedMatch[1], 10) : null;
+
+      return {
+        success: true,
+        outputPath,
+        originalSize,
+        repairedSize,
+        sizeDifference: repairedSize - originalSize,
+        admeshOutput: stdout,
+        strategy,
+        disconnectedFacets: disconnectedCount,
+      };
+    } catch (error) {
+      console.error("[STL REPAIR] Error:", error.message);
+
+      // Provide more helpful error messages
+      if (error.message.includes("command not found")) {
+        throw new Error("ADMesh not found in PATH. Install with: brew install admesh");
+      }
+
+      throw new Error(`STL repair failed: ${error.message}`);
+    }
   }
 }
 

@@ -417,10 +417,10 @@ class PrinterStatus {
       this.previousState = currentState;
     }
 
-    // Check for progress milestones (25%, 50%, 75%)
+    // Check for progress milestones (50% only)
     if (currentState === "Printing" && currentProgress > 0) {
       console.log(`[PRINTER] Checking milestones - Current: ${currentProgress}%, Previous: ${this.previousProgress}%`);
-      const milestones = [25, 50, 75];
+      const milestones = [50];
       for (const milestone of milestones) {
         if (currentProgress >= milestone && this.previousProgress < milestone) {
           if (!this.milestonesSent.has(milestone)) {

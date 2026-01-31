@@ -79,13 +79,15 @@ class NotificationService {
   }
 
   /**
-   * Format temperature display
+   * Format temperature display (rounded to 1 decimal place)
    */
   formatTemp(current, target) {
+    const currentRounded = typeof current === "number" ? current.toFixed(1) : current;
     if (target && target > 0) {
-      return `${current}°C → ${target}°C`;
+      const targetRounded = typeof target === "number" ? target.toFixed(1) : target;
+      return `${currentRounded}°C → ${targetRounded}°C`;
     }
-    return `${current}°C`;
+    return `${currentRounded}°C`;
   }
 
   /**
