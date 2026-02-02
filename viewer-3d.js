@@ -140,7 +140,7 @@ class ModelViewer {
             "images/envmaps/fishermans_bastion/posz.jpg",
             "images/envmaps/fishermans_bastion/negz.jpg",
           ],
-          false
+          false,
         ),
         onModelLoaded: () => {
           this.onModelLoaded();

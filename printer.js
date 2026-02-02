@@ -30,6 +30,7 @@ class PrinterStatus {
     this.lastValidJobInfo = null; // Cache for last valid print data
     this.updateInterval = null;
     this.onStatusUpdate = null;
+    this.isUpdating = false; // Flag to prevent overlapping updates
 
     // State tracking for notifications
     this.previousState = null;
@@ -38,9 +39,8 @@ class PrinterStatus {
     this.milestonesSent = new Set(); // Track which progress milestones we've sent
 
     // TEMPORARY: Initialize with test data to demonstrate caching feature
-    // TODO: Remove this after testing
     this.lastValidJobInfo = {
-      FileName: "test-benchy.3mf",
+      FileName: "no-model-loaded.3mf",
       Progress: 100,
       TimeRemaining: 0,
       PrintDuration: 7245, // 2 hours 45 seconds
@@ -286,7 +286,15 @@ class PrinterStatus {
    */
   async getAllStatus() {
     console.log("[PRINTER] Getting all status...");
-    const [printerInfo, machineInfo] = await Promise.all([this.getPrinterInfo(), this.getMachineInfo()]);
+
+    // Make requests sequentially instead of parallel to avoid overwhelming the printer
+    // FlashForge printers in LAN-only mode can be flaky with simultaneous requests
+    const printerInfo = await this.getPrinterInfo();
+
+    // Small delay between requests to give printer time to process
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const machineInfo = await this.getMachineInfo();
 
     console.log("[PRINTER] All status - printerInfo:", printerInfo);
     console.log("[PRINTER] All status - machineInfo:", machineInfo);
@@ -325,13 +333,26 @@ class PrinterStatus {
    * Update status and call callback
    */
   async updateStatus() {
-    const status = await this.getAllStatus();
+    // Skip if already updating to prevent overlapping requests
+    if (this.isUpdating) {
+      console.log("[PRINTER] Skipping update - previous update still in progress");
+      return;
+    }
 
-    // Detect state changes for notifications
-    this.detectStateChanges(status);
+    this.isUpdating = true;
+    try {
+      const status = await this.getAllStatus();
 
-    if (this.onStatusUpdate) {
-      this.onStatusUpdate(status);
+      // Detect state changes for notifications
+      this.detectStateChanges(status);
+
+      if (this.onStatusUpdate) {
+        this.onStatusUpdate(status);
+      }
+    } catch (error) {
+      console.error("[PRINTER] Error during update:", error);
+    } finally {
+      this.isUpdating = false;
     }
   }
 
@@ -343,9 +364,12 @@ class PrinterStatus {
       return;
     }
 
-    const currentState = status.machine.Status;
+    // Use MachineState (parsed, title case) instead of Status (raw, lowercase)
+    const currentState = status.machine.MachineState;
     const currentProgress = status.job.Progress || 0;
     const currentFileName = status.job.FileName;
+
+    console.log(`[PRINTER] detectStateChanges - State: ${currentState}, Progress: ${currentProgress}%`);
 
     // Check if this is a new print (different file)
     if (currentFileName && currentFileName !== "--" && currentFileName !== this.previousFileName) {
@@ -360,30 +384,30 @@ class PrinterStatus {
 
       // Print started (idle/ready → printing)
       if (
-        currentState === "PRINTING" &&
-        (this.previousState === "READY" || this.previousState === "IDLE" || this.previousState === null)
+        currentState === "Printing" &&
+        (this.previousState === "Ready" || this.previousState === "Idle" || this.previousState === null)
       ) {
         this.onPrintStarted(status);
       }
 
       // Print completed (printing → ready/idle with 100% progress)
       if (
-        (currentState === "READY" || currentState === "IDLE") &&
-        this.previousState === "PRINTING" &&
+        (currentState === "Ready" || currentState === "Idle") &&
+        this.previousState === "Printing" &&
         this.previousProgress >= 99
       ) {
         this.onPrintCompleted(status);
       }
 
       // Print paused
-      if (currentState === "PAUSED" && this.previousState === "PRINTING") {
+      if (currentState === "Paused" && this.previousState === "Printing") {
         this.onPrintPaused(status);
       }
 
       // Print failed/cancelled (printing → ready/idle with low progress)
       if (
-        (currentState === "READY" || currentState === "IDLE") &&
-        this.previousState === "PRINTING" &&
+        (currentState === "Ready" || currentState === "Idle") &&
+        this.previousState === "Printing" &&
         this.previousProgress < 99 &&
         this.previousProgress > 0
       ) {
@@ -393,14 +417,18 @@ class PrinterStatus {
       this.previousState = currentState;
     }
 
-    // Check for progress milestones (25%, 50%, 75%)
-    if (currentState === "PRINTING" && currentProgress > 0) {
-      const milestones = [25, 50, 75];
+    // Check for progress milestones (50% only)
+    if (currentState === "Printing" && currentProgress > 0) {
+      console.log(`[PRINTER] Checking milestones - Current: ${currentProgress}%, Previous: ${this.previousProgress}%`);
+      const milestones = [50];
       for (const milestone of milestones) {
         if (currentProgress >= milestone && this.previousProgress < milestone) {
           if (!this.milestonesSent.has(milestone)) {
+            console.log(`[PRINTER] 🎯 Milestone reached: ${milestone}%`);
             this.onProgressMilestone(status, milestone);
             this.milestonesSent.add(milestone);
+          } else {
+            console.log(`[PRINTER] Milestone ${milestone}% already sent`);
           }
         }
       }

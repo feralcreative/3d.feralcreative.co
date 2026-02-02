@@ -1,0 +1,517 @@
+[UPLOAD] Upload authorized for user: dev@localhost
+[UPLOAD] Received file: window-stop-v3-handle.stl, size: 210584 bytes
+[UPLOAD] Options: sendToPrinter=false (raw: "false", type: string), startPrint=false, levelBeforePrint=false, skipRepair=false
+[UPLOAD] Checking if ADMesh is installed...
+[UPLOAD] Starting STL repair...
+[STL REPAIR] Running: admesh --write-binary-stl="uploads/071694f8a980d09651527f3491e75e24-repaired.stl" --normal-directions --normal-values --exact --tolerance=0.001 --nearby --remove-unconnected --fill-holes --iterations=2 "uploads/071694f8a980d09651527f3491e75e24"
+[STL REPAIR] ADMesh output:
+ADMesh version 0.98.5, Copyright (C) 1995, 1996 Anthony D. Martin
+ADMesh comes with NO WARRANTY.  This is free software, and you are welcome to
+redistribute it under certain conditions.  See the file COPYING for details.
+Opening uploads/071694f8a980d09651527f3491e75e24
+Checking exact...
+Checking nearby. Tolerance= 0.001000 Iteration=1 of 2...  Fixed 0 edges.
+Checking nearby. Tolerance= 0.009144 Iteration=2 of 2...  Fixed 26 edges.
+Removing unconnected facets...
+Filling holes...
+Back to the first facet filling holes: probably a mobius part.
+Try using a smaller tolerance or don't do a nearby check
+Checking normal directions...
+Checking normal values...
+Calculating volume...
+Verifying neighbors...
+edge 2 of facet 443 doesn't match edge 4 of facet 606
+facet (443)/ first facet
+  vertex 0/443  2.20841637E+01  2.95000000E+01  6.00000000E+01
+  vertex 1/443  2.23506527E+01  3.00000000E+01  6.00000000E+01
+  vertex 2/443  2.23268642E+01  2.91348743E+01  6.00000000E+01
+facet (606)/ second facet
+  vertex 0/606  2.20818233E+01  2.94956341E+01  6.00000000E+01
+  vertex 1/606  2.20841637E+01  2.95000000E+01  6.00000000E+01
+  vertex 2/606  2.23268642E+01  2.91348743E+01  6.00000000E+01
+edge 2 of facet 444 doesn't match edge 1 of facet 663
+facet (444)/ first facet
+  vertex 0/444  2.23268642E+01  2.91348743E+01  6.00000000E+01
+  vertex 1/444  2.23506527E+01  3.00000000E+01  6.00000000E+01
+  vertex 2/444  2.26728725E+01  2.85850315E+01  6.00000000E+01
+facet (663)/ second facet
+  vertex 0/663  2.23268642E+01  2.91348743E+01  7.03000031E+01
+  vertex 1/663  2.26728725E+01  2.85850315E+01  6.00000000E+01
+  vertex 2/663  2.23268642E+01  2.91348743E+01  6.00000000E+01
+edge 2 of facet 447 doesn't match edge 1 of facet 667
+facet (447)/ first facet
+  vertex 0/447  2.26728725E+01  2.85850315E+01  6.00000000E+01
+  vertex 1/447  2.27467213E+01  2.94064598E+01  6.00000000E+01
+  vertex 2/447  2.30050488E+01  2.80267220E+01  6.00000000E+01
+facet (667)/ second facet
+  vertex 0/667  2.26728725E+01  2.85850315E+01  7.03000031E+01
+  vertex 1/667  2.30050488E+01  2.80267220E+01  6.00000000E+01
+  vertex 2/667  2.26728725E+01  2.85850315E+01  6.00000000E+01
+edge 2 of facet 449 doesn't match edge 5 of facet 665
+facet (449)/ first facet
+  vertex 0/449  2.30050488E+01  2.80267220E+01  6.00000000E+01
+  vertex 1/449  2.30993786E+01  2.88460503E+01  6.00000000E+01
+  vertex 2/449  2.33231869E+01  2.74602947E+01  6.00000000E+01
+facet (665)/ second facet
+  vertex 0/665  2.33231869E+01  2.74602947E+01  6.00000000E+01
+  vertex 1/665  2.30050488E+01  2.80267220E+01  7.03000031E+01
+  vertex 2/665  2.30050488E+01  2.80267220E+01  6.00000000E+01
+edge 1 of facet 466 doesn't match edge 5 of facet 630
+facet (466)/ first facet
+  vertex 0/466  2.53965225E+01  2.40825844E+01  6.00000000E+01
+  vertex 1/466  2.53409729E+01  2.26799717E+01  6.00000000E+01
+  vertex 2/466  2.55249233E+01  2.20569057E+01  6.00000000E+01
+facet (630)/ second facet
+  vertex 0/630  2.53409729E+01  2.26799717E+01  6.00000000E+01
+  vertex 1/630  2.53368015E+01  2.26786842E+01  6.00000000E+01
+  vertex 2/630  2.55249233E+01  2.20569057E+01  6.00000000E+01
+edge 2 of facet 468 doesn't match edge 1 of facet 707
+facet (468)/ first facet
+  vertex 0/468  2.55249233E+01  2.20569057E+01  6.00000000E+01
+  vertex 1/468  2.56154652E+01  2.34576950E+01  6.00000000E+01
+  vertex 2/468  2.56932640E+01  2.14294415E+01  6.00000000E+01
+facet (707)/ second facet
+  vertex 0/707  2.55249233E+01  2.20569057E+01  7.03000031E+01
+  vertex 1/707  2.56932640E+01  2.14294415E+01  6.00000000E+01
+  vertex 2/707  2.55249233E+01  2.20569057E+01  6.00000000E+01
+edge 2 of facet 470 doesn't match edge 1 of facet 709
+facet (470)/ first facet
+  vertex 0/470  2.56932640E+01  2.14294415E+01  6.00000000E+01
+  vertex 1/470  2.58187428E+01  2.28275337E+01  6.00000000E+01
+  vertex 2/470  2.58458920E+01  2.07979698E+01  6.00000000E+01
+facet (709)/ second facet
+  vertex 0/709  2.56932640E+01  2.14294415E+01  7.03000031E+01
+  vertex 1/709  2.58458920E+01  2.07979698E+01  6.00000000E+01
+  vertex 2/709  2.56932640E+01  2.14294415E+01  6.00000000E+01
+edge 2 of facet 472 doesn't match edge 1 of facet 711
+facet (472)/ first facet
+  vertex 0/472  2.58458920E+01  2.07979698E+01  6.00000000E+01
+  vertex 1/472  2.60062294E+01  2.21924953E+01  6.00000000E+01
+  vertex 2/472  2.59827080E+01  2.01628876E+01  6.00000000E+01
+facet (711)/ second facet
+  vertex 0/711  2.58458920E+01  2.07979698E+01  7.03000031E+01
+  vertex 1/711  2.59827080E+01  2.01628876E+01  6.00000000E+01
+  vertex 2/711  2.58458920E+01  2.07979698E+01  6.00000000E+01
+edge 2 of facet 473 doesn't match edge 1 of facet 713
+facet (473)/ first facet
+  vertex 0/473  2.59827080E+01  2.01628876E+01  6.00000000E+01
+  vertex 1/473  2.60062294E+01  2.21924953E+01  6.00000000E+01
+  vertex 2/473  2.61036301E+01  1.95245857E+01  6.00000000E+01
+facet (713)/ second facet
+  vertex 0/713  2.59827080E+01  2.01628876E+01  7.03000031E+01
+  vertex 1/713  2.61036301E+01  1.95245857E+01  6.00000000E+01
+  vertex 2/713  2.59827080E+01  2.01628876E+01  6.00000000E+01
+edge 2 of facet 488 doesn't match edge 2 of facet 555
+facet (488)/ first facet
+  vertex 0/488  2.20841637E+01  5.00000000E-01  6.00000000E+01
+  vertex 1/488  2.23506527E+01  0.00000000E+00  6.00000000E+01
+  vertex 2/488  2.23268642E+01  8.65125835E-01  6.00000000E+01
+facet (555)/ second facet
+  vertex 0/555  2.20841637E+01  5.00000000E-01  6.00000000E+01
+  vertex 1/555  2.20818233E+01  5.04366219E-01  6.00000000E+01
+  vertex 2/555  2.23268642E+01  8.65125835E-01  6.00000000E+01
+edge 2 of facet 489 doesn't match edge 4 of facet 773
+facet (489)/ first facet
+  vertex 0/489  2.23268642E+01  8.65125835E-01  6.00000000E+01
+  vertex 1/489  2.23506527E+01  0.00000000E+00  6.00000000E+01
+  vertex 2/489  2.26728725E+01  1.41496933E+00  6.00000000E+01
+facet (773)/ second facet
+  vertex 0/773  2.26728725E+01  1.41496933E+00  7.03000031E+01
+  vertex 1/773  2.23268642E+01  8.65125835E-01  6.00000000E+01
+  vertex 2/773  2.26728725E+01  1.41496933E+00  6.00000000E+01
+edge 2 of facet 492 doesn't match edge 2 of facet 771
+facet (492)/ first facet
+  vertex 0/492  2.26728725E+01  1.41496933E+00  6.00000000E+01
+  vertex 1/492  2.27467213E+01  5.93540907E-01  6.00000000E+01
+  vertex 2/492  2.30050488E+01  1.97327816E+00  6.00000000E+01
+facet (771)/ second facet
+  vertex 0/771  2.26728725E+01  1.41496933E+00  6.00000000E+01
+  vertex 1/771  2.30050488E+01  1.97327816E+00  7.03000031E+01
+  vertex 2/771  2.30050488E+01  1.97327816E+00  6.00000000E+01
+edge 1 of facet 494 doesn't match edge 1 of facet 769
+facet (494)/ first facet
+  vertex 0/494  2.30993786E+01  1.15394902E+00  6.00000000E+01
+  vertex 1/494  2.30050488E+01  1.97327816E+00  6.00000000E+01
+  vertex 2/494  2.33231869E+01  2.53970432E+00  6.00000000E+01
+facet (769)/ second facet
+  vertex 0/769  2.33231869E+01  2.53970432E+00  7.03000031E+01
+  vertex 1/769  2.30050488E+01  1.97327816E+00  6.00000000E+01
+  vertex 2/769  2.33231869E+01  2.53970432E+00  6.00000000E+01
+edge 1 of facet 496 doesn't match edge 5 of facet 767
+facet (496)/ first facet
+  vertex 0/496  2.34379368E+01  1.72298503E+00  6.00000000E+01
+  vertex 1/496  2.33231869E+01  2.53970432E+00  6.00000000E+01
+  vertex 2/496  2.36270866E+01  3.11389518E+00  6.00000000E+01
+facet (767)/ second facet
+  vertex 0/767  2.33231869E+01  2.53970432E+00  6.00000000E+01
+  vertex 1/767  2.36270866E+01  3.11389518E+00  7.03000031E+01
+  vertex 2/767  2.36270866E+01  3.11389518E+00  6.00000000E+01
+edge 1 of facet 515 doesn't match edge 5 of facet 583
+facet (515)/ first facet
+  vertex 0/515  2.58187428E+01  7.17246580E+00  6.00000000E+01
+  vertex 1/515  2.56932640E+01  8.57055855E+00  6.00000000E+01
+  vertex 2/515  2.58458920E+01  9.20202923E+00  6.00000000E+01
+facet (583)/ second facet
+  vertex 0/583  2.56932640E+01  8.57055855E+00  6.00000000E+01
+  vertex 1/583  2.56890335E+01  8.57163715E+00  6.00000000E+01
+  vertex 2/583  2.58458920E+01  9.20202923E+00  6.00000000E+01
+edge 1 of facet 517 doesn't match edge 1 of facet 745
+facet (517)/ first facet
+  vertex 0/517  2.60062294E+01  7.80750418E+00  6.00000000E+01
+  vertex 1/517  2.58458920E+01  9.20202923E+00  6.00000000E+01
+  vertex 2/517  2.59827080E+01  9.83711338E+00  6.00000000E+01
+facet (745)/ second facet
+  vertex 0/745  2.59827080E+01  9.83711338E+00  7.03000031E+01
+  vertex 1/745  2.58458920E+01  9.20202923E+00  6.00000000E+01
+  vertex 2/745  2.59827080E+01  9.83711338E+00  6.00000000E+01
+edge 1 of facet 518 doesn't match edge 1 of facet 743
+facet (518)/ first facet
+  vertex 0/518  2.60062294E+01  7.80750418E+00  6.00000000E+01
+  vertex 1/518  2.59827080E+01  9.83711338E+00  6.00000000E+01
+  vertex 2/518  2.61036301E+01  1.04754143E+01  6.00000000E+01
+facet (743)/ second facet
+  vertex 0/743  2.61036301E+01  1.04754143E+01  7.03000031E+01
+  vertex 1/743  2.59827080E+01  9.83711338E+00  6.00000000E+01
+  vertex 2/743  2.61036301E+01  1.04754143E+01  6.00000000E+01
+edge 1 of facet 663 doesn't match edge 2 of facet 444
+facet (663)/ first facet
+  vertex 0/663  2.23268642E+01  2.91348743E+01  7.03000031E+01
+  vertex 1/663  2.26728725E+01  2.85850315E+01  6.00000000E+01
+  vertex 2/663  2.23268642E+01  2.91348743E+01  6.00000000E+01
+facet (444)/ second facet
+  vertex 0/444  2.23268642E+01  2.91348743E+01  6.00000000E+01
+  vertex 1/444  2.23506527E+01  3.00000000E+01  6.00000000E+01
+  vertex 2/444  2.26728725E+01  2.85850315E+01  6.00000000E+01
+edge 2 of facet 665 doesn't match edge 5 of facet 449
+facet (665)/ first facet
+  vertex 0/665  2.33231869E+01  2.74602947E+01  6.00000000E+01
+  vertex 1/665  2.30050488E+01  2.80267220E+01  7.03000031E+01
+  vertex 2/665  2.30050488E+01  2.80267220E+01  6.00000000E+01
+facet (449)/ second facet
+  vertex 0/449  2.30050488E+01  2.80267220E+01  6.00000000E+01
+  vertex 1/449  2.30993786E+01  2.88460503E+01  6.00000000E+01
+  vertex 2/449  2.33231869E+01  2.74602947E+01  6.00000000E+01
+edge 1 of facet 667 doesn't match edge 2 of facet 447
+facet (667)/ first facet
+  vertex 0/667  2.26728725E+01  2.85850315E+01  7.03000031E+01
+  vertex 1/667  2.30050488E+01  2.80267220E+01  6.00000000E+01
+  vertex 2/667  2.26728725E+01  2.85850315E+01  6.00000000E+01
+facet (447)/ second facet
+  vertex 0/447  2.26728725E+01  2.85850315E+01  6.00000000E+01
+  vertex 1/447  2.27467213E+01  2.94064598E+01  6.00000000E+01
+  vertex 2/447  2.30050488E+01  2.80267220E+01  6.00000000E+01
+edge 1 of facet 707 doesn't match edge 2 of facet 468
+facet (707)/ first facet
+  vertex 0/707  2.55249233E+01  2.20569057E+01  7.03000031E+01
+  vertex 1/707  2.56932640E+01  2.14294415E+01  6.00000000E+01
+  vertex 2/707  2.55249233E+01  2.20569057E+01  6.00000000E+01
+facet (468)/ second facet
+  vertex 0/468  2.55249233E+01  2.20569057E+01  6.00000000E+01
+  vertex 1/468  2.56154652E+01  2.34576950E+01  6.00000000E+01
+  vertex 2/468  2.56932640E+01  2.14294415E+01  6.00000000E+01
+edge 1 of facet 709 doesn't match edge 2 of facet 470
+facet (709)/ first facet
+  vertex 0/709  2.56932640E+01  2.14294415E+01  7.03000031E+01
+  vertex 1/709  2.58458920E+01  2.07979698E+01  6.00000000E+01
+  vertex 2/709  2.56932640E+01  2.14294415E+01  6.00000000E+01
+facet (470)/ second facet
+  vertex 0/470  2.56932640E+01  2.14294415E+01  6.00000000E+01
+  vertex 1/470  2.58187428E+01  2.28275337E+01  6.00000000E+01
+  vertex 2/470  2.58458920E+01  2.07979698E+01  6.00000000E+01
+edge 1 of facet 711 doesn't match edge 2 of facet 472
+facet (711)/ first facet
+  vertex 0/711  2.58458920E+01  2.07979698E+01  7.03000031E+01
+  vertex 1/711  2.59827080E+01  2.01628876E+01  6.00000000E+01
+  vertex 2/711  2.58458920E+01  2.07979698E+01  6.00000000E+01
+facet (472)/ second facet
+  vertex 0/472  2.58458920E+01  2.07979698E+01  6.00000000E+01
+  vertex 1/472  2.60062294E+01  2.21924953E+01  6.00000000E+01
+  vertex 2/472  2.59827080E+01  2.01628876E+01  6.00000000E+01
+edge 1 of facet 713 doesn't match edge 2 of facet 473
+facet (713)/ first facet
+  vertex 0/713  2.59827080E+01  2.01628876E+01  7.03000031E+01
+  vertex 1/713  2.61036301E+01  1.95245857E+01  6.00000000E+01
+  vertex 2/713  2.59827080E+01  2.01628876E+01  6.00000000E+01
+facet (473)/ second facet
+  vertex 0/473  2.59827080E+01  2.01628876E+01  6.00000000E+01
+  vertex 1/473  2.60062294E+01  2.21924953E+01  6.00000000E+01
+  vertex 2/473  2.61036301E+01  1.95245857E+01  6.00000000E+01
+edge 1 of facet 743 doesn't match edge 1 of facet 518
+facet (743)/ first facet
+  vertex 0/743  2.61036301E+01  1.04754143E+01  7.03000031E+01
+  vertex 1/743  2.59827080E+01  9.83711338E+00  6.00000000E+01
+  vertex 2/743  2.61036301E+01  1.04754143E+01  6.00000000E+01
+facet (518)/ second facet
+  vertex 0/518  2.60062294E+01  7.80750418E+00  6.00000000E+01
+  vertex 1/518  2.59827080E+01  9.83711338E+00  6.00000000E+01
+  vertex 2/518  2.61036301E+01  1.04754143E+01  6.00000000E+01
+edge 1 of facet 745 doesn't match edge 1 of facet 517
+facet (745)/ first facet
+  vertex 0/745  2.59827080E+01  9.83711338E+00  7.03000031E+01
+  vertex 1/745  2.58458920E+01  9.20202923E+00  6.00000000E+01
+  vertex 2/745  2.59827080E+01  9.83711338E+00  6.00000000E+01
+facet (517)/ second facet
+  vertex 0/517  2.60062294E+01  7.80750418E+00  6.00000000E+01
+  vertex 1/517  2.58458920E+01  9.20202923E+00  6.00000000E+01
+  vertex 2/517  2.59827080E+01  9.83711338E+00  6.00000000E+01
+edge 2 of facet 767 doesn't match edge 4 of facet 496
+facet (767)/ first facet
+  vertex 0/767  2.33231869E+01  2.53970432E+00  6.00000000E+01
+  vertex 1/767  2.36270866E+01  3.11389518E+00  7.03000031E+01
+  vertex 2/767  2.36270866E+01  3.11389518E+00  6.00000000E+01
+facet (496)/ second facet
+  vertex 0/496  2.34379368E+01  1.72298503E+00  6.00000000E+01
+  vertex 1/496  2.33231869E+01  2.53970432E+00  6.00000000E+01
+  vertex 2/496  2.36270866E+01  3.11389518E+00  6.00000000E+01
+edge 1 of facet 769 doesn't match edge 1 of facet 494
+facet (769)/ first facet
+  vertex 0/769  2.33231869E+01  2.53970432E+00  7.03000031E+01
+  vertex 1/769  2.30050488E+01  1.97327816E+00  6.00000000E+01
+  vertex 2/769  2.33231869E+01  2.53970432E+00  6.00000000E+01
+facet (494)/ second facet
+  vertex 0/494  2.30993786E+01  1.15394902E+00  6.00000000E+01
+  vertex 1/494  2.30050488E+01  1.97327816E+00  6.00000000E+01
+  vertex 2/494  2.33231869E+01  2.53970432E+00  6.00000000E+01
+edge 2 of facet 771 doesn't match edge 2 of facet 492
+facet (771)/ first facet
+  vertex 0/771  2.26728725E+01  1.41496933E+00  6.00000000E+01
+  vertex 1/771  2.30050488E+01  1.97327816E+00  7.03000031E+01
+  vertex 2/771  2.30050488E+01  1.97327816E+00  6.00000000E+01
+facet (492)/ second facet
+  vertex 0/492  2.26728725E+01  1.41496933E+00  6.00000000E+01
+  vertex 1/492  2.27467213E+01  5.93540907E-01  6.00000000E+01
+  vertex 2/492  2.30050488E+01  1.97327816E+00  6.00000000E+01
+edge 1 of facet 773 doesn't match edge 5 of facet 489
+facet (773)/ first facet
+  vertex 0/773  2.26728725E+01  1.41496933E+00  7.03000031E+01
+  vertex 1/773  2.23268642E+01  8.65125835E-01  6.00000000E+01
+  vertex 2/773  2.26728725E+01  1.41496933E+00  6.00000000E+01
+facet (489)/ second facet
+  vertex 0/489  2.23268642E+01  8.65125835E-01  6.00000000E+01
+  vertex 1/489  2.23506527E+01  0.00000000E+00  6.00000000E+01
+  vertex 2/489  2.26728725E+01  1.41496933E+00  6.00000000E+01
+Writing binary file uploads/071694f8a980d09651527f3491e75e24-repaired.stl
+
+================= Results produced by ADMesh version 0.98.5 ================
+Input file         : uploads/071694f8a980d09651527f3491e75e24
+File type          : Binary STL file
+Header             : SketchUp STL com.sketchup.SketchUp.2026                                         
+============== Size ==============
+Min X = -0.000000, Max X =  27.000000
+Min Y = -0.500000, Max Y =  30.500000
+Min Z =  0.000000, Max Z =  70.300003
+========= Facet Status ========== Original ============ Final ====
+Number of facets                 :  4210                4267
+Facets with 1 disconnected edge  :   110                  11
+Facets with 2 disconnected edges :     0                   3
+Facets with 3 disconnected edges :     0                   0
+Total disconnected facets        :   110                  14
+=== Processing Statistics ===     ===== Other Statistics =====
+Number of parts       :     4        Volume   :  2700.832764
+Degenerate facets     :     0
+Edges fixed           :    26
+Facets removed        :    34
+Facets added          :    91
+Facets reversed       :   343
+Backwards edges       :   106
+Normals fixed         :   266
+
+[UPLOAD] Repair completed: {
+  success: true,
+  outputPath: 'uploads/071694f8a980d09651527f3491e75e24-repaired.stl',
+  originalSize: 210584,
+  repairedSize: 213434,
+  sizeDifference: 2850,
+  admeshOutput: 'ADMesh version 0.98.5, Copyright (C) 1995, 1996 Anthony D. Martin\n' +
+    'ADMesh comes with NO WARRANTY.  This is free software, and you are welcome to\n' +
+    'redistribute it under certain conditions.  See the file COPYING for details.\n' +
+    'Opening uploads/071694f8a980d09651527f3491e75e24\n' +
+    'Checking exact...\n' +
+    'Checking nearby. Tolerance= 0.001000 Iteration=1 of 2...  Fixed 0 edges.\n' +
+    'Checking nearby. Tolerance= 0.009144 Iteration=2 of 2...  Fixed 26 edges.\n' +
+    'Removing unconnected facets...\n' +
+    'Filling holes...\n' +
+    'Back to the first facet filling holes: probably a mobius part.\n' +
+    "Try using a smaller tolerance or don't do a nearby check\n" +
+    'Checking normal directions...\n' +
+    'Checking normal values...\n' +
+    'Calculating volume...\n' +
+    'Verifying neighbors...\n' +
+    "edge 2 of facet 443 doesn't match edge 4 of facet 606\n" +
+    'facet (443)/ first facet\n' +
+    '  vertex 0/443  2.20841637E+01  2.95000000E+01  6.00000000E+01\n' +
+    '  vertex 1/443  2.23506527E+01  3.00000000E+01  6.00000000E+01\n' +
+    '  vertex 2/443  2.23268642E+01  2.91348743E+01  6.00000000E+01\n' +
+    'facet (606)/ second facet\n' +
+    '  vertex 0/606  2.20818233E+01  2.94956341E+01  6.00000000E+01\n' +
+    '  vertex 1/606  2.20841637E+01  2.95000000E+01  6.00000000E+01\n' +
+    '  vertex 2/606  2.23268642E+01  2.91348743E+01  6.00000000E+01\n' +
+    "edge 2 of facet 444 doesn't match edge 1 of facet 663\n" +
+    'facet (444)/ first facet\n' +
+    '  vertex 0/444  2.23268642E+01  2.91348743E+01  6.00000000E+01\n' +
+    '  vertex 1/444  2.23506527E+01  3.00000000E+01  6.00000000E+01\n' +
+    '  vertex 2/444  2.26728725E+01  2.85850315E+01  6.00000000E+01\n' +
+    'facet (663)/ second facet\n' +
+    '  vertex 0/663  2.23268642E+01  2.91348743E+01  7.03000031E+01\n' +
+    '  vertex 1/663  2.26728725E+01  2.85850315E+01  6.00000000E+01\n' +
+    '  vertex 2/663  2.23268642E+01  2.91348743E+01  6.00000000E+01\n' +
+    "edge 2 of facet 447 doesn't match edge 1 of facet 667\n" +
+    'facet (447)/ first facet\n' +
+    '  vertex 0/447  2.26728725E+01  2.85850315E+01  6.00000000E+01\n' +
+    '  vertex 1/447  2.27467213E+01  2.94064598E+01  6.00000000E+01\n' +
+    '  vertex 2/447  2.30050488E+01  2.80267220E+01  6.00000000E+01\n' +
+    'facet (667)/ second facet\n' +
+    '  vertex 0/667  2.26728725E+01  2.85850315E+01  7.03000031E+01\n' +
+    '  vertex 1/667  2.30050488E+01  2.80267220E+01  6.00000000E+01\n' +
+    '  vertex 2/667  2.26728725E+01  2.85850315E+01  6.00000000E+01\n' +
+    "edge 2 of facet 449 doesn't match edge 5 of facet 665\n" +
+    'facet (449)/ first facet\n' +
+    '  vertex 0/449  2.30050488E+01  2.80267220E+01  6.00000000E+01\n' +
+    '  vertex 1/449  2.30993786E+01  2.88460503E+01  6.00000000E+01\n' +
+    '  vertex 2/449  2.33231869E+01  2.74602947E+01  6.00000000E+01\n' +
+    'facet (665)/ second facet\n' +
+    '  vertex 0/665  2.33231869E+01  2.74602947E+01  6.00000000E+01\n' +
+    '  vertex 1/665  2.30050488E+01  2.80267220E+01  7.03000031E+01\n' +
+    '  vertex 2/665  2.30050488E+01  2.80267220E+01  6.00000000E+01\n' +
+    "edge 1 of facet 466 doesn't match edge 5 of facet 630\n" +
+    'facet (466)/ first facet\n' +
+    '  vertex 0/466  2.53965225E+01  2.40825844E+01  6.00000000E+01\n' +
+    '  vertex 1/466  2.53409729E+01  2.26799717E+01  6.00000000E+01\n' +
+    '  vertex 2/466  2.55249233E+01  2.20569057E+01  6.00000000E+01\n' +
+    'facet (630)/ second facet\n' +
+    '  vertex 0/630  2.53409729E+01  2.26799717E+01  6.00000000E+01\n' +
+    '  vertex 1/630  2.53368015E+01  2.26786842E+01  6.00000000E+01\n' +
+    '  vertex 2/630  2.55249233E+01  2.20569057E+01  6.00000000E+01\n' +
+    "edge 2 of facet 468 doesn't match edge 1 of facet 707\n" +
+    'facet (468)/ first facet\n' +
+    '  vertex 0/468  2.55249233E+01  2.20569057E+01  6.00000000E+01\n' +
+    '  vertex 1/468  2.56154652E+01  2.34576950E+01  6.00000000E+01\n' +
+    '  vertex 2/468  2.56932640E+01  2.14294415E+01  6.00000000E+01\n' +
+    'facet (707)/ second facet\n' +
+    '  vertex 0/707  2.55249233E+01  2.20569057E+01  7.03000031E+01\n' +
+    '  vertex 1/707  2.56932640E+01  2.14294415E+01  6.00000000E+01\n' +
+    '  vertex 2/707  2.55249233E+01  2.20569057E+01  6.00000000E+01\n' +
+    "edge 2 of facet 470 doesn't match edge 1 of facet 709\n" +
+    'facet (470)/ first facet\n' +
+    '  vertex 0/470  2.56932640E+01  2.14294415E+01  6.00000000E+01\n' +
+    '  vertex 1/470  2.58187428E+01  2.28275337E+01  6.00000000E+01\n' +
+    '  vertex 2/470  2.58458920E+01  2.07979698E+01  6.00000000E+01\n' +
+    'facet (709)/ second facet\n' +
+    '  vertex 0/709  2.56932640E+01  2.14294415E+01  7.03000031E+01\n' +
+    '  vertex 1/709  2.58458920E+01  2.07979698E+01  6.00000000E+01\n' +
+    '  vertex 2/709  2.56932640E+01  2.14294415E+01  6.00000000E+01\n' +
+    "edge 2 of facet 472 doesn't match edge 1 of facet 711\n" +
+    'facet (472)/ first facet\n' +
+    '  vertex 0/472  2.58458920E+01  2.07979698E+01  6.00000000E+01\n' +
+    '  vertex 1/472  2.60062294E+01  2.21924953E+01  6.00000000E+01\n' +
+    '  vertex 2/472  2.59827080E+01  2.01628876E+01  6.00000000E+01\n' +
+    'facet (711)/ second facet\n' +
+    '  vertex 0/711  2.58458920E+01  2.07979698E+01  7.03000031E+01\n' +
+    '  vertex 1/711  2.59827080E+01  2.01628876E+01  6.00000000E+01\n' +
+    '  vertex 2/711  2.58458920E+01  2.07979698E+01  6.00000000E+01\n' +
+    "edge 2 of facet 473 doesn't match edge 1 of facet 713\n" +
+    'facet (473)/ first facet\n' +
+    '  vertex 0/473  2.59827080E+01  2.01628876E+01  6.00000000E+01\n' +
+    '  vertex 1/473  2.60062294E+01  2.21924953E+01  6.00000000E+01\n' +
+    '  vertex 2/473  2.61036301E+01  1.95245857E+01  6.00000000E+01\n' +
+    'facet (713)/ second facet\n' +
+    '  vertex 0/713  2.59827080E+01  2.01628876E+01  7.03000031E+01\n' +
+    '  vertex 1/713  2.61036301E+01  1.95245857E+01  6.00000000E+01\n' +
+    '  vertex 2/713  2.59827080E+01  2.01628876E+01  6.00000000E+01\n' +
+    "edge 2 of facet 488 doesn't match edge 2 of facet 555\n" +
+    'facet (488)/ first facet\n' +
+    '  vertex 0/488  2.20841637E+01  5.00000000E-01  6.00000000E+01\n' +
+    '  vertex 1/488  2.23506527E+01  0.00000000E+00  6.00000000E+01\n' +
+    '  vertex 2/488  2.23268642E+01  8.65125835E-01  6.00000000E+01\n' +
+    'facet (555)/ second facet\n' +
+    '  vertex 0/555  2.20841637E+01  5.00000000E-01  6.00000000E+01\n' +
+    '  vertex 1/555  2.20818233E+01  5.04366219E-01  6.00000000E+01\n' +
+    '  vertex 2/555  2.23268642E+01  8.65125835E-01  6.00000000E+01\n' +
+    "edge 2 of facet 489 doesn't match edge 4 of facet 773\n" +
+    'facet (489)/ first facet\n' +
+    '  vertex 0/489  2.23268642E+01  8.65125835E-01  6.00000000E+01\n' +
+    '  vertex 1/489  2.23506527E+01  0.00000000E+00  6.00000000E+01\n' +
+    '  vertex 2/489  2.26728725E+01  1.41496933E+00  6.00000000E+01\n' +
+    'facet (773)/ second facet\n' +
+    '  vertex 0/773  2.26728725E+01  1.41496933E+00  7.03000031E+01\n' +
+    '  vertex 1/773  2.23268642E+01  8.65125835E-01  6.00000000E+01\n' +
+    '  vertex 2/773  2.26728725E+01  1.41496933E+00  6.00000000E+01\n' +
+    "edge 2 of facet 492 doesn't match edge 2 of facet 771\n" +
+    'facet (492)/ first facet\n' +
+    '  vertex 0/492  2.26728725E+01  1.41496933E+00  6.00000000E+01\n' +
+    '  vertex 1/492  2.27467213E+01  5.93540907E-01  6.00000000E+01\n' +
+    '  vertex 2/492  2.30050488E+01  1.97327816E+00  6.00000000E+01\n' +
+    'facet (771)/ second facet\n' +
+    '  vertex 0/771  2.26728725E+01  1.41496933E+00  6.00000000E+01\n' +
+    '  vertex 1/771  2.30050488E+01  1.97327816E+00  7.03000031E+01\n' +
+    '  vertex 2/771  2.30050488E+01  1.97327816E+00  6.00000000E+01\n' +
+    "edge 1 of facet 494 doesn't match edge 1 of facet 769\n" +
+    'facet (494)/ first facet\n' +
+    '  vertex 0/494  2.30993786E+01  1.15394902E+00  6.00000000E+01\n' +
+    '  vertex 1/494  2.30050488E+01  1.97327816E+00  6.00000000E+01\n' +
+    '  vertex 2/494  2.33231869E+01  2.53970432E+00  6.00000000E+01\n' +
+    'facet (769)/ second facet\n' +
+    '  vertex 0/769  2.33231869E+01  2.53970432E+00  7.03000031E+01\n' +
+    '  vertex 1/769  2.30050488E+01  1.97327816E+00  6.00000000E+01\n' +
+    '  vertex 2/769  2.33231869E+01  2.53970432E+00  6.00000000E+01\n' +
+    "edge 1 of facet 496 doesn't match edge 5 of facet 767\n" +
+    'facet (496)/ first facet\n' +
+    '  vertex 0/496  2.34379368E+01  1.72298503E+00  6.00000000E+01\n' +
+    '  vertex 1/496  2.33231869E+01  2.53970432E+00  6.00000000E+01\n' +
+    '  vertex 2/496  2.36270866E+01  3.11389518E+00  6.00000000E+01\n' +
+    'facet (767)/ second facet\n' +
+    '  vertex 0/767  2.33231869E+01  2.53970432E+00  6.00000000E+01\n' +
+    '  vertex 1/767  2.36270866E+01  3.11389518E+00  7.03000031E+01\n' +
+    '  vertex 2/767  2.36270866E+01  3.11389518E+00  6.00000000E+01\n' +
+    "edge 1 of facet 515 doesn't match edge 5 of facet 583\n" +
+    'facet (515)/ first facet\n' +
+    '  vertex 0/515  2.58187428E+01  7.17246580E+00  6.00000000E+01\n' +
+    '  vertex 1/515  2.56932640E+01  8.57055855E+00  6.00000000E+01\n' +
+    '  vertex 2/515  2.58458920E+01  9.20202923E+00  6.00000000E+01\n' +
+    'facet (583)/ second facet\n' +
+    '  vertex 0/583  2.56932640E+01  8.57055855E+00  6.00000000E+01\n' +
+    '  vertex 1/583  2.56890335E+01  8.57163715E+00  6.00000000E+01\n' +
+    '  vertex 2/583  2.58458920E+01  9.20202923E+00  6.00000000E+01\n' +
+    "edge 1 of facet 517 doesn't match edge 1 of facet 745\n" +
+    'facet (517)/ first facet\n' +
+    '  vertex 0/517  2.60062294E+01  7.80750418E+00  6.00000000E+01\n' +
+    '  vertex 1/517  2.58458920E+01  9.20202923E+00  6.00000000E+01\n' +
+    '  vertex 2/517  2.59827080E+01  9.83711338E+00  6.00000000E+01\n' +
+    'facet (745)/ second facet\n' +
+    '  vertex 0/745  2.59827080E+01  9.83711338E+00  7.03000031E+01\n' +
+    '  vertex 1/745  2.58458920E+01  9.20202923E+00  6.00000000E+01\n' +
+    '  vertex 2/745  2.59827080E+01  9.83711338E+00  6.00000000E+01\n' +
+    "edge 1 of facet 518 doesn't match edge 1 of facet 743\n" +
+    'facet (518)/ first facet\n' +
+    '  vertex 0/518  2.60062294E+01  7.80750418E+00  6.00000000E+01\n' +
+    '  vertex 1/518  2.59827080E+01  9.83711338E+00  6.00000000E+01\n' +
+    '  vertex 2/518  2.61036301E+01  1.04754143E+01  6.00000000E+01\n' +
+    'facet (743)/ second facet\n' +
+    '  vertex 0/743  2.61036301E+01  1.04754143E+01  7.03000031E+01\n' +
+    '  vertex 1/743  2.59827080E+01  9.83711338E+00  6.00000000E+01\n' +
+    '  vertex 2/743  2.61036301E+01  1.04754143E+01  6.00000000E+01\n' +
+    "edge 1 of facet 663 doesn't match edge 2 of facet 444\n" +
+    'facet (663)/ first facet\n' +
+    '  vertex 0/663  2.23268642E+01  2.91348743E+01  7.03000031E+01\n' +
+    '  vertex 1/663  2.26728725E+01  2.85850315E+01  6.00000000E+01\n' +
+    '  vertex 2/663  2.23268642E+01  2.91348743E+01  6.00000000E+01\n' +
+    'facet (444)/ second facet\n' +
+    '  vertex 0/444  2.23268642E+01  2.91348743E+01  6.00000000E+01\n' +
+    '  vertex 1/444  2.23506527E+01  3.00000000E+01  6.00000000E+01\n' +
+    '  vertex 2/444  2.26728725E+01  2.85850315E+01  6.00000000E+01\n' +
+    "edge 2 of facet 665 doesn't match edge 5 of facet 449\n" +
+    'facet (665)/ first facet\n' +
+    '  vertex 0/665  2.33231869E+01  2.74602947E+01  6.00000000E+01\n' +
+    '  vertex 1/665  2.30050488E+01  2.80267220E+01  7.03000031E+01\n' +
+    '  vertex 2/665  2.30050488E+01  2.80267220E+01  6.00000000E+01\n' +
+    'facet (449)/ second facet\n' +
+    '  vertex 0/449  2.30050488E+01  2.80267220E+01  6.00000000E+01\n' +
+    '  vertex 1/449  2.30993786E+01  2.88460503E+01  6.00000000E+01\n' +
+    '  vertex 2/449  2.33231869E+01  2.74602947E+01  6.00000000E+01\n' +
+    "edge 1 of facet 667 doesn't match edge 2 of facet 447\n" +
+    'facet (667)/ first facet\n' +
+    '  vertex 0/667  2.26728725E+01  2.858503'... 6402 more characters
+}
+[UPLOAD] Checking sendToPrinter: false, will download only
+[UPLOAD] Repair-only mode: returning file for download
+[UPLOAD] Sending repaired file: window-stop-v3-handle-repaired.stl

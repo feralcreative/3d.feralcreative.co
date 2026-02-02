@@ -38,7 +38,10 @@ RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist
 COPY printer-proxy-server.js ./
 
-# Copy PHP utility files
+# Copy utils directory (needed for stl-repair.js and other utilities)
+COPY utils ./utils
+
+# Copy PHP utility files to dist/api
 COPY utils/log.php ./dist/api/
 COPY utils/view-logs.php ./dist/api/
 COPY utils/printer-proxy.php ./dist/api/printer.php
@@ -52,6 +55,15 @@ RUN mkdir -p /run/nginx && \
     echo '    listen 6198;' >> /etc/nginx/http.d/default.conf && \
     echo '    root /app/dist;' >> /etc/nginx/http.d/default.conf && \
     echo '    index index.html;' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Proxy /api/notify to Node.js server on port 6199' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /api/notify {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://127.0.0.1:6199;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_set_header X-Forwarded-Proto $scheme;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
     echo '    location / {' >> /etc/nginx/http.d/default.conf && \
     echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/http.d/default.conf && \
     echo '    }' >> /etc/nginx/http.d/default.conf && \

@@ -17,7 +17,15 @@ body {
   height: 100%;
   background: black;
   overflow: hidden;
-  font-family: $font-primary, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+  font-family:
+    $font-primary,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
     sans-serif;
 }
 
@@ -236,9 +244,41 @@ body {
     max-width: 70vw;
     padding: 1rem;
   }
-  .model-viewer-link {
-    color: $color-fpo;
-    font-weight: normal;
+  // Make job-file span full width when it contains the button
+  #job-file {
+    width: 100%;
+  }
+
+  .view-model-btn {
+    background: $color-feral;
+    color: white;
+    border: none;
+    padding: 0.25rem 1rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5em;
+
+    .material-icons {
+      font-size: 1.25rem;
+    }
+
+    &:hover {
+      background: lighten($color-fpo, 10%);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
   }
   // Collapsed state
   &.collapsed {
@@ -327,7 +367,9 @@ body {
   .status-content {
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
   }
 
   .status-header {
@@ -358,22 +400,82 @@ body {
     color: $color-fpo;
     border: 1px solid $color-fpo;
 
-    &.printing {
-      background: rgba(0, 255, 0, 0.1);
-      color: #0f0;
-      border-color: #0f0;
-    }
-
+    // Ready/Idle - Yellow
+    &.ready,
     &.idle {
       background: rgba(255, 255, 0, 0.1);
       color: #ff0;
       border-color: #ff0;
     }
 
+    // Printing - Green
+    &.printing {
+      background: rgba(0, 255, 0, 0.1);
+      color: #0f0;
+      border-color: #0f0;
+    }
+
+    // Completed - Bright Green
+    &.completed {
+      background: rgba(0, 255, 0, 0.15);
+      color: #0f0;
+      border-color: #0f0;
+    }
+
+    // Heating - Orange
+    &.heating {
+      background: rgba(255, 165, 0, 0.1);
+      color: #ffa500;
+      border-color: #ffa500;
+    }
+
+    // Calibrating - Blue
+    &.calibrating {
+      background: rgba(0, 150, 255, 0.1);
+      color: #0096ff;
+      border-color: #0096ff;
+    }
+
+    // Pausing - Yellow-Orange
+    &.pausing {
+      background: rgba(255, 200, 0, 0.1);
+      color: #ffc800;
+      border-color: #ffc800;
+    }
+
+    // Paused - Orange
+    &.paused {
+      background: rgba(255, 140, 0, 0.1);
+      color: #ff8c00;
+      border-color: #ff8c00;
+    }
+
+    // Busy - Cyan
+    &.busy {
+      background: rgba(0, 255, 255, 0.1);
+      color: #0ff;
+      border-color: #0ff;
+    }
+
+    // Cancelled - Red
+    &.cancelled {
+      background: rgba(255, 0, 0, 0.15);
+      color: #f00;
+      border-color: #f00;
+    }
+
+    // Error - Red
     &.error {
       background: rgba(255, 0, 0, 0.2);
       color: #f00;
       border-color: #f00;
+    }
+
+    // Unknown - Magenta (default)
+    &.unknown {
+      background: rgba(255, 0, 255, 0.1);
+      color: $color-fpo;
+      border-color: $color-fpo;
     }
   }
 
@@ -517,7 +619,9 @@ body {
   justify-content: center;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(10px);
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
 
   &[style*="display: none"] {
     opacity: 0;
@@ -703,15 +807,251 @@ body {
   font-weight: 500;
 }
 
-// Model viewer link in job filename
-.model-viewer-link {
+// Upload Modal
+.upload-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.upload-modal-content {
+  background: #1a1a1a;
+  border-radius: 1rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.upload-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #333;
+
+  h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0;
+  }
+}
+
+.upload-modal-close {
+  background: none;
+  border: none;
   color: white;
-  text-decoration: underline;
+  font-size: 2rem;
   cursor: pointer;
-  font-weight: 600;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.2s ease;
 
   &:hover {
     color: #ff66ff;
+  }
+}
+
+.upload-modal-body {
+  padding: 1.5rem;
+}
+
+.upload-dropzone {
+  border: 2px dashed #555;
+  border-radius: 0.5rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #222;
+
+  &:hover,
+  &.dragover {
+    border-color: #ff66ff;
+    background: #2a2a2a;
+  }
+
+  svg {
+    color: #888;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #ccc;
+    margin: 0.5rem 0;
+  }
+
+  .upload-hint {
+    font-size: 0.875rem;
+    color: #888;
+  }
+}
+
+.file-info {
+  background: #222;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+
+  p {
+    color: #ccc;
+    margin: 0.5rem 0;
+  }
+
+  strong {
+    color: white;
+  }
+}
+
+.upload-options {
+  margin-top: 1.5rem;
+}
+
+.upload-checkbox {
+  display: flex;
+  align-items: center;
+  margin: 0.75rem 0;
+  cursor: pointer;
+  color: #ccc;
+
+  input[type="checkbox"] {
+    margin-right: 0.75rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+  }
+
+  &:hover {
+    color: white;
+  }
+
+  &.upload-checkbox-warning {
+    color: #ffaa00;
+    font-weight: 600;
+
+    &:hover {
+      color: #ffcc00;
+    }
+  }
+}
+
+.upload-status {
+  margin-top: 1.5rem;
+  text-align: center;
+
+  p {
+    color: #ccc;
+    margin-top: 0.5rem;
+  }
+}
+
+.upload-progress {
+  background: #333;
+  border-radius: 0.5rem;
+  height: 0.5rem;
+  overflow: hidden;
+}
+
+.upload-progress-bar {
+  background: linear-gradient(90deg, #880088, #ff66ff);
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.upload-error {
+  background: #ff000020;
+  border: 1px solid #ff0000;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #ff6666;
+}
+
+.upload-success {
+  background: #00ff0020;
+  border: 1px solid #00ff00;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #66ff66;
+}
+
+.upload-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid #333;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #880088, #ff66ff);
+  color: white;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 102, 255, 0.4);
+  }
+}
+
+.btn-secondary {
+  background: #333;
+  color: white;
+
+  &:hover {
+    background: #444;
+  }
+}
+
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-radius: 0.5rem;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
 }
