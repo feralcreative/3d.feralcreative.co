@@ -80,21 +80,21 @@ The application includes a built-in file upload system with automatic STL repair
 
 ### Installation Requirements
 
-ADMesh must be installed on the server running the printer proxy:
+PyMeshLab (Python library) must be installed on the server running the printer proxy:
 
 ```bash
-# On macOS (development)
-brew install admesh
+# Install Python dependencies
+pip3 install -r requirements.txt
 
-# On Linux (production/Docker)
-apt-get install admesh
+# Or install PyMeshLab directly
+pip3 install pymeshlab
 ```
 
 **Verify installation:**
 
 ```bash
-admesh --version
-# Should output: ADMesh - version 0.98.5 (or similar)
+python3 -c "import pymeshlab; print(pymeshlab.__version__)"
+# Should output: 2025.7.post1 (or similar)
 ```
 
 ### How to Use
@@ -114,31 +114,30 @@ admesh --version
 
 ### What Gets Fixed
 
-ADMesh automatically repairs the following issues in STL files:
+PyMeshLab automatically repairs the following issues in STL files:
 
-- **Inverted Normals**: Ensures all face normals point outward
+- **Duplicate Faces and Vertices**: Removes redundant geometry
+- **Unreferenced Vertices**: Cleans up unused vertices
 - **Non-Manifold Edges**: Fixes edges shared by more than two faces
-- **Holes**: Attempts to close holes in the mesh
-- **Degenerate Facets**: Removes zero-area triangles
-- **Normal Values**: Recalculates normal vectors for accuracy
+- **Non-Manifold Vertices**: Splits vertices to create manifold geometry
+- **Holes**: Closes holes in the mesh (up to 30 edges)
+- **Face Orientation**: Re-orients all faces coherently
+- **Mismatched Borders**: Snaps nearby vertices to close tiny gaps
 
 ### Troubleshooting
 
-#### "ADMesh not installed" Error
+#### "PyMeshLab not installed" Error
 
-**Cause**: ADMesh is not installed or not in the system PATH
+**Cause**: PyMeshLab is not installed or not in the Python PATH
 
 **Solution**:
 
 ```bash
-# Install ADMesh
-brew install admesh  # macOS
-# or
-apt-get install admesh  # Linux
+# Install PyMeshLab
+pip3 install pymeshlab
 
 # Verify installation
-which admesh
-admesh --version
+python3 -c "import pymeshlab; print(pymeshlab.__version__)"
 ```
 
 #### Upload Fails with "Invalid file type"

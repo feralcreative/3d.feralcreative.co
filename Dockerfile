@@ -21,14 +21,20 @@ FROM --platform=linux/amd64 node:20-alpine
 
 WORKDIR /app
 
-# Install PHP, Nginx, and Node tools
+# Install PHP, Nginx, Python, and Node tools
 RUN apk add --no-cache \
     php83 \
     php83-fpm \
     php83-session \
     php83-json \
     nginx \
+    python3 \
+    py3-pip \
     && npm install -g pm2
+
+# Install Python dependencies for STL repair (currently empty - PyMeshLab migration in progress)
+COPY requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt --break-system-packages || true
 
 # Copy package files and install production dependencies
 COPY package*.json ./
@@ -55,9 +61,9 @@ RUN mkdir -p /run/nginx && \
     echo '    listen 6198;' >> /etc/nginx/http.d/default.conf && \
     echo '    root /app/dist;' >> /etc/nginx/http.d/default.conf && \
     echo '    index index.html;' >> /etc/nginx/http.d/default.conf && \
-    echo '    # Proxy /api/notify to Node.js server on port 6199' >> /etc/nginx/http.d/default.conf && \
-    echo '    location /api/notify {' >> /etc/nginx/http.d/default.conf && \
-    echo '        proxy_pass http://127.0.0.1:6199;' >> /etc/nginx/http.d/default.conf && \
+    echo '    # Proxy all /api/* requests to Node.js printer proxy server on port 6199' >> /etc/nginx/http.d/default.conf && \
+    echo '    location /api/ {' >> /etc/nginx/http.d/default.conf && \
+    echo '        proxy_pass http://127.0.0.1:6199/;' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_http_version 1.1;' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_set_header Host $host;' >> /etc/nginx/http.d/default.conf && \
     echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/http.d/default.conf && \
