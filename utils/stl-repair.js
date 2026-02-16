@@ -1,46 +1,50 @@
 /**
  * STL Repair Utility
  *
- * Uses ADMesh to repair STL files by fixing common issues:
+ * Uses PyMeshLab for robust mesh repair:
+ * - Non-manifold edges and vertices
+ * - Duplicate faces and vertices
  * - Inverted normals
- * - Non-manifold edges
- * - Holes in the mesh
- * - Incorrect normal values
+ * - Small connected components
  *
- * Requires ADMesh to be installed: brew install admesh
+ * Requires PyMeshLab: pip3 install pymeshlab
  */
 
 import { exec } from "child_process";
 import { promisify } from "util";
 import { access, stat, readFile } from "fs/promises";
 import { constants, unlinkSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import NodeStl from "node-stl";
 
 const execAsync = promisify(exec);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
- * Check if ADMesh is installed and accessible
- * @returns {Promise<boolean>} True if ADMesh is available
+ * Check if PyMeshLab is installed and accessible
+ * @returns {Promise<boolean>} True if PyMeshLab is available
  */
-export async function isADMeshInstalled() {
+export async function isPyMeshLabInstalled() {
   try {
-    const { stdout } = await execAsync("which admesh");
-    return stdout.trim().length > 0;
+    const { stdout } = await execAsync("python3 -c 'import pymeshlab; print(\"OK\")'");
+    return stdout.trim() === "OK";
   } catch (error) {
     return false;
   }
 }
 
 /**
- * Get ADMesh version
- * @returns {Promise<string>} ADMesh version string
+ * Get PyMeshLab version
+ * @returns {Promise<string>} PyMeshLab version string
  */
-export async function getADMeshVersion() {
+export async function getPyMeshLabVersion() {
   try {
-    const { stdout } = await execAsync("admesh --version");
+    const { stdout } = await execAsync("python3 -c 'import pymeshlab; print(pymeshlab.__version__)'");
     return stdout.trim();
   } catch (error) {
-    throw new Error("ADMesh not installed. Install with: brew install admesh");
+    throw new Error("PyMeshLab not installed. Install with: pip3 install pymeshlab");
   }
 }
 
@@ -73,212 +77,72 @@ async function getFileSize(filePath) {
 }
 
 /**
- * Repair an STL file using ADMesh with progressive repair strategy
+ * Repair an STL file using PyMeshLab
  *
  * @param {string} inputPath - Path to the input STL file
  * @param {string} outputPath - Path to save the repaired STL file
  * @param {object} options - Repair options
- * @param {string} options.admeshPath - Path to ADMesh binary (default: 'admesh')
  * @param {boolean} options.verbose - Enable verbose logging (default: false)
- * @param {string} options.strategy - Repair strategy: 'standard', 'aggressive', 'progressive' (default: 'progressive')
  * @returns {Promise<object>} Repair result with outputPath, originalSize, repairedSize
  */
-export async function repairSTL(inputPath, outputPath, options = {}) {
-  const { admeshPath = "admesh", verbose = false, strategy = "progressive" } = options;
+export async function repairSTLWithPyMeshLab(inputPath, outputPath, options = {}) {
+  const { verbose = false } = options;
 
   // Validate input file exists
   if (!(await fileExists(inputPath))) {
     throw new Error(`Input file not found: ${inputPath}`);
   }
 
-  // Check if ADMesh is installed
-  if (!(await isADMeshInstalled())) {
-    throw new Error("ADMesh not installed. Install with: brew install admesh");
+  // Check if PyMeshLab is installed
+  if (!(await isPyMeshLabInstalled())) {
+    throw new Error("PyMeshLab not installed. Install with: pip3 install pymeshlab");
   }
 
-  // Get original file size
-  const originalSize = await getFileSize(inputPath);
+  // Build command to run Python script
+  const scriptPath = join(__dirname, "pymeshlab-repair.py");
+  const verboseFlag = verbose ? "--verbose" : "";
+  const command = `python3 "${scriptPath}" "${inputPath}" "${outputPath}" ${verboseFlag}`;
 
-  let command;
-  let repairAttempts = [];
-
-  if (strategy === "aggressive") {
-    // Aggressive single-pass repair with higher tolerance
-    // Good for models with many small errors
-    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
-    command = `${admeshPath} --write-binary-stl="${outputPath}" --normal-directions --normal-values --exact --tolerance=0.01 --nearby --iterations=5 "${inputPath}"`;
-    repairAttempts.push({ name: "Aggressive", command });
-  } else if (strategy === "standard") {
-    // Standard repair (original approach)
-    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
-    command = `${admeshPath} --write-binary-stl="${outputPath}" --normal-directions --normal-values --exact --tolerance=0.001 --nearby --iterations=2 "${inputPath}"`;
-    repairAttempts.push({ name: "Standard", command });
-  } else {
-    // Progressive repair: try multiple strategies, use the best result
-    // This is the default and most thorough approach
-
-    // Strategy 1: Conservative - tight tolerance, fewer iterations
-    repairAttempts.push({
-      name: "Conservative",
-      command: `${admeshPath} --write-binary-stl="${outputPath}.pass1" --normal-directions --normal-values --exact --tolerance=0.001 --nearby --iterations=2 "${inputPath}"`,
-      outputFile: `${outputPath}.pass1`,
-    });
-
-    // Strategy 2: Moderate - medium tolerance, more iterations
-    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
-    repairAttempts.push({
-      name: "Moderate",
-      command: `${admeshPath} --write-binary-stl="${outputPath}.pass2" --normal-directions --normal-values --exact --tolerance=0.005 --nearby --iterations=4 "${inputPath}"`,
-      outputFile: `${outputPath}.pass2`,
-    });
-
-    // Strategy 3: Aggressive - high tolerance, maximum iterations
-    // Note: Does NOT use --remove-unconnected or --fill-holes to preserve multi-part models and intentional holes
-    repairAttempts.push({
-      name: "Aggressive",
-      command: `${admeshPath} --write-binary-stl="${outputPath}.pass3" --normal-directions --normal-values --exact --tolerance=0.01 --nearby --iterations=6 "${inputPath}"`,
-      outputFile: `${outputPath}.pass3`,
-    });
+  if (verbose) {
+    console.log(`[STL REPAIR] Running PyMeshLab: ${command}`);
   }
 
-  if (strategy === "progressive") {
-    // Run all repair strategies and pick the best one
+  try {
+    const { stdout, stderr } = await execAsync(command);
+
+    if (verbose && stderr) {
+      console.log(`[STL REPAIR] PyMeshLab stderr:\n${stderr}`);
+    }
+
+    // Parse JSON output from Python script
+    const result = JSON.parse(stdout);
+
+    if (!result.success) {
+      throw new Error(result.error || "PyMeshLab repair failed");
+    }
+
     if (verbose) {
-      console.log(`[STL REPAIR] Using progressive repair strategy with ${repairAttempts.length} passes`);
+      console.log(`[STL REPAIR] PyMeshLab repair completed:`, result);
     }
-
-    let bestResult = null;
-    let bestDisconnectedCount = Infinity;
-
-    for (const attempt of repairAttempts) {
-      try {
-        if (verbose) {
-          console.log(`[STL REPAIR] Trying ${attempt.name} repair...`);
-          console.log(`[STL REPAIR] Command: ${attempt.command}`);
-        }
-
-        const { stdout, stderr } = await execAsync(attempt.command);
-
-        // Parse the output to count disconnected facets
-        const disconnectedMatch = stdout.match(/Total disconnected facets\s*:\s*\d+\s+(\d+)/);
-        const disconnectedCount = disconnectedMatch ? parseInt(disconnectedMatch[1], 10) : Infinity;
-
-        if (verbose) {
-          console.log(`[STL REPAIR] ${attempt.name} result: ${disconnectedCount} disconnected facets`);
-        }
-
-        // Keep track of the best result
-        if (disconnectedCount < bestDisconnectedCount) {
-          bestDisconnectedCount = disconnectedCount;
-          bestResult = {
-            name: attempt.name,
-            outputFile: attempt.outputFile,
-            stdout,
-            stderr,
-            disconnectedCount,
-          };
-        }
-
-        // If we achieved a perfect repair, stop trying
-        if (disconnectedCount === 0) {
-          if (verbose) {
-            console.log(`[STL REPAIR] Perfect repair achieved with ${attempt.name} strategy!`);
-          }
-          break;
-        }
-      } catch (error) {
-        if (verbose) {
-          console.warn(`[STL REPAIR] ${attempt.name} repair failed:`, error.message);
-        }
-        // Continue to next strategy
-      }
-    }
-
-    if (!bestResult) {
-      throw new Error("All repair strategies failed");
-    }
-
-    // Use the best result
-    if (verbose) {
-      console.log(
-        `[STL REPAIR] Best result: ${bestResult.name} with ${bestResult.disconnectedCount} disconnected facets`,
-      );
-      console.log(`[STL REPAIR] ADMesh output:\n${bestResult.stdout}`);
-    }
-
-    // Copy the best result to the final output path
-    const { copyFile } = await import("fs/promises");
-    await copyFile(bestResult.outputFile, outputPath);
-
-    // Clean up temporary files
-    for (const attempt of repairAttempts) {
-      if (attempt.outputFile && (await fileExists(attempt.outputFile))) {
-        unlinkSync(attempt.outputFile);
-      }
-    }
-
-    // Get repaired file size
-    const repairedSize = await getFileSize(outputPath);
 
     return {
       success: true,
-      outputPath,
-      originalSize,
-      repairedSize,
-      sizeDifference: repairedSize - originalSize,
-      admeshOutput: bestResult.stdout,
-      strategy: bestResult.name,
-      disconnectedFacets: bestResult.disconnectedCount,
+      outputPath: result.outputPath,
+      originalSize: result.originalSize,
+      repairedSize: result.repairedSize,
+      sizeDifference: result.sizeDifference,
+      pymeshlabOutput: result,
+      backend: "pymeshlab",
     };
-  } else {
-    // Single-strategy repair (standard or aggressive)
-    if (verbose) {
-      console.log(`[STL REPAIR] Running: ${command}`);
+  } catch (error) {
+    console.error("[STL REPAIR] PyMeshLab error:", error.message);
+
+    // Provide more helpful error messages
+    if (error.message.includes("command not found") || error.message.includes("No module named")) {
+      throw new Error("PyMeshLab not found. Install with: pip3 install pymeshlab");
     }
 
-    try {
-      const { stdout, stderr } = await execAsync(command);
-
-      if (verbose && stdout) {
-        console.log(`[STL REPAIR] ADMesh output:\n${stdout}`);
-      }
-
-      if (stderr && verbose) {
-        console.log(`[STL REPAIR] ADMesh stderr:\n${stderr}`);
-      }
-
-      // Verify output file was created
-      if (!(await fileExists(outputPath))) {
-        throw new Error(`ADMesh failed to create output file: ${outputPath}`);
-      }
-
-      // Get repaired file size
-      const repairedSize = await getFileSize(outputPath);
-
-      // Parse disconnected facets count
-      const disconnectedMatch = stdout.match(/Total disconnected facets\s*:\s*\d+\s+(\d+)/);
-      const disconnectedCount = disconnectedMatch ? parseInt(disconnectedMatch[1], 10) : null;
-
-      return {
-        success: true,
-        outputPath,
-        originalSize,
-        repairedSize,
-        sizeDifference: repairedSize - originalSize,
-        admeshOutput: stdout,
-        strategy,
-        disconnectedFacets: disconnectedCount,
-      };
-    } catch (error) {
-      console.error("[STL REPAIR] Error:", error.message);
-
-      // Provide more helpful error messages
-      if (error.message.includes("command not found")) {
-        throw new Error("ADMesh not found in PATH. Install with: brew install admesh");
-      }
-
-      throw new Error(`STL repair failed: ${error.message}`);
-    }
+    throw new Error(`STL repair with PyMeshLab failed: ${error.message}`);
   }
 }
 
@@ -341,4 +205,55 @@ export async function isSTLWatertight(filePath) {
 export async function needsRepair(filePath) {
   const isWatertight = await isSTLWatertight(filePath);
   return !isWatertight;
+}
+
+/**
+ * Repair an STL file using PyMeshLab
+ *
+ * @param {string} inputPath - Path to the input STL file
+ * @param {string} outputPath - Path to save the repaired STL file
+ * @param {object} options - Repair options
+ * @param {boolean} options.verbose - Enable verbose logging (default: false)
+ * @returns {Promise<object>} Repair result with outputPath, originalSize, repairedSize
+ */
+export async function repairSTL(inputPath, outputPath, options = {}) {
+  const { verbose = false } = options;
+
+  // Check if PyMeshLab is installed
+  const hasPyMeshLab = await isPyMeshLabInstalled();
+
+  if (verbose) {
+    console.log(`[STL REPAIR] PyMeshLab available: ${hasPyMeshLab}`);
+  }
+
+  if (hasPyMeshLab) {
+    if (verbose) {
+      console.log(`[STL REPAIR] Using PyMeshLab backend`);
+    }
+    return await repairSTLWithPyMeshLab(inputPath, outputPath, options);
+  } else {
+    // No repair backend available - log warning but don't throw error
+    // This allows the application to continue working without STL repair
+    if (verbose) {
+      console.warn("[STL REPAIR] PyMeshLab not available. Install with: pip3 install pymeshlab");
+      console.warn("[STL REPAIR] Returning original file without repair");
+    }
+
+    // Return a result indicating no repair was performed
+    const originalSize = await getFileSize(inputPath);
+
+    // Copy input to output so the file exists at the expected location
+    const { copyFile } = await import("fs/promises");
+    await copyFile(inputPath, outputPath);
+
+    return {
+      success: true,
+      outputPath,
+      originalSize,
+      repairedSize: originalSize,
+      sizeDifference: 0,
+      backend: "none",
+      warning: "PyMeshLab not available - file was not repaired",
+    };
+  }
 }

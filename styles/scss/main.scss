@@ -224,6 +224,55 @@ body {
   filter: contrast(1) saturate(1) brightness(1);
 }
 
+// Refresh Stream Button
+.refresh-stream-btn {
+  position: fixed;
+  top: 1rem;
+  right: 5rem; // Move to the left of hamburger menu
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 950;
+  transition: all 0.2s ease;
+  color: white;
+  padding: 0;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+
+    svg {
+      animation: spin 0.5s ease-in-out;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 // Printer Status Overlay
 .printer-status {
   position: fixed;
