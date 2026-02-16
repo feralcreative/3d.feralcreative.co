@@ -175,6 +175,11 @@ class ActivityLogger {
     document.addEventListener("visibilitychange", () => {
       if (window.auth && window.auth.user) {
         this.logEvent(document.hidden ? "page_hidden" : "page_visible", {}, window.auth.user);
+
+        // Refresh the video stream when page becomes visible (for PWA/iOS)
+        if (!document.hidden && window.auth.refreshStream) {
+          window.auth.refreshStream();
+        }
       }
     });
 
