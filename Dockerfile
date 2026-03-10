@@ -1,6 +1,6 @@
 # Multi-stage build for 3D Printer Stream application
 # Build stage
-FROM --platform=linux/amd64 node:20-alpine AS builder
+FROM --platform=linux/amd64 node:20-slim AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM --platform=linux/amd64 node:20-alpine
+FROM --platform=linux/amd64 node:20-slim
 
 WORKDIR /app
 
@@ -92,8 +92,8 @@ ENV WEB_PORT=6198
 ENV PRINTER_PROXY_PORT=6199
 
 # Create startup script
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'php-fpm83 &' >> /app/start.sh && \
+RUN echo '#!/bin/bash' > /app/start.sh && \
+    echo 'service php8.3-fpm start' >> /app/start.sh && \
     echo 'nginx &' >> /app/start.sh && \
     echo 'pm2 start printer-proxy-server.js --name printer-proxy --no-daemon' >> /app/start.sh && \
     chmod +x /app/start.sh
