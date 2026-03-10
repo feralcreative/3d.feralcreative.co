@@ -219,6 +219,12 @@ class GoogleAuth {
         // Initialize printer status monitoring
         this.initPrinterStatus();
       }
+
+      // Handle deeplink: open model viewer if ?model=filename is in URL
+      const modelParam = new URLSearchParams(window.location.search).get("model");
+      if (modelParam && window.modelViewer) {
+        window.modelViewer.openModal(modelParam);
+      }
     } else {
       // User is signed out
       loginScreen.style.display = "flex";

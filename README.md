@@ -2,22 +2,26 @@
 
 Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer with real-time status overlay and Google OAuth authentication.
 
-![Screenshot of https://3d.feralcreative.co](screenshot.jpg)
+![Screenshot of https://3d.feralcreative.co](public/images/screenshot.jpg)
 
 ## Features
 
 - **Live MJPEG Stream** - Real-time video from Synology Surveillance Station
-- **Google OAuth Authentication** - Secure access with email whitelisting
+- **Google OAuth Authentication** - Secure access with tiered email whitelisting
 - **Real-time Printer Status** - Temperature, progress, and print information overlay
-- **3D Model Viewer** - View current print model in 3D by clicking the filename
-- **File Upload with STL Repair** - Upload files directly to printer with automatic STL repair using ADMesh
+- **3D Model Viewer** - View current print model in 3D by clicking the filename or via `?model=` URL deeplink
+- **File Upload with STL Repair** - Upload files directly to printer with automatic STL repair using PyMeshLab
+- **Slack Notifications** - Print event alerts (started, completed, failed, paused)
 - **Responsive Design** - Works on desktop and mobile devices
+- **PWA Support** - Installable on iOS and Android with proper meta tags
 - **Dev Mode** - Bypass authentication on localhost for development
-- **Docker Deployment** - Containerized deployment to Synology NAS
+- **Docker Deployment** - Containerized deployment (Nginx + Node.js + PHP) to Synology NAS
 
 ## 3D Model Viewer
 
 The application includes an interactive 3D model viewer that allows you to view the current print model in 3D.
+
+![Screenshot of model viewer](public/images/model-viewer.jpg)
 
 ### How to Use
 
@@ -25,6 +29,7 @@ The application includes an interactive 3D model viewer that allows you to view 
 2. **Match Filenames**: The STL filename (without extension) must match the job filename reported by the printer
    - Example: If printer shows `test-cube.3mf`, place file as `public/models/test-cube.stl`
 3. **Click to View**: When a print is active, click the filename in the printer status overlay to open the 3D viewer
+4. **Deep Link**: Share or bookmark `https://3d.feralcreative.co/?model=filename` to open a specific model directly
 
 ### File Format
 
@@ -63,16 +68,16 @@ cp my-awesome-print.stl public/models/
 
 ## STL File Upload & Repair
 
-The application includes a built-in file upload system with automatic STL repair functionality powered by ADMesh.
+The application includes a built-in file upload system with automatic STL repair functionality powered by PyMeshLab.
 
 ### Features
 
 - **Drag & Drop Upload** - Upload STL, 3MF, GX, and GCODE files directly to the printer
 - **Automatic STL Repair** - Fixes common issues in STL files before printing:
-  - Inverted normals (faces pointing the wrong direction)
-  - Non-manifold edges (edges shared by more than two faces)
-  - Holes in the mesh
-  - Incorrect normal values
+  - Non-manifold edges
+  - Duplicate faces
+  - Inverted normals
+  - Isolated vertices and degenerate faces
 - **Optional Repair** - Toggle automatic repair on/off per upload
 - **Print Options** - Start printing immediately and/or level bed before printing
 - **File Validation** - Checks file type and size (max 500MB)
@@ -80,28 +85,23 @@ The application includes a built-in file upload system with automatic STL repair
 
 ### Installation Requirements
 
-ADMesh must be installed on the server running the printer proxy:
+PyMeshLab must be available on the server:
 
 ```bash
-# On macOS (development)
-brew install admesh
+# Install Python + PyMeshLab
+pip install pymeshlab
 
-# On Linux (production/Docker)
-apt-get install admesh
+# Verify installation
+python3 -c "import pymeshlab; print('PyMeshLab OK')"
 ```
 
-**Verify installation:**
-
-```bash
-admesh --version
-# Should output: ADMesh - version 0.98.5 (or similar)
-```
+The Docker image installs PyMeshLab automatically.
 
 ### How to Use
 
 1. **Sign in** to the application with your authorized Google account
 2. **Click the hamburger menu** (three lines) in the top-left corner
-3. **Click "Upload File"** to open the upload modal
+3. **Click "Upload File"** to open the upload modal (requires upload permission)
 4. **Select or drag & drop** your file (STL, 3MF, GX, or GCODE)
 5. **Configure options:**
    - ✅ **Automatically repair STL files** (recommended, enabled by default)
@@ -112,66 +112,28 @@ admesh --version
 
 **Default behavior**: The file will be repaired (if STL) and downloaded to your computer. The printer will NOT be touched unless you explicitly check "Send to printer".
 
-### What Gets Fixed
+## Access Control
 
-ADMesh automatically repairs the following issues in STL files:
+The application uses a three-tier permission system:
 
-- **Inverted Normals**: Ensures all face normals point outward
-- **Non-Manifold Edges**: Fixes edges shared by more than two faces
-- **Holes**: Attempts to close holes in the mesh
-- **Degenerate Facets**: Removes zero-area triangles
-- **Normal Values**: Recalculates normal vectors for accuracy
+| Tier     | Config Key              | Access                                           |
+| -------- | ----------------------- | ------------------------------------------------ |
+| Viewer   | `ALLOWED_EMAILS`        | View stream, see printer status                  |
+| Uploader | `UPLOAD_ALLOWED_EMAILS` | All above + file upload                          |
+| Advanced | `ADVANCED_FEATURES`     | All above + STL repair, prep for filament change |
 
-### Troubleshooting
+Domain wildcards are supported (e.g., `@feralcreative.co` grants access to all addresses on that domain).
 
-#### "ADMesh not installed" Error
+## Slack Notifications
 
-**Cause**: ADMesh is not installed or not in the system PATH
+The application sends Slack notifications for key print events:
 
-**Solution**:
+- Print started
+- Print completed
+- Print failed
+- Print paused
 
-```bash
-# Install ADMesh
-brew install admesh  # macOS
-# or
-apt-get install admesh  # Linux
-
-# Verify installation
-which admesh
-admesh --version
-```
-
-#### Upload Fails with "Invalid file type"
-
-**Cause**: File extension is not supported
-
-**Solution**: Only these file types are supported:
-
-- `.stl` - STL files (ASCII or binary)
-- `.3mf` - 3MF files (from Orca Slicer, PrusaSlicer, etc.)
-- `.gx` - FlashForge proprietary format
-- `.gcode` - Standard G-code files
-
-#### Repair Takes Too Long
-
-**Cause**: Large or complex STL files can take time to repair
-
-**Solution**:
-
-- Wait for the repair to complete (usually < 30 seconds)
-- For very large files, consider disabling automatic repair
-- Simplify the model in your CAD software before exporting
-
-#### File Uploads But Doesn't Appear on Printer
-
-**Cause**: Printer may not have received the file or is busy
-
-**Solution**:
-
-- Check printer status overlay for errors
-- Verify printer is connected to the network
-- Try uploading again
-- Check printer's local file list on the printer's touchscreen
+Notifications are sent via a webhook configured in `config.js`. The system includes a 1-minute cooldown to avoid duplicate notifications.
 
 ## Quick Start
 
@@ -185,11 +147,11 @@ npm install
 npm start
 ```
 
-This starts the **Vite dev server** on <http://localhost:5501>
+This starts the **Vite dev server** on <http://localhost:5501> and the **proxy server** on <http://localhost:3001>.
 
 Visit: <http://localhost:5501>
 
-**Note:** In production, the printer API is accessed through a reverse proxy at `https://printer.yourdomain.com` which routes to the Docker container running `printer-proxy-server.js` on port 6199.
+**Note:** In production, the printer API is accessed through a reverse proxy at `https://3dprinter.feralcreative.co` which routes to the Docker container running `printer-proxy-server.js` on port 6199.
 
 ### Production Build
 
@@ -376,9 +338,9 @@ docker images 3d-printer-stream:latest
 
 **Port Already in Use:**
 
-- Port 6198 is configured for this project
-- If port is in use, update `docker-compose.yml` and `utils/deploy/prod.sh`
-- Choose a unique port not used by other projects
+- Port 6198 (Nginx/web) and 6199 (printer proxy) are configured for this project
+- If ports are in use, update `docker-compose.yml` and `utils/deploy/prod.sh`
+- Choose unique ports not used by other projects
 
 ## Project Structure
 
@@ -387,23 +349,35 @@ docker images 3d-printer-stream:latest
 ├── index.html                  # Main application page
 ├── auth.js                     # Google OAuth authentication
 ├── printer.js                  # Printer API client
-├── printer-proxy-server.js     # Printer API proxy server (runs in Docker)
 ├── config.js                   # Application configuration
 ├── logger.js                   # Client-side logging utility
+├── notifications.js            # Slack notification integration
+├── viewer-3d.js                # 3D model viewer module
+├── printer-proxy-server.js     # Printer API proxy server (runs in Docker)
+├── server.js                   # Development proxy server (port 3001)
 ├── styles/
-│   ├── scss/                  # SCSS source files
-│   └── css/                   # Compiled CSS
-├── images/                    # Images and icons
+│   ├── scss/                   # SCSS source files
+│   └── css/                    # Compiled CSS
+├── images/                     # Images and icons
+├── public/
+│   └── models/                 # STL model files for 3D viewer
 ├── utils/
+│   ├── stl-repair.js           # PyMeshLab STL repair wrapper (Node.js)
+│   ├── pymeshlab-repair.py     # Python STL repair script
+│   ├── tcp-gcode-session.js    # Direct TCP G-code communication
+│   ├── patch-server.js         # Patch/gcode server utility
+│   ├── log.php                 # Server-side logging endpoint
+│   ├── view-logs.php           # Log viewer interface
+│   ├── printer-proxy.php       # PHP printer API proxy
 │   └── deploy/
-│       ├── prod.sh            # Production deployment script
-│       └── deploy-utils.sh    # Deployment utilities
-├── Dockerfile                 # Docker image definition
-├── docker-compose.yml         # Docker Compose configuration
-├── .dockerignore              # Docker build exclusions
-├── .env                       # Environment variables (not in git)
-├── .env.example               # Environment template
-└── vite.config.js             # Vite configuration
+│       ├── prod.sh             # Production deployment script
+│       └── deploy-utils.sh     # Deployment utilities
+├── Dockerfile                  # Docker image definition (Nginx + Node.js + PHP + PyMeshLab)
+├── docker-compose.yml          # Docker Compose configuration
+├── .dockerignore               # Docker build exclusions
+├── .env                        # Environment variables (not in git)
+├── .env.example                # Environment template
+└── vite.config.js              # Vite configuration
 ```
 
 ## Technology Stack
@@ -414,9 +388,13 @@ docker images 3d-printer-stream:latest
 - **Video Stream**: MJPEG from Synology Surveillance Station
 - **Printer API**: FlashForge Adventurer 5M Pro HTTP API
 - **3D Model Viewer**: [Online 3D Viewer](https://github.com/kovacsv/online3dviewer) by Viktor Kovacs
-- **Printer Proxy**: Node.js + Express (runs in Docker on port 6199)
+- **STL Repair**: PyMeshLab (Python) via `utils/pymeshlab-repair.py`
+- **Dev Proxy**: Node.js + Express (`server.js` on port 3001)
+- **Production Proxy**: Node.js + Express (`printer-proxy-server.js` on port 6199)
+- **Web Server**: Nginx (serves static frontend on port 6198 in Docker)
+- **Notifications**: Slack webhooks
 - **Deployment**: Docker + Docker Compose on Synology NAS
-- **Reverse Proxy**: Synology (printer.yourdomain.com → localhost:6199)
+- **Reverse Proxy**: Synology (3dprinter.feralcreative.co → localhost:6199)
 - **CDN**: Cloudflare (with automatic cache purging)
 
 ## Printer Proxy Architecture
@@ -428,28 +406,33 @@ The application uses a Node.js proxy server to communicate with the FlashForge p
 ```text
 Browser (yourdomain.com)
     ↓ HTTPS
-Synology Reverse Proxy (printer.yourdomain.com)
+Synology Reverse Proxy (3dprinter.feralcreative.co)
     ↓ HTTP
 Docker Container (printer-proxy-server.js:6199)
     ↓ HTTP
-FlashForge Printer (192.168.1.XXX:8898)
+FlashForge Printer (192.168.1.55:8898)
 ```
+
+### Docker Container Services
+
+The Docker container runs three services:
+
+1. **Nginx** (port 6198) — serves the built frontend static files
+2. **Node.js printer proxy** (`printer-proxy-server.js`, port 6199) — proxies requests to printer
+3. **PHP-FPM** — handles `log.php` and `view-logs.php`
+
+All managed by pm2.
 
 ### Configuration
 
 1. **Reverse Proxy Rule** (Synology DSM):
-   - Source: `https://printer.yourdomain.com:443`
+   - Source: `https://3dprinter.feralcreative.co:443`
    - Destination: `http://localhost:6199`
 
-2. **Docker Container**:
-   - Image: `3d-printer-stream:latest`
-   - Port: 6199 (exposed to host)
-   - Runs: `printer-proxy-server.js`
-
-3. **Endpoints**:
+2. **Endpoints**:
    - `/product` - Printer information
    - `/detail` - Machine status (temperatures, progress)
-   - `/job` - Current job information
+   - `/upload` - File upload and optional STL repair
 
 ### Why a Proxy?
 
@@ -458,22 +441,12 @@ The FlashForge printer's HTTP API doesn't support CORS, preventing direct browse
 - Adds CORS headers for browser compatibility
 - Runs on the same network as the printer
 - Provides verbose logging for troubleshooting
-- Validates and routes requests to the correct printer endpoints
+- Handles file upload and STL repair
+- Routes Slack notification webhooks to avoid CORS restrictions
 
 ## Acknowledgments
 
-This project uses the [FlashForge TypeScript API](https://github.com/GhostTypes/ff-5mp-api-ts) by GhostTypes as a reference for understanding the FlashForge Adventurer 5M Pro HTTP API. The API was created through reverse-engineering the communication between FlashForge printers and their official software.
-
-The FlashForge TypeScript API provides:
-
-- Comprehensive documentation of the HTTP and TCP protocols used by FlashForge printers
-- Support for Adventurer 5M/5M Pro, 5X, and legacy Adventurer 3/4 models
-- Full job control (start, stop, pause, resume)
-- File management and upload capabilities
-- Real-time printer status and job information
-- LED control and direct G-code execution
-
-While this project implements its own lightweight proxy server for browser compatibility, the FlashForge TypeScript API documentation was invaluable for understanding the printer's communication protocol.
+This project uses the [FlashForge TypeScript API](https://github.com/GhostTypes/ff-5mp-api-ts) by GhostTypes as a reference for understanding the FlashForge Adventurer 5M Pro HTTP API.
 
 ## License
 
@@ -481,4 +454,4 @@ ISC
 
 ## Author
 
-Ziad - Feral Creative
+Ziad Ezzat, [Feral Creative](https://github.com/feralcreative)
