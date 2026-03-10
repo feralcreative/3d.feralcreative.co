@@ -156,6 +156,7 @@ utils/deploy/deploy-printer-proxy.sh
 
 # Development logs and console output
 CONSOLE.txt
+TERMINAL.txt
 
 # Documentation with sensitive data
 _AI_AGENT_PRIMER.md
@@ -268,8 +269,10 @@ Icon?
 **/.secrets/*
 **/docs/*
 **/console.txt
+.claude
 
 # Vite build output
 dist/
 node_modules/
 package-lock.json
+**/public/models/*
