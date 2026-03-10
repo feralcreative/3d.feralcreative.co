@@ -9,22 +9,24 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://3d.feralcreative.co/">
-    <meta property="og:title" content="3D Printer Stream">
-    <meta property="og:description" content="Live stream of FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
+    <meta property="og:title" content="Feral Creative 3D Printing">
+    <meta property="og:description" content="Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
     <meta property="og:image" content="https://yourdomain.com/images/feral-3d.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://3d.feralcreative./">
     <meta property="twitter:title" content="3D Printer Stream">
-    <meta property="twitter:description" content="Live stream of FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
+    <meta property="twitter:description" content="Live stream of Feral Creative's FlashForge Adventurer 5M Pro 3D printer. Watch prints in real-time.">
     <meta property="twitter:image" content="https://3d.feralcreative./images/feral-3d.png">
 
-    <!-- PWA Manifest and Icons -->
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/images/web-app-manifest-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/images/web-app-manifest-512x512.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/images/web-app-manifest-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/images/web-app-manifest-512x512.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Feral 3D">
 
     <link rel="stylesheet" href="./styles/css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -96,6 +98,13 @@
     <!-- Stream Container (shown when authenticated) -->
     <div id="stream-container" class="stream-container">
         <a href="https://github.com/feralcreative" target="_blank" rel="noopener noreferrer"><img class="corner" src="/images/feral-corner-bottom-right@2x.png" alt="Your Brand"></a>
+        <button id="refresh-stream-btn" class="refresh-stream-btn" onclick="auth.refreshStream()" aria-label="Refresh video stream">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
         <img id="stream-image" src="" alt="3D Printer Stream" class="stream-image">
 
         <!-- Printer Status Overlay -->

@@ -219,6 +219,12 @@ class GoogleAuth {
         // Initialize printer status monitoring
         this.initPrinterStatus();
       }
+
+      // Handle deeplink: open model viewer if ?model=filename is in URL
+      const modelParam = new URLSearchParams(window.location.search).get("model");
+      if (modelParam && window.modelViewer) {
+        window.modelViewer.openModal(modelParam);
+      }
     } else {
       // User is signed out
       loginScreen.style.display = "flex";
@@ -232,6 +238,30 @@ class GoogleAuth {
         window.printerStatus.stopUpdates();
       }
     }
+  }
+
+  // Refresh the video stream (useful for PWA/iOS when returning to app)
+  refreshStream() {
+    if (!this.user) return;
+
+    const streamImage = document.getElementById("stream-image");
+    if (!streamImage) return;
+
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const streamUrl = isLocalhost ? CONFIG.STREAM_URL.DEV : CONFIG.STREAM_URL.PROD;
+
+    // Set up error handler to show offline image (in case refresh fails)
+    streamImage.onerror = function () {
+      this.src = "/images/offline.jpg";
+      this.onerror = null; // Prevent infinite loop
+    };
+
+    // Force reload the stream by adding a timestamp to bypass cache
+    // Use & instead of ? since the URL already has query parameters
+    const timestamp = new Date().getTime();
+    streamImage.src = `${streamUrl}&_t=${timestamp}`;
+
+    console.log("[STREAM] Refreshed video stream");
   }
 
   // Initialize printer status monitoring
@@ -542,3 +572,25 @@ window.addEventListener("load", async () => {
     auth.renderSignInButton();
   }
 });
+
+// Handle iOS PWA resume - refresh stream when app becomes active
+window.addEventListener("pageshow", (event) => {
+  // event.persisted is true when page is loaded from cache (iOS PWA resume)
+  if (event.persisted && auth && auth.user) {
+    console.log("[STREAM] Page restored from cache, refreshing stream");
+    auth.refreshStream();
+  }
+});
+
+// Additional fallback: refresh stream periodically to handle stale connections
+// This helps when the MJPEG stream dies but the page is still visible
+setInterval(() => {
+  if (auth && auth.user && !document.hidden) {
+    const streamImage = document.getElementById("stream-image");
+    if (streamImage && streamImage.complete && streamImage.naturalHeight === 0) {
+      // Image failed to load, refresh it
+      console.log("[STREAM] Detected broken stream, refreshing");
+      auth.refreshStream();
+    }
+  }
+}, 30000); // Check every 30 seconds
