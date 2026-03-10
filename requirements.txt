@@ -1,0 +1,7 @@
+# Python dependencies for 3D Printer Stream
+# Install with: pip3 install -r requirements.txt
+
+# PyMeshLab - Powerful mesh processing library for STL repair
+# Used by utils/stl-repair-pymeshlab.py
+# TODO: Re-enable when PyMeshLab migration is complete
+# pymeshlab>=2023.12

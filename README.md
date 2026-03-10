@@ -85,17 +85,22 @@ The application includes a built-in file upload system with automatic STL repair
 
 ### Installation Requirements
 
-PyMeshLab must be available on the server:
+PyMeshLab (Python library) must be installed on the server running the printer proxy:
 
 ```bash
-# Install Python + PyMeshLab
-pip install pymeshlab
+# Install Python dependencies
+pip3 install -r requirements.txt
 
-# Verify installation
-python3 -c "import pymeshlab; print('PyMeshLab OK')"
+# Or install PyMeshLab directly
+pip3 install pymeshlab
 ```
 
-The Docker image installs PyMeshLab automatically.
+**Verify installation:**
+
+```bash
+python3 -c "import pymeshlab; print(pymeshlab.__version__)"
+# Should output: 2025.7.post1 (or similar)
+```
 
 ### How to Use
 
@@ -112,7 +117,39 @@ The Docker image installs PyMeshLab automatically.
 
 **Default behavior**: The file will be repaired (if STL) and downloaded to your computer. The printer will NOT be touched unless you explicitly check "Send to printer".
 
-## Access Control
+### What Gets Fixed
+
+PyMeshLab automatically repairs the following issues in STL files:
+
+- **Duplicate Faces and Vertices**: Removes redundant geometry
+- **Unreferenced Vertices**: Cleans up unused vertices
+- **Non-Manifold Edges**: Fixes edges shared by more than two faces
+- **Non-Manifold Vertices**: Splits vertices to create manifold geometry
+- **Holes**: Closes holes in the mesh (up to 30 edges)
+- **Face Orientation**: Re-orients all faces coherently
+- **Mismatched Borders**: Snaps nearby vertices to close tiny gaps
+
+### Troubleshooting
+
+#### "PyMeshLab not installed" Error
+
+**Cause**: PyMeshLab is not installed or not in the Python PATH
+
+**Solution**:
+
+```bash
+# Install PyMeshLab
+pip3 install pymeshlab
+
+# Verify installation
+python3 -c "import pymeshlab; print(pymeshlab.__version__)"
+```
+
+#### Upload Fails with "Invalid file type"
+
+**Cause**: File extension is not supported
+
+**Solution**: Only these file types are supported:
 
 The application uses a three-tier permission system:
 
