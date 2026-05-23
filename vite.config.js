@@ -7,6 +7,11 @@ export default defineConfig({
   server: {
     port: 5501,
     open: true,
+    watch: {
+      // The ./3d symlink points into Dropbox (which has self-referential
+      // symlinks); excluding it prevents chokidar ELOOP crashes on startup.
+      ignored: ["**/3d/**"],
+    },
   },
   build: {
     outDir: "dist",
