@@ -270,6 +270,7 @@ Icon?
 **/docs/*
 **/console.txt
 .claude
+**/models/*.stl
 
 # Vite build output
 dist/
