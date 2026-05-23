@@ -14,12 +14,11 @@ class PrinterStatus {
 
     if (isLocalhost) {
       // Development: Use local proxy server to avoid CORS issues
-      this.baseUrl = `http://localhost:3001`;
+      this.baseUrl = CONFIG.PRINTER_PROXY_URL.DEV;
       this.useProxy = false;
     } else {
-      // Production: Use separate subdomain for printer API
-      // Synology reverse proxy forwards 3dprinter.feralcreative.co to localhost:6199
-      this.baseUrl = `https://3dprinter.feralcreative.co`;
+      // Production: Use /api which is proxied by Nginx to printer-proxy-server.js on port 6199
+      this.baseUrl = CONFIG.PRINTER_PROXY_URL.PROD;
       this.useProxy = false;
     }
 
@@ -439,40 +438,47 @@ class PrinterStatus {
 
   /**
    * Event handlers for state changes (to be overridden or used with callbacks)
+   * NOTE: Notifications are now handled server-side by printer-proxy-server.js
+   * Client-side notifications are disabled to prevent duplicates
    */
   onPrintStarted(status) {
     console.log("[PRINTER] Print started:", status.job.FileName);
-    if (window.notificationService) {
-      window.notificationService.notifyPrintStarted(status);
-    }
+    // Notifications handled server-side - client-side disabled to prevent duplicates
+    // if (window.notificationService) {
+    //   window.notificationService.notifyPrintStarted(status);
+    // }
   }
 
   onPrintCompleted(status) {
     console.log("[PRINTER] Print completed:", status.job.FileName);
-    if (window.notificationService) {
-      window.notificationService.notifyPrintCompleted(status);
-    }
+    // Notifications handled server-side - client-side disabled to prevent duplicates
+    // if (window.notificationService) {
+    //   window.notificationService.notifyPrintCompleted(status);
+    // }
   }
 
   onProgressMilestone(status, milestone) {
     console.log(`[PRINTER] Progress milestone: ${milestone}%`);
-    if (window.notificationService) {
-      window.notificationService.notifyProgress(status, milestone);
-    }
+    // Notifications handled server-side - client-side disabled to prevent duplicates
+    // if (window.notificationService) {
+    //   window.notificationService.notifyProgress(status, milestone);
+    // }
   }
 
   onPrintPaused(status) {
     console.log("[PRINTER] Print paused");
-    if (window.notificationService) {
-      window.notificationService.notifyPrintPaused(status);
-    }
+    // Notifications handled server-side - client-side disabled to prevent duplicates
+    // if (window.notificationService) {
+    //   window.notificationService.notifyPrintPaused(status);
+    // }
   }
 
   onPrintFailed(status) {
     console.log("[PRINTER] Print failed/cancelled");
-    if (window.notificationService) {
-      window.notificationService.notifyPrintFailed(status);
-    }
+    // Notifications handled server-side - client-side disabled to prevent duplicates
+    // if (window.notificationService) {
+    //   window.notificationService.notifyPrintFailed(status);
+    // }
   }
 
   /**

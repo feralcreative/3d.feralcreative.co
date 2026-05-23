@@ -10,13 +10,21 @@ class ModelViewer {
     this.viewerInstance = null;
     this.modalElement = null;
     this.updateInterval = null;
+    this.hashChangeHandler = null;
+
+    // Set up hash change listener
+    this.setupHashListener();
+
+    // Check for model in URL hash on initialization
+    this.checkHashOnLoad();
   }
 
   /**
    * Open modal and load 3D model
    * @param {string} fileName - Name of the model file to load
+   * @param {boolean} updateHash - Whether to update the URL hash (default: true)
    */
-  async openModal(fileName) {
+  async openModal(fileName, updateHash = true) {
     if (!fileName || fileName === "--") {
       console.warn("[MODEL VIEWER] No valid filename provided");
       return;
@@ -24,6 +32,11 @@ class ModelViewer {
 
     this.currentFileName = fileName;
     this.isOpen = true;
+
+    // Update URL hash if requested
+    if (updateHash) {
+      this.setHash(fileName);
+    }
 
     // Create modal if it doesn't exist
     if (!this.modalElement) {
@@ -45,12 +58,18 @@ class ModelViewer {
 
   /**
    * Close modal and cleanup
+   * @param {boolean} updateHash - Whether to clear the URL hash (default: true)
    */
-  closeModal() {
+  closeModal(updateHash = true) {
     if (!this.isOpen) return;
 
     this.isOpen = false;
     this.currentFileName = null;
+
+    // Clear URL hash if requested
+    if (updateHash) {
+      this.clearHash();
+    }
 
     // Hide modal
     if (this.modalElement) {
@@ -485,6 +504,87 @@ class ModelViewer {
       console.log("[MODEL VIEWER] Added colored coordinate axes");
     } catch (error) {
       console.error("[MODEL VIEWER] Error adding axes:", error);
+    }
+  }
+
+  /**
+   * Set URL query parameter to model filename
+   * @param {string} fileName - Model filename to set in URL
+   */
+  setHash(fileName) {
+    if (!fileName) return;
+
+    // Encode the filename to handle special characters
+    const encodedFileName = encodeURIComponent(fileName);
+    const url = new URL(window.location);
+    url.searchParams.set("model", encodedFileName);
+
+    // Use history.pushState to avoid page reload
+    history.pushState(null, "", url);
+    console.log(`[MODEL VIEWER] Set URL parameter: ?model=${encodedFileName}`);
+  }
+
+  /**
+   * Clear URL query parameter
+   */
+  clearHash() {
+    const url = new URL(window.location);
+    if (url.searchParams.has("model")) {
+      url.searchParams.delete("model");
+      // Use history.replaceState to avoid adding to browser history
+      history.replaceState(null, "", url);
+      console.log("[MODEL VIEWER] Cleared URL parameter");
+    }
+  }
+
+  /**
+   * Get model filename from URL query parameter
+   * @returns {string|null} - Model filename or null if not found
+   */
+  getHashFileName() {
+    const url = new URL(window.location);
+    const fileName = url.searchParams.get("model");
+
+    if (fileName) {
+      console.log(`[MODEL VIEWER] Found model in URL: ${fileName}`);
+      return fileName;
+    }
+
+    return null;
+  }
+
+  /**
+   * Set up popstate listener for browser back/forward buttons
+   */
+  setupHashListener() {
+    this.hashChangeHandler = () => {
+      const fileName = this.getHashFileName();
+
+      if (fileName && !this.isOpen) {
+        // URL has model parameter and viewer is closed - open it
+        console.log(`[MODEL VIEWER] URL change detected, opening model: ${fileName}`);
+        this.openModal(fileName, false); // Don't update URL again
+      } else if (!fileName && this.isOpen) {
+        // URL parameter cleared and viewer is open - close it
+        console.log("[MODEL VIEWER] URL parameter cleared, closing viewer");
+        this.closeModal(false); // Don't clear URL again
+      }
+    };
+
+    window.addEventListener("popstate", this.hashChangeHandler);
+  }
+
+  /**
+   * Check for model in URL query parameter on page load
+   */
+  checkHashOnLoad() {
+    const fileName = this.getHashFileName();
+    if (fileName) {
+      console.log(`[MODEL VIEWER] Model found in URL on load: ${fileName}`);
+      // Wait a bit for the page to fully load before opening
+      setTimeout(() => {
+        this.openModal(fileName, false); // Don't update URL again
+      }, 500);
     }
   }
 }
