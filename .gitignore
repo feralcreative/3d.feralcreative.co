@@ -276,3 +276,4 @@ dist/
 node_modules/
 package-lock.json
 **/public/models/*
+3d
