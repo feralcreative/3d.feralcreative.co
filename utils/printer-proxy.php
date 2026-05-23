@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Printer configuration
-define('PRINTER_IP', '192.168.1.55');
+define('PRINTER_IP', '192.168.1.66');
 define('PRINTER_SERIAL', 'SNMOME9201982');
 define('PRINTER_CHECK_CODE', '7a385286');
 
