@@ -26,6 +26,6 @@
     "online-3d-viewer": "^0.18.0"
   },
   "devDependencies": {
-    "vite": "^5.0.0"
+    "vite": "^8.2.0"
   }
 }
