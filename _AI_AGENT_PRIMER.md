@@ -38,7 +38,7 @@ scad/
 ├── .gitignore
 ├── parts/                   # one .scad per design — the actual source
 │   └── example-spacer.scad  # template showing house style
-├── lib/                     # BOSL2 goes here (not yet installed)
+├── lib/                     # BOSL2 lives here, as a git submodule
 ├── renders/                 # generated PNGs (gitignored)
 ├── stl/                     # generated STLs (gitignored)
 └── utils/
@@ -89,6 +89,7 @@ Things that reliably bite, worth knowing before writing anything:
 - **`difference()` subtracts every child after the first.** Order matters; a misplaced brace silently changes the result.
 - **`$fn` controls curve resolution.** Set it once at the top of a part. High values make renders slow, so keep it moderate while iterating and raise it before the final STL.
 - **Preview and render are different operations.** `render.sh` produces PNGs quickly. `build.sh` runs the real mesh computation and can be genuinely slow on complex parts—do not assume it hung.
+- **Read the geometry summary `build.sh` prints.** `Status: NoError` means manifold, and `Genus` counts through-holes topologically—a part with one bore should report `Genus: 1`. If you punched a hole and genus came back `0`, the cut did not go through. That is a free correctness check on every build; do not ignore it.
 - **Output is manifold by construction.** Unlike SketchUp exports, OpenSCAD CSG output should not need mesh repair. The printer site has a PyMeshLab repair step for uploads; parts from here should pass through it untouched. If one does not, that is a real signal something is wrong with the geometry.
 
 ## House style for parts
@@ -104,12 +105,14 @@ Follow `parts/example-spacer.scad`:
 
 ## Current state
 
-Nothing is built yet. This is a fresh scaffold, and specifically:
+The toolchain is set up and verified end to end. No real parts exist yet—`parts/example-spacer.scad` is a template, not a design.
 
-- **Git is not initialized.** Ziad is handling that himself. Do not run `git init`.
-- **OpenSCAD is not installed** as of scaffolding. Both scripts look for `openscad` on `PATH` first, then fall back to `/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD`, since the macOS app bundle does not add itself to `PATH`.
-- **BOSL2 is not installed.** `lib/` is empty. It is the library that makes rounding, chamfering, and part attachment tolerable, and it should be added as a git submodule at `lib/BOSL2` once git exists. Parts that need fillets should use it rather than fighting `minkowski()`.
-- **The camera flags in `render.sh` are unverified.** They were written from general knowledge of the OpenSCAD CLI and have not been run against a real install. Confirm them against `openscad --help` on first use—flag syntax has drifted between the 2021.01 stable release and the newer development snapshots, and `--camera`, `--viewall`, and `--autocenter` are the ones to check.
+- **OpenSCAD 2026.06.12** is installed at `/Applications/OpenSCAD.app`. It is *not* on `PATH`; both scripts fall back to `/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD`, which is the path that actually gets used. The CLI cannot be extracted from the bundle—it resolves 58 dylibs through `@rpath` internally—so a second machine needs its own install.
+- **BOSL2 is installed** as a git submodule at `lib/BOSL2` (v2.0.747). Clone with `--recurse-submodules`. Use it for rounding, chamfering, and attachment rather than fighting `minkowski()`.
+- **`include <BOSL2/std.scad>` works only through the scripts.** `lib/` is not a directory OpenSCAD searches, so `render.sh` and `build.sh` export `OPENSCADPATH` pointing at it. Invoking the `openscad` binary directly, outside those scripts, will fail to resolve the include.
+- **The camera flags are verified.** `--camera`, `--projection`, `--viewall`, and `--autocenter` all behave as written on 2026.06.12. This was checked with a deliberately asymmetric test rig, because the example spacer is rotationally symmetric and its front and right views are pixel-identical whether the flags work or not. If you ever re-verify this, do not use a symmetric part.
+- **The three elevations render orthographic**, so they read as true drawings; iso stays perspective as an overview.
+- **STLs export as ASCII**, which is OpenSCAD's default. `--export-format=binstl` produces much smaller files if that ever matters for the web viewer.
 
 ## Possible future work
 
