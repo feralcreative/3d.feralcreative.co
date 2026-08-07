@@ -1,0 +1,12 @@
+# Generated output — reproducible from source, never committed
+renders/*
+!renders/.gitkeep
+stl/*
+!stl/.gitkeep
+
+# macOS
+.DS_Store
+
+# BOSL2 is expected at lib/BOSL2 as a git submodule.
+# If you'd rather vendor it as a plain clone instead, uncomment:
+# lib/BOSL2/
