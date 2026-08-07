@@ -21,6 +21,12 @@ set -euo pipefail
 
 OUTDIR="${OUTDIR:-stl}"
 
+# Libraries live in lib/, which is not one of OpenSCAD's default search paths.
+# Exporting OPENSCADPATH is what lets a part say `include <BOSL2/std.scad>` and
+# have it resolve — and it works no matter which directory you invoke from.
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export OPENSCADPATH="${REPO_ROOT}/lib${OPENSCADPATH:+:$OPENSCADPATH}"
+
 NAS_HOST="nas.feralcreative.co"
 NAS_PORT="33725"
 NAS_USER="ziad"

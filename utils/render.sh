@@ -16,12 +16,22 @@ set -euo pipefail
 IMGSIZE="${IMGSIZE:-1200,900}"
 OUTDIR="${OUTDIR:-renders}"
 
-# view name : rot_x,rot_y,rot_z
+# Libraries live in lib/, which is not one of OpenSCAD's default search paths.
+# Exporting OPENSCADPATH is what lets a part say `include <BOSL2/std.scad>` and
+# have it resolve — and it works no matter which directory you invoke from.
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export OPENSCADPATH="${REPO_ROOT}/lib${OPENSCADPATH:+:$OPENSCADPATH}"
+
+# view name : rot_x,rot_y,rot_z : projection
+#
+# Orthographic on the three elevations so they read as true drawings — no
+# perspective taper, so edges that should line up visibly line up. Iso stays
+# perspective purely because it looks better as an overview.
 VIEWS=(
-  "iso:55,0,25"
-  "front:90,0,0"
-  "right:90,0,90"
-  "top:0,0,0"
+  "iso:55,0,25:p"
+  "front:90,0,0:o"
+  "right:90,0,90:o"
+  "top:0,0,0:o"
 )
 
 find_openscad() {
@@ -57,8 +67,7 @@ BASE="$(basename "$SCAD" .scad)"
 mkdir -p "$OUTDIR"
 
 for view in "${VIEWS[@]}"; do
-  name="${view%%:*}"
-  rot="${view##*:}"
+  IFS=':' read -r name rot proj <<< "$view"
   out="$OUTDIR/${BASE}-${name}.png"
 
   # gimbal camera: translate_x,y,z , rot_x,y,z , dist
@@ -67,6 +76,7 @@ for view in "${VIEWS[@]}"; do
     -o "$out" \
     --imgsize="$IMGSIZE" \
     --camera="0,0,0,${rot},0" \
+    --projection="$proj" \
     --viewall \
     --autocenter \
     "$@" \
