@@ -30,12 +30,22 @@ include <BOSL2/threading.scad>
 
 /* [Body] */
 height    = 19.20;  // overall height (mm)
-collar_d  = 13.60;  // outside diameter at the bottom, between ribs (mm)
+collar_d  = 14.50;  // outside diameter at the bottom, between ribs (mm)
 collar_h  = 2.00;   // straight section at the bottom, before the flare (mm)
 barrel_d  = 18.20;  // outside diameter of the barrel, between ribs (mm)
 barrel_z0 = 9.00;   // height at which the flare reaches full diameter (mm)
 barrel_z1 = 15.50;  // height at which the top taper starts (mm)
 top_d     = 17.39;  // outside diameter at the top face, between ribs (mm)
+
+// collar_d was 13.60 on the legacy mesh. The collar is straight while the bore
+// under it is already coning open, so the wall thinned as it climbed and hit
+// 0.867 mm at the top of the collar — the thinnest section anywhere in the part,
+// thinner than the thread wall. A rib bead then sits on top of that, taking the
+// section to 1.65 mm at each rib and back to 0.87 between: the slicer changes
+// its mind about how many wall loops fit twelve times a layer, and every change
+// leaves an unfilled pocket inside a rib. 14.50 puts the thin spot at 1.31 mm,
+// level with the thinnest section elsewhere. It costs 0.9 mm of diameter at the
+// bottom and nothing else — the collar is a grip surface and mates with nothing.
 
 /* [Grip ribs] */
 rib_count    = 12;    // beads around the barrel
