@@ -29,6 +29,22 @@ That writes four PNGs to `renders/`—iso, front, right, top. **Read all four.**
 
 Treat a render you have not looked at as work not done.
 
+## Design against the printer, not in the abstract
+
+`docs/flashforge-ad5m-pro-scad-reference.md` is the constraint set for the machine these parts get printed on, a FlashForge Adventurer 5M Pro. Read it before choosing a wall thickness, a clearance, a facet count, or a position on the plate. It is not background reading, it is the numbers.
+
+What is in there that actually changes geometry:
+
+- **Wall-thickness ladders per nozzle.** A wall that is not an integer multiple of the extrusion width prints with gaps or over-extrusion. On a 0.4 nozzle, 2 mm is a bad number and 1.68 and 2.10 are good ones.
+- **Clearance ladders** for press, snug, free, and print-in-place fits, anchored to values known to work on this machine rather than to general advice.
+- **Faceting rules**, including that OpenSCAD's polygons are inscribed, so holes come out undersized before any printing effect is considered.
+- **The safe build envelope**, which is smaller than the nominal one once the purge strip, the wipe strip, and the unprobed border are taken off.
+- **The binding constraint.** On this machine it is the MCU, not the motion system, so simple geometry beats clever geometry. Section 6 spells out what that rules out.
+
+Every figure carries a source and an evidence marker, and they are not interchangeable: `[SPEC]` is a hard constraint, `[FIELD]` is a field report, `[DERIVED]` is arithmetic done inside the document, and ⚠️ is contested or unverified. A ⚠️ is something to raise with Ziad, not something to quietly design around.
+
+`docs/printer-profile-research-prompt.md` is the prompt that produced that reference. You do not need it to design anything. It matters only if the hardware changes, or if someone wants the same document built for a different printer.
+
 ## Layout
 
 ```text
@@ -37,7 +53,9 @@ scad/
 ├── README.md                # short human-facing summary
 ├── .gitignore
 ├── parts/                   # one .scad per design — the actual source
-│   └── example-spacer.scad  # template showing house style
+│   ├── example-spacer.scad  # template showing house style
+│   └── art/                 # SVG artwork the parts import
+├── docs/                    # printer reference, and the prompt behind it
 ├── lib/                     # BOSL2 lives here, as a git submodule
 ├── renders/                 # generated PNGs (gitignored)
 ├── stl/                     # generated STLs (gitignored)
@@ -46,7 +64,7 @@ scad/
     └── build.sh             # part -> STL, optional --push to NAS
 ```
 
-Scripts live in `utils/`, never `scripts/`—that is Ziad's convention across all his repos. Documentation other than `README.md` and this file belongs in a `docs/` folder if one is ever needed.
+Scripts live in `utils/`, never `scripts/`—that is Ziad's convention across all his repos. Documentation other than `README.md` and this file belongs in `docs/`.
 
 <!--| PAGE-BREAK -->
 
@@ -105,14 +123,14 @@ Follow `parts/example-spacer.scad`:
 
 ## Current state
 
-The toolchain is set up and verified end to end. No real parts exist yet—`parts/example-spacer.scad` is a template, not a design.
+The toolchain is set up and verified end to end. `parts/example-spacer.scad` is still a template rather than a design, but real parts now exist alongside it: the two halves of a chalk holder that thread together, and a painter's pyramid. Those are remakes of legacy SketchUp-era meshes in `_incoming/`, so their dimensions were measured off the old geometry — which means a number in one of those files is as likely to be a faithfully copied mistake as a decision. The chalk holder's thread groove was 0.596 mm deeper than anything needed it to be for exactly that reason.
 
 - **OpenSCAD 2026.06.12** is installed at `/Applications/OpenSCAD.app`. It is *not* on `PATH`; both scripts fall back to `/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD`, which is the path that actually gets used. The CLI cannot be extracted from the bundle—it resolves 58 dylibs through `@rpath` internally—so a second machine needs its own install.
 - **BOSL2 is installed** as a git submodule at `lib/BOSL2` (v2.0.747). Clone with `--recurse-submodules`. Use it for rounding, chamfering, and attachment rather than fighting `minkowski()`.
 - **`include <BOSL2/std.scad>` works only through the scripts.** `lib/` is not a directory OpenSCAD searches, so `render.sh` and `build.sh` export `OPENSCADPATH` pointing at it. Invoking the `openscad` binary directly, outside those scripts, will fail to resolve the include.
 - **The camera flags are verified.** `--camera`, `--projection`, `--viewall`, and `--autocenter` all behave as written on 2026.06.12. This was checked with a deliberately asymmetric test rig, because the example spacer is rotationally symmetric and its front and right views are pixel-identical whether the flags work or not. If you ever re-verify this, do not use a symmetric part.
 - **The three elevations render orthographic**, so they read as true drawings; iso stays perspective as an overview.
-- **STLs export as ASCII**, which is OpenSCAD's default. `--export-format=binstl` produces much smaller files if that ever matters for the web viewer.
+- **STLs export as binary.** OpenSCAD's own default is ASCII, which is the same geometry at roughly seven times the size — a part carrying artwork ran to 63 MB before the switch and 11 MB after. `build.sh` passes `--export-format=binstl` for you; pass `--ascii` if you need to read or diff a mesh by eye.
 
 ## Possible future work
 
