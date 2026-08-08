@@ -49,6 +49,13 @@ slot_z0 =  4.600;  // start, above the bottom face (mm)
 slot_h  = 60.000;  // length (mm)
 slot_az = 270;     // which way it faces (deg)
 
+// Break on the two long edges where the slot comes out through the outside,
+// so they do not feel sharp under the fingers. It widens what you see: the
+// walls stay where they are but the mouth opens up by roughly this much either
+// side, so 0.40 turns a 2.00 slot into about 2.80 at the surface. The two ends
+// of the slot are left square — nothing rests on them.
+slot_round = 0.400;  // (mm)
+
 /* [Collar] */
 // With collar_d equal to body_d this is no longer a flare — it is just the last
 // stretch of body before the spigot, and the only thing still making it a collar
@@ -191,13 +198,40 @@ module blank() {
         cylinder(d1 = r_root * 2, d2 = collet_tip_d, h = collet_h);
 }
 
-// The slot down the body, cut clean through one wall only. The cube's first
-// dimension is a reach, not a diameter — it only has to run from the axis out
-// past the outside, so it is tied to the part's widest.
+// Cross-section of the slot, with its two outside corners rounded off.
+//
+// The rounding is worked on the body's section rather than on the cut, because
+// a corner that pokes into a void is convex, and rounding a convex corner means
+// taking material away. Erode by the radius and dilate back and that is exactly
+// what happens — the same trick the painter's pyramid uses on its lug tips. The
+// cut is then whatever the rounded section does not occupy.
+//
+// The strip runs from the axis outward, which is what keeps the slot through
+// one wall only. reach is a reach, not a diameter: it just has to clear the
+// outside. The corners it leaves at the axis end get rounded too, but they sit
+// at r = 1 and the bore takes them regardless.
+module slot_profile() {
+    reach = max(body_d, collar_d);
+
+    difference() {
+        circle(d = body_d + 2 * eps);
+
+        offset(r = slot_round, $fn = 16) offset(r = -slot_round, $fn = 16)
+            difference() {
+                circle(d = body_d);
+
+                translate([0, -slot_w / 2])
+                    square([reach, slot_w]);
+            }
+    }
+}
+
+// The slot down the body, cut clean through one wall only.
 module loading_slot() {
     rotate([0, 0, slot_az])
-        translate([0, -slot_w / 2, slot_z0])
-            cube([max(body_d, collar_d), slot_w, slot_h]);
+        translate([0, 0, slot_z0])
+            linear_extrude(slot_h)
+                slot_profile();
 }
 
 // One collet slot. The box gives it a constant width rather than a constant

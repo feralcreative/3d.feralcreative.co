@@ -8,7 +8,13 @@
 # Usage:
 #   utils/build.sh parts/example-spacer.scad
 #   utils/build.sh parts/example-spacer.scad -D 'outer_d=30'
+#   utils/build.sh parts/example-spacer.scad --ascii    # ASCII STL instead of binary
 #   utils/build.sh parts/example-spacer.scad --push     # copy to the NAS (see below)
+#
+# STLs come out binary. OpenSCAD's own default is ASCII, which is the same
+# geometry at roughly seven times the size — a part carrying artwork runs to
+# tens of megabytes, which is slow to rsync and worse to open in the web viewer.
+# Pass --ascii if you need to read or diff the mesh by eye.
 #
 # --push rsyncs the STL to the printer site's models directory on the NAS, which
 # is bind-mounted into the 3d-printer-stream container, so the model shows up in
@@ -43,7 +49,7 @@ find_openscad() {
 }
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: $0 <part.scad> [--push] [extra openscad args...]" >&2
+  echo "usage: $0 <part.scad> [--ascii] [--push] [extra openscad args...]" >&2
   exit 64
 fi
 
@@ -51,13 +57,14 @@ SCAD="$1"
 shift
 
 PUSH=0
+FORMAT="binstl"
 ARGS=()
 for arg in "$@"; do
-  if [[ "$arg" == "--push" ]]; then
-    PUSH=1
-  else
-    ARGS+=("$arg")
-  fi
+  case "$arg" in
+    --push)  PUSH=1 ;;
+    --ascii) FORMAT="asciistl" ;;
+    *)       ARGS+=("$arg") ;;
+  esac
 done
 
 if [[ ! -f "$SCAD" ]]; then
@@ -74,9 +81,11 @@ BASE="$(basename "$SCAD" .scad)"
 OUT="$OUTDIR/${BASE}.stl"
 mkdir -p "$OUTDIR"
 
+# --export-format goes before the caller's own args, so passing one explicitly
+# still wins.
 echo "rendering $SCAD -> $OUT (this may take a while)"
-"$OPENSCAD" -o "$OUT" "${ARGS[@]+"${ARGS[@]}"}" "$SCAD"
-echo "built $OUT ($(du -h "$OUT" | cut -f1))"
+"$OPENSCAD" -o "$OUT" --export-format="$FORMAT" "${ARGS[@]+"${ARGS[@]}"}" "$SCAD"
+echo "built $OUT ($(du -h "$OUT" | cut -f1), $FORMAT)"
 
 if [[ "$PUSH" -eq 1 ]]; then
   echo "pushing to ${NAS_USER}@${NAS_HOST}:${NAS_PATH}/"
