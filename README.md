@@ -88,6 +88,10 @@ Read it before picking a wall thickness, a clearance, or a facet count. If you p
 
 Expect it to be a heavy one-time job. The reference above took three parallel research agents, roughly a hundred tool calls, and a separate verification agent that caught four real errors. It only has to run once per machine, and only needs re-running when the nozzles, plates, or firmware change.
 
+### Our printers
+
+If you do use my instructions to build profiles for your printer(s), please commit them and submit a PR. I'd love a library of printer specs for people to use off the shelf without burning tokens.
+
 ## Notes
 
 See `_AI_AGENT_PRIMER.md` for background, conventions, and how this connects to the `3d.feralcreative.co` printer site.
