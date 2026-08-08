@@ -34,9 +34,17 @@ collar_d  = 14.50;  // outside diameter at the bottom, between ribs (mm)
 collar_h  = 2.00;   // straight section at the bottom, before the flare (mm)
 barrel_d  = 18.20;  // outside diameter of the barrel, between ribs (mm)
 barrel_z0 = 9.00;   // height at which the flare reaches full diameter (mm)
-barrel_z1 = 15.50;  // height at which the top taper starts (mm)
-top_d     = 17.39;  // outside diameter at the top face, between ribs (mm)
+barrel_z1 = 15.50;  // where a top taper would start; inert while top_d = barrel_d (mm)
+top_d     = 18.20;  // outside diameter at the top face, between ribs (mm)
 
+// top_d was 17.39 on the legacy mesh, which put a step at the joint. It now
+// matches barrel_d and the handle's body, so the tool reads as one cylinder
+// from the butt of the handle to the start of this part's nose taper. Two
+// things fall out of that: the outer profile is straight from barrel_z0 to
+// height, which is why barrel_z1 no longer does anything, and the wall over the
+// thread groove at the top rim goes from 0.895 mm to 1.300 mm — it was the
+// thinnest section left in the part.
+//
 // collar_d was 13.60 on the legacy mesh. The collar is straight while the bore
 // under it is already coning open, so the wall thinned as it climbed and hit
 // 0.867 mm at the top of the collar — the thinnest section anywhere in the part,
@@ -79,8 +87,33 @@ thread_root_gap = 0.200;  // (mm)
 // thing the spigot meets is a knife-edged partial thread — easy to cross, and
 // it shaves swarf that then packs the rest of the run. On, the thread stops
 // short and leaves a plain pilot bore at the mouth that squares the spigot up
-// before any thread engages. Off reproduces the original.
-thread_blunt_start = false;
+// before any thread engages. Off reproduces the original; on is what BOSL2
+// defaults to, and what it recommends for anything printed. Must match the
+// handle's flag of the same name.
+thread_blunt_start = true;
+
+// Only read when blunt start is on. thread_pilot is how much plain bore at the
+// mouth the spigot enters before any thread bites; thread_mouth_bevel is the
+// lead-in chamfer on the lip, which is about getting the spigot in coaxially
+// and has nothing to do with how the thread turns once engaged.
+//
+// The pilot sits at the groove root, r 7.800, not at the land — it has to clear
+// the handle's crest at 7.600, so it guides on that with 0.200 of slack. A
+// pilot at the land would simply refuse the spigot.
+//
+// Both come out of thread engagement, so they are not free — see the note over
+// thread_lead_in. The chamfer also comes out of the seat: it is cut off the top
+// face, which is what bears against the handle's collar, and at 0.40 that face
+// is 0.90 mm wide between the bore and the outside. Do not run it much past
+// 0.60 or there is very little seat left.
+thread_pilot       = 1.50;  // (mm)
+thread_mouth_bevel = 0.40;  // (mm)
+
+// How far the thread ramps up to full height at each end. BOSL2's default is
+// generous, and on a thread only 1.85 turns long that is expensive: this pair
+// clamps through its thread, so turns lost here are clamp lost. Held short
+// deliberately. undef hands the choice back to BOSL2.
+thread_lead_in = 0.60;  // (mm)
 
 // Axial gap at each thread flank. 0 reproduces the legacy pair exactly, which
 // is a line-to-line fit that will not turn once printed. 0.15 is a sane
@@ -186,12 +219,22 @@ module ribs() {
 }
 
 // A thread-shaped rod to subtract. It starts eps below the shoulder so its end
-// face is never coplanar with it. Where it stops at the top depends on which
-// entry you asked for: run it a full pitch past the mouth and the thread walks
-// off the end as the original's does; stop it level with the mouth and blunt
-// start puts its run-out inside the part, leaving the pilot bore.
+// face is never coplanar with it.
+//
+// The mask always runs past the mouth, whichever entry you asked for. That is
+// not cosmetic: the bore under it is drawn bore_relief undersize on purpose, so
+// if the mask stops level with the mouth then the relieved surface — not the
+// thread's own minor diameter — becomes the visible bore. It does, measurably:
+// stopping it flush puts r 7.088 on the top face and triples the count of
+// degenerate facets there. The mask's core has to cover the mouth.
+//
+// So overrun is only ever about where the thread runs out, and the two entries
+// get there differently. Blunt start off runs a full pitch past, and the thread
+// walks off the face at full height as the original's does. Blunt start on
+// clears the face by a hair and holds the thread back from it with end_len2
+// instead, which is what leaves the plain pilot bore.
 module thread_mask() {
-    overrun = thread_blunt_start ? 0 : thread_pitch;
+    overrun = thread_blunt_start ? eps : thread_pitch;
 
     translate([0, 0, thread_z0 - eps])
         generic_threaded_rod(
@@ -202,7 +245,10 @@ module thread_mask() {
             internal    = true,
             left_handed = thread_left,
             blunt_start = thread_blunt_start,
-            bevel       = false,
+            end_len2    = thread_blunt_start ? thread_pilot + overrun : undef,
+            lead_in     = thread_blunt_start ? thread_lead_in : undef,
+            bevel1      = false,
+            bevel2      = thread_blunt_start ? thread_mouth_bevel : false,
             anchor      = BOTTOM);
 }
 

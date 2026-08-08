@@ -22,9 +22,26 @@ include <BOSL2/std.scad>
 include <BOSL2/threading.scad>
 
 /* [Body] */
-body_d = 15.000;  // outside diameter of the tube (mm)
+body_d = 18.200;  // outside diameter of the tube (mm)
 bore_d =  9.637;  // through bore the chalk sits in (mm)
 body_h = 65.000;  // plain tube, up to the base of the collar (mm)
+
+// body_d was 15.000 on the legacy mesh, which made the tool a thin shaft with a
+// fat head. It now matches the tip's barrel between its ribs, so the whole thing
+// reads as one cylinder. The bore is untouched — it still has to hold the chalk.
+// The wall goes from 2.68 mm to 4.28 mm and the body's solid volume roughly
+// doubles, which at any sane infill is not worth worrying about.
+
+/* [Butt end] */
+// Rounding on the outside of the open end. The default is the wall thickness,
+// which is the largest value that means anything: the curve then runs all the
+// way in and arrives tangent at the bore, leaving no flat face at all. The bore
+// stays a sharp edge, which is deliberate — the end is open so a jammed stick
+// can be driven out from behind, and that wants an edge, not a funnel.
+//
+// Anything smaller leaves a flat ring between the curve and the bore. Anything
+// larger is not geometry, it eats the bore.
+butt_round = (body_d - bore_d) / 2;  // (mm)
 
 /* [Loading slot] */
 slot_w  =  2.000;  // width (mm)
@@ -33,8 +50,12 @@ slot_h  = 60.000;  // length (mm)
 slot_az = 270;     // which way it faces (deg)
 
 /* [Collar] */
-collar_d = 17.400;  // outside diameter at the top of the collar (mm)
-collar_h =  5.000;  // cone from body_d up to collar_d (mm)
+// With collar_d equal to body_d this is no longer a flare — it is just the last
+// stretch of body before the spigot, and the only thing still making it a collar
+// is its top face, which is the seat the tip screws down onto. Set collar_d back
+// below body_d to get a waist here instead.
+collar_d = 18.200;  // outside diameter at the top of the collar (mm)
+collar_h =  5.000;  // body_d up to collar_d, coned if they differ (mm)
 
 /* [Threaded spigot] */
 spigot_h        = 10.600;  // collar top to the base of the collet (mm)
@@ -50,7 +71,13 @@ thread_left     = false;   // the original is right handed
 // leading thread is a knife edge. On, it stops short and leaves a plain pilot
 // at the spigot's tip that enters the tip's bore square before any thread
 // bites. Off reproduces the original. Set it to match the tip.
-thread_blunt_start = false;
+thread_blunt_start = true;
+
+// How far the thread ramps up to full height at each end. BOSL2's default is
+// generous, and on a thread under two turns long that is expensive: this pair
+// clamps through its thread, so turns lost here are clamp lost. Held short
+// deliberately, and kept the same as the tip's. undef hands it back to BOSL2.
+thread_lead_in = 0.60;  // (mm)
 
 // Axial gap taken off this thread's crest. Leave it at 0: the tip already
 // carries the pair's clearance in its own thread_clearance, and taking it in
@@ -65,6 +92,26 @@ collet_slots     = 4;      // fingers are the gaps between these
 collet_slot_w    = 2.000;  // (mm)
 collet_slot_ramp = 1.000;  // coned relief under each slot (mm)
 collet_slot_az   = 0;      // angle of the first slot (deg)
+
+/* [Wordmark] */
+// The wordmark half of the Hobbs maker's mark, sunk into the side of the body.
+// Same SVG the painter's pyramid uses, and it comes in the same way: scaled
+// against a measured bounding box rather than to any absolute size.
+//
+// It is turned 90 degrees so it reads along the handle rather than around it.
+// That is not only a look — cylindrical_extrude() wraps the child's X around
+// the circumference and runs its Y along the axis, so a mark this long has to
+// be turned to fit at all.
+mark_file  = "art/hobbs-mark-word.svg";  // "" for none
+mark_len   = 40.00;  // length along the handle axis (mm)
+mark_z     = 32.50;  // centre, above the bottom face (mm)
+mark_depth =  0.40;  // how far it is cut into the wall (mm)
+
+// Which way it faces. The loading slot is at 270, and cylindrical_extrude()
+// puts its children at 270 by default, so this is doing real work, not just
+// choosing a nice side. Keep it a multiple of 360/$fn or the wrap's facets stop
+// lining up with the body's.
+mark_az = 90;  // (deg)
 
 /* [Quality] */
 $fn = 64;  // segments per full circle
@@ -87,6 +134,19 @@ z_top    = z_collet + collet_h;
 // Crest width as actually cut, with any allowance taken off both flanks.
 crest_w = thread_crest_w - 2 * thread_clearance;
 
+// Bounding box and centre of the wordmark in the millimetres OpenSCAD produces
+// when it imports it, measured by extruding the bare SVG and reading the mesh.
+// Remeasure both if the artwork is ever replaced.
+mark_native = [401.015, 75.219];
+mark_centre = [321.745,  37.790];
+mark_k      = mark_len / mark_native[0];
+
+// How far past the surface the cut reaches. Deliberately larger than eps: the
+// wrap approximates the cylinder with its own polygon, and where that polygon
+// disagrees with the body's the two surfaces part company by about 0.011 mm,
+// which eps alone would not clear.
+mark_over = 0.05;
+
 // One pitch of the tooth, in BOSL2's units: x is a fraction of the pitch and
 // must stay inside [-1/2, 1/2]; y is depth in fractions of the pitch, with 0 at
 // the crest. Flat crest, flat root, short flanks — a square thread with just
@@ -102,7 +162,9 @@ thread_profile = [
 
 // Everything solid, before anything is taken out of it.
 module blank() {
-    cylinder(d = body_d, h = body_h);
+    // The bore is subtracted later, and it takes exactly the flat disc this
+    // rounding leaves behind — which is what puts the fillet tangent to it.
+    cyl(d = body_d, h = body_h, rounding1 = butt_round, anchor = BOTTOM);
 
     translate([0, 0, body_h])
         cylinder(d1 = body_d, d2 = collar_d, h = collar_h);
@@ -121,6 +183,7 @@ module blank() {
             internal    = false,
             left_handed = thread_left,
             blunt_start = thread_blunt_start,
+            lead_in     = thread_blunt_start ? thread_lead_in : undef,
             bevel       = false,
             anchor      = BOTTOM);
 
@@ -128,11 +191,13 @@ module blank() {
         cylinder(d1 = r_root * 2, d2 = collet_tip_d, h = collet_h);
 }
 
-// The slot down the body, cut clean through one wall only.
+// The slot down the body, cut clean through one wall only. The cube's first
+// dimension is a reach, not a diameter — it only has to run from the axis out
+// past the outside, so it is tied to the part's widest.
 module loading_slot() {
     rotate([0, 0, slot_az])
         translate([0, -slot_w / 2, slot_z0])
-            cube([collar_d, slot_w, slot_h]);
+            cube([max(body_d, collar_d), slot_w, slot_h]);
 }
 
 // One collet slot. The box gives it a constant width rather than a constant
@@ -158,6 +223,40 @@ module collet_slot() {
     }
 }
 
+// The wordmark as a flat outline, scaled to mark_len and centred on the origin,
+// then turned so it runs along the handle. The rotate has to come last: the
+// centring is done in the artwork's own frame.
+// The $fn = 0 is not decoration. Left to inherit the part's $fn of 64 this one
+// cut takes the mesh from 2,550 facets to 613,536; turning it off halves that to
+// 280,326. Do not expect to tune it further — $fa and $fs were measured to make
+// no difference at all here, and neither does any non-zero $fn, so whatever the
+// SVG importer does with them it is not what the manual implies. 280k facets
+// slice fine but write a 96 MB ASCII STL; export binstl for this part.
+module mark_2d() {
+    rotate(90)
+        scale(mark_k)
+            translate(-mark_centre)
+                import(file = mark_file, center = false, $fn = 0);
+}
+
+// The same outline wrapped onto the body and turned into a solid to subtract.
+// Wrapping matters at this size: 40 mm of mark stands 7.5 mm around an 18.2 mm
+// barrel, and a flat cut would come out 0.43 mm shallower at its edges than at
+// its centre — most of a 0.40 mm deboss.
+//
+// size is given so the wrap only builds facets over the mark. Left to itself it
+// assumes the child goes right round the cylinder; set it too small and it
+// quietly clips the artwork instead.
+module mark_cut() {
+    translate([0, 0, mark_z])
+        cylindrical_extrude(
+            ir   = body_d / 2 - mark_depth,
+            or   = body_d / 2 + mark_over,
+            size = [mark_native[1] * mark_k * 1.05, mark_len * 1.05],
+            spin = mark_az - 270)
+                mark_2d();
+}
+
 module chalk_holder_handle() {
     difference() {
         blank();
@@ -170,6 +269,9 @@ module chalk_holder_handle() {
         for (i = [0 : collet_slots - 1])
             rotate([0, 0, collet_slot_az + i * 360 / collet_slots])
                 collet_slot();
+
+        if (mark_file != "")
+            mark_cut();
     }
 }
 
