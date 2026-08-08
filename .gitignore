@@ -3,6 +3,7 @@ renders/*
 !renders/.gitkeep
 stl/*
 !stl/.gitkeep
+_incoming
 
 # macOS
 .DS_Store
