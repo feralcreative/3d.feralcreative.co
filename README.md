@@ -76,9 +76,13 @@ If you want the native build anyway, `winget install --id=OpenSCAD.OpenSCAD -e` 
 
 Parts here are designed against one specific machine, and its constraints are written down rather than remembered.
 
+### My printer
+
 [docs/flashforge-ad5m-pro-scad-reference.md](docs/flashforge-ad5m-pro-scad-reference.md) is the profile for the FlashForge Adventurer 5M Pro this repo prints on: safe build envelope after the purge and wipe strips are subtracted, per-nozzle wall-thickness ladders, flow-capped real speeds, clearance ladders for press/snug/free fits, faceting rules for `$fn`, a materials matrix, and a copy-paste OpenSCAD constants block. Every figure carries a source and an evidence marker, so you can tell at a glance whether a number is a manufacturer spec, a field report, or arithmetic done inside the document—and an independent verification pass has been run over the whole thing.
 
 Read it before picking a wall thickness, a clearance, or a facet count. If you print on something else, its numbers are wrong for you—don't borrow them.
+
+### Your printer
 
 [docs/printer-profile-research-prompt.md](docs/printer-profile-research-prompt.md) is how to build the equivalent for your own printer, so your agent designs against your machine instead of a generic one. It is a reusable prompt for any agent with web search and subagents: fill in a hardware block—printer, nozzles, plates, materials, slicer, firmware—paste it in, and it assembles the same kind of document for your machine. It also explains why it is shaped the way it is, and how to adapt it for resin, CNC, or laser.
 
