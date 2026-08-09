@@ -1,4 +1,4 @@
-// chalk-holder.scad
+// hobbs-chalk-holder.scad
 //
 // Both halves of the chalk holder on one plate: a slotted handle with a
 // threaded spigot and a split collet, and the ring that screws onto it. Merged
@@ -46,6 +46,7 @@
 
 include <BOSL2/std.scad>
 include <BOSL2/threading.scad>
+include <../logos/marks.scad>
 
 /* [Plate] */
 // Which parts to emit. Build one at a time when you want a clean STL per part;
@@ -157,6 +158,27 @@ handle_collet_slot_w    = 2.000;  // (mm)
 handle_collet_slot_ramp = 1.000;  // coned relief under each slot (mm)
 handle_collet_slot_az   = 0;      // angle of the first slot (deg)
 
+/* [Handle: maker's mark] */
+// The wordmark, cut into the barrel. It comes from ../logos/marks.scad, which
+// registers and scales it — hobbs_word_alone() rather than hobbs_mark_word()
+// because the figure is not on this part, so the width asked for should be the
+// width of the lettering.
+//
+// It is turned 90 degrees so it reads along the handle rather than around it.
+// That is not only a look: cylindrical_extrude() wraps the child's X around the
+// circumference and runs its Y along the axis, so a mark this long has to be
+// turned to fit at all.
+handle_mark       = true;   // set false for a blank barrel
+handle_mark_len   = 40.00;  // length along the handle axis (mm)
+handle_mark_z     = 32.50;  // centre, above the bottom face (mm)
+handle_mark_depth =  0.40;  // how far it is cut into the wall (mm)
+
+// Which way it faces. The loading slot is at 270, and cylindrical_extrude() puts
+// its children at 270 by default, so this is doing real work, not just choosing
+// a nice side. Keep it a multiple of 360/$fn or the wrap's facets stop lining up
+// with the body's.
+handle_mark_az = 90;  // (deg)
+
 /* [Ring: body] */
 ring_height    = 19.20;  // overall height (mm)
 ring_collar_d  = 14.50;  // outside diameter at the bottom, between ribs (mm)
@@ -225,6 +247,10 @@ eps = 0.01;
 
 // Radial clearance is not the knob here — see [Thread].
 $slop = 0;
+
+// How far the mark's cutting solid stands proud of the barrel, so its outer
+// face is never coplanar with the surface it is cut into.
+handle_mark_over = 0.05;
 
 // Where each part sits on the plate. The ring is measured over its ribs, so the
 // air between the two really is part_gap.
@@ -413,6 +439,25 @@ module handle_collet_slot() {
     }
 }
 
+// The wordmark wrapped onto the barrel and turned into a solid to subtract.
+// Wrapping matters at this size: 40 mm of mark stands 7.5 mm around an 18.2 mm
+// barrel, and a flat cut would come out 0.43 mm shallower at its edges than at
+// its centre — most of a 0.40 mm deboss.
+//
+// size is given so the wrap only builds facets over the mark. Left to itself it
+// assumes the child goes right round the cylinder; set it too small and it
+// quietly clips the artwork instead.
+module handle_mark_cut() {
+    translate([0, 0, handle_mark_z])
+        cylindrical_extrude(
+            ir   = handle_body_d / 2 - handle_mark_depth,
+            or   = handle_body_d / 2 + handle_mark_over,
+            size = [hobbs_word_height(handle_mark_len) * 1.05,
+                    handle_mark_len * 1.05],
+            spin = handle_mark_az - 270)
+                rotate(90) hobbs_word_alone(handle_mark_len);
+}
+
 module chalk_holder_handle() {
     difference() {
         handle_blank();
@@ -425,6 +470,9 @@ module chalk_holder_handle() {
         for (i = [0 : handle_collet_slots - 1])
             rotate([0, 0, handle_collet_slot_az + i * 360 / handle_collet_slots])
                 handle_collet_slot();
+
+        if (handle_mark)
+            handle_mark_cut();
     }
 }
 
