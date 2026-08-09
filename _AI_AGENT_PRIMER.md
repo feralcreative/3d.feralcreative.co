@@ -53,8 +53,8 @@ scad/
 ├── README.md                # short human-facing summary
 ├── .gitignore
 ├── parts/                   # one .scad per design — the actual source
-│   ├── example-spacer.scad  # template showing house style
-│   └── art/                 # SVG artwork the parts import
+│   └── example-spacer.scad  # template showing house style
+├── logos/                   # artwork, and marks.scad — the library that places it
 ├── docs/                    # printer reference, and the prompt behind it
 ├── lib/                     # BOSL2 lives here, as a git submodule
 ├── renders/                 # generated PNGs (gitignored)
@@ -65,6 +65,8 @@ scad/
 ```
 
 Scripts live in `utils/`, never `scripts/`—that is Ziad's convention across all his repos. Documentation other than `README.md` and this file belongs in `docs/`.
+
+**Never `import()` an SVG from a part.** `include <../logos/marks.scad>` and call `hobbs_mark(width)`, `feral_logo(width)` or `vmc_top_rocker(width)`—each is centred on the origin and scaled to the width you ask for. That file exists because doing it by hand goes wrong three ways: the importer honours `$fn` and ignores `$fa`/`$fs`, so artwork inherits the part's resolution and costs three times the triangles it needs; a relative path resolves against the file it is written in, and a missing import prints an ERROR and then *exits 0*, so `build.sh` reports success and hands you an STL with no artwork on it; and the split Hobbs layers only stay in register because both are measured against the bounding box of the pair. Read the header of `logos/marks.scad`—it also records which marks can be cut through and which have counters that would drop out.
 
 <!--| PAGE-BREAK -->
 

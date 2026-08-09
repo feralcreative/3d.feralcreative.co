@@ -41,6 +41,8 @@
 // supports weld on just as hard as automatic ones. Several of the profiles in
 // docs/profiles/ are set that way.
 
+include <../logos/marks.scad>
+
 /* [Shell] */
 base_side   = 60.00;  // length of each base edge (mm)
 apex_height = 46.82;  // outer apex above the base plane (mm)
@@ -72,15 +74,15 @@ notch_spacing = 14.00;  // centre to centre (mm)
 // and the two Bs are islands, and a through-cut would drop them on the floor.
 // So the wordmark is raised instead — which is exactly what the original does.
 //
-// Both files are split out of _incoming/hobbs-makers-mark.svg and keep its
-// viewBox, so they stay in register with each other and share one scale and
-// one position.
+// Both layers come from ../logos/marks.scad, which registers them against the
+// bounding box of the pair rather than their own — that shared box is the only
+// reason a cut figure and a raised wordmark still line up on the same face.
 //
 // art_width and art_up are not guesses: the legacy wordmark measures 17.50 mm
 // wide by 3.28 mm tall, and the SVG's wordmark divides into that at 0.04363
 // either way, which pins the scale and then the position of the whole mark.
-art_figure_file = "art/hobbs-mark-figure.svg";  // cut through; "" for none
-art_word_file   = "art/hobbs-mark-word.svg";    // raised; "" for none
+art_figure = true;  // cut through the wall
+art_word   = true;  // raised off the face
 //
 // The original sits at 30.78 wide, 18.47 up and 3.01 to the left, and at that
 // placement the cut runs off the face and breaches the corner where two walls
@@ -122,13 +124,6 @@ R_in  = 2 * a_in;
 h_in  = apex_height * a_in / a_out;
 
 function face_az(i) = 60 + 120 * i;
-
-// Bounding box of the two artwork layers taken together, in the millimetres
-// OpenSCAD produces when it imports them. Remeasure both if the artwork is
-// ever replaced — they are what art_width and art_up are reckoned against.
-art_native = [705.551, 471.131];
-art_centre = [352.776, 235.746];
-art_k      = art_width / art_native[0];
 
 // Centre of the circle through three points.
 function circumcentre(p1, p2, p3) =
@@ -203,26 +198,18 @@ module foot_notches(i) {
     }
 }
 
-// One layer of the mark in the face's own 2D frame, centred on the origin.
-// Both layers go through here, and that is what keeps them registered.
-module art_layer(file) {
-    scale(art_k)
-        translate(-art_centre)
-            import(file = file, center = false);
-}
-
 // The figure, cut clean through the wall from outside to inside.
 module art_figure_cut() {
     translate([art_across, art_up, -wall_t - eps])
         linear_extrude(wall_t + 2 * eps)
-            art_layer(art_figure_file);
+            hobbs_mark_figure(art_width);
 }
 
 // The wordmark, sunk eps into the face so it is never coplanar with it.
 module art_word_relief() {
     translate([art_across, art_up, -eps])
         linear_extrude(art_relief + eps)
-            art_layer(art_word_file);
+            hobbs_mark_word(art_width);
 }
 
 module painters_pyramid() {
@@ -244,12 +231,12 @@ module painters_pyramid() {
         for (i = notch_faces)
             foot_notches(i);
 
-        if (art_figure_file != "")
+        if (art_figure)
             for (i = [0 : 2])
                 face_frame(i) art_figure_cut();
     }
 
-    if (art_word_file != "")
+    if (art_word)
         for (i = [0 : 2])
             face_frame(i) art_word_relief();
 }

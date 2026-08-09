@@ -109,6 +109,8 @@
 // be pushed out sideways rather than shaken out of a deep tube, which is the one
 // thing a top-loading box could never offer.
 
+include <../logos/marks.scad>
+
 /* [Plate] */
 show      = "plate"; // [plate, all, box, door, test]
 plate_gap = 10.00;   // clear air between box and door on the bed (mm)
@@ -171,23 +173,18 @@ door_tab   = 6.00;  // how far the door stands proud of the rim, to pull on (mm)
 post_fillet = 3.00; // fillet joining the channel posts to the body (mm)
 
 /* [Artwork] */
-// Both layers of the maker's mark, sunk into the door's outer face. The two
-// files are split out of _incoming/hobbs-makers-mark.svg and keep its viewBox,
-// so they stay in register with each other and share one scale and one position.
+// The maker's mark, sunk into the door's outer face. Registration, scale and
+// tessellation all come from ../logos/marks.scad — see that file before
+// reaching for import() here.
 //
 // The pyramid has to cut the figure through and raise the wordmark, because the
-// counters of the O and the two Bs are islands that a through-cut would drop on
-// the floor. A deboss has no such problem — the islands stand on the floor of
-// the recess — so both layers get the same treatment here.
-//
-// These paths resolve against the file that names them, not the directory you
-// run from. Copy this part somewhere else to try something and the imports
-// quietly return nothing — no warning, no error, just a blank panel.
-art_figure_file = "art/hobbs-mark-figure.svg";  // "" for none
-art_word_file   = "art/hobbs-mark-word.svg";    // "" for none
-art_width       = 48.00;  // width of the whole mark across the door (mm)
-art_down        = 50.00;  // mark's centre, down from the top of the door (mm)
-art_depth       = 0.80;   // how far it is sunk into the face (mm)
+// counters of the O and the two Bs are islands that a through-cut drops on the
+// floor. A deboss has no such problem — the islands stand on the floor of the
+// recess — so both layers go in together.
+art_mark   = true;   // set false for a blank door
+art_width  = 48.00;  // width of the whole mark across the door (mm)
+art_down   = 50.00;  // mark's centre, down from the top of the door (mm)
+art_depth  = 0.80;   // how far it is sunk into the face (mm)
 
 /* [Pyramid, as measured] */
 // Taken off hobbs-painters-pyramid.scad and its STL. The lug reach is measured
@@ -260,12 +257,6 @@ door_len = cavity_len + door_tab;
 // the end.
 test_door_len = test_h - floor_t + door_tab;
 
-// Bounding box of the two artwork layers taken together, in the millimetres
-// OpenSCAD produces when it imports them. Remeasure both if the artwork is ever
-// replaced — they are what art_width is reckoned against.
-art_native = [705.551, 471.131];
-art_centre = [352.776, 235.746];
-art_k      = art_width / art_native[0];
 
 // Plan extents. offset(r=) is a dilation by a disk, so an offset shape reaches
 // exactly r past the original in every direction, corners included.
@@ -384,17 +375,6 @@ module box() {
     }
 }
 
-// Both layers of the mark together, centred on the origin, in the door's frame.
-// Running the pair through one scale and one translate is what keeps them
-// registered — remeasure art_native and art_centre if the artwork is replaced.
-module door_art() {
-    scale(art_k)
-        translate(-art_centre) {
-            if (art_figure_file != "") import(file = art_figure_file, center = false);
-            if (art_word_file   != "") import(file = art_word_file,   center = false);
-        }
-}
-
 // Drawn flat on the bed, as it prints: width along X, length along Y, and the
 // marked face upward, so the deboss is a pocket in the top surface rather than
 // detail laid against the build plate.
@@ -403,9 +383,10 @@ module door(len = door_len, mark_y = door_len - art_down) {
         translate([-door_half, 0, 0])
             cube([2 * door_half, len, door_t]);
 
-        translate([0, mark_y, door_t - art_depth])
-            linear_extrude(art_depth + eps)
-                door_art();
+        if (art_mark)
+            translate([0, mark_y, door_t - art_depth])
+                linear_extrude(art_depth + eps)
+                    hobbs_mark(art_width);
     }
 }
 

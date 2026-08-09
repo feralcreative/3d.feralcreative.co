@@ -21,6 +21,8 @@
 include <BOSL2/std.scad>
 include <BOSL2/threading.scad>
 
+include <../logos/marks.scad>
+
 /* [Body] */
 body_d = 18.200;  // outside diameter of the tube (mm)
 bore_d =  9.637;  // through bore the chalk sits in (mm)
@@ -109,7 +111,7 @@ collet_slot_az   = 0;      // angle of the first slot (deg)
 // That is not only a look — cylindrical_extrude() wraps the child's X around
 // the circumference and runs its Y along the axis, so a mark this long has to
 // be turned to fit at all.
-mark_file  = "art/hobbs-mark-word.svg";  // "" for none
+mark       = true;   // set false for a blank handle
 mark_len   = 40.00;  // length along the handle axis (mm)
 mark_z     = 32.50;  // centre, above the bottom face (mm)
 mark_depth =  0.40;  // how far it is cut into the wall (mm)
@@ -144,9 +146,6 @@ crest_w = thread_crest_w - 2 * thread_clearance;
 // Bounding box and centre of the wordmark in the millimetres OpenSCAD produces
 // when it imports it, measured by extruding the bare SVG and reading the mesh.
 // Remeasure both if the artwork is ever replaced.
-mark_native = [401.015, 75.219];
-mark_centre = [321.745,  37.790];
-mark_k      = mark_len / mark_native[0];
 
 // How far past the surface the cut reaches. Deliberately larger than eps: the
 // wrap approximates the cylinder with its own polygon, and where that polygon
@@ -267,10 +266,7 @@ module collet_slot() {
 // SVG importer does with them it is not what the manual implies. 280k facets
 // slice fine but write a 96 MB ASCII STL; export binstl for this part.
 module mark_2d() {
-    rotate(90)
-        scale(mark_k)
-            translate(-mark_centre)
-                import(file = mark_file, center = false, $fn = 0);
+    rotate(90) hobbs_word_alone(mark_len);
 }
 
 // The same outline wrapped onto the body and turned into a solid to subtract.
@@ -286,7 +282,7 @@ module mark_cut() {
         cylindrical_extrude(
             ir   = body_d / 2 - mark_depth,
             or   = body_d / 2 + mark_over,
-            size = [mark_native[1] * mark_k * 1.05, mark_len * 1.05],
+            size = [hobbs_word_height(mark_len) * 1.05, mark_len * 1.05],
             spin = mark_az - 270)
                 mark_2d();
 }
@@ -304,7 +300,7 @@ module chalk_holder_handle() {
             rotate([0, 0, collet_slot_az + i * 360 / collet_slots])
                 collet_slot();
 
-        if (mark_file != "")
+        if (mark)
             mark_cut();
     }
 }
