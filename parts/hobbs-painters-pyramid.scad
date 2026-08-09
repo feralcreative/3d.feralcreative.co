@@ -9,6 +9,37 @@
 //
 // The artwork is the one thing that cannot be described parametrically, so it
 // comes in as SVG — see the notes over the artwork parameters below.
+//
+// PRINTING. Turn support off globally and paint it onto the two foot notches.
+// Nothing else. Confirmed on the printer in PETG, 2026-08-08 — Orca asks for
+// support all over this part and it is wrong.
+//
+// Why, from measuring the mesh: the faces sit at 69.7 degrees from horizontal,
+// nowhere near needing anything. Of 3483 mm² of downward-facing surface only
+// 234 mm² falls under the usual 45 degree threshold, in two places.
+//
+//   The two foot notches. Flat roofs at exactly z = 2.00, each 7.00 mm wide by
+//   1.706 mm deep — notch_w by the wall's horizontal thickness — for 23.88 mm²
+//   over four facets. The only near-horizontal surfaces in the part. These are
+//   the two you paint, and they are tiny.
+//
+//   The artwork cutouts. Ten thousand-odd facets at 20 to 30 degrees, but each
+//   ledge is only about 1.7 mm wide, because art_figure_cut() extrudes along
+//   the face normal and the face is at 69.7. Leave these bare. Support here is
+//   the hardest kind to pick out and it lands inside the mark.
+//
+// What the bare cutouts actually cost, in PETG: a few wisps inside the logo,
+// which a heat gun removes. That is the whole price. It is a much better trade
+// than picking supports out of the cat's tail, so do not be tempted back.
+//
+// If the wisps ever do matter more than the scarring would, the fix is in the
+// model rather than the slicer — extrude art_figure_cut() vertically instead of
+// along the face normal and the 20 degree ceiling goes away entirely.
+//
+// Separately, and regardless of how supports get placed: if the slicer profile
+// has support_interface_spacing = 0 then the interface is solid, and painted
+// supports weld on just as hard as automatic ones. Several of the profiles in
+// docs/profiles/ are set that way.
 
 /* [Shell] */
 base_side   = 60.00;  // length of each base edge (mm)
