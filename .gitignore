@@ -267,6 +267,7 @@ stl/*
 !stl/.gitkeep
 _incoming
 MODELS
+_PLANS
 
 # BOSL2 is expected at lib/BOSL2 as a git submodule.
 # If you'd rather vendor it as a plain clone instead, uncomment:
