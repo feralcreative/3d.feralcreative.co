@@ -58,6 +58,7 @@ scad/
 │   └── example-spacer.scad  # template showing house style
 ├── logos/                   # artwork, and marks.scad — the library that places it
 ├── docs/                    # printer + slicing references, and the prompt behind them
+│   └── _PLANS/              # open work — read the highest-numbered file first
 ├── lib/                     # BOSL2 lives here, as a git submodule
 ├── renders/                 # generated PNGs (gitignored)
 ├── stl/                     # generated STLs (gitignored)
@@ -124,6 +125,14 @@ Follow `parts/example-spacer.scad`:
 4. One part per file, named after the part.
 
 `build.sh` and `render.sh` both accept `-D 'name=value'` to override any top-level parameter without editing the file, which is the fast way to compare variants.
+
+## Where the open work is
+
+`docs/_PLANS/` holds the running record of what is in flight, one file per round, named `part-NN-<UTC stamp>.md`. **Read the highest-numbered one before starting anything**, and check for any sibling files it references — a reverted patch parked for later lives next to the note that explains it.
+
+Those files carry the things that do not survive in the code: a measurement off a printed part, why an option was rejected, what question is blocking the next step. A number in a `.scad` file tells you what was decided; the plan tells you whether it is still believed.
+
+Write the next one at a stopping point rather than leaving state in a conversation. Ziad's global rule puts plans in `_PLANS`; in this repo that folder lives under `docs/`, not the root.
 
 ## Current state
 
