@@ -158,6 +158,8 @@ Sources: [0.25 machine](https://raw.githubusercontent.com/SoftFever/OrcaSlicer/m
 
 Wall thickness must be an integer multiple of line width, or the slicer either leaves a gap or over-extrudes. Snap every vertical wall in your model to the nearest value in the column for the active nozzle.
 
+> ⚠️ **CORRECTED by measurement—see `flash-studio-slicing-reference.md`.** This ladder assumes one line width throughout. In the installed profile only the *outer* wall is 0.42; `inner_wall_line_width` is **0.45**. For a thin feature with two exposed faces (a tube wall, a collet finger) the real rungs are 0.84, **1.29**, **1.74**—not 1.26 and 1.68. `wall_loops` is also 2.
+
 | Walls | 0.25 mm (LW 0.25) | **0.4 mm (LW 0.42)** | 0.6 mm (LW 0.62) | 0.8 mm (LW 0.82) |
 |---|---|---|---|---|
 | 2 | 0.50 | **0.84** | 1.24 | 1.64 |
@@ -239,6 +241,8 @@ FlashForge confirms the direction officially: switching textured → smooth caus
 The print-in-place figure has a real-world anchor: the community's most-liked enclosure hinge fix exists specifically because FlashForge's own print-in-place hinge shipped at **0.10 mm clearance and fuses shut mid-print**; the fix opens it to **0.15 mm** ([hinge remix, 144 likes / 2,196 DL](https://www.printables.com/model/1119699-flashforge-ad5m-enclosure-hinge-remixed-to-be-easi)). **[DERIVED] Treat 0.15 mm as the absolute floor for a print-in-place joint on this machine and 0.25 mm as the safe default.**
 
 4. **Design holes oversized.** Circular holes lose diameter to two independent effects: extrusion pull-in, and OpenSCAD's inscribed-polygon approximation (§6.2). Compensate for both. Start at **+0.15 mm on diameter for the 0.4 nozzle** and verify.
+
+    > ⚠️ **REFUTED on this machine—see `flash-studio-slicing-reference.md`.** Verified as instructed and the figure does not hold: a bore drawn at 10.150 across the flats miked 9.5–9.6 in PETG at 0.12 mm layers, a loss of **0.55–0.65 on diameter**. The zero XY compensation this section predicts *is* confirmed. Note also that `initial_layer_print_height` is 0.30 regardless of layer height, so first-layer squish spans 0.3 mm and part of that loss may be at the bore's mouth rather than along its length.
 5. **Skew is correctable but only on modded firmware.** `[skew_correction]` exists in both community mods, not on stock ([Forge-X CALIBRATION.md](https://raw.githubusercontent.com/DrA1ex/ff5m/1.4.1/docs/CALIBRATION.md)). If parts come out as parallelograms, that's a machine fix, not a design fix.
 
 ---

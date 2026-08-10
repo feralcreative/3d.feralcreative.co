@@ -43,7 +43,9 @@ What is in there that actually changes geometry:
 
 Every figure carries a source and an evidence marker, and they are not interchangeable: `[SPEC]` is a hard constraint, `[FIELD]` is a field report, `[DERIVED]` is arithmetic done inside the document, and ⚠️ is contested or unverified. A ⚠️ is something to raise with Ziad, not something to quietly design around.
 
-`docs/printer-profile-research-prompt.md` is the prompt that produced that reference. You do not need it to design anything. It matters only if the hardware changes, or if someone wants the same document built for a different printer.
+`docs/flash-studio-slicing-reference.md` is the other half, and it outranks the first one wherever they disagree. That reference was assembled from FlashForge's published profiles and community reports; the slicing reference was read straight out of the slicer installed on this machine—every path, inheritance chain and resolved value, plus how to drive Flash Studio headless from the command line. It already corrects the wall-thickness ladder (inner walls are 0.45, not 0.42) and refutes the hole-compensation starting value (measured 0.55–0.65 on diameter, not 0.15). **Read it before quoting any print setting, choosing a wall thickness, or advising on print quality.** Do not go hunting through the app bundle again—it is all written down.
+
+`docs/printer-profile-research-prompt.md` is the prompt that produced the design reference. You do not need it to design anything. It matters only if the hardware changes, or if someone wants the same document built for a different printer.
 
 ## Layout
 
@@ -55,7 +57,7 @@ scad/
 ├── parts/                   # one .scad per design — the actual source
 │   └── example-spacer.scad  # template showing house style
 ├── logos/                   # artwork, and marks.scad — the library that places it
-├── docs/                    # printer reference, and the prompt behind it
+├── docs/                    # printer + slicing references, and the prompt behind them
 ├── lib/                     # BOSL2 lives here, as a git submodule
 ├── renders/                 # generated PNGs (gitignored)
 ├── stl/                     # generated STLs (gitignored)
