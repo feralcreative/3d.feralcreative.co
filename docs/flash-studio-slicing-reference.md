@@ -233,6 +233,52 @@ For whatever still gets through: a brief pass with a heat gun. That is already t
 
 <!--| PAGE-BREAK -->
 
+## The low-string presets
+
+Applied 2026-08-09. Two user presets, written to `~/Library/Application Support/Orca-Flashforge/user/default/`. **They are user presets deliberately**—nothing inside the app bundle was touched, so a Flash Studio update cannot clobber them and the stock profiles remain intact underneath.
+
+### `filament/Rapid PETG Burnt Titanium.json`
+
+Inherits `Flashforge HS PETG`, which is the correct family for this filament.
+
+| Setting | Stock | Set to | Why |
+| --- | --- | --- | --- |
+| `nozzle_temperature` | 265 (Pro) / 255 (HS) | **240** | The stringing cause. Inside FlashForge's own declared range for the material, which is 220–260 |
+| `nozzle_temperature_initial_layer` | 255 | **245** | Slightly hotter than the body for bed adhesion |
+| `filament_retraction_length` | `nil`, so the machine's 0.8 | **1.6** | 0.8 is FlashForge's PLA default; direct drive takes more for PETG |
+| `filament_retract_before_wipe` | `nil`, so the machine's 100% | **20%** | At 100% the retraction finishes before the wipe starts, so the wipe does nothing about ooze |
+| `filament_max_volumetric_speed` | 12 | **8** | See below—this one is a deliberate trade |
+
+**Why the flow cap.** Cooler PETG cannot melt as fast. At 0.12 mm layers and 0.42 mm width the 200 mm/s outer wall demands about 10 mm³/s, which is close to the stock cap of 12 and unrealistic at 240 °C. Capping at 8 makes the slicer *slow down* to stay inside the melt rate rather than under-extrude. **Prints get slower.** That is the intended behaviour; raise it back toward 12 only if the temperature goes back up.
+
+Retraction on the **filament** rather than the machine is deliberate too: retraction belongs to the material. Setting it machine-side would have applied 1.6 mm to PLA as well.
+
+### `process/0.12mm Fine @AD5M Pro 0.4 - Low String.json`
+
+Inherits `0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle`, and changes exactly one thing:
+
+| Setting | Stock | Set to | Why |
+| --- | --- | --- | --- |
+| `reduce_crossing_wall` | 0 | **1** | "Avoid crossing walls." Matters more for these parts than most—the chalk holder's collet has four slots, so every layer up it crosses open space eight times |
+
+### Verification, rollback, and what to do next
+
+Both chains were resolved after writing and every value confirmed to land:
+
+```text
+filament: Rapid PETG Burnt Titanium <- Flashforge HS PETG <- Flashforge Generic PETG
+          <- fdm_filament_pet <- fdm_filament_common
+process:  0.12mm Fine @AD5M Pro 0.4 - Low String <- 0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle
+          <- 0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle <- fdm_process_flashforge_0.20
+          <- fdm_process_flashforge_common <- fdm_process_common
+```
+
+The previous `user/` tree was copied to `user_backup-manual-<timestamp>/` in the same directory before anything was written. Rolling back is deleting the two new files, or restoring that folder.
+
+**Writing the files does not select them.** Both must be picked in the Flash Studio GUI before they take effect.
+
+If it still strings at 240, go down before touching anything else—235, then 230, which is the floor of the useful band. Only after temperature is exhausted is retraction worth another look, and 2.0 mm is the next rung.
+
 ## Corrections to the SCAD reference
 
 Each of these is a place where `flashforge-ad5m-pro-scad-reference.md` says something the installed profiles contradict or refine. **Where they disagree, this document wins**—these values were read from the slicer that will actually run the job.
@@ -285,5 +331,5 @@ None of this is built yet. If it gets built, it belongs in `utils/`, alongside t
 1. **Does the CLI resolve `inherits` from a bare child profile?** Untested. Verify with `--export-settings` before trusting any slice driven from the bundle's files directly.
 2. **Is the bore tight only at its mouth?** Mike a printed bore 10 mm up from the bed and compare with the reading at the opening. If it opens up, the 0.30 mm first layer is the culprit and `hole_pull_in` is set too high.
 3. **What is the real pull-in at mid-height?** Follows from item 2. Orca's tolerance test, run once for this filament, would settle it properly.
-4. **Does HS PETG at a reduced temperature fix the stringing?** The prescription above is reasoned, not yet confirmed on a print.
+4. **Does 240 °C fix the stringing?** The presets are applied but unproven on a print. If it still strings, drop to 235 then 230 before changing anything else.
 5. **The three-perimeter question**, per the wall ladder correction. Needs a slice and a G-code parse.
