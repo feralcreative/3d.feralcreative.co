@@ -2,13 +2,36 @@
 //
 // Both halves of the chalk holder on one plate: a slotted handle with a
 // threaded spigot and a split collet, and the ring that screws onto it. Merged
-// from chalk-holder-handle.scad and chalk-holder-tip.scad.
+// from chalk-holder-handle.scad and chalk-holder-tip.scad. Set show = "coupon"
+// for a short fit test instead of the pair.
 //
-// HOW THE PAIR WORKS. The ring screws down onto the spigot until its top face
-// meets the collar. As it goes it draws its own tapered bore over the collet,
-// squeezing the four fingers onto the chalk — from touching at the collet's
-// base to 0.33 mm of squeeze at its tip. The thread is the clamp, not just a
-// fastening, which is why a thread that binds ruins the whole mechanism.
+// HOW THE PAIR WORKS. The ring screws down the spigot and draws its own tapered
+// bore over the collet, squeezing the four fingers onto the chalk. The thread is
+// the clamp, not just a fastening, which is why a thread that binds ruins the
+// whole mechanism.
+//
+// It stops on the chalk, not on the collar, and it does so from a long way out.
+// The bore takes a 10.50 mm stick and the collet closes 2.67 mm on diameter from
+// there, over 1.8 turns of the nut — so a new 9.50 mm stick arrests it with the
+// ring still standing about 6.3 mm off the collar, and that gap shrinks as the
+// stick wears. It is meant to feel like a drafting pencil: open wide, wind down
+// a long way, grip.
+//
+// The legacy pair did the opposite. It squeezed 0.66 mm over half a turn, and
+// its bore printed at about 9.47, so a 9.50 stick could not get in without being
+// shaved to size on the way — and once in, there was nothing left to take up. It
+// scraped the chalk and held it badly, and those were the same defect.
+//
+// WHAT SETS THE SIZE OF THIS TOOL. The clamping stroke can never exceed the
+// collet's length: the ring's cone has to open from under the collet's tip to
+// over its base within the collet's own span, so stroke approaches collet_h and
+// never reaches it. Wanting 1.8 turns of stroke is therefore what forces a 16 mm
+// collet, which forces a bigger thread under it to keep the finger roots thick,
+// which forces a bigger barrel around that. None of the size here is styling.
+//
+// The whole mechanism is written out in [Hidden] under -- clamp --, including
+// what it trades against: stroke is spent out of thread engagement, and there
+// are 2.9 turns of that to spend.
 //
 // NAMES ARE PREFIXED ON PURPOSE. OpenSCAD has no namespaces and no scoping for
 // top-level assignments: the last one in the file wins, everywhere in the file,
@@ -32,11 +55,11 @@
 //   Handle, butt down. Keeps the collet fingers off the bed, where a small
 //   four-arc footprint would print badly and elephant's foot would deform the
 //   surface that does the gripping. It also puts the collar's seat face upward,
-//   so the face the ring lands on comes out flat. The cost is the butt's
-//   bullnose: see the note over handle_butt_round.
+//   so the face the ring bottoms against comes out flat. The cost is the butt's
+//   bullnose: see the note over handle_butt_flat.
 //
 //   Ring, nose down. Puts the seat face up for the same reason, and leaves the
-//   outer flare and the coned bore at about 15 and 7 degrees off vertical,
+//   outer flare and the coned bore at about 9 and 8 degrees off vertical,
 //   which is nothing. Printed the other way up the seat would be squashed
 //   against the bed and the coned bore would become a real overhang.
 //
@@ -49,20 +72,34 @@ include <BOSL2/threading.scad>
 include <../logos/marks.scad>
 
 /* [Plate] */
-// Which parts to emit. Build one at a time when you want a clean STL per part;
-// leave it on "both" to slice the pair as one plate.
-show = "both";  // [both, handle, ring]
+// Which parts to emit. Build one at a time when you want a clean STL per part,
+// leave it on "both" to slice the pair as one plate, or ask for the fit coupon —
+// see coupon_h. Anything else emits nothing at all, which is what you want when
+// another file includes this one to get at its numbers.
+show = "both";  // [both, handle, ring, coupon]
 
 // Clear air between the two parts, surface to surface, with the ring measured
 // over its ribs rather than its barrel.
 part_gap = 8.00;  // (mm)
+
+// The coupon is the top of the handle and the whole ring: every surface the
+// clamp uses and none of the handle that it doesn't. It exists because this fit
+// gets tuned by printing it, and a full pair is most of an hour to find out the
+// bore is two tenths out.
+//
+// Measured down from the collet's top face, so it grows downward. It has to
+// reach past the collar's top face — the seat the ring lands on — or the coupon
+// leaves out the thing it exists to test; that is 34.60. 42.00 clears it with a
+// stub of body to hold onto, and still stops short of the wordmark at 32.50, so
+// the coupon comes out blank.
+coupon_h = 42.00;  // (mm)
 
 /* [Thread] */
 // Shared by both halves. These are the numbers that describe the joint itself
 // rather than either part, and they were the ones duplicated across the two
 // old files.
 thread_pitch   = 5.500;  // single start, so pitch equals lead (mm)
-thread_crest_d = 15.200; // the spigot's crest diameter (mm)
+thread_crest_d = 16.800; // the spigot's crest diameter (mm)
 thread_crest_w = 2.700;  // axial width of that crest at mid-flank (mm)
 thread_depth   = 0.900;  // the spigot's tooth height, radially (mm)
 thread_flank   = 0.300;  // axial run of each flank; 0 would be truly square (mm)
@@ -76,10 +113,11 @@ thread_left    = false;  // the original is right handed
 thread_blunt_start = true;
 
 // How far the thread ramps to full height at each end. BOSL2's default is
-// generous, and on a thread under two turns long that is expensive: this pair
-// clamps through its thread, so turns lost here are clamp lost. Measured, the
-// spigot carries 1.87 turns of full-height crest with blunt start off and 1.56
-// with it on at this lead-in. undef hands the choice back to BOSL2.
+// generous, and this pair clamps through its thread, so turns lost here are
+// clamp lost. It matters less than it did: the spigot now carries 17.60 mm of
+// thread, about 3.2 turns, where the legacy one had under two, so the lead-in
+// costs proportionally a third of what it used to. undef hands the choice back
+// to BOSL2.
 thread_lead_in = 0.60;  // (mm)
 
 // Radial air between the spigot's crest and the bottom of the ring's groove. It
@@ -97,33 +135,78 @@ thread_root_gap = 0.200;  // (mm)
 handle_thread_clearance = 0.000;  // (mm)
 ring_thread_clearance   = 0.150;  // (mm)
 
+/* [Chalk] */
+// The stick the tool is built around. The bore, the collet's outside diameter
+// and therefore the entire clamp all follow from these three numbers, so fitting
+// a different stick is one edit rather than four.
+chalk_d = 9.500;  // nominal diameter of a new stick (mm)
+
+// Diametral air between the stick and the bore, as printed. This is not a
+// sliding-fit allowance — the collet closes onto the stick, so nothing here has
+// to be tight. It is how much oversize, out-of-round and dusty stick the tool
+// swallows without shaving it on the way in, and shaving is exactly what the
+// legacy bore did: drawn at 9.637 it printed near 9.47, so a 9.50 stick could
+// not physically enter it.
+//
+// A full millimetre is deliberate and it is what makes the tool forgiving. It is
+// affordable only because the collet closes 2.67 mm on diameter — with the old
+// 0.66 mm of closure, a bore this generous would have gripped nothing.
+//
+// It is not free either. Every 0.1 here is another 0.05 mm of collet radius,
+// which is another 0.36 mm of clamping stroke, which comes straight out of
+// thread engagement — see clamp_travel_budget.
+chalk_slop = 1.000;  // (mm)
+
+// Extrusion pull-in: a hole comes out this much undersize on diameter.
+//
+// MEASURED, not taken from the reference. docs/flashforge-ad5m-pro-scad-reference.md
+// §5.3 gives 0.15 for the 0.4 nozzle and flags it as an unverified starting
+// point, and on this machine it is not close: a bore drawn at 10.150 across the
+// flats miked 9.5 to 9.6, a loss of 0.55 to 0.65. 0.600 is the middle of that.
+//
+// Two caveats. The reference's figure is tied to FlashForge's 0.20 mm profiles
+// and these parts are printed at 0.12 for the sake of the thread, which is a
+// different profile with its own compensations. And some of that loss is
+// probably not pull-in at all but elephant's foot near the bed, which would mean
+// the bore is only tight at its mouth. Both are reasons the number is soft — and
+// reasons chalk_slop is generous, because the collet's range absorbs the error
+// either way.
+//
+// The other half of the rule, that OpenSCAD's circles come out inscribed, is
+// handled where the bore is derived, because it needs $fn.
+hole_pull_in = 0.600;  // (mm)
+
 /* [Handle: body] */
-handle_body_d = 18.200;  // outside diameter of the tube (mm)
-handle_bore_d =  9.637;  // through bore the chalk sits in (mm)
+handle_body_d = 20.000;  // outside diameter of the tube (mm)
 handle_body_h = 65.000;  // plain tube, up to the base of the collar (mm)
 
+// The bore is not here — it is derived from [Chalk] down in [Hidden].
+//
 // handle_body_d was 15.000 on the legacy mesh, which made the tool a thin shaft
 // with a fat head. It now matches the ring's barrel between its ribs, so the
-// whole thing reads as one cylinder. The bore is untouched — it still has to
-// hold the chalk. The wall goes from 2.68 mm to 4.28 mm and the body's solid
-// volume roughly doubles, which at any sane infill is not worth worrying about.
+// whole thing reads as one cylinder. It has since grown again, to 20.000, not
+// for looks but because the thread under the collet had to get bigger and the
+// ring's wall over the thread groove goes with it. With the bore at 11.11 the
+// wall is 4.44 mm against the legacy part's 2.68.
 
 /* [Handle: butt end] */
-// Rounding on the outside of the open end. The default is the wall thickness,
-// which is the largest value that means anything: the curve then runs all the
-// way in and arrives tangent at the bore, leaving no flat face at all. The bore
-// stays a sharp edge, which is deliberate — the end is open so a jammed stick
-// can be driven out from behind, and that wants an edge, not a funnel.
+// The open end is rounded off on the outside. What you set is not the radius —
+// it is how much flat contact ring is left between the curve and the bore, and
+// the radius is whatever is left over. That way the rounding tracks the bore
+// automatically and can never eat it, which is what the radius used to have to
+// be kept in step with by hand.
 //
-// Printing cost, since the handle goes butt down: the first layer becomes a
-// 1.3 mm ring instead of the full 4.28 mm annulus, and the surface is about 18
+// 0 is the largest rounding that means anything: the curve runs all the way in
+// and arrives tangent at the bore, leaving no flat face at all. That is what the
+// legacy pair does. The bore stays a sharp edge either way, which is deliberate
+// — the end is open so a jammed stick can be driven out from behind, and that
+// wants an edge, not a funnel.
+//
+// Printing cost at 0, since the handle goes butt down: the first layer is about
+// a 1 mm sliver instead of the full 4.44 mm annulus, and the surface is about 20
 // degrees off horizontal for the first millimetre. It will droop there or want
-// support. Back it off to around 3.3 to leave a 1 mm flat contact ring and it
-// still reads as round.
-//
-// Anything smaller leaves a flat ring between the curve and the bore. Anything
-// larger is not geometry, it eats the bore.
-handle_butt_round = (handle_body_d - handle_bore_d) / 2;  // (mm)
+// support. 1.00 gives a proper contact ring and still reads as round.
+handle_butt_flat = 0.000;  // flat ring left between the rounding and the bore (mm)
 
 /* [Handle: loading slot] */
 handle_slot_w  =  2.000;  // width (mm)
@@ -141,21 +224,50 @@ handle_slot_round = 0.400;  // (mm)
 /* [Handle: collar] */
 // With handle_collar_d equal to handle_body_d this is no longer a flare — it is
 // just the last stretch of body before the spigot, and the only thing still
-// making it a collar is its top face, which is the seat the ring screws down
-// onto. Set it back below handle_body_d to get a waist here instead.
-handle_collar_d = 18.200;  // outside diameter at the top of the collar (mm)
+// making it a collar is its top face, which is what the ring would bottom
+// against — though with this much clamping range it rarely gets that far. Set it
+// back below handle_body_d to get a waist here instead.
+handle_collar_d = 20.000;  // outside diameter at the top of the collar (mm)
 handle_collar_h =  5.000;  // body up to collar, coned if the two differ (mm)
 
 /* [Handle: threaded spigot] */
-handle_spigot_h = 10.600;  // collar top to the base of the collet (mm)
-handle_thread_h = 10.300;  // how much of the spigot carries thread (mm)
+handle_spigot_h = 18.300;  // collar top to the base of the collet (mm)
+handle_thread_h = 17.600;  // how much of the spigot carries thread (mm)
 
 /* [Handle: collet] */
-handle_collet_h         = 9.000;  // base of the collet to the top face (mm)
-handle_collet_tip_d     = 12.000; // outside diameter at the very top (mm)
-handle_collet_slots     = 4;      // fingers are the gaps between these
-handle_collet_slot_w    = 2.000;  // (mm)
-handle_collet_slot_ramp = 1.000;  // coned relief under each slot (mm)
+handle_collet_h      = 16.300;  // base of the collet to the top face (mm)
+handle_collet_slots  = 4;      // fingers are the gaps between these
+handle_collet_slot_w = 2.000;  // (mm)
+
+// Finger thickness at the very tip, and the number the whole clamp turns on: the
+// collet's outside diameter up there is the bore plus twice this, and how far
+// that exceeds ring_mouth_d IS the mechanism. Everything else is second order.
+// See the clamp block in [Hidden].
+//
+// The legacy pair had the outside diameter typed here instead, at 12.000. Held
+// against the bore this file now runs, that would leave a 0.44 mm finger — one
+// extrusion, on the thinnest and most heavily worked feature of the tool. 1.260
+// is three 0.42 mm lines, which is what the printer reference asks for on
+// anything load-bearing that flexes.
+handle_collet_tip_wall = 1.260;  // (mm)
+
+// What the fingers actually do: gripping a new 9.50 mm stick bends each one
+// 0.50 mm, and the full 1.33 mm is only reached by winding the nut down on an
+// empty holder. Worth not making a habit of — the handle prints butt down, so a
+// finger bends across the layers rather than along them, and PETG creeps.
+//
+// Peak bending strain at that full deflection is about 1.5 %, against a PETG
+// yield somewhere near 4 %. That is better than the shorter collet managed at
+// half the closure, because strain falls with the square of the finger's length
+// and this one is nearly twice as long.
+
+// Coned relief under each slot, so the finger root is a ramp rather than a square
+// corner. It is the stress riser that decides whether a finger ever cracks, and
+// the root here is thinner and works harder than the legacy pair's, so this is
+// the first number to reach for if one does. It is not free: the relief opens
+// inward as it descends, so a longer ramp drags that erosion further down the
+// spigot wall underneath the thread.
+handle_collet_slot_ramp = 1.000;  // (mm)
 handle_collet_slot_az   = 0;      // angle of the first slot (deg)
 
 /* [Handle: maker's mark] */
@@ -180,20 +292,20 @@ handle_mark_depth =  0.40;  // how far it is cut into the wall (mm)
 handle_mark_az = 90;  // (deg)
 
 /* [Ring: body] */
-ring_height    = 19.20;  // overall height (mm)
-ring_collar_d  = 14.50;  // outside diameter at the bottom, between ribs (mm)
+ring_height    = 34.20;  // overall height (mm)
+ring_collar_d  = 16.00;  // outside diameter at the bottom, between ribs (mm)
 ring_collar_h  = 2.00;   // straight section at the bottom, before the flare (mm)
-ring_barrel_d  = 18.20;  // outside diameter of the barrel, between ribs (mm)
-ring_barrel_z0 = 9.00;   // height at which the flare reaches full diameter (mm)
-ring_barrel_z1 = 15.50;  // where a top taper would start; inert while top = barrel (mm)
-ring_top_d     = 18.20;  // outside diameter at the top face, between ribs (mm)
+ring_barrel_d  = 20.00;  // outside diameter of the barrel, between ribs (mm)
+ring_barrel_z0 = 15.00;   // height at which the flare reaches full diameter (mm)
+ring_barrel_z1 = 27.00;  // where a top taper would start; inert while top = barrel (mm)
+ring_top_d     = 20.00;  // outside diameter at the top face, between ribs (mm)
 
 // ring_top_d was 17.39 on the legacy mesh, which put a step at the joint. It now
 // matches the barrel and the handle's body, so the tool reads as one cylinder
 // from the butt of the handle to the start of the nose taper. Two things fall
 // out of that: the outer profile is straight from ring_barrel_z0 to ring_height,
 // which is why ring_barrel_z1 no longer does anything, and the wall over the
-// thread groove at the top rim goes from 0.895 mm to 1.300 mm — it was the
+// thread groove at the top rim goes from 0.895 mm to 1.400 mm — it was the
 // thinnest section left in the part.
 //
 // ring_collar_d was 13.60. The collar is straight while the bore under it is
@@ -201,9 +313,9 @@ ring_top_d     = 18.20;  // outside diameter at the top face, between ribs (mm)
 // thinnest section anywhere in the part. A rib bead then sits on top of that,
 // taking the section to 1.65 mm at each rib and back to 0.87 between, so the
 // slicer changes its mind about how many wall loops fit twelve times a layer
-// and every change leaves an unfilled pocket inside a rib. 14.50 puts the thin
-// spot at 1.31 mm. It costs 0.9 mm of diameter and nothing else — the collar is
-// a grip surface and mates with nothing.
+// and every change leaves an unfilled pocket inside a rib. 14.50 put the thin
+// spot at 1.31 mm; 16.00 puts it at 2.23. It costs diameter and nothing else:
+// the collar is a grip surface and mates with nothing.
 
 /* [Ring: grip ribs] */
 ring_rib_count    = 12;    // beads around the barrel
@@ -211,20 +323,35 @@ ring_rib_r_bottom = 0.78;  // bead radius at the base (mm)
 ring_rib_r_top    = 0.94;  // bead radius from ring_barrel_z0 upwards (mm)
 
 /* [Ring: bore] */
-ring_mouth_d  = 11.40;  // bore at the bottom face (mm)
-ring_throat_d = 13.52;  // bore just under the thread shoulder (mm)
+// These two are the cone that squeezes the collet, and the line between them is
+// the ramp the whole clamp rides down. Its slope decides how much nut travel a
+// given amount of squeeze costs — steeper is less travel for the same grip, and
+// travel is expensive because it is spent out of thread engagement.
+//
+// The throat cannot simply rise to whatever the slope wants: the bore has to
+// step OUT as it enters the thread, so it must stay under the thread's own land,
+// less the relief the bore is drawn undersize by. That ceiling is 15.792, and
+// 15.48 leaves 0.156 mm of shoulder on radius. There is an assert on it in
+// [Hidden], because past the ceiling the step inverts and ring_body_profile
+// folds back on itself — which is not an error, just a quietly wrong part.
+//
+// The mouth is the other half of it. How far the collet's tip exceeds it is the
+// entire clamp, so lowering ring_mouth_d buys grip range and raising it gives
+// range back to get the nut closer to the collar.
+ring_mouth_d  = 11.00;  // bore at the bottom face (mm)
+ring_throat_d = 15.48;  // bore just under the thread shoulder (mm)
 
 /* [Ring: thread] */
-ring_thread_z0      = 9.00;    // shoulder the thread starts from (mm)
-ring_thread_minor_d = 14.592;  // land diameter — what the spigot's crest bites (mm)
+ring_thread_z0      = 16.30;    // shoulder the thread starts from (mm)
+ring_thread_minor_d = 16.192;  // land diameter — what the spigot's crest bites (mm)
 
 // Only read when blunt start is on. The pilot is how much plain bore at the
 // mouth the spigot enters before any thread bites; the bevel is the lead-in
 // chamfer on the lip, which is about getting the spigot in coaxially and has
 // nothing to do with how the thread turns once engaged.
 //
-// The pilot sits at the groove root, r 7.800, not at the land — it has to clear
-// the spigot's crest at 7.600, so it guides on that with 0.200 of slack. A
+// The pilot sits at the groove root, r 8.600, not at the land — it has to clear
+// the spigot's crest at 8.400, so it guides on that with 0.200 of slack. A
 // pilot at the land would simply refuse the spigot.
 //
 // Both come out of thread engagement, so neither is free. The chamfer also
@@ -260,6 +387,27 @@ handle_x = -(handle_r + part_gap / 2);
 ring_x    =   ring_r + part_gap / 2;
 
 // -- handle -----------------------------------------------------------------
+
+// The bore, and why it is derived down here instead of up beside its own inputs
+// in [Chalk]: it reads $fn, and $fn is not assigned until [Quality], further
+// down the file. OpenSCAD does not resolve forward references in top-level
+// assignments — read $fn before it is set and the answer is nan, silently, and
+// nan would go straight on into the butt rounding, the collet cone and the slot
+// ramp without so much as a warning.
+//
+// The division is what circumscribes it. OpenSCAD's circles come out inscribed,
+// so a bore drawn at diameter d only measures d*cos(180/$fn) across its flats:
+// 0.012 mm at $fn = 64 and a bore around 10. Small, but the same sign as the
+// pull-in, and the whole point of deriving any of this is to stop having to be
+// right by hand.
+handle_bore_d = (chalk_d + chalk_slop + hole_pull_in) / cos(180 / $fn);
+
+// The biggest rounding that means anything is the entire wall, which arrives
+// tangent at the bore and leaves no flat at all. handle_butt_flat backs it off
+// from there, and because both terms follow the bore it can never eat it.
+handle_butt_round = (handle_body_d - handle_bore_d) / 2 - handle_butt_flat;
+
+handle_collet_tip_d = handle_bore_d + 2 * handle_collet_tip_wall;
 
 handle_r_bore   = handle_bore_d / 2;
 handle_r_root   = thread_crest_d / 2 - thread_depth;  // also the collet's base radius
@@ -341,6 +489,98 @@ ring_thread_profile = [
     [ (ring_groove_w / 2 + thread_flank / 2) / thread_pitch,          -ring_thread_depth / thread_pitch],
     [ 0.5,                                                          -ring_thread_depth / thread_pitch],
 ];
+
+// -- clamp -------------------------------------------------------------------
+//
+// None of this draws anything. It is the mechanism written down, because until
+// now it only existed as two numbers a hundred lines apart and a sentence in the
+// header, and every one of these is a thing you would otherwise have to rederive
+// before you could safely change anything.
+//
+// In use the handle stands collet up and the ring is upside down relative to how
+// it is drawn: its TOP face, the threaded end, is the one that comes down onto
+// the collar, and its mouth points at the sky. A point at ring-local z therefore
+// sits at handle-global handle_z_collar + ring_height + g - z, where g is the
+// air still left between the ring's top face and the collar, and g = 0 is fully
+// seated.
+//
+// Two cones converge on each other. The ring's bore opens upward at
+// ring_bore_slope; the collet closes upward at handle_collet_slope, which is
+// negative and much shallower. For most of the stroke the contact is the collet's
+// own top edge riding down the bore, and then for the last clamp_tip_protrusion
+// it swaps to the ring's mouth edge biting the collet's flank, the tip having by
+// then come out through the mouth.
+
+handle_collet_r_tip = handle_collet_tip_d / 2;
+handle_collet_slope = (handle_collet_r_tip - handle_r_root) / handle_collet_h;
+ring_bore_slope     = (ring_r_throat - ring_r_mouth) / ring_thread_z0;
+
+// How far the collet's tip stands out past the mouth once the ring is seated.
+clamp_tip_protrusion = handle_spigot_h + handle_collet_h - ring_height;
+
+// The one number the whole thing turns on: how much bigger the collet's tip is
+// than the ring's mouth.
+clamp_tip_overlap = handle_collet_r_tip - ring_r_mouth;
+
+// First contact to full seat, and the squeeze delivered by the time it gets
+// there. Both are on radius; double clamp_closure for the width of the grip
+// range. Divide clamp_stroke by thread_pitch for turns of the nut.
+clamp_stroke  = clamp_tip_overlap / ring_bore_slope + clamp_tip_protrusion;
+clamp_closure = clamp_tip_overlap - handle_collet_slope * clamp_tip_protrusion;
+
+// Clearance between the collet's BASE and the bore at full seat. It is small on
+// purpose — that is what lets the bore lie along the whole flank rather than
+// only bite at the mouth — but nothing feeding it is a free parameter. Nudge
+// ring_height, handle_spigot_h, ring_mouth_d or ring_throat_d and it goes
+// negative, at which point the ring stops dead on the collet's base.
+clamp_base_gap = ring_r_mouth
+               + ring_bore_slope * (ring_height - handle_spigot_h)
+               - handle_r_root;
+
+// What the stroke is spent out of. Stroke and the engagement still left when the
+// clamp starts to load always sum to this, so buying one spends the other. The
+// legacy budget was 1.6 turns, which could not cover a turn of each; it is 2.9
+// now, bought by raising handle_spigot_h and ring_height together and taking
+// handle_thread_h up with the spigot. That is the only way to grow it.
+clamp_travel_budget = handle_thread_h - ring_thread_pilot;
+clamp_engagement    = clamp_travel_budget - clamp_stroke;
+
+// What it will actually hold, as printed rather than as drawn: the bore loses
+// the inscribed-polygon slice and the extrusion pull-in, and the collet closes
+// by clamp_closure on radius from there. Conservative at the bottom end, since
+// printing also makes the collet fatter and the mouth smaller.
+chalk_d_max = handle_bore_d * cos(180 / $fn) - hole_pull_in;
+chalk_d_min = chalk_d_max - 2 * clamp_closure;
+
+// -- the invariants ----------------------------------------------------------
+//
+// Three things that are true now, are not enforced by anything else, and would
+// each produce a part that renders perfectly and does not work.
+
+assert(clamp_base_gap > 0,
+       str("ring bore is narrower than the collet's base at full seat: the ring ",
+           "will stop on the collet instead of running down the thread"));
+
+assert(ring_r_throat < ring_r_minor - ring_bore_relief,
+       str("ring_throat_d is past the thread's land: the bore steps inward ",
+           "entering the thread instead of outward, and ring_body_profile then ",
+           "folds back on itself"));
+
+assert(handle_butt_round > 0,
+       str("handle_butt_flat is wider than the wall, so there is no rounding ",
+           "left to take off the butt"));
+
+// clamp_base_gap reads the bore's cone at the collet's base. If the cone stops
+// short of that station the figure is an extrapolation of a surface that is not
+// there, and it will happily report a healthy clearance for a ring that jams.
+assert(ring_thread_z0 >= ring_height - handle_spigot_h,
+       str("the ring's tapered bore ends before it reaches the collet's base at ",
+           "full seat: raise ring_thread_z0 or shorten handle_spigot_h"));
+
+// The stroke is only as long as the shorter of the two threads allows.
+assert(ring_height - ring_thread_z0 >= handle_thread_h,
+       str("the ring's internal thread is shorter than the spigot's, so the ",
+           "spigot bottoms out before the clamp closes"));
 
 // ===========================================================================
 // Handle
@@ -555,12 +795,39 @@ module chalk_holder_ring() {
 // The plate
 // ===========================================================================
 
+// The fit coupon: the top coupon_h of the handle, dropped onto the bed. It is cut
+// out of the finished part rather than built as a short one, so it cannot drift
+// out of agreement with the real thing — the collet, the thread and the seat are
+// that geometry, not a copy of it.
+//
+// It prints cut face down, collet up, exactly as the handle does. The flat
+// annulus it lands on is a better first layer than the handle's own bullnose.
+module chalk_holder_coupon() {
+    z0 = handle_z_top - coupon_h;
+
+    assert(z0 < handle_z_collar,
+           str("coupon_h does not reach the collar's top face, so the coupon ",
+               "leaves out the seat the ring lands on — the thing it is for"));
+
+    translate([0, 0, -z0])
+        intersection() {
+            chalk_holder_handle();
+
+            translate([0, 0, z0])
+                cylinder(d = 2 * handle_body_d, h = coupon_h + eps);
+        }
+}
+
 module chalk_holder() {
     if (show == "both" || show == "handle")
         translate([show == "handle" ? 0 : handle_x, 0, 0])
             chalk_holder_handle();
 
-    if (show == "both" || show == "ring")
+    if (show == "coupon")
+        translate([handle_x, 0, 0])
+            chalk_holder_coupon();
+
+    if (show == "both" || show == "ring" || show == "coupon")
         translate([show == "ring" ? 0 : ring_x, 0, 0])
             chalk_holder_ring();
 }
