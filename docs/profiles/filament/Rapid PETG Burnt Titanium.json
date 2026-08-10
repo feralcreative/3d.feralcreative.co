@@ -1,0 +1,31 @@
+{
+    "type": "filament",
+    "name": "Rapid PETG Burnt Titanium",
+    "from": "User",
+    "inherits": "Flashforge HS PETG",
+    "version": "2.3.0.3",
+    "filament_settings_id": [
+        "Rapid PETG Burnt Titanium"
+    ],
+    "filament_extruder_variant": [
+        "Direct Drive Standard"
+    ],
+    "compatible_printers": [
+        "Flashforge Adventurer 5M Pro 0.4 Nozzle"
+    ],
+    "nozzle_temperature": [
+        "240"
+    ],
+    "nozzle_temperature_initial_layer": [
+        "245"
+    ],
+    "filament_retraction_length": [
+        "1.6"
+    ],
+    "filament_retract_before_wipe": [
+        "20%"
+    ],
+    "filament_max_volumetric_speed": [
+        "8"
+    ]
+}

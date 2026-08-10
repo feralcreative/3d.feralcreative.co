@@ -2,7 +2,7 @@
 
 **Machine:** FlashForge Adventurer 5M Pro, 0.4 nozzle
 **Slicer:** Flash Studio 1.7.13, reporting internally as Orca-Flashforge 2.3.2
-**Verified:** 2026-08-09, by reading the installed profiles and running the CLI
+**Verified:** 2026-08-09 by reading the installed profiles; corrected 2026-08-10 by driving the CLI and reading the G-code back
 
 ## Why this exists
 
@@ -32,22 +32,51 @@ The executable lives inside the bundle, and its name contains a space:
 
 **It runs headless.** Confirmed: invoked with no display attached it printed help and exited 0. No X server, no window, no GUI session required.
 
-A complete slice, using the profiles already installed:
+**Use `utils/slice.sh`.** It exists because every naive way of doing this is silently wrong, and the rest of this section is why. Driving the binary by hand is for debugging the script, not for producing a job you intend to print.
 
 ```bash
-P="/Applications/Flash Studio.app/Contents/Resources/profiles/Flashforge"
-"/Applications/Flash Studio.app/Contents/MacOS/Flash Studio" \
-  --slice 0 \
-  --load-settings "$P/machine/Flashforge Adventurer 5M Pro 0.4 Nozzle.json;$P/process/0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle.json" \
-  --load-filaments "$P/filament/Flashforge PETG Pro.json" \
-  --outputdir /tmp/slice-out \
-  --export-3mf /tmp/slice-out/out.gcode.3mf \
-  stl/hobbs-chalk-holder.stl
+utils/slice.sh stl/hobbs-chalk-holder.stl          # low-string settings, applied and verified
+utils/slice.sh parts/hobbs-chalk-holder.scad       # meshes it first via build.sh
+utils/slice.sh stl/x.stl --stock                   # stock profiles, no overrides
+utils/slice.sh stl/x.stl --set filament:nozzle_temperature=235
 ```
 
-Machine profile first in `--load-settings`, process profile second, semicolon-separated. Filaments are a separate flag. **Because the profiles ship inside the bundle, nothing needs exporting**—point at them in place and the slice uses exactly the settings the GUI would.
+Machine profile first in `--load-settings`, process profile second, semicolon-separated. Filaments are a separate flag.
 
-Caveat not yet resolved: those files carry `inherits` keys, and it is untested whether the CLI resolves an inheritance chain from a bare child file or needs a fully-resolved profile. If a slice comes out with obviously wrong settings, that is the first thing to suspect. `--export-settings resolved.json` dumps the merged configuration and is the way to check.
+### The CLI does not resolve `inherits`
+
+**Verified 2026-08-10, and it is the trap that matters most.** Point `--load-settings` or `--load-filaments` at a profile from the bundle and only the keys *physically present in that one file* take effect. Everything else falls back to the slicer's **built-in defaults, not the parent profile**. Since almost every profile here is a thin overlay, the result is a slice that has almost nothing to do with the settings you named.
+
+Slicing with the bundle's own `Flashforge PETG Pro.json` and `0.12mm Fine`, exactly as this document previously recommended, produced:
+
+```text
+filament_type                  PLA     should be PETG
+pressure_advance               0.02    should be 0.046
+filament_max_volumetric_speed  2       should be 12
+fan_min_speed                  20      should be 80
+inner_wall_line_width          0       should be 0.45
+outer_wall_line_width          0       should be 0.42
+elefant_foot_compensation      0       should be 0.15
+inherits_group                 ['', '', '']
+```
+
+`nozzle_temperature` came out right at 265 only because PETG Pro's own file happens to set it, and `layer_height` at 0.12 for the same reason. That is what makes this so dangerous: the one or two values you would think to spot-check are exactly the ones that survive.
+
+Two ways to get a correct slice:
+
+- **Resolve the chains yourself and pass flat profiles.** This is what `utils/ffprofile.py` does, walking `inherits` and merging child over parent before handing the result to the CLI. `utils/slice.sh` calls it on every run.
+- **Slice a project 3mf saved by the GUI.** Its `project_settings.config` is already fully flattened, so `--slice 0 file.3mf` with no profile flags resolves correctly. Confirmed against a GUI-saved project: PETG, 0.046, flow 12, walls 0.45/0.42.
+
+When merging profiles yourself, remove `inherits` and **leave every other metadata key alone**. Stripping `instantiation`, `setting_id` or `is_custom_defined` makes the slicer stop treating the machine profile as a real printer, and it then rejects the job with `process not compatible with printer` even though the process profile's `compatible_printers` names that machine exactly. Renaming the merged machine profile breaks the same match.
+
+### Two path quirks in the output flags
+
+Both cost a full slice before being understood, and neither is documented upstream:
+
+- **`--export-3mf` is resolved relative to `--outputdir`.** Give it an absolute path and you get `/out/dir//abs/path`, which fails with `Unable to open the file` *after* the slice has completed and the G-code has been thrown away. Pass a bare filename.
+- **`--export-settings` ignores `--outputdir`** and writes relative to the current directory. Give it an absolute path or it lands wherever you happened to be standing.
+
+`--export-settings` dumps the merged configuration and is how you check that a setting really took. Do not skip it—see the presets section below for what happens when you trust the GUI instead.
 
 ### Flags that matter
 
@@ -79,7 +108,9 @@ The slicer prints its own precedence rules, and they are worth internalising bec
 3) setting values loaded from 3mf (lowest priority)
 ```
 
-So a single setting can be overridden on the command line without editing or copying a profile—the same pattern `render.sh` and `build.sh` already use with OpenSCAD's `-D`.
+**That first line is unreachable in this build, and reading it as an escape hatch is a mistake.** Orca-Flashforge 2.3.2 exposes no per-setting command-line flags at all—`--help` lists only structural options such as `--scale`, `--rotate` and `--load-settings`. There is no `--nozzle-temperature`. Upstream PrusaSlicer accepted generic per-setting options and the precedence text is inherited from it, but nothing here honours it.
+
+So there is no way to override one value at the command line. The only reliable route is to change it in the profile you load, which is why `utils/slice.sh` writes overrides into a resolved profile rather than passing flags—the closest equivalent to the `-D` pattern `render.sh` and `build.sh` use with OpenSCAD, but it works by rewriting the profile, not by beating it on priority.
 
 <!--| PAGE-BREAK -->
 
@@ -237,6 +268,8 @@ For whatever still gets through: a brief pass with a heat gun. That is already t
 
 Applied 2026-08-09. Two user presets, written to `~/Library/Application Support/Orca-Flashforge/user/default/`. **They are user presets deliberately**—nothing inside the app bundle was touched, so a Flash Studio update cannot clobber them and the stock profiles remain intact underneath.
 
+**Every preset also gets a copy committed to `docs/profiles/`** in this repo—`docs/profiles/filament/` for filament, matching subfolder for process and printer. The app's `user/` tree is outside version control and one reinstall away from gone; the repo copy is the durable, diffable record. Copying there is *in addition to* writing the app's preset, never instead of it.
+
 ### `filament/Rapid PETG Burnt Titanium.json`
 
 Inherits `Flashforge HS PETG`, which is the correct family for this filament.
@@ -261,21 +294,34 @@ Inherits `0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle`, and changes exactly one 
 | --- | --- | --- | --- |
 | `reduce_crossing_wall` | 0 | **1** | "Avoid crossing walls." Matters more for these parts than most—the chalk holder's collet has four slots, so every layer up it crosses open space eight times |
 
-### Verification, rollback, and what to do next
+### These presets did not work, and the reason is the point
 
-Both chains were resolved after writing and every value confirmed to land:
+An earlier version of this section claimed both chains were resolved and every value confirmed to land. **That was wrong, and the print that followed paid for it.** Recorded here in full because the failure mode is invisible and will happen again to anyone who trusts the GUI.
+
+The job sliced on 2026-08-09 ran at 265 °C. Its resolved configuration, read back out of the saved project:
 
 ```text
-filament: Rapid PETG Burnt Titanium <- Flashforge HS PETG <- Flashforge Generic PETG
-          <- fdm_filament_pet <- fdm_filament_common
-process:  0.12mm Fine @AD5M Pro 0.4 - Low String <- 0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle
-          <- 0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle <- fdm_process_flashforge_0.20
-          <- fdm_process_flashforge_common <- fdm_process_common
+filament_settings_id            "Rapid PETG Burnt Titanium"   the preset, selected
+inherits_group                  ["", "Flashforge HS PETG", ""]  chain declared
+nozzle_temperature              265        the preset's 240 absent
+filament_retraction_length      nil        the preset's 1.6 absent
+filament_retract_before_wipe    nil        the preset's 20% absent
+filament_max_volumetric_speed   12         the preset's 8 absent
+print_settings_id               "0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle"
+reduce_crossing_wall            0          the process preset never selected
 ```
 
-The previous `user/` tree was copied to `user_backup-manual-<timestamp>/` in the same directory before anything was written. Rolling back is deleting the two new files, or restoring that folder.
+The preset file itself is correct—`docs/profiles/filament/Rapid PETG Burnt Titanium.json` has all five values properly shaped as single-element string lists. It was selected. It contributed nothing.
 
-**Writing the files does not select them.** Both must be picked in the Flash Studio GUI before they take effect.
+**The tell is that 265 cannot come from that chain at all.** `Flashforge HS PETG` sets no temperature and inherits 255 from `Flashforge Generic PETG`; only `Flashforge PETG Pro` sets 265. So the project was carrying a stale flattened configuration from when PETG Pro was selected, with the new preset's *name* attached to it. Selecting a preset in the GUI updated the label and not the values.
+
+Three lessons, in order of usefulness:
+
+1. **Never verify a setting by looking at the GUI.** Verify it in the G-code, which is the only artefact the printer sees. `utils/gcode-probe.py` prints the commanded temperatures and the real retraction distances for exactly this reason.
+2. **A stale project is more dangerous than a wrong profile**, because every name on screen looks right. If a project has been open across a preset change, re-slice from the STL rather than the project.
+3. **Prefer `utils/slice.sh` over the GUI for anything you care about.** It resolves the chain, writes the overrides into the profile, and reads the result back, so there is no step where a value can be quietly dropped.
+
+Rollback, if the app presets need undoing: the previous `user/` tree was copied to `user_backup-manual-<timestamp>/` alongside it, so restoring that folder or deleting the two files is enough. The repo copies under `docs/profiles/` are the durable record and are not affected.
 
 If it still strings at 240, go down before touching anything else—235, then 230, which is the floor of the useful band. Only after temperature is exhausted is retraction worth another look, and 2.0 mm is the next rung.
 
@@ -324,12 +370,25 @@ The repo already has a design loop—`utils/render.sh` to see geometry, `utils/b
 - **Support decisions.** Slice with supports off and inspect, to confirm the "no supports needed" claims in `parts/hobbs-painters-pyramid.scad`.
 - **Time and filament.** `slice_info.config` inside the exported `.gcode.3mf` carries filament in mm and grams, estimated print time and layer count—machine-readable, so a coupon-versus-full-plate decision stops being a guess.
 
-None of this is built yet. If it gets built, it belongs in `utils/`, alongside the other two scripts, and it should export nothing to the printer.
+**Built, 2026-08-10.** `utils/slice.sh` drives the slice, `utils/ffprofile.py` resolves the profile chains, and `utils/gcode-probe.py` reads the job back. They export nothing to the printer. What the probe reports, and what each is for:
+
+| Reported | Why |
+| --- | --- |
+| Layer count and max Z | Whether the slicer emitted the whole part. The cheap standing check, in the spirit of reading genus out of `build.sh` |
+| Temperature setpoints, in order | First layer and body separately. The only place a temperature cannot hide |
+| Retraction distances, totalled per event | Proves a filament-side override reached the machine |
+| Extrusion roles at a given Z | Whether a thin wall became perimeters or gap fill |
+| Work cliff | The layer where extrusion per layer collapses, meaning some geometry finished and whatever is left is now printing alone with no cooling interval |
+
+Two notes for anyone extending it. Retraction is **not** one G-code move: with `retract_before_wipe` below 100% the slicer emits a pure `G1 E-n` for the portion taken before the wipe and spreads the rest across the wipe's own `G1 X.. Y.. E-..` moves, so counting only the pure move reports a 1.6 mm retraction as 1.15. And extrusion-role *segments* count `;TYPE:` blocks, not loops, so they show which roles are present rather than how many perimeters were laid.
+
+Still not built: support verification for `parts/hobbs-painters-pyramid.scad`.
 
 ## Open items
 
-1. **Does the CLI resolve `inherits` from a bare child profile?** Untested. Verify with `--export-settings` before trusting any slice driven from the bundle's files directly.
+1. ~~Does the CLI resolve `inherits` from a bare child profile?~~ **Answered 2026-08-10: no.** See "The CLI does not resolve `inherits`". A slice driven from bundle profiles silently comes out with the slicer's built-in defaults for everything the named file does not set.
 2. **Is the bore tight only at its mouth?** Mike a printed bore 10 mm up from the bed and compare with the reading at the opening. If it opens up, the 0.30 mm first layer is the culprit and `hole_pull_in` is set too high.
 3. **What is the real pull-in at mid-height?** Follows from item 2. Orca's tolerance test, run once for this filament, would settle it properly.
-4. **Does 240 °C fix the stringing?** The presets are applied but unproven on a print. If it still strings, drop to 235 then 230 before changing anything else.
-5. **The three-perimeter question**, per the wall ladder correction. Needs a slice and a G-code parse.
+4. **Does 240 °C fix the stringing?** Still unproven on a print—but for a new reason. The 2026-08-09 print never ran at 240 at all, so it was not a test of anything. 240 is now confirmed to reach the G-code via `utils/slice.sh`; what remains is printing it.
+5. **The three-perimeter question.** Partly answered, and not favourably. Above the ring's top face the collet fingers print as **one outer wall plus gap infill, with no inner wall at all**. Segment counts cannot say how many loops the outer-wall block contains, so the exact perimeter count is still open, but gap fill on a load-bearing flexing feature is already the answer to whether the 1.26 mm tip wall resolves cleanly: it does not.
+6. **Does the collet survive at 240 °C?** The open question after the 6.41 mm loss. The failure begins about ten layers above the work cliff at z 34.38, where the ring finishes and the four fingers lose their cooling interval. If it fails again at 240, the next lever is cooling time rather than temperature—`slow_down_layer_time` is 8 s and this is the geometry that wants more.

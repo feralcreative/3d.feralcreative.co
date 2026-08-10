@@ -265,6 +265,7 @@ renders/*
 !renders/.gitkeep
 stl/*
 !stl/.gitkeep
+slice/
 _incoming
 MODELS
 _PLANS
