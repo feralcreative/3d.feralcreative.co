@@ -1,10 +1,12 @@
 # Status — Hobbs chalk holder
 
-Written 2026-08-10, end of a long and mostly unproductive session. Read this before touching print settings or the chalk holder.
+Written 2026-08-10, end of a long and mostly unproductive session; amended 2026-08-11 after a geometry change Ziad asked for. Read this before touching print settings or the chalk holder.
 
 ## Where things actually stand
 
-**The geometry is finished and Ziad is happy with it.** Size, shape, collet travel and the wordmark are all where he wants them. Do not redesign anything. `parts/hobbs-chalk-holder.scad` is the source of truth and its current parameters are the ones he asked for.
+**The geometry was changed on 2026-08-11, on request.** Four things: the channel closed 0.5 mm, the handle grew to 102.3 mm so a 4″ stick is contained tip to butt, the collet fingers thinned from 1.524 to 0.840 mm for flex with a 0.24 mm three-line bite lip at the tip, and `ring_mouth_d` came down to 12.05 because the thinner tip would otherwise have gripped nothing under 9.45 mm. Grip range is now 9.85–8.85 mm over 0.55 turns, against 11.25–9.00 over 1.51. Full account and the numbers in [_PLANS/chalk-holder-05-260811T1552Z.md](_PLANS/chalk-holder-05-260811T1552Z.md).
+
+Everything before that change still stands as written below, and nothing else about the design was touched. Do not redesign anything on your own initiative. `parts/hobbs-chalk-holder.scad` is the source of truth and its current parameters are the ones he asked for.
 
 **The printer cannot finish a coupon.** Three attempts in a row jammed the feed drive, at roughly 6.5 mm, 10 mm and 20 mm of height. The extruder grinds the filament flat, stops advancing, and the print continues in the air. Ziad has had to strip and brush the drive gear twice.
 
@@ -65,7 +67,9 @@ The next agent should know how this session was wasted, because the failure mode
 
 ## Where to start
 
-1. **Print the rolled-back coupon** at `slice/hobbs-chalk-holder-coupon/plate_1.gcode`. Change nothing else. This is a single-variable test of the rollback and it answers the only question that matters.
+1. **Print the coupon** at `slice/hobbs-chalk-holder-coupon/plate_1.gcode`, which as of 2026-08-11 is the new geometry sliced on the rolled-back stack — 245 → 240 °C, retraction 0.8, 298 layers, 53m 46s. Change no settings. It tests the rollback and the new collet in one print. The rolled-back coupon of the *old* geometry that this section used to point at was overwritten when the new one was sliced (`utils/slice.sh` clears its output directory); it is reproducible from the `-D` overrides listed in plan 05, but it has still never been printed.
+
+   One thing to know before it runs: over the 63 collet-only layers the new fingers deposit 0.197 mm per layer against the old 0.269, so the retract-to-extrude ratio up the collet is 17:1 where it was 15:1. That ratio is the mechanism behind all three jams. If it starves again, the lever is `retraction_minimum_travel` 1 → 6 mm, alone, which plan 04 measured taking whole-print retractions 706 → 543.
 2. **If it finishes**, the geometry is done and so is the print config. Stop. Stringing is cosmetic and Ziad can live with it; he said as much. Do not resume tuning without being asked.
 3. **If it still jams**, the cause is not my settings, and the investigation should turn to the machine — drive gear tension, heat creep in the hotend, and whether the PTFE or the nozzle needs replacing after three grinding events. It should *not* turn back to slicer settings.
 4. **If stringing is ever worth attacking again**, do it one variable at a time, with a printed part after each, and prefer levers that do not trade against feed reliability: travel speed, wipe distance, and `reduce_crossing_wall`. Not temperature. Not retraction length.
@@ -81,6 +85,7 @@ Two fixes made today are corrections rather than tuning, and they should stay:
 
 ## Open, and genuinely unresolved
 
-- Whether the handle body should grow to suit a 4″ Crayola stick. Handle is 98.3 mm, body untouched at 65 mm. Ziad raised it and it was never settled.
+- ~~Whether the handle body should grow to suit a 4″ Crayola stick.~~ Settled 2026-08-11: body 65 → 69 mm, handle 98.3 → 102.3, so a 101.6 mm stick is contained with the ring on and 0.7 mm to spare. The loading slot and the wordmark moved with it.
+- Whether a 0.24 mm bite lip holds soft gypsum without crushing it, and whether its 0.45 mm inward ledge bridges cleanly on a curve. Both are new on 2026-08-11 and only a printed part answers either.
 - Faceting visible on the printed handle away from the wordmark, at `$fn` 256. Measured in the mesh and the toolpath, never explained. Low priority and possibly cosmetic to the point of not mattering.
 - `docs/_PLANS` is gitignored by the blanket `_PLANS` rule at `.gitignore:271`, so the plan files are local only. Ziad's call whether to unignore.

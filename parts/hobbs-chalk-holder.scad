@@ -10,12 +10,18 @@
 // the clamp, not just a fastening, which is why a thread that binds ruins the
 // whole mechanism.
 //
-// It stops on the chalk, not on the collar, and it does so from a long way out.
-// The bore takes a 10.50 mm stick and the collet closes 2.67 mm on diameter from
-// there, over 1.8 turns of the nut — so a new 9.50 mm stick arrests it with the
-// ring still standing about 6.3 mm off the collar, and that gap shrinks as the
-// stick wears. It is meant to feel like a drafting pencil: open wide, wind down
-// a long way, grip.
+// It stops on the chalk, not on the collar. The channel admits a 9.85 mm stick
+// and the collet closes 1.00 mm on diameter from there, over 0.55 turns of the
+// nut — so a 9.42 mm stick (what Crayola sidewalk chalk actually mikes) arrests
+// it with the ring still standing about 1.75 mm off the collar, and that gap
+// shrinks as the stick wears.
+//
+// It used to wind a long way — 2.67 mm of closure over 1.8 turns, drafting-pencil
+// fashion. That is gone, and it was spent deliberately on a flexible collet: a
+// 0.84 mm finger has far less tip to overlap the ring's mouth with than a 1.52 mm
+// one did, and the mouth cannot drop below about 10 mm or the chalk will not pass
+// through it, which caps the stroke near 0.95 turns whatever else is changed.
+// Grip and flex won; travel paid.
 //
 // The legacy pair did the opposite. It squeezed 0.66 mm over half a turn, and
 // its bore printed at about 9.47, so a 9.50 stick could not get in without being
@@ -28,6 +34,12 @@
 // never reaches it. Wanting 1.8 turns of stroke is therefore what forces a 16 mm
 // collet, which forces a bigger thread under it to keep the finger roots thick,
 // which forces a bigger barrel around that. None of the size here is styling.
+//
+// That paragraph is the history of how the tool got this big, and it is still why
+// the collet is 16 mm of thread under it. It is no longer what sets the stroke:
+// the collet is 10 mm, the finger is 0.84 mm, and the stroke those two allow is
+// 0.55 turns. Engagement is no longer the scarce thing either — there is 13.05 mm
+// of it left at full seat.
 //
 // The whole mechanism is written out in [Hidden] under -- clamp --, including
 // what it trades against: stroke is spent out of thread engagement, and there
@@ -94,8 +106,8 @@ part_gap = 8.00;  // (mm)
 // That distance is now 28.30, not the 34.60 this was originally sized against:
 // the collet lost 6.3 mm when it was shortened for a positive stop. 36.00 keeps
 // the same 7.7 mm stub of body to hold onto, and still starts above the wordmark
-// — the cut face lands at z 62.30 against a mark spanning 12.50 to 52.50 — so
-// the coupon comes out blank.
+// — the cut face lands at z 66.30 against a mark spanning 14.50 to 54.50, both
+// having moved up 4 mm with the longer body — so the coupon comes out blank.
 //
 // It follows the handle for everything else, being an intersection of it, so the
 // wider bore and the shorter collet arrive here without any edit.
@@ -177,10 +189,13 @@ chalk_d = 9.500;  // nominal diameter of a new stick (mm)
 // which is another 0.36 mm of clamping stroke, which comes straight out of
 // thread engagement — see clamp_travel_budget.
 // Opened 1.000 -> 1.750 on 2026-08-10: a printed collet still scraped the stick
-// on the way in. The stated cost below is real and was paid knowingly — 0.75 mm
-// more bore is 2.68 mm more clamping stroke, taken out of thread engagement,
-// which drops from 10.50 to 7.82 mm. Still over a turn in hand.
-chalk_slop = 1.750;  // (mm)
+// on the way in.
+//
+// Closed 1.750 -> 1.250 on 2026-08-11, asked for directly: 0.5 mm out of the
+// channel. Note that the channel a stick actually has to pass is no longer this
+// one — the bite lip at the collet's tip is 0.9 mm narrower again, and that is
+// the number to reason about. See handle_collet_bite_t.
+chalk_slop = 1.250;  // (mm)
 
 // Extrusion pull-in: a hole comes out this much undersize on diameter.
 //
@@ -203,9 +218,16 @@ hole_pull_in = 0.600;  // (mm)
 
 /* [Handle: body] */
 handle_body_d = 20.000;  // outside diameter of the tube (mm)
-handle_body_h = 65.000;  // plain tube, up to the base of the collar (mm)
+handle_body_h = 69.000;  // plain tube, up to the base of the collar (mm)
 
 // The bore is not here — it is derived from [Chalk] down in [Hidden].
+//
+// handle_body_h was 65.000, which made the tool 98.3 mm overall against a 4 inch
+// (101.6 mm) stick, so a fresh stick disappeared into the bore instead of
+// reaching the butt. 69.000 puts the bore at 102.3 mm, so a new stick is fully
+// contained with the ring on and 0.7 mm to spare. Two things follow it and are
+// not derived: handle_slot_h, which keeps the loading slot ending 0.4 mm below
+// the body top, and handle_mark_z, which keeps the wordmark centred.
 //
 // handle_body_d was 15.000 on the legacy mesh, which made the tool a thin shaft
 // with a fat head. It now matches the ring's barrel between its ribs, so the
@@ -236,7 +258,7 @@ handle_butt_flat = 0.000;  // flat ring left between the rounding and the bore (
 /* [Handle: loading slot] */
 handle_slot_w  =  2.000;  // width (mm)
 handle_slot_z0 =  4.600;  // start, above the bottom face (mm)
-handle_slot_h  = 60.000;  // length (mm)
+handle_slot_h  = 64.000;  // length (mm)
 handle_slot_az = 270;     // which way it faces (deg)
 
 // Break on the two long edges where the slot comes out through the outside, so
@@ -284,32 +306,59 @@ handle_collet_slot_w = 2.000;  // (mm)
 //
 // The legacy pair had the outside diameter typed here instead, at 12.000. Held
 // against the bore this file now runs, that would leave a 0.44 mm finger — one
-// extrusion, on the thinnest and most heavily worked feature of the tool. 1.260
-// is three 0.42 mm lines, which is what the printer reference asks for on
-// anything load-bearing that flexes.
-// Raised 1.260 -> 1.524 when the collet was shortened to 10.000, and it is not a
-// free choice: it is what keeps the cone's slope where it was.
+// extrusion, on the thinnest and most heavily worked feature of the tool. It has
+// been 1.260 (three 0.42 mm lines) and then 1.524 (three or four), both chosen to
+// keep the finger off the one-extrusion floor.
 //
-// The tip DIAMETER here is derived, as bore + 2 * this, so shortening the collet
-// on its own does not leave a wider end the way a saw would — it pivots the cone
-// steeper and holds the tip diameter fixed, which quietly halves the clamp. The
-// sawn part this copies has a 1.524 mm finger at its new end face. Change one of
-// handle_collet_h or this without the other and the clamp moves; the pair is
-// what reproduces the geometry that was measured.
+// Thinned 1.524 -> 0.840 on 2026-08-11, asked for directly: two lines instead of
+// three, for a finger that actually flexes. 0.840 is 0.42 + 0.42, which is the
+// clean two-loop rung — and this profile lays exactly wall_loops = 2, so it is
+// also the thickest wall that prints as two full perimeters with no gap fill.
+// 1.290 (0.42 + 0.45 + 0.42) would need wall_loops raised to 3 and otherwise
+// resolves as two perimeters plus gap fill; see docs/flash-studio-slicing-reference.md.
 //
-// It also prints better: 1.524 is three or four extrusions rather than two and
-// a gap-fill, on the feature that starves the extruder.
-handle_collet_tip_wall = 1.524;  // (mm)
+// THE TIP DIAMETER IS DERIVED, as bore + 2 * this, so this number is the clamp.
+// Thinning the finger by 0.684 took 1.368 mm off the tip's outside diameter, and
+// with the bore's own 0.5 mm that is 1.868 mm of overlap with the ring's mouth
+// gone. Left alone it would have closed 0.20 mm and gripped nothing smaller than
+// 9.45 — above the stick it is for. ring_mouth_d came down to 12.05 to pay for
+// it. Change this without changing the mouth and the clamp goes with it.
+handle_collet_tip_wall = 0.840;  // (mm)
 
-// What the fingers actually do: gripping a new 9.50 mm stick bends each one
-// 0.50 mm, and the full 1.33 mm is only reached by winding the nut down on an
-// empty holder. Worth not making a habit of — the handle prints butt down, so a
-// finger bends across the layers rather than along them, and PETG creeps.
+// The bite lip: the top of each finger is thicker than the rest of it, and the
+// extra goes INWARD, so the channel steps narrower for the last two layers and
+// that edge is what closes on the chalk. Below it the finger clears the stick and
+// is free to bend.
 //
-// Peak bending strain at that full deflection is about 1.5 %, against a PETG
-// yield somewhere near 4 %. That is better than the shorter collet managed at
-// half the closure, because strain falls with the square of the finger's length
-// and this one is nearly twice as long.
+// Grown inward rather than outward on purpose. Outward would put a proud band on
+// the cone the ring's mouth rides, and with only 0.1 mm of tip protrusion at full
+// seat the mouth would ride over that band and off it again within a quarter of a
+// millimetre of travel — the grip would arrive and then let go. Inward leaves the
+// cone unbroken, so nothing about the clamp arithmetic knows the lip is there.
+//
+// 0.450 is one inner-wall line, taking the lip to 1.290 — the three-wide section
+// that was asked for. 0.240 is two layers at 0.12. The lip's underside is an
+// unsupported 0.45 mm ledge running round a curve; it should bridge, but it is
+// one of the two things only a printed part can answer.
+//
+// It costs channel: the passage at the lip is 0.9 mm narrower than the bore, so
+// the widest stick the tool admits is set here, not by chalk_slop. There is an
+// assert in [Hidden] keeping it wider than a nominal stick.
+handle_collet_bite_t = 0.450;  // extra finger thickness at the tip, inward (mm)
+handle_collet_bite_h = 0.240;  // height of that band — two 0.12 mm layers (mm)
+
+// What the fingers actually do: gripping a 9.42 mm stick bends each one 0.215 mm,
+// and the full 0.50 mm is only reached by winding the nut down on an empty
+// holder. Worth not making a habit of — the handle prints butt down, so a finger
+// bends across the layers rather than along them, and PETG creeps.
+//
+// Strain is no longer the worry it was. Peak bending strain goes as thickness
+// times deflection over length squared, and thinning the finger to 0.840 halved
+// the first term while the smaller closure more than halved the second: against
+// the 1.5 % this collet was estimated at when it was 1.524 thick and closing
+// 1.125, it now lands near 0.4 %, on a PETG yield somewhere around 4 %. The
+// finger root and its relief ramp remain the place a crack would start, not the
+// tip — see handle_collet_slot_ramp.
 
 // Sacrificial webs that bridge the slots, joining the four fingers into one
 // body for the duration of the print. **They must be snapped out before the
@@ -349,7 +398,11 @@ handle_collet_tip_wall = 1.524;  // (mm)
 // tied. Raising retraction_minimum_travel from 1 mm to 6 mm gets 706 down to
 // 543, so the slot crossings are not where most retractions come from.
 collet_tie   = false;   // measured counterproductive; see above
-collet_tie_t = 0.840;   // radial thickness of each web, if enabled (mm)
+// Dropped 0.840 -> 0.600 when the finger itself came down to 0.840. The assert
+// below wants the web strictly thinner than a finger, and it only fires when
+// collet_tie is true — so left at 0.840 this would have sat harmless until
+// someone enabled the tie and then refused to render.
+collet_tie_t = 0.600;   // radial thickness of each web, if enabled (mm)
 
 // The web sits flush with the collet's outer cone and grows inward, so the
 // outside envelope is unchanged and the ring still slides over it. It has to
@@ -378,7 +431,7 @@ handle_collet_slot_az   = 0;      // angle of the first slot (deg)
 // turned to fit at all.
 handle_mark       = true;   // set false for a blank barrel
 handle_mark_len   = 40.00;  // length along the handle axis (mm)
-handle_mark_z     = 32.50;  // centre, above the bottom face (mm)
+handle_mark_z     = 34.50;  // centre, above the bottom face (mm)
 handle_mark_depth =  0.40;  // how far it is cut into the wall (mm)
 
 // Which way it faces. The loading slot is at 270, and cylindrical_extrude() puts
@@ -459,11 +512,21 @@ ring_rib_r_top    = 0.94;  // bead radius from ring_barrel_z0 upwards (mm)
 // The mouth is the other half of it. How far the collet's tip exceeds it is the
 // entire clamp, so lowering ring_mouth_d buys grip range and raising it gives
 // range back to get the nut closer to the collar.
-// 12.65 is not a new choice of mouth. It is the diameter the old 11.00 bore had
-// already reached 6 mm up its own cone, which is where the end face now is. The
-// cone, its slope, and everything the clamp does are unchanged; the part simply
-// starts further along it.
-ring_mouth_d  = 12.65;  // bore at the bottom face (mm)
+// 12.65 was not a new choice of mouth: it was the diameter the old 11.00 bore had
+// already reached 6 mm up its own cone, which is where the end face now is.
+//
+// 12.05, on 2026-08-11, IS a new choice, and it is a forced one. Thinning the
+// collet finger to 0.840 and closing the bore 0.5 mm together took 1.868 mm off
+// the collet's tip diameter, and the clamp is nothing but the amount by which
+// that tip exceeds this mouth. At 12.65 the pair would have closed 0.20 mm and
+// held nothing under 9.45 mm. 12.05 restores 0.50 mm of closure and a grip range
+// of 9.85–8.85, which brackets the 9.42 mm stick with wear to spare.
+//
+// It cannot go much lower. The mouth is a hole the chalk itself passes through, so
+// somewhere near 10 mm it stops being a mouth — which is what caps the stroke at
+// roughly 0.95 turns and why this design winds 0.55 rather than 1.8. Lowering it
+// also eats clamp_base_gap, which is only 0.173 mm here and has an assert on it.
+ring_mouth_d  = 12.05;  // bore at the bottom face (mm)
 ring_throat_d = 15.48;  // bore just under the thread shoulder (mm)
 
 /* [Ring: thread] */
@@ -537,6 +600,11 @@ ring_x    =   ring_r + part_gap / 2;
 // pull-in, and the whole point of deriving any of this is to stop having to be
 // right by hand.
 handle_bore_d = (chalk_d + chalk_slop + hole_pull_in) / cos(180 / $fn);
+
+// The channel at the bite lip, which is the narrowest passage in the tool and
+// therefore the one that decides what stick will go in at all. The bore above is
+// only the widest part of the channel now.
+handle_bite_bore_d = handle_bore_d - 2 * handle_collet_bite_t;
 
 // The biggest rounding that means anything is the entire wall, which arrives
 // tangent at the bore and leaves no flat at all. handle_butt_flat backs it off
@@ -681,11 +749,16 @@ clamp_base_gap = ring_r_mouth
 clamp_travel_budget = handle_thread_h - ring_thread_pilot;
 clamp_engagement    = clamp_travel_budget - clamp_stroke;
 
-// What it will actually hold, as printed rather than as drawn: the bore loses
+// What it will actually hold, as printed rather than as drawn: the channel loses
 // the inscribed-polygon slice and the extrusion pull-in, and the collet closes
 // by clamp_closure on radius from there. Conservative at the bottom end, since
 // printing also makes the collet fatter and the mouth smaller.
-chalk_d_max = handle_bore_d * cos(180 / $fn) - hole_pull_in;
+//
+// Measured at the LIP, not the bore. The lip is 0.9 mm narrower and sits at the
+// tip, so it is what a stick has to clear and what closes on it; reading
+// handle_bore_d here would overstate the top of the range by that 0.9 mm and
+// describe a stick the tool refuses.
+chalk_d_max = handle_bite_bore_d * cos(180 / $fn) - hole_pull_in;
 chalk_d_min = chalk_d_max - 2 * clamp_closure;
 
 // -- the invariants ----------------------------------------------------------
@@ -701,6 +774,15 @@ assert(ring_r_throat < ring_r_minor - ring_bore_relief,
        str("ring_throat_d is past the thread's land: the bore steps inward ",
            "entering the thread instead of outward, and ring_body_profile then ",
            "folds back on itself"));
+
+// The lip narrows the channel at the one place a stick cannot avoid, so it is the
+// gate on the whole tool. Past a nominal stick it produces a holder that grips
+// beautifully and will not accept chalk — which is the legacy part's defect,
+// arrived at from the other direction.
+assert(chalk_d_max >= chalk_d,
+       str("the bite lip is narrower than a nominal stick: it admits ",
+           chalk_d_max, " mm as printed against chalk_d ", chalk_d,
+           ". Reduce handle_collet_bite_t or open chalk_slop"));
 
 // The web has to be the weak point, or snapping it out takes a finger with it.
 assert(!collet_tie || (collet_tie_t > 0 && collet_tie_t < handle_collet_tip_wall),
@@ -871,8 +953,19 @@ module chalk_holder_handle() {
         difference() {
             handle_blank();
 
+            // The channel, in two stages: full bore all the way up, then the
+            // last handle_collet_bite_h narrower, which is what leaves the lip
+            // standing proud on the inside of each finger. The step between them
+            // is a horizontal face inside the bore — it is a subtracted-to-
+            // subtracted boundary, not a subtracted-to-parent one, so it needs no
+            // eps of its own; the two cylinders simply have to meet.
             translate([0, 0, -eps])
-                cylinder(d = handle_bore_d, h = handle_z_top + 2 * eps);
+                cylinder(d = handle_bore_d,
+                         h = handle_z_top - handle_collet_bite_h + eps);
+
+            translate([0, 0, handle_z_top - handle_collet_bite_h])
+                cylinder(d = handle_bite_bore_d,
+                         h = handle_collet_bite_h + eps);
 
             handle_loading_slot();
 
