@@ -41,27 +41,20 @@ FS_BIN="${FS_APP}/Contents/MacOS/Flash Studio"
 FS_PROFILES="${FS_APP}/Contents/Resources/profiles/Flashforge"
 
 MACHINE="${MACHINE:-Flashforge Adventurer 5M Pro 0.4 Nozzle}"
-PROCESS="${PROCESS:-0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle}"
-FILAMENT="${FILAMENT:-Flashforge HS PETG}"
 
-# The low-string settings, from docs/flash-studio-slicing-reference.md. Applied
-# by default because the stock stack strings badly on this filament: PETG Pro
-# runs 265 C, and retraction is left at FlashForge's 0.8 mm PLA default.
-#
-# HS PETG is the base rather than PETG Pro because that is the family "Rapid"
-# belongs to; it resolves to 255 C via Generic PETG, and 240 comes from here.
-#
-# The flow cap is a deliberate trade, not a tune: cooler PETG cannot melt as
-# fast, so capping volumetric speed makes the slicer slow down instead of
-# under-extruding. Prints get slower. Raise it only if the temperature goes up.
-LOW_STRING=(
-  "filament:nozzle_temperature=240"
-  "filament:nozzle_temperature_initial_layer=245"
-  "filament:filament_retraction_length=1.6"
-  "filament:filament_retract_before_wipe=20%"
-  "filament:filament_max_volumetric_speed=8"
-  "process:reduce_crossing_wall=1"
-)
+# Our own presets are the default, and they are the single source of truth for
+# every value. This script used to default to the stock parents and then paste a
+# hardcoded array of overrides on top; because command-line overrides outrank
+# everything, that array silently beat the preset. It carried retraction 1.6 --
+# the value that ground the extruder on 2026-08-10 -- long after the preset had
+# been corrected to 0.4. Do not reintroduce it. If a value needs changing,
+# change it in docs/profiles/ and reinstall, so the repo and the app agree.
+PROCESS="${PROCESS:-0.12mm Fine @AD5M Pro 0.4 - Low String}"
+FILAMENT="${FILAMENT:-Rapid PETG Burnt Titanium}"
+
+# --stock drops back to the untuned FlashForge stack, for comparison only.
+STOCK_PROCESS="0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle"
+STOCK_FILAMENT="Flashforge HS PETG"
 
 if [[ $# -lt 1 ]]; then
   echo "usage: $0 <part.scad|file.stl|file.3mf> [--stock] [--set kind:key=value] [--at-z Z]" >&2
@@ -108,10 +101,14 @@ PROFDIR="${OUTDIR}/profiles"
 rm -rf "$OUTDIR"
 mkdir -p "$PROFDIR"
 
-SETS=()
-if [[ "$STOCK" -eq 0 ]]; then
-  for s in "${LOW_STRING[@]}"; do SETS+=(--set "$s"); done
+if [[ "$STOCK" -eq 1 ]]; then
+  PROCESS="$STOCK_PROCESS"
+  FILAMENT="$STOCK_FILAMENT"
 fi
+
+# Only what the caller asked for on this invocation. Everything else comes from
+# the presets, so what gets sliced is what the repo says.
+SETS=()
 for s in "${EXTRA_SETS[@]+"${EXTRA_SETS[@]}"}"; do SETS+=(--set "$s"); done
 
 echo "== resolving profiles"

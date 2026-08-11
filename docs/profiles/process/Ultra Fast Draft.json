@@ -1,0 +1,22 @@
+{
+    "bottom_shell_layers": "2",
+    "enable_overhang_speed": "0",
+    "from": "User",
+    "inherits": "0.24mm Draft @Flashforge AD5M Pro 0.4 Nozzle",
+    "initial_layer_speed": "200",
+    "inner_wall_speed": "600",
+    "is_custom_defined": "0",
+    "layer_height": "0.28",
+    "name": "Ultra Fast Draft",
+    "only_one_wall_first_layer": "1",
+    "only_one_wall_top": "1",
+    "outer_wall_acceleration": "5000",
+    "outer_wall_speed": "300",
+    "print_settings_id": "Ultra Fast Draft",
+    "slow_down_layers": "0",
+    "sparse_infill_density": "0%",
+    "top_shell_layers": "2",
+    "travel_speed": "600",
+    "version": "2.1.1.0",
+    "wall_loops": "1"
+}

@@ -45,6 +45,13 @@ import sys
 
 BUNDLE = ("/Applications/Flash Studio.app/Contents/Resources/profiles/Flashforge")
 
+# Our own presets live in the repo, not in the bundle, so they have to be
+# searched first -- a name that exists in both must resolve to ours. Parents
+# still come from the bundle, which is what the walk upward relies on.
+REPO_PROFILES = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "docs", "profiles")
+
 # Only `inherits` is removed, because a merged profile has nothing left to
 # inherit and leaving it in would invite the slicer to resolve the chain a
 # second time. Everything else is left exactly as the system profiles have it.
@@ -58,14 +65,19 @@ DROP_ON_WRITE = ("inherits",)
 
 
 def find_by_name(name, kind, bundle):
-    """Locate a profile by its `name` field, which is not its filename."""
-    for path in sorted(glob.glob(os.path.join(bundle, kind, "*.json"))):
-        try:
-            with open(path) as fh:
-                if json.load(fh).get("name") == name:
-                    return path
-        except (OSError, ValueError):
-            continue
+    """Locate a profile by its `name` field, which is not its filename.
+
+    The repo is searched ahead of the bundle so our presets win over any
+    same-named system profile.
+    """
+    for root in (REPO_PROFILES, bundle):
+        for path in sorted(glob.glob(os.path.join(root, kind, "*.json"))):
+            try:
+                with open(path) as fh:
+                    if json.load(fh).get("name") == name:
+                        return path
+            except (OSError, ValueError):
+                continue
     return None
 
 

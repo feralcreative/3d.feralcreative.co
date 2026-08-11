@@ -76,7 +76,7 @@ include <../logos/marks.scad>
 // leave it on "both" to slice the pair as one plate, or ask for the fit coupon —
 // see coupon_h. Anything else emits nothing at all, which is what you want when
 // another file includes this one to get at its numbers.
-show = "both";  // [both, handle, ring, coupon]
+show = "both";  // [both, handle, ring, coupon, coupon-handle, collet-test]
 
 // Clear air between the two parts, surface to surface, with the ring measured
 // over its ribs rather than its barrel.
@@ -89,10 +89,31 @@ part_gap = 8.00;  // (mm)
 //
 // Measured down from the collet's top face, so it grows downward. It has to
 // reach past the collar's top face — the seat the ring lands on — or the coupon
-// leaves out the thing it exists to test; that is 34.60. 42.00 clears it with a
-// stub of body to hold onto, and still stops short of the wordmark at 32.50, so
+// leaves out the thing it exists to test.
+//
+// That distance is now 28.30, not the 34.60 this was originally sized against:
+// the collet lost 6.3 mm when it was shortened for a positive stop. 36.00 keeps
+// the same 7.7 mm stub of body to hold onto, and still starts above the wordmark
+// — the cut face lands at z 62.30 against a mark spanning 12.50 to 52.50 — so
 // the coupon comes out blank.
-coupon_h = 42.00;  // (mm)
+//
+// It follows the handle for everything else, being an intersection of it, so the
+// wider bore and the shorter collet arrive here without any edit.
+coupon_h = 36.00;  // (mm)
+
+// A much shorter coupon that exists only to find out whether the collet prints
+// at all. show = "collet-test".
+//
+// The fit coupon above is 42 mm and most of an hour and a quarter, and it spends
+// the first 25 mm printing thread that was never in question. The collet is the
+// part that fails, so this keeps a stub of spigot to stand on and nothing else:
+// the four-island geometry starts within a few layers, so a starving extruder
+// shows itself in minutes instead of at the hour mark, with far less filament
+// dragged through a grinding drive gear.
+//
+// It deliberately does NOT reach the collar, so it tells you nothing about fit.
+// Wrong tool for that; use coupon_h.
+collet_test_base = 3.00;  // spigot kept below the collet's base (mm)
 
 /* [Thread] */
 // Shared by both halves. These are the numbers that describe the joint itself
@@ -155,7 +176,11 @@ chalk_d = 9.500;  // nominal diameter of a new stick (mm)
 // It is not free either. Every 0.1 here is another 0.05 mm of collet radius,
 // which is another 0.36 mm of clamping stroke, which comes straight out of
 // thread engagement — see clamp_travel_budget.
-chalk_slop = 1.000;  // (mm)
+// Opened 1.000 -> 1.750 on 2026-08-10: a printed collet still scraped the stick
+// on the way in. The stated cost below is real and was paid knowingly — 0.75 mm
+// more bore is 2.68 mm more clamping stroke, taken out of thread engagement,
+// which drops from 10.50 to 7.82 mm. Still over a turn in hand.
+chalk_slop = 1.750;  // (mm)
 
 // Extrusion pull-in: a hole comes out this much undersize on diameter.
 //
@@ -235,7 +260,20 @@ handle_spigot_h = 18.300;  // collar top to the base of the collet (mm)
 handle_thread_h = 17.600;  // how much of the spigot carries thread (mm)
 
 /* [Handle: collet] */
-handle_collet_h      = 16.300;  // base of the collet to the top face (mm)
+// Shortened from 16.300 on 2026-08-10, after a print that stopped 6.41 mm early
+// turned out to clamp better than the drawn part.
+//
+// The reason is the hard stop. At full seat a 16.3 collet has its tip 0.4 mm
+// PROUD of the mouth, so the mouth bites the flank and closes 1.333 mm on
+// radius — more than a chalk stick wants, which is why it always arrested early
+// and left the nut standing proud. Ending the collet 6 mm short of the mouth
+// makes full seat close 0.759 instead, so the nut can be wound down until it
+// stops and the grip is right when it gets there.
+//
+// The price is range, and it is the scale-up's gain given back: 10.50–8.98 mm
+// of stick instead of 10.50–7.83. Ample for Crayola sidewalk chalk, which mikes
+// 9.42 against a 9.50 nominal.
+handle_collet_h      = 10.000;  // base of the collet to the top face (mm)
 handle_collet_slots  = 4;      // fingers are the gaps between these
 handle_collet_slot_w = 2.000;  // (mm)
 
@@ -249,7 +287,19 @@ handle_collet_slot_w = 2.000;  // (mm)
 // extrusion, on the thinnest and most heavily worked feature of the tool. 1.260
 // is three 0.42 mm lines, which is what the printer reference asks for on
 // anything load-bearing that flexes.
-handle_collet_tip_wall = 1.260;  // (mm)
+// Raised 1.260 -> 1.524 when the collet was shortened to 10.000, and it is not a
+// free choice: it is what keeps the cone's slope where it was.
+//
+// The tip DIAMETER here is derived, as bore + 2 * this, so shortening the collet
+// on its own does not leave a wider end the way a saw would — it pivots the cone
+// steeper and holds the tip diameter fixed, which quietly halves the clamp. The
+// sawn part this copies has a 1.524 mm finger at its new end face. Change one of
+// handle_collet_h or this without the other and the clamp moves; the pair is
+// what reproduces the geometry that was measured.
+//
+// It also prints better: 1.524 is three or four extrusions rather than two and
+// a gap-fill, on the feature that starves the extruder.
+handle_collet_tip_wall = 1.524;  // (mm)
 
 // What the fingers actually do: gripping a new 9.50 mm stick bends each one
 // 0.50 mm, and the full 1.33 mm is only reached by winding the nut down on an
@@ -260,6 +310,52 @@ handle_collet_tip_wall = 1.260;  // (mm)
 // yield somewhere near 4 %. That is better than the shorter collet managed at
 // half the closure, because strain falls with the square of the finger's length
 // and this one is nearly twice as long.
+
+// Sacrificial webs that bridge the slots, joining the four fingers into one
+// body for the duration of the print. **They must be snapped out before the
+// tool is used** — left in, they stop the collet flexing and the clamp does
+// nothing.
+//
+// This is not a stiffness aid, it is a printing fix, and the reason is worth
+// understanding before changing it. Without the webs each layer up the collet is
+// four separate islands, so the nozzle travels and retracts four times per layer
+// while depositing about 0.06 mm of filament into each one. Two prints failed on
+// that: the extruder ground a flat into the filament, lost grip, and stopped
+// delivering part way up, leaving a collet that ended flat and even where the
+// material simply stopped arriving. Retraction length was cut from 1.6 to 0.4 mm
+// to reduce the damage per cycle, but the cycle COUNT is set by the geometry and
+// only this fixes it. See docs/_PLANS/chalk-holder-04-260810T1514Z.md.
+//
+// Joined, the cross-section is a continuous annulus: one island, roughly a
+// quarter of the travel, and several times the extrusion per layer.
+// **Default OFF, because it was measured and it does not work.** Kept only so
+// the idea is not had again from scratch.
+//
+// The reasoning was that four islands mean four travels and four retractions per
+// layer, so joining them should cut both. Sliced both ways, at z 12.30 of the
+// collet test:
+//
+//     collet_tie   path blocks   retractions   extruded
+//     false             8             4          0.247 mm
+//     true              4             5          0.190 mm
+//
+// It halves the path blocks and yet retracts MORE, while depositing LESS. An
+// annulus that alternates 0.84 mm web with 1.4 mm finger is a varying-thickness
+// wall, and the slicer fragments its path handling the transitions rather than
+// running one clean loop. Making the web full finger thickness would fix that
+// and give a solid collet nobody can cut four slots back into.
+//
+// Whole-print retraction counts barely moved either: 706 untied against 691
+// tied. Raising retraction_minimum_travel from 1 mm to 6 mm gets 706 down to
+// 543, so the slot crossings are not where most retractions come from.
+collet_tie   = false;   // measured counterproductive; see above
+collet_tie_t = 0.840;   // radial thickness of each web, if enabled (mm)
+
+// The web sits flush with the collet's outer cone and grows inward, so the
+// outside envelope is unchanged and the ring still slides over it. It has to
+// stay thinner than the thinnest part of a finger, so that it is the web that
+// breaks and not the finger — that thinnest point is handle_collet_tip_wall, and
+// the assert below enforces it.
 
 // Coned relief under each slot, so the finger root is a ramp rather than a square
 // corner. It is the stress riser that decides whether a finger ever cracks, and
@@ -291,8 +387,33 @@ handle_mark_depth =  0.40;  // how far it is cut into the wall (mm)
 // with the body's.
 handle_mark_az = 90;  // (deg)
 
+// Resolution of the WRAP, kept separate from the part's $fn, because the two
+// have wildly different costs. marks.scad already pins $fn = 0 over the SVG
+// import so the lettering is cheap, but cylindrical_extrude tessellates the
+// wrapped solid at $fn and that is where the triangles go: the handle is 256 KB
+// with the mark off and 10 MB with it on, at $fn = 64. Raising the part to 128
+// takes it to 33 MB and to 256 it reaches 144 MB, essentially all of it wrap.
+//
+// Decoupling lets the body be as round as you like while the deboss stays cheap.
+// The cut floor is faceted at this value rather than the part's, which on a
+// 0.40 mm deboss is not something you can see or feel.
+//
+// Keep handle_mark_az a multiple of BOTH 360/$fn and 360/handle_mark_fn, or the
+// wrap's facets stop lining up with the body's. 90 satisfies every power-of-two
+// value either is likely to take.
+handle_mark_fn = 32;
+
 /* [Ring: body] */
-ring_height    = 34.20;  // overall height (mm)
+// Shortened with the collet, 34.20 -> 28.20. This is the sawn-off top of the
+// old ring, and it costs nothing: the contact point is wherever the bore's cone
+// equals the collet's tip radius, and a 10 mm collet cannot reach nearer than
+// 6 mm from the old mouth even at full seat. That 6 mm of bore was unreachable.
+//
+// Note this DOES NOT generalise. Plan 03 rejected sawing the mouth off, and was
+// right at the time: a 16.3 collet works its way right up to the mouth, so every
+// millimetre of that bore was load-bearing. Lengthen the collet again and this
+// becomes a bad edit for exactly the reason recorded there.
+ring_height    = 28.20;  // overall height (mm)
 ring_collar_d  = 16.00;  // outside diameter at the bottom, between ribs (mm)
 ring_collar_h  = 2.00;   // straight section at the bottom, before the flare (mm)
 ring_barrel_d  = 20.00;  // outside diameter of the barrel, between ribs (mm)
@@ -338,11 +459,18 @@ ring_rib_r_top    = 0.94;  // bead radius from ring_barrel_z0 upwards (mm)
 // The mouth is the other half of it. How far the collet's tip exceeds it is the
 // entire clamp, so lowering ring_mouth_d buys grip range and raising it gives
 // range back to get the nut closer to the collar.
-ring_mouth_d  = 11.00;  // bore at the bottom face (mm)
+// 12.65 is not a new choice of mouth. It is the diameter the old 11.00 bore had
+// already reached 6 mm up its own cone, which is where the end face now is. The
+// cone, its slope, and everything the clamp does are unchanged; the part simply
+// starts further along it.
+ring_mouth_d  = 12.65;  // bore at the bottom face (mm)
 ring_throat_d = 15.48;  // bore just under the thread shoulder (mm)
 
 /* [Ring: thread] */
-ring_thread_z0      = 16.30;    // shoulder the thread starts from (mm)
+// Dropped 16.30 -> 10.30 with ring_height, so the thread keeps its full 17.90 mm
+// of length against the spigot's 17.60. Shortening the ring without this would
+// trip the engagement assert in [Hidden].
+ring_thread_z0      = 10.30;    // shoulder the thread starts from (mm)
 ring_thread_minor_d = 16.192;  // land diameter — what the spigot's crest bites (mm)
 
 // Only read when blunt start is on. The pilot is how much plain bore at the
@@ -363,7 +491,15 @@ ring_thread_pilot       = 1.50;  // (mm)
 ring_thread_mouth_bevel = 0.40;  // (mm)
 
 /* [Quality] */
-$fn         = 64;  // segments per full circle
+// Raised 64 -> 256 on 2026-08-10. Faceting was visible on the thread and collet
+// in both the render and the print, and it is affordable now that the wordmark's
+// wrap has its own resolution: see handle_mark_fn. At 64 the part was 10 MB and
+// 256 would have been 144 MB, essentially all wrap; decoupled, 256 costs 6 MB.
+//
+// The clamp barely notices, because the bore is already divided by
+// cos(180/$fn) so the inscribed-polygon loss cancels. Across 64 to 256 the
+// closure moves 0.760 -> 0.754 and the grip range 8.980 -> 8.993.
+$fn         = 256;  // segments per full circle
 ring_rib_fn  = 24;  // segments on the rib beads; they are only ~1 mm across
 
 /* [Hidden] */
@@ -566,6 +702,12 @@ assert(ring_r_throat < ring_r_minor - ring_bore_relief,
            "entering the thread instead of outward, and ring_body_profile then ",
            "folds back on itself"));
 
+// The web has to be the weak point, or snapping it out takes a finger with it.
+assert(!collet_tie || (collet_tie_t > 0 && collet_tie_t < handle_collet_tip_wall),
+       str("collet_tie_t must be between 0 and handle_collet_tip_wall (",
+           handle_collet_tip_wall, "), so the sacrificial web is thinner than ",
+           "the thinnest part of a finger and breaks before the finger does"));
+
 assert(handle_butt_round > 0,
        str("handle_butt_flat is wider than the wall, so there is no rounding ",
            "left to take off the butt"));
@@ -688,6 +830,11 @@ module handle_collet_slot() {
 // assumes the child goes right round the cylinder; set it too small and it
 // quietly clips the artwork instead.
 module handle_mark_cut() {
+    // Assigning $fn here applies to the children below it, so the wrap is
+    // tessellated at handle_mark_fn while the rest of the part keeps the
+    // part-level $fn. This is the whole reason the two are separate parameters.
+    $fn = handle_mark_fn;
+
     translate([0, 0, handle_mark_z])
         cylindrical_extrude(
             ir   = handle_body_d / 2 - handle_mark_depth,
@@ -698,21 +845,48 @@ module handle_mark_cut() {
                 rotate(90) hobbs_word_alone(handle_mark_len);
 }
 
-module chalk_holder_handle() {
+// A thin conical shell on the collet's outer surface, spanning its full height.
+//
+// Unioned onto the finished collet it changes nothing where a finger already is
+// — the shell's outer face is that same cone — and leaves material across each
+// slot, which is the web. Doing it as one shell rather than four wedges means no
+// angular bookkeeping and nothing to keep in step with handle_collet_slots.
+module handle_collet_tie_shell() {
     difference() {
-        handle_blank();
+        cylinder(r1 = handle_r_root, r2 = handle_collet_r_tip,
+                 h = handle_collet_h);
 
         translate([0, 0, -eps])
-            cylinder(d = handle_bore_d, h = handle_z_top + 2 * eps);
+            cylinder(r1 = handle_r_root - collet_tie_t,
+                     r2 = handle_collet_r_tip - collet_tie_t,
+                     h = handle_collet_h + 2 * eps);
+    }
+}
 
-        handle_loading_slot();
+module chalk_holder_handle() {
+    // The webs go on AFTER the slots are cut, not before — cutting first and
+    // filling second is what keeps the finger roots, their ramps and the bore
+    // exactly as they were.
+    union() {
+        difference() {
+            handle_blank();
 
-        for (i = [0 : handle_collet_slots - 1])
-            rotate([0, 0, handle_collet_slot_az + i * 360 / handle_collet_slots])
-                handle_collet_slot();
+            translate([0, 0, -eps])
+                cylinder(d = handle_bore_d, h = handle_z_top + 2 * eps);
 
-        if (handle_mark)
-            handle_mark_cut();
+            handle_loading_slot();
+
+            for (i = [0 : handle_collet_slots - 1])
+                rotate([0, 0, handle_collet_slot_az + i * 360 / handle_collet_slots])
+                    handle_collet_slot();
+
+            if (handle_mark)
+                handle_mark_cut();
+        }
+
+        if (collet_tie)
+            translate([0, 0, handle_z_collet])
+                handle_collet_tie_shell();
     }
 }
 
@@ -818,14 +992,42 @@ module chalk_holder_coupon() {
         }
 }
 
+// The collet, a stub of spigot, and nothing else. Cut face down, collet up, the
+// same way round as the handle and the fit coupon.
+module chalk_holder_collet_test() {
+    z0 = handle_z_collet - collet_test_base;
+
+    assert(z0 > handle_z_collar,
+           str("collet_test_base reaches below the collar, which makes this the ",
+               "fit coupon the long way round — use show = \"coupon\" instead"));
+
+    translate([0, 0, -z0])
+        intersection() {
+            chalk_holder_handle();
+
+            translate([0, 0, z0])
+                cylinder(d = 2 * handle_body_d,
+                         h = handle_z_top - z0 + eps);
+        }
+}
+
 module chalk_holder() {
     if (show == "both" || show == "handle")
         translate([show == "handle" ? 0 : handle_x, 0, 0])
             chalk_holder_handle();
 
-    if (show == "coupon")
-        translate([handle_x, 0, 0])
+    // "coupon-handle" is the coupon's handle with no ring beside it, for when a
+    // good ring already exists and only the handle needs printing again. Be
+    // aware of what it costs thermally: the ring is what gives the collet's
+    // fingers time to cool between visits, and without it they are printing
+    // alone from their base rather than only above z 34.4. See the work cliff
+    // discussion in docs/_PLANS/chalk-holder-04-260810T1514Z.md.
+    if (show == "coupon" || show == "coupon-handle")
+        translate([show == "coupon-handle" ? 0 : handle_x, 0, 0])
             chalk_holder_coupon();
+
+    if (show == "collet-test")
+        chalk_holder_collet_test();
 
     if (show == "both" || show == "ring" || show == "coupon")
         translate([show == "ring" ? 0 : ring_x, 0, 0])

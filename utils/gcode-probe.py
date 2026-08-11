@@ -37,8 +37,11 @@ RE_Z = re.compile(r"^;Z:([0-9.]+)")
 RE_TEMP = re.compile(r"^M10[49]\s+S([0-9.]+)")
 RE_E = re.compile(r"^G[01]\b.*?\bE(-?[0-9.]+)")
 RE_TYPE = re.compile(r"^;TYPE:(.+)")
+# Orca writes some header facts with a colon and others with an equals sign
+# (`; total layer number: 349` but `; estimated printing time ... = 1h 4m 14s`),
+# so both separators have to be accepted or the timing quietly never appears.
 RE_HEADER = re.compile(r"^;\s*(total layer number|max_z_height|total filament"
-                       r"|filament used|estimated printing time)[^:]*:\s*(.+)", re.I)
+                       r"|filament used|estimated printing time)[^:=]*[:=]\s*(.+)", re.I)
 
 
 def load(path):
@@ -128,8 +131,8 @@ def main():
                 layer_roles[cur_layer][cur_role] += 1
 
     print("file            %s" % which)
-    for key in ("total layer number", "max_z_height", "estimated printing time",
-                "total filament", "filament used"):
+    for key in ("total layer number", "max_z_height", "filament used",
+                "total filament", "estimated printing time"):
         if key in header:
             print("%-15s %s" % (key.replace("total layer number", "layers")
                                    .replace("max_z_height", "max z"), header[key]))

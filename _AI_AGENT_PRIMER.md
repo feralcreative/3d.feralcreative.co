@@ -45,6 +45,28 @@ Every figure carries a source and an evidence marker, and they are not interchan
 
 `docs/flash-studio-slicing-reference.md` is the other half, and it outranks the first one wherever they disagree. That reference was assembled from FlashForge's published profiles and community reports; the slicing reference was read straight out of the slicer installed on this machine—every path, inheritance chain and resolved value, plus how to drive Flash Studio headless from the command line. It already corrects the wall-thickness ladder (inner walls are 0.45, not 0.42) and refutes the hole-compensation starting value (measured 0.55–0.65 on diameter, not 0.15). **Read it before quoting any print setting, choosing a wall thickness, or advising on print quality.** Do not go hunting through the app bundle again—it is all written down.
 
+## Printer settings live in two places, and they drift
+
+Ziad works across two machines, **Feral MacBook** and **Feral Studio**, against one printer. Slicer presets exist in two places and neither is authoritative alone:
+
+- **The app's `user/` tree** at `~/Library/Application Support/Orca-Flashforge/user/default/`. This is what Flash Studio actually reads. It is outside version control and one reinstall away from gone, and it is per-machine.
+- **`docs/profiles/` in this repo.** The durable, diffable, shared record. It is inert—copying a file here changes no print.
+
+**Whenever a print setting is tweaked, leave a copy in the repo.** That is the only way the other machine ever sees it. And before trusting any setting, **check what is in the app against what is in the repo**:
+
+```bash
+utils/profiles-check.sh            # report drift
+utils/profiles-check.sh --install  # repo -> app, then restart Flash Studio
+utils/profiles-check.sh --capture  # app -> repo, then commit
+```
+
+Both directions of drift have already caused real damage. A setting tuned on one machine and never committed is invisible on the other. A setting committed and never installed is invisible to the GUI—that one cost a print, which ran at 265 °C while the repo said 240.
+
+Two things that make this bite harder than it should:
+
+- **A preset is two files.** The `.json` holds the settings; a `.info` sidecar is how Flash Studio registers it. Copy only the `.json` to another machine and the preset never appears in the dropdown, with no error and no clue why.
+- **Installing a preset is not applying it.** It must be selected, and even then the value may not reach the job. Verify in the G-code with `utils/gcode-probe.py`, never on screen. `docs/flash-studio-slicing-reference.md` records a preset that was correct, selected, and contributed nothing.
+
 There is a third stage to the loop now, and it exists because a print failed for reasons nobody could see. `utils/slice.sh` slices a part and then reads the G-code back, reporting layer count, max Z, the temperatures actually commanded, real retraction distances, and where extrusion per layer collapses. **Never verify a print setting by looking at the slicer's GUI.** On 2026-08-09 a correct, correctly-selected filament preset contributed nothing to a job, the print ran 25 °C too hot, and it cost the top 6.41 mm of a collet. The G-code is the only artefact the printer sees, so it is the only place a setting is real. It exports nothing to the printer; sending a job is a separate, deliberate act.
 
 `docs/printer-profile-research-prompt.md` is the prompt that produced the design reference. You do not need it to design anything. It matters only if the hardware changes, or if someone wants the same document built for a different printer.
@@ -69,7 +91,8 @@ scad/
     ├── build.sh             # part -> STL, optional --push to NAS
     ├── slice.sh             # part or STL -> sliced job, settings verified
     ├── ffprofile.py         # resolves Flash Studio's profile inheritance
-    └── gcode-probe.py       # reads a sliced job back and reports what it will do
+    ├── gcode-probe.py       # reads a sliced job back and reports what it will do
+    └── profiles-check.sh    # app presets vs docs/profiles/, drift both ways
 ```
 
 Scripts live in `utils/`, never `scripts/`—that is Ziad's convention across all his repos. Documentation other than `README.md` and this file belongs in `docs/`.

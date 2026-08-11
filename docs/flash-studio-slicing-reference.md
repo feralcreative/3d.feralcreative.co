@@ -226,8 +226,45 @@ Most values arrive as single-element lists (`['265']`), not scalars. Unset overr
 | `pressure_advance` | 0.046 | 0.046 | Matches the SCAD reference |
 | `fan_min_speed` / `fan_max_speed` | 80 / 100 | 80 / 100 | |
 | `overhang_fan_speed` | 100 | 80 | |
-| `slow_down_layer_time` | 8 | 8 | |
+| `slow_down_layer_time` | 8 | 8 | Target minimum seconds per layer. Bounded by the next row—see below |
+| `slow_down_min_speed` | **30** | 30 | How far the slicer may slow down to hit that target. Raising the target does nothing until this comes down |
 | every `filament_retraction_*` | `nil` | `nil` | **Nothing overrides the machine's 0.8 mm** |
+
+### Retraction has an upper limit set by extrusion per layer
+
+**Long retraction starves small layers.** This is the counterweight to the stringing advice below, and it outranks it: raising `filament_retraction_length` to 1.6 mm to cure stringing caused a print to stop extruding entirely part way up a collet. The nozzle kept moving and delivered nothing.
+
+The test is the ratio of filament retracted to filament deposited, per layer. Measured on the chalk holder's collet, where four thin fingers are four separate islands:
+
+```text
+layer   z        extruded   retracted   cycles   ratio
+201     24.30     0.565      3.20         2      6:1
+281     33.90     0.255      6.40         4     25:1
+341     41.10     0.486      6.40         4     13:1
+```
+
+At 0.06 mm of deposit per island, four 1.6 mm retract/deretract cycles per layer with a z-hop and a wipe between them let PETG ooze down the nozzle faster than those extrusions can re-pressurize it. A print starved at 25:1 and an earlier one at 12:1; 0.4 mm brings the worst layer to 6:1.
+
+Two things follow:
+
+- **Retraction length is a whole-print setting with a per-region cost.** Before raising it, ask what the smallest layer in the part extrudes. Anything under a millimetre per layer is in the danger zone.
+- **The real lever is usually extrusion per layer, not retraction.** Several small islands each getting one perimeter plus gap fill is the worst case; joining them into one body cuts travel count and raises deposit at the same time.
+
+### Cooling time is capped by minimum speed, not by the target
+
+Both cooling settings are **filament** settings even though they read like process ones—they resolve as lists, and `--set process:slow_down_layer_time=...` is rejected.
+
+The pair works as a target and a limit. `slow_down_layer_time` asks for a minimum seconds per layer; `slow_down_min_speed` is how slowly the slicer is permitted to go to get there. **Raising the target alone achieves nothing when the limit is the binding constraint**, which it is on any small layer. Measured on the chalk holder's collet, where each layer above the collar consumes about a quarter of a millimetre of filament:
+
+```text
+layer_time 8,  min_speed 30    43m 54s     the stock pairing
+layer_time 12, min_speed 5     1h 13m
+layer_time 20, min_speed 5     1h 58m
+```
+
+At `min_speed` 30 those layers finish in roughly two seconds no matter what the target says. Dropping it to 5 is what lets the dwell actually happen, and the print time is the evidence that it did.
+
+This matters for any tall thin feature that finishes after its neighbours. See `docs/_PLANS/chalk-holder-04-260810T1514Z.md` for the case that produced these numbers—a collet whose fingers failed 1.2 mm after the part beside them stopped printing.
 
 <!--| PAGE-BREAK -->
 
@@ -269,6 +306,42 @@ For whatever still gets through: a brief pass with a heat gun. That is already t
 Applied 2026-08-09. Two user presets, written to `~/Library/Application Support/Orca-Flashforge/user/default/`. **They are user presets deliberately**—nothing inside the app bundle was touched, so a Flash Studio update cannot clobber them and the stock profiles remain intact underneath.
 
 **Every preset also gets a copy committed to `docs/profiles/`** in this repo—`docs/profiles/filament/` for filament, matching subfolder for process and printer. The app's `user/` tree is outside version control and one reinstall away from gone; the repo copy is the durable, diffable record. Copying there is *in addition to* writing the app's preset, never instead of it.
+
+### Moving a preset between computers
+
+Verified 2026-08-10 by installing the filament preset on a second machine, where it had not existed.
+
+**A preset is two files, not one, and copying only the JSON does nothing visible.** Flash Studio enumerates user presets through a `.info` sidecar sitting beside the JSON; without it the preset simply does not appear in the dropdown, with no error and no clue as to why. Both files belong in `docs/profiles/`.
+
+```text
+~/Library/Application Support/Orca-Flashforge/user/default/filament/
+├── Rapid PETG Burnt Titanium.json
+└── Rapid PETG Burnt Titanium.info
+```
+
+The sidecar is four fields and a timestamp:
+
+```text
+sync_info = create
+user_id =
+setting_id =
+base_id = GFSA04
+updated_time = 1786382901
+```
+
+**`base_id` is the `setting_id` of the profile named in the JSON's `inherits`, copied verbatim.** `Flashforge HS PETG` carries `setting_id` `GFSA04`, so that is what goes here. Nothing is prefixed or derived—the resemblance to the pre-existing `Shitty PLA.info`, whose `base_id` is `OGFSA04`, is because *its* parent `Generic PLA @System` genuinely has that id. To find any parent's id, read `setting_id` out of its file in the bundle.
+
+Two smaller things that make a user preset match the ones the GUI writes itself: `"is_custom_defined": "0"`, and no `setting_id` or `filament_id` key at all. A preset with an invented `filament_id` is not worth the risk—the known-good example has none.
+
+`@System` is not a suffix convention to imitate. Those are the names of profiles in the separate `OrcaFilamentLibrary` set that ships alongside the Flashforge one; a Flashforge parent is named plainly, as `Flashforge HS PETG`.
+
+Installing on a new machine, start to finish:
+
+1. Copy both files from `docs/profiles/filament/` into the path above.
+2. **Restart Flash Studio.** It reads the `user/` tree at startup.
+3. Select the preset, then **verify in the G-code and not in the GUI**—`utils/gcode-probe.py` prints the commanded temperature. The whole reason this document is so emphatic on that point is recorded above.
+
+None of this is needed to *print* correctly. `utils/slice.sh` resolves and writes settings itself and never consults a user preset, so a machine with no presets installed still produces a correct job. Installing them matters only for working in the GUI.
 
 ### `filament/Rapid PETG Burnt Titanium.json`
 
@@ -389,6 +462,6 @@ Still not built: support verification for `parts/hobbs-painters-pyramid.scad`.
 1. ~~Does the CLI resolve `inherits` from a bare child profile?~~ **Answered 2026-08-10: no.** See "The CLI does not resolve `inherits`". A slice driven from bundle profiles silently comes out with the slicer's built-in defaults for everything the named file does not set.
 2. **Is the bore tight only at its mouth?** Mike a printed bore 10 mm up from the bed and compare with the reading at the opening. If it opens up, the 0.30 mm first layer is the culprit and `hole_pull_in` is set too high.
 3. **What is the real pull-in at mid-height?** Follows from item 2. Orca's tolerance test, run once for this filament, would settle it properly.
-4. **Does 240 °C fix the stringing?** Still unproven on a print—but for a new reason. The 2026-08-09 print never ran at 240 at all, so it was not a test of anything. 240 is now confirmed to reach the G-code via `utils/slice.sh`; what remains is printing it.
+4. **Does 240 °C fix the stringing?** **240 now reaches the machine**—confirmed on the printer's own readout during the 2026-08-10 print, not just in the G-code. The stringing question itself is still open, and that print does not settle it: it is a single object, so there are few long travels, and stringing shows up most between objects. Judge it on a multi-object plate. The one region worth inspecting on a single part is the collet, whose four slots mean eight open-air crossings per layer above z 7.5.
 5. **The three-perimeter question.** Partly answered, and not favourably. Above the ring's top face the collet fingers print as **one outer wall plus gap infill, with no inner wall at all**. Segment counts cannot say how many loops the outer-wall block contains, so the exact perimeter count is still open, but gap fill on a load-bearing flexing feature is already the answer to whether the 1.26 mm tip wall resolves cleanly: it does not.
 6. **Does the collet survive at 240 °C?** The open question after the 6.41 mm loss. The failure begins about ten layers above the work cliff at z 34.38, where the ring finishes and the four fingers lose their cooling interval. If it fails again at 240, the next lever is cooling time rather than temperature—`slow_down_layer_time` is 8 s and this is the geometry that wants more.

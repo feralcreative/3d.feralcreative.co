@@ -1,0 +1,10 @@
+{
+    "enable_support": "1",
+    "from": "User",
+    "inherits": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle",
+    "is_custom_defined": "0",
+    "name": "0.20mm @Flashforge AD5M Pro 0.4 Nozzle - Tree Supports",
+    "print_settings_id": "0.20mm @Flashforge AD5M Pro 0.4 Nozzle - Tree Supports",
+    "support_type": "tree(auto)",
+    "version": "2.1.1.0"
+}

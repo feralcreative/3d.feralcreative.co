@@ -1,0 +1,14 @@
+{
+    "enable_support": "1",
+    "from": "User",
+    "inherits": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle",
+    "is_custom_defined": "0",
+    "name": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle - ASA",
+    "print_settings_id": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle - ASA",
+    "support_interface_bottom_layers": "1",
+    "support_interface_spacing": "0",
+    "support_interface_top_layers": "1",
+    "support_style": "snug",
+    "support_top_z_distance": "0.28",
+    "version": "2.1.1.0"
+}
