@@ -279,13 +279,8 @@ class GoogleAuth {
     // Initialize static project information from config
     this.initProjectInfo();
 
-    // Initialize notification service
-    if (CONFIG.SLACK && CONFIG.SLACK.WEBHOOK_URL) {
-      window.notificationService = new NotificationService(CONFIG.SLACK.WEBHOOK_URL, CONFIG.SLACK);
-      console.log("[NOTIFICATIONS] Slack notifications enabled");
-    } else {
-      console.warn("[NOTIFICATIONS] Slack webhook not configured");
-    }
+    // Slack notifications are sent server-side by printer-proxy-server.js.
+    // Nothing to initialize here.
 
     // Create printer status instance
     window.printerStatus = new PrinterStatus(CONFIG.PRINTER.IP, CONFIG.PRINTER.SERIAL, CONFIG.PRINTER.CHECK_CODE);

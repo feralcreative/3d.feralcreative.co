@@ -437,48 +437,28 @@ class PrinterStatus {
   }
 
   /**
-   * Event handlers for state changes (to be overridden or used with callbacks)
-   * NOTE: Notifications are now handled server-side by printer-proxy-server.js
-   * Client-side notifications are disabled to prevent duplicates
+   * Event handlers for state changes. These are logging hooks only — Slack
+   * notifications are sent server-side by printer-proxy-server.js, which runs
+   * whether or not a browser is open.
    */
   onPrintStarted(status) {
     console.log("[PRINTER] Print started:", status.job.FileName);
-    // Notifications handled server-side - client-side disabled to prevent duplicates
-    // if (window.notificationService) {
-    //   window.notificationService.notifyPrintStarted(status);
-    // }
   }
 
   onPrintCompleted(status) {
     console.log("[PRINTER] Print completed:", status.job.FileName);
-    // Notifications handled server-side - client-side disabled to prevent duplicates
-    // if (window.notificationService) {
-    //   window.notificationService.notifyPrintCompleted(status);
-    // }
   }
 
   onProgressMilestone(status, milestone) {
     console.log(`[PRINTER] Progress milestone: ${milestone}%`);
-    // Notifications handled server-side - client-side disabled to prevent duplicates
-    // if (window.notificationService) {
-    //   window.notificationService.notifyProgress(status, milestone);
-    // }
   }
 
   onPrintPaused(status) {
     console.log("[PRINTER] Print paused");
-    // Notifications handled server-side - client-side disabled to prevent duplicates
-    // if (window.notificationService) {
-    //   window.notificationService.notifyPrintPaused(status);
-    // }
   }
 
   onPrintFailed(status) {
     console.log("[PRINTER] Print failed/cancelled");
-    // Notifications handled server-side - client-side disabled to prevent duplicates
-    // if (window.notificationService) {
-    //   window.notificationService.notifyPrintFailed(status);
-    // }
   }
 
   /**
