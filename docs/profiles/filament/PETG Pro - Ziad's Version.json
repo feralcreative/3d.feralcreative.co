@@ -1,0 +1,19 @@
+{
+    "name": "PETG Pro - Ziad's Version",
+    "from": "User",
+    "inherits": "Flashforge PETG Pro",
+    "version": "2.3.0.3",
+    "filament_settings_id": [
+        "PETG Pro - Ziad's Version"
+    ],
+    "compatible_printers": [
+        "Flashforge Adventurer 5M Pro 0.4 Nozzle"
+    ],
+    "is_custom_defined": "0",
+    "nozzle_temperature_initial_layer": [
+        "240"
+    ],
+    "nozzle_temperature": [
+        "220"
+    ]
+}

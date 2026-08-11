@@ -1,0 +1,13 @@
+{
+    "name": "0.12mm Fine @AD5M Pro 0.4 - Ziad's Version",
+    "from": "User",
+    "inherits": "0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle",
+    "version": "2.3.0.3",
+    "print_settings_id": "0.12mm Fine @AD5M Pro 0.4 - Ziad's Version",
+    "print_extruder_id": [
+        "1"
+    ],
+    "print_extruder_variant": [
+        "Direct Drive Standard"
+    ]
+}

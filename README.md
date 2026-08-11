@@ -98,4 +98,4 @@ If you do use my instructions to build profiles for your printer(s), please comm
 
 ## Notes
 
-See `_AI_AGENT_PRIMER.md` for background, conventions, and how this connects to the `3d.feralcreative.co` printer site.
+See [AGENTS.md](AGENTS.md) for the working rules and conventions, [docs/architecture.md](docs/architecture.md) for how this connects to the `3d.feralcreative.co` printer site, and [docs/decisions.md](docs/decisions.md) for background on why things are the way they are.
