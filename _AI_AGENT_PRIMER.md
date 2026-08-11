@@ -5,6 +5,8 @@
 **Owner:** Ziad (Feral Creative)
 **Created:** 2026-08-07
 
+> **Start with [docs/STATUS.md](docs/STATUS.md).** It records where the chalk holder stands, what is currently broken, and—more usefully—how the 2026-08-10 session was wasted chasing print settings that were never the problem. If you are about to change a slicer setting, read it first. It exists specifically so the next agent does not repeat that.
+
 ## Why this repo exists
 
 Ziad has been designing 3D-printable parts in SketchUp for years. The archive lives in Dropbox at `/Volumes/Feral SSD/Dropbox (Personal)/_FERAL/3d`—roughly 50 project folders, 6.5 GB, mostly binary `.skp` and `.stl` files. That archive stays where it is. This repo is not a migration of it.
@@ -68,6 +70,10 @@ Two things that make this bite harder than it should:
 - **Installing a preset is not applying it.** It must be selected, and even then the value may not reach the job. Verify in the G-code with `utils/gcode-probe.py`, never on screen. `docs/flash-studio-slicing-reference.md` records a preset that was correct, selected, and contributed nothing.
 
 There is a third stage to the loop now, and it exists because a print failed for reasons nobody could see. `utils/slice.sh` slices a part and then reads the G-code back, reporting layer count, max Z, the temperatures actually commanded, real retraction distances, and where extrusion per layer collapses. **Never verify a print setting by looking at the slicer's GUI.** On 2026-08-09 a correct, correctly-selected filament preset contributed nothing to a job, the print ran 25 °C too hot, and it cost the top 6.41 mm of a collet. The G-code is the only artefact the printer sees, so it is the only place a setting is real. It exports nothing to the printer; sending a job is a separate, deliberate act.
+
+A third source of drift was removed on 2026-08-10 and must not come back: **`utils/slice.sh` used to carry a hardcoded `LOW_STRING` array of `--set` overrides and apply it by default.** Command-line overrides outrank presets, so that array silently beat everything in `docs/profiles/`—including a retraction length of 1.6 mm that kept being applied for hours after the preset had been corrected to 0.4, and which ground the extruder. The script now defaults to the repo's own presets and passes only what the caller asks for on that invocation. If you find yourself wanting a convenient array of defaults in a script, put them in the preset instead.
+
+**Be very reluctant to tune print settings at all.** The 2026-08-10 session traded three working prints for a cosmetic stringing complaint and jammed the feed drive three times. Retraction length and temperature both trade against feed reliability, and on a part with thin isolated features—the chalk holder's four collet fingers—per-layer extrusion collapses while retraction events do not, so the same short length of filament is cycled through the drive gear until it is powder. Change one thing, print a part, then change the next. [docs/STATUS.md](docs/STATUS.md) has the full account.
 
 `docs/printer-profile-research-prompt.md` is the prompt that produced the design reference. You do not need it to design anything. It matters only if the hardware changes, or if someone wants the same document built for a different printer.
 
@@ -155,6 +161,8 @@ Follow `parts/example-spacer.scad`:
 `build.sh` and `render.sh` both accept `-D 'name=value'` to override any top-level parameter without editing the file, which is the fast way to compare variants.
 
 ## Where the open work is
+
+[docs/STATUS.md](docs/STATUS.md) is the short answer: current state, the one test that should run next, and a list of the wrong turns taken so far. Read it before the plans.
 
 `docs/_PLANS/` holds the running record of what is in flight, one file per round, named `part-NN-<UTC stamp>.md`. **Read the highest-numbered one before starting anything**, and check for any sibling files it references—a reverted patch parked for later lives next to the note that explains it.
 

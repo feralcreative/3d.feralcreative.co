@@ -9,39 +9,18 @@
     "compatible_printers": [
         "Flashforge Adventurer 5M Pro 0.4 Nozzle"
     ],
+    "is_custom_defined": "0",
     "nozzle_temperature": [
         "240"
     ],
     "nozzle_temperature_initial_layer": [
         "245"
     ],
-    "filament_retraction_length": [
-        "0.4"
+    "nozzle_temperature_range_low": [
+        "220"
     ],
-    "filament_retract_before_wipe": [
-        "20%"
-    ],
-    "filament_max_volumetric_speed": [
-        "8"
-    ],
-    "is_custom_defined": "0",
-    "slow_down_layer_time": [
-        "12"
-    ],
-    "slow_down_min_speed": [
-        "5"
-    ],
-    "filament_retraction_speed": [
-        "25"
-    ],
-    "filament_retraction_minimum_travel": [
-        "10"
-    ],
-    "filament_deretraction_speed": [
-        "25"
-    ],
-    "filament_retract_when_changing_layer": [
-        "0"
+    "nozzle_temperature_range_high": [
+        "240"
     ],
     "textured_plate_temp": [
         "80"
@@ -54,12 +33,6 @@
     ],
     "hot_plate_temp_initial_layer": [
         "80"
-    ],
-    "nozzle_temperature_range_low": [
-        "220"
-    ],
-    "nozzle_temperature_range_high": [
-        "240"
     ],
     "cool_plate_temp": [
         "80"

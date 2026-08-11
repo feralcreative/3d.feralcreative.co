@@ -92,6 +92,10 @@ Expect it to be a heavy one-time job. The reference above took three parallel re
 
 If you do use my instructions to build profiles for your printer(s), please commit them and submit a PR. I'd love a library of printer specs for people to use off the shelf without burning tokens.
 
+## Status
+
+[docs/STATUS.md](docs/STATUS.md) is the current state of play: what is designed and finished, what is broken, and what to try next. Read it before changing a print setting or picking the chalk holder back up.
+
 ## Notes
 
 See `_AI_AGENT_PRIMER.md` for background, conventions, and how this connects to the `3d.feralcreative.co` printer site.

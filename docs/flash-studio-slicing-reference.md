@@ -290,7 +290,7 @@ A print in this filament strung badly with the filament already dried. The cause
 In order of effect:
 
 1. **Nozzle temperature 265 → 235.** By far the largest lever. Run a temperature tower if the first guess is not right; the band worth exploring is 230–245.
-2. **Retraction 0.8 → 1.6–2.0 mm**, keeping 35 mm/s. 0.8 is FlashForge's PLA default and the filament profile does not override it. Direct drive tolerates more than this for PETG. Orca's built-in retraction test settles it in one print.
+2. ~~**Retraction 0.8 → 1.6–2.0 mm**~~ **Withdrawn. Do not do this.** It was the reasoning below, and it was wrong in practice: 1.6 mm ground the extruder on 2026-08-10, and the 0.4 mm correction that followed jammed it twice more. On this geometry every value of retraction length other than the stock 0.8 has produced a failed print. Leave it alone. See [STATUS.md](STATUS.md).
 3. **`retract_before_wipe` 100% → 0–30%.** At 100% the retraction finishes before the wipe move starts, so the wipe cannot clear ooze. Lower it and the retraction happens *during* the wipe, depositing residue on the wall instead of trailing it through air.
 4. **`reduce_crossing_wall` 0 → 1.** Currently off. It matters more for these parts than for most: the chalk holder's collet has four slots, so every layer up it crosses open space eight times. The SCAD reference makes the same point from the other direction—*"Because retractions are risky, minimize travel-heavy geometry."*
 5. **Switch to `Flashforge HS PETG`** as the base profile, since that is the family the filament belongs to. Worth doing for correctness, but it only buys 10 °C of the 30 needed.
@@ -351,13 +351,15 @@ Inherits `Flashforge HS PETG`, which is the correct family for this filament.
 | --- | --- | --- | --- |
 | `nozzle_temperature` | 265 (Pro) / 255 (HS) | **240** | The stringing cause. Inside FlashForge's own declared range for the material, which is 220–260 |
 | `nozzle_temperature_initial_layer` | 255 | **245** | Slightly hotter than the body for bed adhesion |
-| `filament_retraction_length` | `nil`, so the machine's 0.8 | **1.6** | 0.8 is FlashForge's PLA default; direct drive takes more for PETG |
-| `filament_retract_before_wipe` | `nil`, so the machine's 100% | **20%** | At 100% the retraction finishes before the wipe starts, so the wipe does nothing about ooze |
-| `filament_max_volumetric_speed` | 12 | **8** | See below—this one is a deliberate trade |
+| `filament_retraction_length` | `nil`, so the machine's 0.8 | ~~1.6~~ **reverted to stock** | Ground the extruder. So did the 0.4 that replaced it. Do not set this |
+| `filament_retract_before_wipe` | `nil`, so the machine's 100% | ~~20%~~ **reverted to stock** | Rolled back with the rest of the retraction tuning |
+| `filament_max_volumetric_speed` | 12 | ~~8~~ **reverted to stock** | Only ever justified as a companion to a lower temperature |
 
-**Why the flow cap.** Cooler PETG cannot melt as fast. At 0.12 mm layers and 0.42 mm width the 200 mm/s outer wall demands about 10 mm³/s, which is close to the stock cap of 12 and unrealistic at 240 °C. Capping at 8 makes the slicer *slow down* to stay inside the melt rate rather than under-extrude. **Prints get slower.** That is the intended behaviour; raise it back toward 12 only if the temperature goes back up.
+**As of 2026-08-10 this preset carries temperature and bed temperature only.** Everything else in the table above was rolled back at Ziad's instruction after three consecutive jams, none of which happened under the stock retraction values. The rollback is untested against a finished print—that test is the first item in [STATUS.md](STATUS.md).
 
-Retraction on the **filament** rather than the machine is deliberate too: retraction belongs to the material. Setting it machine-side would have applied 1.6 mm to PLA as well.
+The flow-cap argument is kept because the reasoning may hold at a lower temperature: cooler PETG cannot melt as fast, and at 0.12 mm layers and 0.42 mm width the 200 mm/s outer wall demands about 10 mm³/s, close to the stock cap of 12. Capping at 8 makes the slicer slow down rather than under-extrude. It was never shown to help here, and it was in force during two failures, so treat it as an untested idea rather than a recommendation.
+
+Retraction belongs on the **filament** rather than the machine, if it is ever set again: setting it machine-side would apply it to PLA as well.
 
 ### `process/0.12mm Fine @AD5M Pro 0.4 - Low String.json`
 
