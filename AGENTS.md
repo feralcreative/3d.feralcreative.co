@@ -11,7 +11,10 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Install deps (BOSL2 submodule) | `git submodule update --init` |
 | Render a part to PNGs (iso, front, right, top) | `utils/render.sh parts/<part>.scad` |
 | Render a variant without editing the file | `utils/render.sh parts/<part>.scad -D 'outer_d=30'` |
-| Build STL (binary, reports manifold + genus) | `utils/build.sh parts/<part>.scad` |
+| Build STL (binary, versioned, reports manifold + genus) | `utils/build.sh parts/<part>.scad` |
+| Build a named variant, with its own version series | `utils/build.sh parts/<part>.scad -D 'show="coupon"' --name <part>-coupon` |
+| Restamp instead of incrementing | `utils/build.sh parts/<part>.scad --version 3` |
+| Build with no version stamp at all | `utils/build.sh parts/<part>.scad --no-version` |
 | Build ASCII STL (to read or diff a mesh) | `utils/build.sh parts/<part>.scad --ascii` |
 | Publish STL to the printer site's NAS | `utils/build.sh parts/<part>.scad --push` (needs explicit permission) |
 | Slice and verify the job | `utils/slice.sh stl/<part>.stl` or `utils/slice.sh parts/<part>.scad` |
@@ -64,7 +67,7 @@ There is no runtime. The pipeline is four stages, each with its own verification
 
 1. `parts/<part>.scad` — the source of truth. One part per file, named after the part.
 2. `utils/render.sh` → `renders/<part>-{iso,front,right,top}.png`. Fast preview; elevations are orthographic, iso is perspective. Verifies shape.
-3. `utils/build.sh` → `stl/<part>.stl`, binary, plus OpenSCAD's manifold/genus summary. Verifies topology.
+3. `utils/build.sh` → `stl/<part>-v<N>.stl`, binary, plus OpenSCAD's manifold/genus summary. Verifies topology. `stl/<part>.stl` is a symlink to the newest version, which is what every other stage and every path quoted in the docs resolves through.
 4. `utils/slice.sh` → `slice/<part>/{plate_1.gcode,out.gcode.3mf,resolved.json,slice.log}`. Internally: `ffprofile.py` flattens the profile inheritance chain, Flash Studio slices, `gcode-probe.py` reads the result back. Verifies settings.
 
 Dependency direction: parts include `lib/BOSL2` and `logos/marks.scad`; nothing includes a part except another part reading its numbers (`hobbs-chalk-holder.scad` is written to be includable for that). Scripts depend on parts, never the reverse.
@@ -72,6 +75,7 @@ Dependency direction: parts include `lib/BOSL2` and `logos/marks.scad`; nothing 
 Non-obvious coupling:
 
 - **`OPENSCADPATH`.** `lib/` is not a directory OpenSCAD searches. `render.sh` and `build.sh` export `OPENSCADPATH` themselves, so `include <BOSL2/std.scad>` resolves. Invoking the `openscad` binary directly, outside the scripts, will fail to resolve it.
+- **The STL version counter is committed, the STLs are not.** `docs/stl-versions.txt` holds one `<name> <n>` line per output name and is the only durable record of where a series is up to — `stl/` is gitignored and regenerable, so a counter kept beside the meshes would reset to v1 the first time the tree was cleaned. It counts builds, not design changes.
 - **The NAS is the only join to the printer site.** `~/www/feral/3d.feralcreative.co` shares no code and no history with this repo. `build.sh --push` rsyncs an STL to `/volume1/web/3d-printer-stream/public/models`, which is bind-mounted into that container, so a new model appears in the web viewer immediately with no rebuild and no deploy.
 - **Slicer presets exist in two places and drift.** See [docs/architecture.md](docs/architecture.md).
 
@@ -98,6 +102,7 @@ Scripts live in `utils/`, never `scripts/`. Documentation other than `README.md`
 - **Polygons are inscribed**, so holes come out undersized before any printing effect is considered. See the faceting rules in the printer reference.
 - **`build.sh` on a complex part is genuinely slow** because it runs the real mesh computation, not the preview. It has not hung.
 - **A wall thickness that is not an integer multiple of the extrusion width prints with gaps or over-extrusion.** On a 0.4 nozzle, 2 mm is a bad number; 1.68 and 2.10 are good ones. Inner walls are 0.45, not 0.42—the slicing reference corrects the design reference here.
+- **A variant built without `--name` shares the parent part's version series and overwrites its file.** The stamp is keyed on the output name and the default name is the `.scad`'s basename, so `-D 'show="coupon"'` alone produces another `hobbs-chalk-holder-vN.stl`, not a coupon of its own. Name the variant.
 - **Installing a preset is not applying it, and applying it is not reaching the job.** Verify in G-code.
 - **A preset is two files.** The `.json` holds the settings; the `.info` sidecar is how Flash Studio registers it. Copy only the `.json` and the preset never appears in the dropdown, with no error and no clue.
 - **`--export-3mf` resolves relative to `--outputdir`; `--export-settings` ignores `--outputdir` entirely.** Both quirks are already handled in `slice.sh`—do not "fix" the asymmetry.
