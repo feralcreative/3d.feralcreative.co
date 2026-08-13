@@ -4,6 +4,10 @@ Written 2026-08-10, end of a long and mostly unproductive session; amended 2026-
 
 ## Where things actually stand
 
+**Current job is the v4 coupon**, which adds eight axial grip ribs inside the collet fingers — two per finger, 0.84 wide, over the top 3.5 mm only so the root still flexes. Ribs fragment the slicer's perimeter path where they step the wall thickness, and a five-way sweep settled how to mitigate it: fewer and wider ribs, 108 fragments a layer down to 53. **`wall_loops` is not the lever** — 2 → 3 was tested twice, verified in the G-code, and changed nothing. No preset was touched. [_PLANS/chalk-holder-07-260812T2308Z.md](_PLANS/chalk-holder-07-260812T2308Z.md).
+
+**Amended again 2026-08-12.** The v1 coupon of the 08-11 geometry was printed. It grips but does not bite — the collet runs out of closure at about the diameter of the stick, so the chalk slides back into the handle — and the barrel channel measured about a millimetre loose. Three parameters moved in response (`chalk_slop` 1.25 → 0.75, `handle_collet_bite_t` 0.45 → 0.20, `ring_mouth_d` 12.05 → 11.05), the entry is deliberately unchanged at 9.85, and closure went 1.00 → 1.51 mm on diameter. The current job is the v2 coupon; full account in [_PLANS/chalk-holder-06-260812T2205Z.md](_PLANS/chalk-holder-06-260812T2205Z.md). Note the finding there that the model overstates closure by roughly 0.5 mm against the printed part, which is the next thing to measure.
+
 **The geometry was changed on 2026-08-11, on request.** Four things: the channel closed 0.5 mm, the handle grew to 102.3 mm so a 4″ stick is contained tip to butt, the collet fingers thinned from 1.524 to 0.840 mm for flex with a 0.24 mm three-line bite lip at the tip, and `ring_mouth_d` came down to 12.05 because the thinner tip would otherwise have gripped nothing under 9.45 mm. Grip range is now 9.85–8.85 mm over 0.55 turns, against 11.25–9.00 over 1.51. Full account and the numbers in [_PLANS/chalk-holder-05-260811T1552Z.md](_PLANS/chalk-holder-05-260811T1552Z.md).
 
 Everything before that change still stands as written below, and nothing else about the design was touched. Do not redesign anything on your own initiative. `parts/hobbs-chalk-holder.scad` is the source of truth and its current parameters are the ones he asked for.
@@ -67,7 +71,9 @@ The next agent should know how this session was wasted, because the failure mode
 
 ## Where to start
 
-1. **Print the coupon** at `slice/hobbs-chalk-holder-coupon/plate_1.gcode`, which as of 2026-08-11 is the new geometry sliced on the rolled-back stack — 245 → 240 °C, retraction 0.8, 298 layers, 53m 46s. Change no settings. It tests the rollback and the new collet in one print. The rolled-back coupon of the *old* geometry that this section used to point at was overwritten when the new one was sliced (`utils/slice.sh` clears its output directory); it is reproducible from the `-D` overrides listed in plan 05, but it has still never been printed.
+1. **Print the coupon** at `slice/hobbs-chalk-holder-coupon/plate_1.gcode`. As of 2026-08-12 that is the v2 geometry — 298 layers, 54m 19s, same rolled-back stack. The paragraph below describes the 08-11 v1 job it replaced, and its reasoning about the retract-to-extrude ratio up the collet still applies.
+
+   As of 2026-08-11 it was the new geometry sliced on the rolled-back stack — 245 → 240 °C, retraction 0.8, 298 layers, 53m 46s. Change no settings. It tests the rollback and the new collet in one print. The rolled-back coupon of the *old* geometry that this section used to point at was overwritten when the new one was sliced (`utils/slice.sh` clears its output directory); it is reproducible from the `-D` overrides listed in plan 05, but it has still never been printed.
 
    One thing to know before it runs: over the 63 collet-only layers the new fingers deposit 0.197 mm per layer against the old 0.269, so the retract-to-extrude ratio up the collet is 17:1 where it was 15:1. That ratio is the mechanism behind all three jams. If it starves again, the lever is `retraction_minimum_travel` 1 → 6 mm, alone, which plan 04 measured taking whole-print retractions 706 → 543.
 2. **If it finishes**, the geometry is done and so is the print config. Stop. Stringing is cosmetic and Ziad can live with it; he said as much. Do not resume tuning without being asked.

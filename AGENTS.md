@@ -17,6 +17,9 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Build with no version stamp at all | `utils/build.sh parts/<part>.scad --no-version` |
 | Build ASCII STL (to read or diff a mesh) | `utils/build.sh parts/<part>.scad --ascii` |
 | Publish STL to the printer site's NAS | `utils/build.sh parts/<part>.scad --push` (needs explicit permission) |
+| Build a coupon of only what changed since the last print | `utils/coupon.sh parts/<part>.scad` |
+| Coupon with every component, ignoring the log | `utils/coupon.sh parts/<part>.scad --all` |
+| Record that the last coupon was printed | `utils/coupon.sh parts/<part>.scad --printed` |
 | Slice and verify the job | `utils/slice.sh stl/<part>.stl` or `utils/slice.sh parts/<part>.scad` |
 | Slice against untuned FlashForge stack | `utils/slice.sh stl/<part>.stl --stock` |
 | One-off slicer override | `utils/slice.sh stl/<part>.stl --set filament:nozzle_temperature=235` |
@@ -67,7 +70,7 @@ There is no runtime. The pipeline is four stages, each with its own verification
 
 1. `parts/<part>.scad` — the source of truth. One part per file, named after the part.
 2. `utils/render.sh` → `renders/<part>-{iso,front,right,top}.png`. Fast preview; elevations are orthographic, iso is perspective. Verifies shape.
-3. `utils/build.sh` → `stl/<part>-v<N>.stl`, binary, plus OpenSCAD's manifold/genus summary. Verifies topology. `stl/<part>.stl` is a symlink to the newest version, which is what every other stage and every path quoted in the docs resolves through.
+3. `utils/build.sh` → `stl/<part>-v01.stl`, zero padded to two digits, binary, plus OpenSCAD's manifold/genus summary. Verifies topology. `stl/<part>.stl` is a symlink to the newest version, which is what every other stage and every path quoted in the docs resolves through.
 4. `utils/slice.sh` → `slice/<part>/{plate_1.gcode,out.gcode.3mf,resolved.json,slice.log}`. Internally: `ffprofile.py` flattens the profile inheritance chain, Flash Studio slices, `gcode-probe.py` reads the result back. Verifies settings.
 
 Dependency direction: parts include `lib/BOSL2` and `logos/marks.scad`; nothing includes a part except another part reading its numbers (`hobbs-chalk-holder.scad` is written to be includable for that). Scripts depend on parts, never the reverse.
@@ -75,6 +78,7 @@ Dependency direction: parts include `lib/BOSL2` and `logos/marks.scad`; nothing 
 Non-obvious coupling:
 
 - **`OPENSCADPATH`.** `lib/` is not a directory OpenSCAD searches. `render.sh` and `build.sh` export `OPENSCADPATH` themselves, so `include <BOSL2/std.scad>` resolves. Invoking the `openscad` binary directly, outside the scripts, will fail to resolve it.
+- **A coupon carries only what changed since the last print, by default.** `utils/coupon.sh` hashes each component's mesh, compares it against `docs/print-log.txt`, and leaves off anything identical to what was last printed — reprinting an unchanged half costs plate time and answers nothing. The part declares its own components in two comment directives (`// COUPON-COMPONENTS:`, `// COUPON-PLATE:`); the script knows nothing about any particular part. Nothing in the repo can see a print, so the printed columns move only when Ziad runs `--printed`. Pass `--all` to override.
 - **The STL version counter is committed, the STLs are not.** `docs/stl-versions.txt` holds one `<name> <n>` line per output name and is the only durable record of where a series is up to — `stl/` is gitignored and regenerable, so a counter kept beside the meshes would reset to v1 the first time the tree was cleaned. It counts builds, not design changes.
 - **The NAS is the only join to the printer site.** `~/www/feral/3d.feralcreative.co` shares no code and no history with this repo. `build.sh --push` rsyncs an STL to `/volume1/web/3d-printer-stream/public/models`, which is bind-mounted into that container, so a new model appears in the web viewer immediately with no rebuild and no deploy.
 - **Slicer presets exist in two places and drift.** See [docs/architecture.md](docs/architecture.md).

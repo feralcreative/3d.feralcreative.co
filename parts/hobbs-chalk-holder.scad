@@ -79,6 +79,14 @@
 // _incoming/, which are drawn in units of 0.1 mm — so a number here is as
 // likely to be a faithfully copied mistake as a decision. Two already were.
 
+// The two halves a coupon can carry, and the variant that puts both on one
+// plate. utils/coupon.sh reads these to work out what has changed since the
+// last print and leaves the unchanged half off — so the names on the left have
+// to stay stable, and any new variant that belongs on a coupon has to be
+// declared here or the script will not know it exists.
+// COUPON-COMPONENTS: handle=coupon-handle ring=ring
+// COUPON-PLATE: coupon
+
 include <BOSL2/std.scad>
 include <BOSL2/threading.scad>
 include <../logos/marks.scad>
@@ -174,6 +182,16 @@ ring_thread_clearance   = 0.150;  // (mm)
 // a different stick is one edit rather than four.
 chalk_d = 9.500;  // nominal diameter of a new stick (mm)
 
+// What the sticks in the studio actually mike, which is not the same number and
+// is the one the grip ribs are sized against. The lip is held to the nominal
+// figure above — it is the continuous passage, and it should admit any stick
+// sold as 9.5 — while the ribs are allowed to come inside that, because they are
+// twelve narrow contacts rather than a bore and they are meant to engage.
+//
+// Raise this if a batch of chalk turns out fatter, and the rib assert below will
+// tell you if the ribs have become a press fit rather than a slip fit.
+chalk_d_measured = 9.420;  // (mm)
+
 // Diametral air between the stick and the bore, as printed. This is not a
 // sliding-fit allowance — the collet closes onto the stick, so nothing here has
 // to be tight. It is how much oversize, out-of-round and dusty stick the tool
@@ -195,7 +213,16 @@ chalk_d = 9.500;  // nominal diameter of a new stick (mm)
 // channel. Note that the channel a stick actually has to pass is no longer this
 // one — the bite lip at the collet's tip is 0.9 mm narrower again, and that is
 // the number to reason about. See handle_collet_bite_t.
-chalk_slop = 1.250;  // (mm)
+//
+// Closed again 1.250 -> 0.750 on 2026-08-12, after the v1 coupon was printed and
+// measured: about a millimetre of wiggle in the barrel. This is the barrel's
+// number and nothing else's — the entry is set by the lip and was deliberately
+// held at 9.85 by taking handle_collet_bite_t down in the same change.
+//
+// It does not act alone on the clamp. The collet's tip is bore + 2 * finger, so
+// 0.5 off here is 0.5 off the tip's outside diameter and 0.5 of grip given away.
+// ring_mouth_d paid that back and then bought more; see it and the note there.
+chalk_slop = 0.750;  // (mm)
 
 // Extrusion pull-in: a hole comes out this much undersize on diameter.
 //
@@ -336,16 +363,111 @@ handle_collet_tip_wall = 0.840;  // (mm)
 // millimetre of travel — the grip would arrive and then let go. Inward leaves the
 // cone unbroken, so nothing about the clamp arithmetic knows the lip is there.
 //
-// 0.450 is one inner-wall line, taking the lip to 1.290 — the three-wide section
-// that was asked for. 0.240 is two layers at 0.12. The lip's underside is an
-// unsupported 0.45 mm ledge running round a curve; it should bridge, but it is
-// one of the two things only a printed part can answer.
+// 0.450 was one inner-wall line, taking the lip to 1.290 — the three-wide
+// section originally asked for. 0.240 is two layers at 0.12. The lip's underside
+// is an unsupported ledge running round a curve; it should bridge, but it is one
+// of the two things only a printed part can answer.
+//
+// Cut 0.450 -> 0.200 on 2026-08-12, and it is bookkeeping rather than a
+// judgement about bite. chalk_slop came down 0.5 in the same change, and the lip
+// is measured inward from the bore, so left at 0.450 the entry would have
+// followed the bore down to 9.35 mm as printed — under the 9.42 mm a Crayola
+// stick mikes, so a fresh stick would have had to be shaved on the way in. That
+// is the legacy part's defect arrived at from the other side, and the assert in
+// [Hidden] refuses to render it. 0.200 holds the entry at 9.85, exactly where it
+// was before either change.
+//
+// The cost is that 0.200 is under one extrusion line, so the ledge is no longer
+// a clean inner wall — the slicer resolves it as it sees fit, and how much of a
+// bite is left is now a question for a printed part rather than one the profile
+// answers. If it turns out not to bite, the lever is chalk_slop back up rather
+// than this back up: the entry is what this protects.
 //
 // It costs channel: the passage at the lip is 0.9 mm narrower than the bore, so
 // the widest stick the tool admits is set here, not by chalk_slop. There is an
 // assert in [Hidden] keeping it wider than a nominal stick.
-handle_collet_bite_t = 0.450;  // extra finger thickness at the tip, inward (mm)
+handle_collet_bite_t = 0.200;  // extra finger thickness at the tip, inward (mm)
 handle_collet_bite_h = 0.240;  // height of that band — two 0.12 mm layers (mm)
+
+/* [Handle: collet grip ribs] */
+// Ribs on the INSIDE of each finger, running along the tool's axis, to turn four
+// broad arcs of contact into twelve narrow ones. The clamp force is the same;
+// the pressure at each contact is several times higher, which is what digs into
+// gypsum and stops a stick walking back down the barrel under hand pressure.
+//
+// AXIAL IS THE WHOLE POINT, and it is why this is safe to print where a
+// horizontal rib would not be. The handle prints collet up, so a rib running
+// around the bore is an unsupported ledge bridging on a curve — the same gamble
+// as handle_collet_bite_h, taken once per rib. A rib running along the axis is
+// just a locally thicker wall in every layer: it prints inside the same
+// perimeter loop, nothing bridges, and every layer is identical to the one
+// under it.
+//
+// They are deliberately SHORT. Bending stiffness goes as thickness cubed, so a
+// 0.40 mm rib on a 0.84 mm finger is about 2.5x the local stiffness — run the
+// full 10 mm and the collet stops flexing, which is exactly what plan 05 spent
+// the clamp's travel to buy. Confined to the top few millimetres, the root is
+// still 0.84 and still does the bending.
+// HOW MANY, AND WHY NOT MORE. A rib is a step in the wall's thickness, and the
+// slicer breaks its perimeter path at every step — so the gap fill it leaves
+// scales with the rib COUNT, not with how much material the ribs add. Sliced
+// five ways at z 33.30, everything else held:
+//
+//     3 x 0.42 wide      108 gap-fill fragments per layer
+//     3 x 0.84            65
+//     1 x 0.42            42
+//     1 x 0.84            18
+//     thicker rib, wall_loops = 3    113
+//
+// The last line is the important one: raising wall_loops does nothing, verified
+// twice with `; wall_loops = 3` read back out of the G-code. This is not a print
+// setting problem and nothing in docs/profiles/ should be touched for it. Two
+// wide ribs is the middle of that table — eight contacts to keep a stick from
+// rocking, at a fraction of the fragmentation of twelve narrow ones.
+handle_collet_ribs = 2;  // per finger; 0 disables them entirely
+
+// Measured from the LIP's passage, not from the bore. The lip already steps the
+// channel in by handle_collet_bite_t, and a rib flush with that would add
+// nothing at the tip — it would only extend the same narrowing further down. So
+// the crest sits this much inside the lip, and the rib's own radial height is
+// whatever that takes: handle_collet_bite_t + this below the lip, and just this
+// within it.
+//
+// 0.200 puts the channel at the ribs near 9.45 as printed, against sticks that
+// mike 9.42. A stick still drops in — the ribs are not a press fit — and they
+// engage as the nut closes, which is what the 1.51 mm of closure is for. Raising
+// it past about 0.25 turns insertion into a push fit, which is the legacy part's
+// defect in miniature. There is an assert below.
+handle_collet_rib_h = 0.200;  // crest, inside the lip's passage (mm)
+
+// Two extrusion lines. 0.420 was one, and one line is a sliver the slicer will
+// not run a path around — it fills it, which is where the fragmentation in the
+// table above comes from. At 0.840 the rib is wide enough to carry its own pair
+// of perimeters, and the same measurement drops by more than half at equal rib
+// count. It bites over a wider contact, which is the trade: less pressure per
+// rib than a knife edge would give, but a knife edge is what will not print.
+handle_collet_rib_w = 0.840;  // tangential width (mm)
+
+// Axial run, measured down from the collet's top face, and how much of that run
+// is spent ramping up to full height. The ramp is not cosmetic: a rib that
+// arrives at full height in one layer leaves a small ledge at its lower end,
+// which is the overhang this whole arrangement exists to avoid.
+handle_collet_rib_len  = 3.500;  // (mm)
+handle_collet_rib_ramp = 1.500;  // of that run, the lead-in (mm)
+
+// Angular pitch BETWEEN ribs, not the half-span — the set is laid out
+// symmetrically about each finger's centreline, so two ribs sit at plus and
+// minus half of this and three sat at minus one, zero and plus one.
+//
+// 40 with two ribs puts them at ±20 deg, which is exactly where the outer pair
+// of the original three sat. That is deliberate: dropping the middle rib should
+// not also narrow the span, because the span is what stops a stick rocking
+// between contacts. It was 20 while there were three ribs.
+//
+// A rib that runs off the edge of a finger would be left standing over a slot
+// with nothing under it; the assert in [Hidden] checks the whole set clears the
+// finger's own arc, measured at the crest radius where the finger is narrowest.
+handle_collet_rib_spread = 40;  // (deg)
 
 // What the fingers actually do: gripping a 9.42 mm stick bends each one 0.215 mm,
 // and the full 0.50 mm is only reached by winding the nut down on an empty
@@ -525,8 +647,22 @@ ring_rib_r_top    = 0.94;  // bead radius from ring_barrel_z0 upwards (mm)
 // It cannot go much lower. The mouth is a hole the chalk itself passes through, so
 // somewhere near 10 mm it stops being a mouth — which is what caps the stroke at
 // roughly 0.95 turns and why this design winds 0.55 rather than 1.8. Lowering it
-// also eats clamp_base_gap, which is only 0.173 mm here and has an assert on it.
-ring_mouth_d  = 12.05;  // bore at the bottom face (mm)
+// also eats clamp_base_gap, which is only 0.173 mm at 12.05 and has an assert on it.
+//
+// 12.05 -> 11.05 on 2026-08-12, and this one comes from a printed part rather
+// than from arithmetic. On the v1 coupon the collet ran out of travel at about
+// the diameter of the stick: it closed onto a 9.42 mm stick and stopped there
+// with nothing left to bite with, so the chalk slid back into the handle under
+// hand pressure. The model said the pair should reach 8.85, so the drawn closure
+// was already being spent somewhere the drawing does not see — most likely the
+// tip printing fat and the mouth printing small, which are the same 0.6 mm of
+// extrusion pull-in the bore is compensated for and these two surfaces are not.
+//
+// A full millimetre off the mouth therefore buys two different things at once,
+// and they are worth keeping separate: 0.5 of it replaces the grip that
+// chalk_slop gave away by shrinking the collet's tip, and 0.5 of it is new
+// closure, which is the part that answers the complaint.
+ring_mouth_d  = 11.05;  // bore at the bottom face (mm)
 ring_throat_d = 15.48;  // bore just under the thread shoulder (mm)
 
 /* [Ring: thread] */
@@ -614,6 +750,26 @@ handle_butt_round = (handle_body_d - handle_bore_d) / 2 - handle_butt_flat;
 handle_collet_tip_d = handle_bore_d + 2 * handle_collet_tip_wall;
 
 handle_r_bore   = handle_bore_d / 2;
+
+// The grip ribs' crest, as a radius, and the passage they leave between them.
+// Measured off the lip's passage rather than off the bore — see
+// handle_collet_rib_h — so a rib stands bite_t + rib_h tall below the lip and
+// rib_h tall within it, on one constant crest radius the whole way up.
+//
+// Below handle_r_bore and not beside handle_bite_bore_d, where it reads more
+// naturally, because it needs handle_r_bore: a top-level assignment that reads a
+// name declared further down the file silently evaluates to undef, and this one
+// did exactly that on the first pass — the ribs' whole chain came out undef and
+// the press-fit assert fired against a nonexistent number.
+handle_collet_rib_r = handle_r_bore - handle_collet_bite_t - handle_collet_rib_h;
+handle_rib_bore_d   = 2 * handle_collet_rib_r;
+
+// The narrowest thing a stick has to pass, which is the ribs when there are any
+// and the lip when there are not. Everything downstream that asks "what will go
+// in" reads this, so turning the ribs off restores the previous behaviour
+// exactly rather than leaving a stale number behind.
+handle_channel_d = handle_collet_ribs > 0 ? handle_rib_bore_d : handle_bite_bore_d;
+
 handle_r_root   = thread_crest_d / 2 - thread_depth;  // also the collet's base radius
 handle_z_collar = handle_body_h + handle_collar_h;    // top of the collar
 handle_z_collet = handle_z_collar + handle_spigot_h;  // base of the collet
@@ -754,11 +910,30 @@ clamp_engagement    = clamp_travel_budget - clamp_stroke;
 // by clamp_closure on radius from there. Conservative at the bottom end, since
 // printing also makes the collet fatter and the mouth smaller.
 //
-// Measured at the LIP, not the bore. The lip is 0.9 mm narrower and sits at the
-// tip, so it is what a stick has to clear and what closes on it; reading
-// handle_bore_d here would overstate the top of the range by that 0.9 mm and
-// describe a stick the tool refuses.
-chalk_d_max = handle_bite_bore_d * cos(180 / $fn) - hole_pull_in;
+// Measured at the narrowest passage — the grip ribs, or the lip when the ribs
+// are off. Reading handle_bore_d here would overstate the top of the range by
+// well over a millimetre and describe a stick the tool refuses.
+chalk_d_max = handle_channel_d * cos(180 / $fn) - hole_pull_in;
+
+// What the lip alone would admit, kept separate because the two are asserted
+// against different things: the lip against a nominal stick, the ribs against a
+// measured one.
+chalk_lip_d = handle_bite_bore_d * cos(180 / $fn) - hole_pull_in;
+
+// Defined here rather than beside the ribs' own parameters because they read
+// chalk_d_max, and a top-level assignment that reads a name declared further
+// down the file gets nan without a warning — the same trap handle_bore_d and
+// $fn are documented for above.
+chalk_collet_ribs_ok = handle_collet_ribs == 0 || chalk_d_max >= chalk_d_measured;
+
+// Both angles are taken at the crest radius, where the finger is at its
+// narrowest: the slot is a constant-width box, so the arc it eats grows as the
+// radius falls, and checking at the bore would pass a rib that overhangs.
+rib_arc_avail = 180 / handle_collet_slots
+              - asin((handle_collet_slot_w / 2) / handle_collet_rib_r);
+rib_arc_used  = handle_collet_rib_spread * (handle_collet_ribs - 1) / 2
+              + asin((handle_collet_rib_w / 2) / handle_collet_rib_r);
+rib_arc_ok    = rib_arc_used < rib_arc_avail;
 chalk_d_min = chalk_d_max - 2 * clamp_closure;
 
 // -- the invariants ----------------------------------------------------------
@@ -779,10 +954,41 @@ assert(ring_r_throat < ring_r_minor - ring_bore_relief,
 // gate on the whole tool. Past a nominal stick it produces a holder that grips
 // beautifully and will not accept chalk — which is the legacy part's defect,
 // arrived at from the other direction.
-assert(chalk_d_max >= chalk_d,
+assert(chalk_lip_d >= chalk_d,
        str("the bite lip is narrower than a nominal stick: it admits ",
-           chalk_d_max, " mm as printed against chalk_d ", chalk_d,
+           chalk_lip_d, " mm as printed against chalk_d ", chalk_d,
            ". Reduce handle_collet_bite_t or open chalk_slop"));
+
+// The ribs are allowed inside the lip's passage — that is what they are for —
+// but not inside the stick, or the tool has to be forced onto its own chalk and
+// scores it on the way in. That is the legacy part's defect reached from the
+// other direction, and it is a slip fit by design: the closure does the biting.
+assert(chalk_collet_ribs_ok,
+       str("the grip ribs are a press fit: they leave ", chalk_d_max,
+           " mm as printed against chalk_d_measured ", chalk_d_measured,
+           ". Reduce handle_collet_rib_h or open chalk_slop"));
+
+// A rib is placed by angle but the finger it sits on is bounded by a
+// constant-WIDTH slot, so the finger's arc narrows as the radius drops and the
+// crest is the worst case. Outside that arc a rib would be left standing over a
+// slot with nothing under it — which renders perfectly and prints as a thread of
+// plastic hanging in the gap.
+assert(handle_collet_ribs == 0 || rib_arc_ok,
+       str("the grip ribs run off the edge of a finger: the outer rib reaches ",
+           rib_arc_used, " deg from the centreline against ", rib_arc_avail,
+           " deg of finger at the crest. Reduce handle_collet_rib_spread, ",
+           "handle_collet_rib_w or handle_collet_ribs"));
+
+assert(handle_collet_rib_ramp <= handle_collet_rib_len,
+       "handle_collet_rib_ramp is longer than the rib it ramps into");
+
+// The ribs stiffen whatever they cover, and the finger has to keep a thin root
+// or the collet stops being a collet. Half the collet is an arbitrary line, but
+// it is the right side of one: at 3.5 of 10 mm the root is untouched.
+assert(handle_collet_rib_len < handle_collet_h / 2,
+       str("the grip ribs cover ", handle_collet_rib_len, " mm of a ",
+           handle_collet_h, " mm collet, which stiffens the part that is ",
+           "supposed to bend. Shorten handle_collet_rib_len"));
 
 // The web has to be the weak point, or snapping it out takes a finger with it.
 assert(!collet_tie || (collet_tie_t > 0 && collet_tie_t < handle_collet_tip_wall),
@@ -945,6 +1151,48 @@ module handle_collet_tie_shell() {
     }
 }
 
+// One grip rib, lying on +x and running up the tool's axis, to be rotated onto a
+// finger's inner face.
+//
+// It is a hull of two boxes rather than a drawn prism, and that is what makes
+// the ramp: the lower box has no radial height at all and sits flush in the bore
+// wall, the upper one stands out to the crest, and the convex hull between them
+// is a rib that grows out of the wall over handle_collet_rib_ramp and then runs
+// parallel to it. Both boxes overshoot outward into the finger by eps so the
+// union has thickness to bite on rather than a coincident face.
+//
+// The crest is one radius the whole way up, so where the rib passes through the
+// bite lip — which already stands proud by handle_collet_bite_t — the two merge
+// into a single surface and the rib is only handle_collet_rib_h tall there.
+module handle_collet_rib() {
+    z0     = handle_z_top - handle_collet_rib_len;
+    height = handle_collet_rib_len - handle_collet_rib_ramp;
+
+    hull() {
+        translate([handle_r_bore - eps, -handle_collet_rib_w / 2, z0])
+            cube([2 * eps, handle_collet_rib_w, eps]);
+
+        translate([handle_collet_rib_r, -handle_collet_rib_w / 2,
+                   z0 + handle_collet_rib_ramp])
+            cube([handle_r_bore - handle_collet_rib_r + eps,
+                  handle_collet_rib_w, height]);
+    }
+}
+
+// Every rib on every finger. Fingers are the gaps BETWEEN slots, so a finger's
+// centreline is half a slot pitch off a slot's, which is where the 0.5 comes
+// from; the ribs then sit symmetrically about that.
+module handle_collet_ribs_all() {
+    pitch = 360 / handle_collet_slots;
+
+    for (f = [0 : handle_collet_slots - 1])
+        for (k = [0 : handle_collet_ribs - 1])
+            rotate([0, 0, handle_collet_slot_az + (f + 0.5) * pitch
+                          + (k - (handle_collet_ribs - 1) / 2)
+                            * handle_collet_rib_spread])
+                handle_collet_rib();
+}
+
 module chalk_holder_handle() {
     // The webs go on AFTER the slots are cut, not before — cutting first and
     // filling second is what keeps the finger roots, their ramps and the bore
@@ -980,6 +1228,13 @@ module chalk_holder_handle() {
         if (collet_tie)
             translate([0, 0, handle_z_collet])
                 handle_collet_tie_shell();
+
+        // Added after the slots are cut, for the same reason the webs are: the
+        // ribs are on the inner face and the slot cut is radial, so building
+        // them first would let the slot take a bite out of the two ribs nearest
+        // each edge and leave them half width.
+        if (handle_collet_ribs > 0)
+            handle_collet_ribs_all();
     }
 }
 
@@ -1110,11 +1365,23 @@ module chalk_holder() {
             chalk_holder_handle();
 
     // "coupon-handle" is the coupon's handle with no ring beside it, for when a
-    // good ring already exists and only the handle needs printing again. Be
-    // aware of what it costs thermally: the ring is what gives the collet's
-    // fingers time to cool between visits, and without it they are printing
-    // alone from their base rather than only above z 34.4. See the work cliff
-    // discussion in docs/_PLANS/chalk-holder-04-260810T1514Z.md.
+    // good ring already exists and only the handle needs printing again. It is
+    // what utils/coupon.sh selects when the ring has not changed since the last
+    // print.
+    //
+    // The thermal cost is real but much smaller than this comment used to
+    // claim, and it is now measured rather than assumed. Layer times up the
+    // collet, sliced both ways:
+    //
+    //     z 26.0-28.2 (ring still printing)   5.7 s with -> 3.7 s without
+    //     z 30.0-36.0 (collet alone anyway)   2.6 s with -> 2.6 s without
+    //
+    // The ring tops out at 28.2 and the collet starts at 26.0, so the ballast
+    // only ever covered the collet's bottom 2.2 mm — above that the fingers
+    // were always printing alone and the ring changed nothing. Worth knowing
+    // for the other reason too: the profile asks for 8 s a layer and gets 2.6,
+    // because slow_down_min_speed bottoms out at 30 mm/s before the layer can
+    // be stretched that far. See docs/_PLANS/chalk-holder-04-260810T1514Z.md.
     if (show == "coupon" || show == "coupon-handle")
         translate([show == "coupon-handle" ? 0 : handle_x, 0, 0])
             chalk_holder_coupon();

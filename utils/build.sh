@@ -21,7 +21,8 @@
 # Pass --ascii if you need to read or diff the mesh by eye.
 #
 # VERSIONS. Every build stamps a version into the filename —
-# stl/<name>-v<N>.stl — and leaves stl/<name>.stl as a symlink to the newest, so
+# stl/<name>-v01.stl, zero padded to two digits so a listing sorts in the order
+# the versions ran — and leaves stl/<name>.stl as a symlink to the newest, so
 # anything pointing at the plain name (slice.sh, the docs, a slicer window you
 # left open) still finds the current mesh. The counter is per name and lives in
 # docs/stl-versions.txt, which is COMMITTED on purpose: stl/ is gitignored and
@@ -140,7 +141,13 @@ if [[ "$VERSIONED" -eq 1 ]]; then
   else
     VER=$(( $(version_current "$BASE") + 1 ))
   fi
-  OUT="$OUTDIR/${BASE}-v${VER}.stl"
+  # Two digits, zero padded, so a directory listing sorts the way the versions
+  # actually ran — v9 before v10 alphabetically is wrong, v09 before v10 is
+  # right. %02d is a minimum rather than a limit, so v100 keeps working and
+  # keeps sorting. The ledger stores the bare integer; the padding is a display
+  # and filename convention, not the number itself.
+  VER_TAG="$(printf 'v%02d' "$VER")"
+  OUT="$OUTDIR/${BASE}-${VER_TAG}.stl"
 else
   VER=""
   OUT="$OUTDIR/${BASE}.stl"
@@ -167,8 +174,8 @@ echo "built $OUT ($(du -h "$OUT" | cut -f1), $FORMAT)"
 # tree copied without it dangling.
 if [[ "$VERSIONED" -eq 1 ]]; then
   version_record "$BASE" "$VER"
-  ln -sfn "${BASE}-v${VER}.stl" "$OUTDIR/${BASE}.stl"
-  echo "stamped v${VER} (docs/stl-versions.txt); $OUTDIR/${BASE}.stl -> ${BASE}-v${VER}.stl"
+  ln -sfn "${BASE}-${VER_TAG}.stl" "$OUTDIR/${BASE}.stl"
+  echo "stamped ${VER_TAG} (docs/stl-versions.txt); $OUTDIR/${BASE}.stl -> ${BASE}-${VER_TAG}.stl"
 fi
 
 if [[ "$PUSH" -eq 1 ]]; then

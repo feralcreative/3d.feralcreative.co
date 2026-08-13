@@ -91,10 +91,10 @@ fi
 # build.sh already reports manifoldness and genus, which is worth seeing.
 #
 # The unversioned name is deliberate. build.sh stamps its output as
-# stl/<name>-v<N>.stl and points stl/<name>.stl at the newest, so this picks up
+# stl/<name>-v01.stl and points stl/<name>.stl at the newest, so this picks up
 # the mesh just built while keeping the slice directory a stable
 # slice/<part>/ — the path STATUS.md and the plan files quote. Slice a specific
-# version by naming its file: utils/slice.sh stl/<name>-v3.stl.
+# version by naming its file: utils/slice.sh stl/<name>-v03.stl.
 if [[ "$INPUT" == *.scad ]]; then
   echo "== building mesh"
   "${REPO_ROOT}/utils/build.sh" "$INPUT"

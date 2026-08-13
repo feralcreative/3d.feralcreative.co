@@ -123,12 +123,20 @@ def main():
                 # disagree whenever their retraction length differs.
                 if cur_layer >= 0 and ("X" in line or "Y" in line):
                     layer_work[cur_layer] += e
+                    # Count the MOVE against whatever role is currently in
+                    # force, not the ;TYPE line that announced it. The slicer
+                    # only emits ;TYPE when the role CHANGES, so a layer that
+                    # continues the previous layer's role emits none at all —
+                    # and counting declarations reported those layers as having
+                    # no extrusion whatsoever. On the chalk holder's collet that
+                    # is most of the tip: layers 296 and 297 were called empty
+                    # while each was laying 0.077 mm through four fingers.
+                    if e > 0 and cur_role:
+                        layer_roles[cur_layer][cur_role] += 1
             continue
         m = RE_TYPE.match(line)
         if m:
             cur_role = m.group(1).strip()
-            if cur_layer >= 0:
-                layer_roles[cur_layer][cur_role] += 1
 
     print("file            %s" % which)
     for key in ("total layer number", "max_z_height", "filament used",
@@ -189,12 +197,17 @@ def main():
               % (layer_z[idx], idx + 1, args.at_z))
         roles = layer_roles.get(idx)
         if not roles:
+            # A layer with no extrusion is a real answer, not an absence of one:
+            # it means the slicer laid nothing at that height, which on a thin
+            # feature is the difference between a wall and a gap. Report it and
+            # stop, rather than falling through into .most_common() on a None.
             print("  no extrusion on this layer")
-        for role, n in roles.most_common():
-            print("  %-24s %d segments" % (role, n))
-        if roles and any("Gap" in r for r in roles):
-            print("  NOTE gap fill present — a wall here did not resolve into "
-                  "clean perimeters")
+        else:
+            for role, n in roles.most_common():
+                print("  %-24s %d extruding moves" % (role, n))
+            if any("Gap" in r for r in roles):
+                print("  NOTE gap fill present — a wall here did not resolve "
+                      "into clean perimeters")
 
     if args.expect_z is not None and max_z is not None:
         if abs(max_z - args.expect_z) > 0.2:
