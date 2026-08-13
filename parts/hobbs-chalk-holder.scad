@@ -576,7 +576,41 @@ handle_collet_slot_az   = 0;      // angle of the first slot (deg)
 handle_mark       = true;   // set false for a blank barrel
 handle_mark_len   = 40.00;  // length along the handle axis (mm)
 handle_mark_z     = 34.50;  // centre, above the bottom face (mm)
-handle_mark_depth =  0.40;  // how far it is cut into the wall (mm)
+handle_mark_depth =  1.00;  // how far it is cut into the wall (mm)
+
+// The wall angle of the cut, measured from horizontal, and what makes a deep
+// deboss printable at all.
+//
+// The handle prints barrel up, so a prismatic cut leaves a horizontal roof over
+// every letter: at the top edge of each stroke the wall has to bridge inward by
+// the full depth with nothing under it. At 0.40 that is a ledge small enough to
+// get away with. At 1.00 it is not, and it is the kind of thing a slicer answers
+// with support material inside the lettering, which then has to be picked out of
+// a 1 mm deep letter.
+//
+// Sloping every face fixes it without support at any depth, because there is no
+// horizontal roof left. The cost is paid in stroke width: the cut narrows as it
+// deepens, so the deepest section is the artwork eroded by depth / tan(angle),
+// and the HOBBS strokes go spindly past about 0.30 mm of erosion (rendered as a
+// ladder before this was chosen; they survive 0.50 but barely).
+//
+// 90 is prismatic — no taper, the old behaviour. 45 is the classic
+// self-supporting chamfer and costs 1.00 mm of erosion per millimetre of depth,
+// which this artwork cannot pay. 70 is still 20 degrees off vertical, well
+// inside what prints unsupported, and costs 0.36 — so 1.00 mm of depth erodes
+// the deepest section by 0.29 and the letters hold.
+handle_mark_taper = 70;  // (deg from horizontal)
+
+// The taper is built as a stack of prismatic bands rather than a true cone,
+// because cylindrical_extrude wraps a 2D child and cannot loft between two of
+// them. Each band is one wrap, so this multiplies the most expensive operation
+// in the part — see handle_mark_fn — and it is why the number is small.
+//
+// It does not need to be large. What each band leaves is a horizontal ledge as
+// deep as the band itself, so 5 bands over 1.00 mm gives 0.20 mm ledges, which
+// bridge without complaint. The staircase is invisible at 0.20 mm on a surface
+// that is 0.40 mm of deboss to the eye.
+handle_mark_steps = 5;
 
 // Which way it faces. The loading slot is at 270, and cylindrical_extrude() puts
 // its children at 270 by default, so this is doing real work, not just choosing
@@ -1151,14 +1185,50 @@ module handle_mark_cut() {
     // part-level $fn. This is the whole reason the two are separate parameters.
     $fn = handle_mark_fn;
 
-    translate([0, 0, handle_mark_z])
-        cylindrical_extrude(
-            ir   = handle_body_d / 2 - handle_mark_depth,
-            or   = handle_body_d / 2 + handle_mark_over,
-            size = [hobbs_word_height(handle_mark_len) * 1.05,
-                    handle_mark_len * 1.05],
-            spin = handle_mark_az - 270)
-                rotate(90) hobbs_word_alone(handle_mark_len);
+    // A prismatic cut is one band with no erosion, which is what 90 degrees
+    // means and what this module used to do unconditionally.
+    steps = handle_mark_taper >= 90 ? 1 : max(1, handle_mark_steps);
+    band  = handle_mark_depth / steps;
+
+    // How far each band reaches back into the one above it. eps is the wrong
+    // size here and it produced a mesh of genus 28 against this part's 2 — 26
+    // spurious tunnels along the seams.
+    //
+    // The reason is that the wrap is tessellated at handle_mark_fn = 32, where
+    // a cylinder near r 9.5 misses the true circle by 0.046 mm between facet
+    // vertices — four times eps. Two bands nominally meeting at one radius are
+    // therefore up to 0.046 apart in places, and an eps overlap does not close
+    // that. This takes twice the sagitta, so they always overlap.
+    //
+    // It costs nothing visible: a band only ever reaches back into ground the
+    // band above it has already cut, and that one is eroded less, so it is
+    // wider everywhere.
+    overlap = 2 * (handle_body_d / 2) * (1 - cos(180 / handle_mark_fn));
+
+    for (i = [0 : steps - 1]) {
+        // Depth at this band's outer and inner faces. The erosion is the one at
+        // the OUTER face, so the topmost band is the artwork at full size and
+        // the letters read their true width from outside — eroding by the inner
+        // figure instead would thin the visible outline and leave the widest
+        // part of the cut buried where nobody can see it.
+        d_out = band * i;
+        d_in  = band * (i + 1);
+        erode = handle_mark_taper >= 90 ? 0
+                                        : d_out / tan(handle_mark_taper);
+
+        translate([0, 0, handle_mark_z])
+            cylindrical_extrude(
+                ir   = handle_body_d / 2 - d_in,
+                // The outermost band stands proud of the barrel; every other one
+                // reaches back into its neighbour by overlap, above.
+                or   = handle_body_d / 2 - d_out
+                       + (i == 0 ? handle_mark_over : overlap),
+                size = [hobbs_word_height(handle_mark_len) * 1.05,
+                        handle_mark_len * 1.05],
+                spin = handle_mark_az - 270)
+                    offset(delta = -erode)
+                        rotate(90) hobbs_word_alone(handle_mark_len);
+    }
 }
 
 // A thin conical shell on the collet's outer surface, spanning its full height.
