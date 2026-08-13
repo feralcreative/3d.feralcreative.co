@@ -290,10 +290,32 @@ handle_slot_az = 270;     // which way it faces (deg)
 
 // Break on the two long edges where the slot comes out through the outside, so
 // they do not feel sharp under the fingers. It widens what you see: the walls
-// stay where they are but the mouth opens up by roughly this much either side,
-// so 0.40 turns a 2.00 slot into 2.80 at the surface, measured. The two ends of
-// the slot are left square — nothing rests on them.
+// stay where they are but the mouth opens up, so 0.40 turns a 2.00 slot into
+// 2.61 at the surface, measured in the mesh. The two ends of the slot are left
+// square — nothing rests on them.
+//
+// That figure used to read 2.80, measured on a barrel that was secretly a
+// 16-sided polygon; a chord across two flats is not the mouth. See
+// handle_slot_round_fn.
 handle_slot_round = 0.400;  // (mm)
+
+// Segments for the erode/dilate that produces that rounding, and NOT a detail:
+// this number sets the roundness of the whole barrel between the slot's ends.
+//
+// The profile is drawn as a disc minus the eroded-and-dilated body section, so
+// everything outside the dilated shape is cut away — which means the dilated
+// shape IS the barrel over the slot's length. offset() spends its $fn on a full
+// circle, so at 16 the dilation came back as a 16-sided polygon and the barrel
+// was shaved to it: a measured 0.192 mm flat every 22.5 degrees, which is
+// exactly r*(1-cos(180/16)) at r 10, from z 4.6 to 68.6. That is the faceting
+// STATUS.md had recorded as visible on the printed handle and never explained;
+// it was never the part's own $fn, which is why raising that to 256 did not
+// help.
+//
+// 256 matches the body and takes the flat to 0.0008 mm. It is not free — the
+// erode/dilate runs over a 256-gon rather than a 16-gon — but it is a 2D
+// operation on one profile and costs about a second.
+handle_slot_round_fn = 256;
 
 /* [Handle: collar] */
 // With handle_collar_d equal to handle_body_d this is no longer a flare — it is
@@ -1067,8 +1089,14 @@ module handle_slot_profile() {
     difference() {
         circle(d = handle_body_d + 2 * eps);
 
-        offset(r = handle_slot_round, $fn = 16)
-        offset(r = -handle_slot_round, $fn = 16)
+        // Dilated by eps more than it was eroded, so the cut's boundary lands
+        // just OUTSIDE the barrel instead of exactly on it. At matching offsets
+        // the two surfaces are coplanar over the slot's whole length — the case
+        // eps exists to prevent everywhere else in this file — which renders as
+        // z-fighting stripes up the barrel and leaves CGAL deciding a 60 mm
+        // seam by rounding. It costs the slot 0.02 mm of width.
+        offset(r = handle_slot_round + eps, $fn = handle_slot_round_fn)
+        offset(r = -handle_slot_round, $fn = handle_slot_round_fn)
             difference() {
                 circle(d = handle_body_d);
 
