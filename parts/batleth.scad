@@ -39,14 +39,14 @@ mesh_length = 99.625;  // source mesh, tip to tip — the scale every number is 
 length      = 77;      // finished part, tip to tip (mm)
 shrink      = length / mesh_length;
 
-// 0.30 + 16 x 0.12: the AD5M's first layer is 0.30 mm even on the 0.12 Fine
-// profile — it does not scale with layer height — so a stack that lands exactly
-// on a layer boundary is 0.30 plus a whole number of 0.12s, not a multiple of
-// 0.12. This plate was 1.50 (0.30 + 10 x 0.12), itself the clean stack just
-// above the 1.4375 a uniform shrink of the source would have given. Half again
-// on that is 2.25, and 2.22 is the nearest clean stack to it — 48% up, not 50.
-// 2.34 (0.30 + 17 x 0.12) is the clean stack above.
-thickness = 2.22;      // plate: 17 layers at 0.12 fine (mm)
+// 11 x 0.20, printed on a 0.20 process. The fixed 0.30 first layer this file
+// used to do its arithmetic around belongs to the 0.12 Fine chain alone, not to
+// the machine: every 0.20 process on the AD5M resolves both layer_height and
+// initial_layer_print_height to 0.20, so here a stack that lands exactly on a
+// layer boundary is just a whole number of 0.20s. This plate was 1.50 back on
+// 0.12 Fine; half again on that is 2.25, and 2.20 is the nearest boundary to it
+// — 47% up, not 50. 2.40 is the boundary above.
+thickness = 2.20;      // plate: 11 layers at 0.20 (mm)
 
 /* [Edge treatment] */
 // The grind is symmetric, both faces, and stops on a flat land rather than
@@ -60,25 +60,25 @@ thickness = 2.22;      // plate: 17 layers at 0.12 fine (mm)
 // deliberately past that already — it is the 2.0 the full-size part carried,
 // shrunk by the same factor.
 //
-// It did NOT follow the plate from 1.50 to 2.22. Holding the included angle the
-// thinner plate had would need 2.57, which is twice what the spikes can carry,
-// so the run stays put and the long edges are blunter instead: the bevel rises
-// (thickness - grind_land)/2 over grind_run, which is 61 degrees included here
-// against 40 before. (The 50 this comment used to claim was never right for
+// It did NOT follow the plate from 1.50 to 2.20. Holding the included angle the
+// thinner plate had would need 2.54, which is well past what the spikes can
+// carry, so the run stays put and the long edges are blunter instead: the bevel
+// rises (thickness - grind_land)/2 over grind_run, which is 60 degrees included
+// here against 40 before. (The 50 this comment used to claim was never right for
 // either plate.) grind_land does not scale either: it is one nozzle, not a
 // proportion. back_round does, because "full" is a relationship, not a number.
 grind_run  = 1.55;  // how far back from the front edge the bevel starts (mm)
 grind_land = 0.4;   // flat left at the very edge, one nozzle wide (mm)
-back_round = 1.11;  // bullnose radius on the back edge; = thickness/2, i.e. full (mm)
+back_round = 1.10;  // bullnose radius on the back edge; = thickness/2, i.e. full (mm)
 
 // The same roll-off on the hand slot walls, so the grip is not a pair of sharp
 // arrises. It is NOT taken to thickness/2 like the back edge, because what caps
 // it is the web between the mid slot and each side slot: that web is 1.87 mm at
-// the mid plane and the roll-off eats it from both sides, so a full 1.11 would
+// the mid plane and the roll-off eats it from both sides, so a full 1.10 would
 // consume the web outright and the slots would break through into each other at
 // both faces. 0.5 keeps 0.87 mm, two lines. It is pinned by that web, not by
 // the plate, so it did not move with the thickness — it just leaves more
-// vertical land in the middle of the wall now, 1.22 mm against 0.5.
+// vertical land in the middle of the wall now, 1.20 mm against 0.5.
 slot_round = 0.5;   // roll-off radius on the hand slot walls (mm)
 
 /* [Back edge - superellipse] */
