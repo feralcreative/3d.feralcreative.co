@@ -3,4 +3,8 @@ hobbs-chalk-holder-coupon 5
 phone-shower-holder 5
 phone-shower-holder-assembled 1
 slim-can-adapter 1
+slim-can-holder-3in 2
+slim-can-holder-3in-censored 3
+slim-can-holder-3in-explicit 4
 slim-can-screwdriver-stubby 2
+slim-can-screwdriver-tall 2

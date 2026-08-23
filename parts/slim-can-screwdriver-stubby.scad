@@ -19,14 +19,22 @@
 // reference behaves — its waist is round and its barrel is not — and it is one
 // boolean rather than a lofted blend.
 //
-// ⚠️ TWO THINGS TO KNOW BEFORE PRINTING THIS.
+// TWO FILES, ONE DESIGN. `_incoming/slim-can-screwdriver.stl` is the same
+// shape as the stubby, scaled 1.0780 across and 1.2720 up — resampling its
+// silhouette against the stubby's at matching heights gives a deviation of
+// exactly zero at every height checked, so this is a scale and not a redraw.
+// `variant` switches between them. Every parameter in this file is a STUBBY
+// dimension; the scale is applied last, to the finished solid.
 //
-// 1. The bore is Ø50.20 as drawn, and a Red Bull 250 ml slim can is Ø53. The
-//    reference will not accept one. `bore_d` is the only thing to change.
-// 2. The underside of the cap overhangs at about 60 degrees from vertical at
-//    its worst, and turning the part over moves the problem to the base cone
-//    at about 54. A waist this deep cannot avoid it. Supports, or open out
-//    `neck_min_d`.
+// That is also the answer to which one holds a can. The stubby bore is Ø50.20
+// and will not take a Ø53 slim can. The tall one is Ø54.12 as drawn and Ziad
+// measured a printed one at Ø53.85, a loss of 0.27 on diameter — so the tall
+// variant is the one that works, with about 0.85 mm of clearance in the hand.
+//
+// ⚠️ The underside of the cap overhangs at about 60 degrees from vertical at
+// its worst, and turning the part over moves the problem to the base cone at
+// about 54. A waist this deep cannot avoid it. Supports, or open out
+// `neck_min_d`.
 //
 // HOW IT WAS MEASURED. Horizontal sections were cut through the mesh at 0.05 mm
 // steps near features and 1 mm through the body, each section resolved into
@@ -45,10 +53,14 @@ eps = 0.01;
 // "cut" is a half-section for reading the wall and the ledge. Not for printing.
 show = "part";   // [part, cut]
 
+// Which of the two reference files to produce. See the header — they are the
+// same design at two scales, and only "tall" fits a 250 ml slim can.
+variant = "stubby";   // [stubby, tall]
+
 /* [Bore] */
 
-// Bore diameter (mm). MEASURED 50.20 off the reference. A 250 ml slim can is
-// 53.0 across and needs roughly 53.6 here; see the warning in the header.
+// Bore diameter (mm), before the variant scale. MEASURED 50.20 off the stubby;
+// the tall variant carries this to 54.12, which is the one that fits a can.
 bore_d = 50.20;
 // Height of the ledge the can lands on, above the base (mm).
 floor_t = 4.175;
@@ -119,12 +131,75 @@ shoulder_r = 15.95;
 // alone will move the barrel and cap edges, because the tangency is derived.
 shoulder_cd = 56.70;
 
+/* [Can grip ribs] */
+
+// Rounded vertical ribs inside the bore, so the can is held instead of
+// rattling, without shrinking the bore itself. Set rib_count or rib_h to 0 to
+// reproduce the reference exactly.
+//
+// WHY RIBS RATHER THAN A SMALLER BORE. Two reasons, and the second is the one
+// that matters. A smaller bore has to be right the first time; six small
+// rounded bumps can be sanded down in two minutes if the can will not go in,
+// and nothing can be added back to a bore that came out loose. Erring tight is
+// the recoverable direction here. And a rib bears on a rounded 3 mm patch with
+// a lead-in above it, so a fit that is slightly over-tight slides in firmly
+// rather than stopping dead.
+//
+// THE ARITHMETIC, on the printed tall variant Ziad measured at Ø53.85 against a
+// Ø53.0 can. Two ribs sit across any diameter, so the working size is
+// 53.85 - 2 x rib_h:
+//
+//     rib_h 0.50  ->  52.85   0.15 interference   (this default)
+//     rib_h 0.425 ->  53.00   dead zero
+//     rib_h 0.35  ->  53.15   0.15 clearance
+//     rib_h 0.30  ->  53.25   0.25 clearance
+//
+// These are in FINAL coordinates, applied after the variant scale, unlike every
+// other dimension in this file — a grip is an absolute size, not a proportion.
+rib_count = 6;
+// How far each rib stands into the bore (mm).
+rib_h = 0.50;
+// Chord width of the bump (mm). Sets the bearing area, and its radius is
+// derived so the arc is exactly this wide at exactly rib_h proud.
+rib_w = 3.00;
+// Lead-in at the top, over which the rib fades to nothing (mm). This is what
+// makes insertion progressive instead of a step.
+rib_ramp = 6.0;
+// Foot at the bottom, same idea (mm). This end is the one the printer sees as
+// an overhang, and at 0.5 over 2 mm it is 14 degrees off vertical.
+rib_foot = 2.0;
+
+/* [Print correction] */
+
+// Model-to-print scale, applied last, on top of the variant scale.
+//
+// Ziad measured a printed tall variant: 83.98 across the points against a model
+// 84.300, and 53.85 in the bore against a model 54.116. One uniform factor fits
+// both — the part came out 0.41% small, which is thermal shrinkage.
+//
+// ⚠️ That does NOT agree with docs/flash-studio-slicing-reference.md, which
+// records a bore loss of 0.55–0.65 mm on diameter measured on a 10 mm bore. A
+// fixed loss of that size would have taken 0.6 off this 54 mm bore, and it took
+// 0.27. A proportional loss would have taken 0.04 off the 10 mm bore. Both
+// numbers can be right if the small-bore loss is first-layer squish and
+// extrusion pull-in rather than shrinkage, but they are not the same effect and
+// neither should be applied to the other's case. Two data points from one
+// months-old print of unknown settings — worth knowing, not worth trusting.
+//
+// 1.0 reproduces the reference exactly. 1.00414 aims the printed part at the
+// model's nominal dimensions.
+print_scale = 1.0;
+
 /* [Quality] */
 
 // Chord error target (mm). 0.02 is the 0.4-nozzle figure.
 chord_err = 0.02;
 
 /* [Hidden] */
+
+// Measured off the two reference files, not chosen.
+var_xy = (variant == "tall" ? 1.0780 : 1.0) * print_scale;
+var_z  = (variant == "tall" ? 1.2720 : 1.0) * print_scale;
 
 function facets(r, e = chord_err) = ceil(180 / acos(1 - e / r));
 function arc(cr, cz, r, a0, a1, n = 24) =
@@ -150,6 +225,9 @@ sh_dz     = sqrt(pow(groove_r + shoulder_r, 2) - pow(gr_cr - sh_cr, 2));
 sh_zlo    = neck_z - sh_dz;
 sh_zhi    = neck_z + sh_dz;
 a_wall    = acos((peak_r - sh_cr) / shoulder_r);      // shoulder meets the barrel
+barrel_top_z = neck_z - sqrt(pow(groove_r + shoulder_r, 2)
+                            - pow(neck_r + groove_r - sh_cr, 2))
+               + shoulder_r * sin(a_wall);
 a_tan     = atan2(sh_dz, gr_cr - sh_cr);              // shoulder meets the groove
 b_lo      = atan2(sh_zlo - neck_z, sh_cr - gr_cr) + 360;
 b_hi      = atan2(sh_zhi - neck_z, sh_cr - gr_cr);
@@ -210,10 +288,60 @@ module stubby_holder() {
     }
 }
 
+// Ribs live in final coordinates and stop short of the waist. They have to:
+// on the tall variant the wall at the narrowest point of the waist is only
+// 2.02 mm thick, which leaves no room for a bump behind it. Keeping them in the
+// barrel is also where the can wants holding.
+bore_rf     = bore_d / 2 * var_xy;
+rib_r       = (rib_w * rib_w / 4 + rib_h * rib_h) / (2 * rib_h);
+rib_ax      = bore_rf + rib_r - rib_h;
+rib_z0      = floor_t * var_z + 2;
+rib_z1      = barrel_top_z * var_z - 1;
+rib_back    = rib_ax + rib_r;                 // how far the rib reaches outward
+wall_avail  = valley_r * var_xy;              // thinnest point of the barrel
+
+assert(rib_count == 0 || rib_h <= 0 || rib_back <= wall_avail - 0.84,
+       "grip rib is too big for the barrel wall: reduce rib_w or rib_h");
+
+module ribs() {
+    n = facets(rib_r);
+    for (i = [0 : rib_count - 1])
+        // 30 degrees puts a rib behind each lobe peak, where the wall is thick.
+        rotate([0, 0, 30 + i * 360 / rib_count])
+            hull() {
+                translate([bore_rf + rib_r, 0, rib_z0])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+                translate([rib_ax, 0, rib_z0 + rib_foot])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+                translate([rib_ax, 0, rib_z1 - rib_ramp])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+                translate([bore_rf + rib_r, 0, rib_z1])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+            }
+}
+
+// Report what this actually builds, because every parameter above is a stubby
+// dimension and the tall variant is 7.8% wider than the numbers you just read.
+echo(str("variant=", variant, "  bore ", bore_d * var_xy,
+         "  across ribs ", bore_d * var_xy - 2 * rib_h,
+         "  across points ", peak_d * var_xy, "  height ", total_h * var_z));
+
+// The variant scale goes on the body only, which is exactly how the tall
+// reference was made — note that it turns every arc in the silhouette into an
+// ellipse, which is a property of the reference and not a defect here. The ribs
+// are added afterwards so their size does not scale with the variant.
+module can_holder() {
+    union() {
+        scale([var_xy, var_xy, var_z]) stubby_holder();
+        if (rib_count > 0 && rib_h > 0) ribs();
+    }
+}
+
 if (show == "cut")
     difference() {
-        stubby_holder();
-        translate([-peak_d, -peak_d, -eps]) cube([2 * peak_d, peak_d, total_h + 1]);
+        can_holder();
+        translate([-peak_d * var_xy, -peak_d * var_xy, -eps])
+            cube([2 * peak_d * var_xy, peak_d * var_xy, total_h * var_z + 1]);
     }
 else
-    stubby_holder();
+    can_holder();
