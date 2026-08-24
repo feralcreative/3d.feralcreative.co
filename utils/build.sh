@@ -33,6 +33,12 @@
 # increments, because the script cannot tell the difference and guessing wrongly
 # is worse than an extra number. Pass --version N to restamp deliberately.
 #
+# FINISHED PARTS CARRY NO VERSION. All of the above is for a part that is still
+# moving. Once it stops, `utils/finalize.sh <name>` collapses the series to a
+# single stl/<name>.stl with no stamp and no symlink, so there is nothing stale
+# sitting beside the current mesh looking equally printable. Use --no-version
+# here instead when a part is known to be done before it is built.
+#
 # --name matters more than it looks. The stamp is keyed on the output name, and
 # the default name is the .scad's basename — so without it every variant of a
 # multi-variant part (show = "coupon", "ring", "collet-test") shares one counter

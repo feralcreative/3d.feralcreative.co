@@ -63,10 +63,11 @@
 // string. Any string not in the table fails an assert rather than going quietly
 // unjustified.
 //
-// THE FIT. The bore is drawn generous and six rounded ribs take the slack back
-// up. That is the recoverable direction — a rib that is too proud sands down in
-// two minutes and a bore that came out loose can never be made smaller. See
-// [Grip ribs] for the arithmetic and the reason the numbers are uncertain.
+// THE FIT — CONFIRMED. The bore is drawn generous and six rounded ribs take the
+// slack back up. Drawn 54.00, printed 53.77, 53.17 across the ribs, and a real
+// 250 ml can goes in snug and comes out without a fight. Measured off the fit
+// coupon on 2026-08-22; see bore_comp and [Grip ribs] before changing either
+// number, because they were sized against each other.
 //
 // ORIENTATION. Printed floor-down, z = 0 at the underside. The only overhang in
 // the part is the roof over the annular cavity, a 6.60 mm bridge broken into
@@ -76,11 +77,20 @@
 // deliberate — it is what you grab and what you drink from. total_h is a
 // parameter if that is wrong.
 
+// The one thing a coupon can answer here, and the variant that puts it on a
+// plate. There is only one, so the plate and the component are the same
+// variant; utils/coupon.sh reads these directives and needs no knowledge of
+// this part. Keep the names stable.
+//
+// COUPON-COMPONENTS: fit=coupon
+// COUPON-PLATE: coupon
+
 /* [Output] */
 
 // "cut" is a half-section for reading the double wall, the cavity and the ribs.
 // Not for printing — build it with --name if you want it as its own STL.
-show = "part";   // [part, cut]
+// "coupon" is the fit test; see [Fit coupon].
+show = "part";   // [part, cut, coupon]
 
 $fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
 $fs = 0.4;
@@ -95,12 +105,24 @@ can_d = 53.0;
 can_slop = 0.40;
 // Extra diameter added to the bore to cover this machine's bore shrinkage (mm).
 //
-// ⚠️ Contested, and the ribs exist because of it. The design reference predicts
-// +0.15 is enough. The slicing reference refutes that by measurement — a bore
-// drawn at 10.15 miked 9.5–9.6. But slim-can-screwdriver-stubby.scad records a
-// printed Ø54.12 bore coming out at 53.85, a loss of only 0.27, which agrees
-// with neither. 0.60 is carried over from slim-can-adapter.scad for
-// consistency; the true printed bore is somewhere between 53.4 and 53.7.
+// SETTLED, 2026-08-22, by the fit coupon. A bore drawn at 54.00 miked 53.77
+// between the ribs — a loss of 0.23 on diameter. Ziad pushed a real 250 ml can
+// in: "fits perfectly, snug enough but not difficult".
+//
+// That closes an argument that had been open since this part was started. The
+// design reference predicted +0.15 would cover it. The slicing reference
+// refuted that from a bore drawn at 10.15 that miked 9.5–9.6, a loss of
+// 0.55–0.65, which would have put this bore at 53.40. The stubby recorded 0.27
+// off a Ø54 bore. The stubby was right and the slicing reference does not
+// generalise: 0.23 on Ø54 against 0.60 on Ø10 is not one effect at two sizes.
+// A fixed loss would have taken 0.60 off here and did not; a proportional loss
+// would have taken 0.04 off the 10 mm bore and did not. The small-bore figure
+// is first-layer squish and extrusion pull-in — local, and roughly constant in
+// absolute terms — and it must not be applied to a bore of this size.
+//
+// ⚠️ Do NOT "correct" this number to the measured 0.23. 0.60 is what produced a
+// bore that fits, and the ribs were sized against it. The two are a matched
+// pair; changing one without the other opens the fit back up.
 bore_comp = 0.60;
 
 /* [Shell] */
@@ -127,8 +149,25 @@ floor_t = 5.40;
 // can back out of a 100 mm bore, which matters more here than on a short one.
 // Set to 0 for a closed floor.
 drain_d = 12.0;
-// 45-degree chamfer on the bottom outside edge (mm), per the fit rules — more
-// reliable than the slicer's 0.15 mm elephant-foot compensation.
+// Radius of the round on the bottom outside edge (mm). Set to 0 for a plain
+// chamfer of base_cham instead.
+//
+// ⚠️ It is NOT a full quarter-round, and it cannot be. A round tangent to the
+// bottom face is horizontal where it meets the bed: the first 0.20 mm of layer
+// would grow 1.40 mm outward with nothing under it, which is a 90-degree
+// overhang and prints as a drooping skirt. So the arc is truncated at
+// base_over, and below that it runs on as a straight cone at that same angle
+// down to the bed. The radius you asked for is the radius you get everywhere
+// the eye reads it; only the last 1.46 mm is a cone.
+base_round = 5.00;
+
+// Steepest overhang the round is allowed to reach, measured from vertical.
+// 45 is MAX_OVERHANG_DEG out of the printer reference — safe unsupported on
+// this machine, and FlashForge's own guidance is more conservative still.
+base_over = 45;
+
+// 45-degree chamfer on the bottom outside edge (mm), used only when
+// base_round is 0 — more reliable than the slicer's elephant-foot compensation.
 base_cham = 0.60;
 
 /* [Mouth] */
@@ -195,10 +234,39 @@ line_gap = 2.00;
 // over half, because the eye reads a block on a cylinder as low when it is
 // geometrically centred.
 text_z = 55.0;
-// How deep the letters are cut (mm). The panel is a vertical wall, so each
-// letter is a notch in a perimeter and not an overhang — there is no reason to
-// draft it, and a straight-walled cut is the one the slicer resolves best.
+// How deep the letters are cut (mm).
 deboss_d = 0.70;
+
+// Wall angle of the cut, from horizontal — the same treatment as the chalk
+// holder's wordmark, and for the same reason.
+//
+// The plaque is a vertical wall and the part prints upright, so a prismatic cut
+// leaves a horizontal roof over the top edge of every stroke: the wall has to
+// reach back in by the full depth with nothing under it. At 0.40 that is a
+// ledge you get away with. At 0.70 it is marginal, and a slicer's answer to
+// marginal is support material inside the lettering, which then has to be
+// picked out of a 0.70 mm deep letter.
+//
+// Sloping every face removes the roof entirely. The cost is stroke width: the
+// cut narrows as it deepens, so the deepest section is the artwork eroded by
+// depth / tan(angle). 90 is prismatic — no taper. 45 is the classic
+// self-supporting chamfer and costs 1.00 mm per mm of depth. 70 is still 20
+// degrees off vertical, well inside what prints unsupported, and costs 0.36.
+// Measured off the built mesh: the floor of the cut comes out 0.408 narrower
+// than the opening, so each edge loses 0.204. Against stems of roughly 1.7 to
+// 2.1 mm at these sizes that leaves about 1.3 at the narrowest — three passes
+// of a 0.4 nozzle, and the opening is still full width where it is read.
+deboss_taper = 70;   // (deg from horizontal)
+
+// The taper is a stack of prismatic bands, not a true draft, because
+// linear_extrude cannot loft between two offsets of a 2D shape. What each band
+// leaves is a horizontal ledge as deep as the band, so 5 over 0.70 gives 0.14 mm
+// ledges — below one layer, and invisible.
+//
+// Unlike the chalk holder this is a flat cut and not a cylindrical wrap, so the
+// bands are cheap and there is no faceting mismatch to overlap away. eps is
+// enough here.
+deboss_steps = 5;
 
 /* [Grip ribs] */
 
@@ -206,18 +274,20 @@ deboss_d = 0.70;
 // rattling, without shrinking the bore itself. Set rib_count or rib_h to 0 for
 // a plain slip fit.
 //
-// THE ARITHMETIC. Two ribs sit across any diameter, so the working size is
-// (printed bore) - 2 x rib_h. The printed bore is the uncertain part — the two
-// references disagree, and the range below is honest rather than tidy:
+// THE ARITHMETIC, now measured rather than predicted. Two ribs sit across any
+// diameter, so the working size is (printed bore) - 2 x rib_h, and the printed
+// bore is 53.77 — see bore_comp for how that was established.
 //
-//                      bore 53.40 (slicing ref)   bore 53.70 (stubby measured)
-//     rib_h 0.20            53.00  zero                 53.30  0.30 clear
-//     rib_h 0.30            52.80  0.20 interference    53.10  0.10 clear
-//     rib_h 0.40            52.60  0.40 interference    52.90  0.10 interference
+//     rib_h 0.20  ->  53.37   0.37 clearance on a Ø53 can
+//     rib_h 0.30  ->  53.17   0.17 clearance   <- printed, and it fits
+//     rib_h 0.40  ->  52.97   0.03 interference
+//     rib_h 0.50  ->  52.77   0.23 interference
 //
-// 0.30 is the default because it is the only row that is at worst a firm push
-// on one reading and a light rattle on the other. Measure the printed bore
-// before trusting any of it, and sand the ribs rather than reprinting.
+// 0.30 was chosen when the printed bore could have been anything from 53.40 to
+// 53.70, on the grounds that it was the only value that was at worst a firm
+// push and at worst a light rattle. It landed at 0.17 of clearance and Ziad
+// called it snug but not difficult, so it stays. Go to 0.40 only if a future
+// can measures under Ø53, and sand rather than reprint.
 rib_count = 6;
 // How far each rib stands into the bore (mm).
 rib_h = 0.30;
@@ -238,6 +308,26 @@ rib_foot = 2.0;
 web_count = 8;
 // Web thickness (mm). 1.35 is 3 walls at the real 0.45 inner line width.
 web_t = 1.35;
+
+/* [Fit coupon] */
+
+// The top of the part, cut off and stood on the bed, so a real can can be
+// pushed into it before committing to a five-hour print. It is a genuine slice
+// of the barrel — inner shell, cavity, webs, outer shell, flutes — because that
+// structure is what decides whether the bore comes out round and on size, and a
+// bare tube would not answer the same question.
+//
+// Height (mm). The budget from the top down: 2.00 of mouth chamfer, 1.00 of
+// clearance, 8.00 of rib ramp and then full-proud rib. 18.00 leaves 7 mm of
+// rib at full height, which is plenty to feel, and clears the top of the plaque
+// at z 76.42 by 1.58.
+coupon_h = 18.00;
+
+// Relief on the bore at the cut face (mm), at 45 degrees, taking the rib tips
+// with it. The real part's bore never touches the bed — the floor does — so
+// without this the coupon's tightest point would be its own elephant foot and
+// it would read tight for a reason the part does not share.
+coupon_relief = 0.60;
 
 /* [Quality] */
 
@@ -264,6 +354,18 @@ cav_ri   = bore_r + inner_w;
 cav_ro   = out_r - outer_w;
 cav_z0   = floor_t;
 cav_z1   = total_h - roof_t;
+
+// The base round. Centre sits one radius in and one radius up, so the arc is
+// tangent to the barrel at z = base_round. base_tan is where it reaches
+// base_over from vertical and hands over to the cone; base_foot is where that
+// cone lands on the bed.
+base_cz     = base_round;
+base_cr     = out_r - base_round;
+base_tan_r  = base_cr + base_round * cos(base_over);
+base_tan_z  = base_cz - base_round * sin(base_over);
+base_foot_r = base_tan_r - base_tan_z * tan(base_over);
+// Height at which the barrel first reaches full width, whichever edge is used.
+base_top_z  = base_round > 0 ? base_round : base_cham;
 
 // Flute cutter: a circle of flute_cut_r whose nearest approach to the axis
 // leaves flute_depth cut out of the outside.
@@ -365,6 +467,10 @@ assert(flute_count == 0 || flute_depth <= 0
        "the flutes overlap: reduce flute_count or flute_cut_r");
 assert(bore_r + mouth_cham_r < out_r - top_cham,
        "the mouth chamfer has run into the top chamfer");
+assert(base_round == 0 || base_round < total_h / 4,
+       "the base round has swallowed the barrel: reduce base_round");
+assert(base_round == 0 || base_foot_r > drain_d / 2 + 8,
+       "the base round has eaten the floor out to the drain: reduce base_round");
 assert(sign_count == 0 || sign_w < outer_d,
        "a plaque has to be cut IN: text_w + 2 x sign_pad must be under outer_d");
 assert(sign_count == 0 || sign_t - deboss_d >= 2.10,
@@ -376,18 +482,28 @@ assert(sign_count < 2 || sign_back_ang * sign_count < 180 - 8,
 assert(sign_count == 0 || len([for (l = lines) if (is_undef(ink(l))) l]) == 0,
        "a line has no measured ink box: re-measure it into ink() (see header)");
 assert(sign_count == 0
-       || (sign_z0 - sign_sag > base_cham && sign_z1 + sign_sag < total_h - top_cham),
+       || (sign_z0 - sign_sag > base_top_z && sign_z1 + sign_sag < total_h - top_cham),
        "the plaque and its bevels have run off the end of the barrel");
 
 // Solid section of the holder, before the wall is hollowed out. Bottom inner
 // corner first, running counter-clockwise: floor, base chamfer, barrel, top
 // chamfer, rim, mouth lead-in, bore, floor again.
 module holder_solid() {
+    // Bottom edge: a cone from the bed up to base_tan, then the arc round to
+    // vertical. Angles are measured at the arc's centre, 0 being the
+    // tangent-to-vertical point and -base_over the handover to the cone. The
+    // segment count comes off the same chord-error budget as everything else.
+    n = max(2, ceil(facets(base_round) * base_over / 360));
+    base = base_round > 0
+        ? concat(
+            [[base_foot_r, 0]],
+            [for (i = [0 : n]) let (a = -base_over * (n - i) / n)
+                [base_cr + base_round * cos(a), base_cz + base_round * sin(a)]])
+        : [[out_r - base_cham, 0], [out_r, base_cham]];
     pts = concat(
         drain_d > 0 ? [[r_drain, 0]] : [[0, 0]],
+        base,
         [
-            [out_r - base_cham,      0],
-            [out_r,                  base_cham],
             [out_r,                  total_h - top_cham],
             [out_r - top_cham,       total_h],
             [r_bore + mouth_cham_r,  total_h],
@@ -501,12 +617,29 @@ module wordmark() {
 // axis to +Y and the 2D y axis to +Z, which is exactly how the text reads to
 // someone standing at +X — no mirroring needed, and getting that backwards is
 // the classic way to emboss a part in reverse.
+//
+// The stack runs from the plaque surface inward, band 0 outermost. Erosion is
+// taken from each band's OUTER face, so band 0 is the artwork at full size and
+// the letters read their true width from outside — eroding by the inner figure
+// instead would thin the visible outline and bury the widest part of the cut
+// where nobody can see it. It also means the flush left and right edges are
+// still exactly text_w apart at the surface, which is where they are measured.
 module text_cutters() {
+    steps = deboss_taper >= 90 ? 1 : max(1, deboss_steps);
+    band  = deboss_d / steps;
     for (i = [0 : sign_count - 1])
         rotate([0, 0, i * 360 / sign_count])
-            translate([flat_r - deboss_d, 0, text_z])
-                rotate([90, 0, 90])
-                    linear_extrude(height = deboss_d + eps) wordmark();
+            for (k = [0 : steps - 1]) {
+                erode = deboss_taper >= 90 ? 0
+                                           : (band * k) / tan(deboss_taper);
+                translate([flat_r - band * (k + 1), 0, text_z])
+                    rotate([90, 0, 90])
+                        // Every band reaches eps outward into its neighbour —
+                        // band 0 out past the plaque surface, the rest into the
+                        // band above — so no two bands meet on a shared plane.
+                        linear_extrude(height = band + eps)
+                            offset(delta = -erode) wordmark();
+            }
 }
 
 module ribs() {
@@ -569,7 +702,32 @@ for (i = [0 : len(lines) - 1])
     echo(str("  line ", i, "  \"", lines[i], "\"  size ", sizes[i],
              "  cap ", heights[i]));
 
-if (show == "cut")
+// The fit coupon: the top coupon_h of the finished part, dropped onto the bed
+// the same way up as the part itself. Taking it off the real thing rather than
+// drawing a lookalike is deliberate — every number that could move the bore is
+// then the number the part will print with.
+module fit_coupon() {
+    z0 = total_h - coupon_h;
+    c  = coupon_relief + rib_h;          // 45 degrees, clearing the rib tips
+    assert(sign_count == 0 || z0 > sign_z1 + sign_sag,
+           str("coupon_h reaches into the plaque at z ", sign_z1 + sign_sag,
+               " — shorten it, or the coupon is not a plain barrel section"));
+    difference() {
+        translate([0, 0, -z0])
+            intersection() {
+                slim_can_holder();
+                translate([-outer_d, -outer_d, z0])
+                    cube([2 * outer_d, 2 * outer_d, coupon_h + eps]);
+            }
+        translate([0, 0, -eps])
+            cylinder(h = c + eps, r1 = bore_r + coupon_relief + eps,
+                     r2 = bore_r + coupon_relief - c, $fn = nseg);
+    }
+}
+
+if (show == "coupon")
+    fit_coupon();
+else if (show == "cut")
     difference() {
         slim_can_holder();
         translate([-outer_d, -outer_d, -eps])

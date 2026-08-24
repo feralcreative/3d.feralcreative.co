@@ -1,10 +1,12 @@
 batleth 6
 hobbs-chalk-holder-coupon 5
+large-door-stop 1
 phone-shower-holder 5
 phone-shower-holder-assembled 1
 slim-can-adapter 1
 slim-can-holder-3in 2
-slim-can-holder-3in-censored 3
-slim-can-holder-3in-explicit 4
+slim-can-holder-3in-censored 5
+slim-can-holder-3in-coupon 1
+slim-can-holder-3in-explicit 6
 slim-can-screwdriver-stubby 2
 slim-can-screwdriver-tall 2

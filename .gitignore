@@ -263,8 +263,19 @@ _reference
 # Generated output — reproducible from source, never committed
 renders/*
 !renders/.gitkeep
+
+# stl/ — finished parts are committed, work in progress is not.
+#
+# A finished part carries no version in its name (see utils/finalize.sh), and
+# that file is the deliverable: it is what gets printed and what gets sent to
+# anyone. Every -vNN build beside it is scratch from an iteration that is over.
+#
+# Order matters here — the last matching pattern wins, and re-including only
+# works because stl/ itself is never excluded, only its contents.
 stl/*
 !stl/.gitkeep
+!stl/*.stl
+stl/*-v[0-9][0-9]*.stl
 slice/
 _incoming
 MODELS

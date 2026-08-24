@@ -15,6 +15,8 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Build a named variant, with its own version series | `utils/build.sh parts/<part>.scad -D 'show="coupon"' --name <part>-coupon` |
 | Restamp instead of incrementing | `utils/build.sh parts/<part>.scad --version 3` |
 | Build with no version stamp at all | `utils/build.sh parts/<part>.scad --no-version` |
+| Collapse a finished part to one unversioned file | `utils/finalize.sh <name>` |
+| Collapse every finished series | `utils/finalize.sh --all` |
 | Build ASCII STL (to read or diff a mesh) | `utils/build.sh parts/<part>.scad --ascii` |
 | Publish STL to the printer site's NAS | `utils/build.sh parts/<part>.scad --push` (needs explicit permission) |
 | Build a coupon of only what changed since the last print | `utils/coupon.sh parts/<part>.scad` |
@@ -71,6 +73,8 @@ There is no runtime. The pipeline is four stages, each with its own verification
 1. `parts/<part>.scad` — the source of truth. One part per file, named after the part.
 2. `utils/render.sh` → `renders/<part>-{iso,front,right,top}.png`. Fast preview; elevations are orthographic, iso is perspective. Verifies shape.
 3. `utils/build.sh` → `stl/<part>-v01.stl`, zero padded to two digits, binary, plus OpenSCAD's manifold/genus summary. Verifies topology. `stl/<part>.stl` is a symlink to the newest version, which is what every other stage and every path quoted in the docs resolves through.
+
+    **A finished part carries no version at all.** Versions are for a part that is still moving; once it stops, `utils/finalize.sh <name>` promotes whatever `stl/<name>.stl` resolves to into a real file of that name and deletes the rest of the series, so there is exactly one file and nothing stale beside it to print by mistake. It follows the symlink rather than the highest number — those differ (`slim-can-adapter` carried a v02 while both the ledger and the link said v01). `docs/stl-versions.txt` is deliberately left alone, so rebuilding a finished part resumes at the next number rather than colliding with its own history. `build.sh --no-version` writes the plain name directly when a part is known to be done up front.
 4. `utils/slice.sh` → `slice/<part>/{plate_1.gcode,out.gcode.3mf,resolved.json,slice.log}`. Internally: `ffprofile.py` flattens the profile inheritance chain, Flash Studio slices, `gcode-probe.py` reads the result back. Verifies settings.
 
 Dependency direction: parts include `lib/BOSL2` and `logos/marks.scad`; nothing includes a part except another part reading its numbers (`hobbs-chalk-holder.scad` is written to be includable for that). Scripts depend on parts, never the reverse.
@@ -79,7 +83,7 @@ Non-obvious coupling:
 
 - **`OPENSCADPATH`.** `lib/` is not a directory OpenSCAD searches. `render.sh` and `build.sh` export `OPENSCADPATH` themselves, so `include <BOSL2/std.scad>` resolves. Invoking the `openscad` binary directly, outside the scripts, will fail to resolve it.
 - **A coupon carries only what changed since the last print, by default.** `utils/coupon.sh` hashes each component's mesh, compares it against `docs/print-log.txt`, and leaves off anything identical to what was last printed — reprinting an unchanged half costs plate time and answers nothing. The part declares its own components in two comment directives (`// COUPON-COMPONENTS:`, `// COUPON-PLATE:`); the script knows nothing about any particular part. Nothing in the repo can see a print, so the printed columns move only when Ziad runs `--printed`. Pass `--all` to override.
-- **The STL version counter is committed, the STLs are not.** `docs/stl-versions.txt` holds one `<name> <n>` line per output name and is the only durable record of where a series is up to — `stl/` is gitignored and regenerable, so a counter kept beside the meshes would reset to v1 the first time the tree was cleaned. It counts builds, not design changes.
+- **The STL version counter is committed; the versioned STLs are not.** `docs/stl-versions.txt` holds one `<name> <n>` line per output name and is the only durable record of where a series is up to — every `-vNN.stl` is gitignored and regenerable, so a counter kept beside the meshes would reset to v1 the first time the tree was cleaned. It counts builds, not design changes. The finished unversioned file is committed and does not affect this.
 - **The NAS is the only join to the printer site.** `~/www/feral/3d.feralcreative.co` shares no code and no history with this repo. `build.sh --push` rsyncs an STL to `/volume1/web/3d-printer-stream/public/models`, which is bind-mounted into that container, so a new model appears in the web viewer immediately with no rebuild and no deploy.
 - **Slicer presets exist in two places and drift.** See [docs/architecture.md](docs/architecture.md).
 
@@ -120,7 +124,8 @@ Scripts live in `utils/`, never `scripts/`. Documentation other than `README.md`
 - Conventional Commits, imperative mood: `type(scope): subject`. Types in use: `feat`, `fix`, `docs`, `refactor`, `chore`, `revert`. Scopes are part or subsystem names (`chalk-holder`, `slicing`, `utils`, `logos`).
 - **No AI attribution of any kind**—no `Co-Authored-By`, no "Generated with" footer.
 - Never commit unasked. Hand over one chained line and let Ziad run it: `git add -A && git commit -m "type(scope): subject"`.
-- Never committed: `renders/`, `stl/`, `slice/`, `_incoming/`, `MODELS`, `_PLANS` (which is why `docs/_PLANS/` is local-only—Ziad's call whether to unignore), and anything matching `.env*`. No file matching a `.gitignore` entry may be read into a commit, a log, or a chat response.
+- Never committed: `renders/`, `slice/`, `3mf/`, `_incoming/`, `MODELS`, `_PLANS` (which is why `docs/_PLANS/` is local-only—Ziad's call whether to unignore), and anything matching `.env*`. No file matching a `.gitignore` entry may be read into a commit, a log, or a chat response.
+- **`stl/` is half-committed.** A finished part—no version in its name, see `utils/finalize.sh`—IS committed, because it is the deliverable. Every `-vNN.stl` beside it is not. The `.gitignore` does that with `stl/*`, then `!stl/*.stl`, then `stl/*-v[0-9][0-9]*.stl`: order matters, and the re-include only works because `stl/` itself is never excluded, only its contents.
 - Work on `main`. Branch first if the change is speculative.
 
 ## Credentials

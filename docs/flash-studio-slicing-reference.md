@@ -426,6 +426,8 @@ The reference says FlashForge sets no XY compensation, marked ⚠️ and unverif
 
 Its recommended starting point of "+0.15 mm on diameter for the 0.4 nozzle" does **not** hold here. Measured on this machine and filament at 0.12 mm layers: a bore drawn at 10.150 mm across the flats miked 9.5–9.6 mm, a loss of **0.55–0.65 mm on diameter**. `hole_pull_in` in the chalk holder is set to 0.600 from that measurement rather than from the reference.
 
+**⚠️ That figure does not scale up. It is a small-bore number and applying it to a large bore is wrong.** Two independent measurements on Ø54 bores: `slim-can-screwdriver-stubby.scad` records a bore drawn at 54.116 miking 53.85, a loss of **0.27**, and the `slim-can-holder-3in` fit coupon printed 2026-08-22 records one drawn at 54.00 miking 53.77, a loss of **0.23**. Neither model of the loss survives both cases—a fixed 0.60 would have taken 0.60 off the Ø54 bores and took a third of that; a proportional loss would have taken 0.04 off the Ø10 bore and took fifteen times that. The small-bore loss is first-layer squish and extrusion pull-in, which are local and roughly constant in absolute terms, so they dominate a 10 mm bore and disappear into a 54 mm one. Design a small bore against 0.60 and a large one against roughly 0.25, and measure anything in between rather than interpolating.
+
 ### First layer height does not scale
 
 Not covered by the reference at all, and it changes how elephant's foot is reasoned about: **`initial_layer_print_height` is 0.30 mm even when `layer_height` is 0.12.** First-layer squish effects therefore span 0.3 mm of height regardless of how fine the rest of the print is, and a bore's mouth is affected over that whole range.
