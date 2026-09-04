@@ -9,9 +9,18 @@
 // tube standing on the cut end, flush with it, leaning back 15 degrees. The
 // tube is open at the top and its floor is the slab. The top 5 mm of its
 // front wall is scooped away so the controls of whatever stands in it are not
-// crowded against it, and a slot runs the whole depth of the floor so a
-// charging cable has somewhere to go — what is left of the floor is two side
-// strips. That is the whole part.
+// crowded against it, and a slot takes most of the floor so a charging cable
+// has somewhere to go, stopping short of the back wall. A letter is debossed
+// into the front wall and repeated in the slab's top face, turned to read from
+// behind the stand. That is the whole part.
+//
+// TWO LETTERED BUILDS, and the name matters:
+//
+//     utils/build.sh parts/roku-stand.scad -D 'mark="Z"' --name roku-stand-z
+//     utils/build.sh parts/roku-stand.scad -D 'mark="R"' --name roku-stand-r
+//
+// Without --name a variant shares the plain part's version series and
+// overwrites its file.
 //
 // HOW IT IS BUILT. Five 2D outlines and one shear.
 //
@@ -22,8 +31,12 @@
 //                   back arc all the way down to the front — then cut by the
 //                   same front arc as the base, so the two stand flush.
 //   pocket_outline  the tube outline eroded by wall_t.
-//   slot_outline    the pocket narrowed to 23 wide. Front and rear both come
-//                   from the pocket, so the slot spans its full depth.
+//   slot_outline    the pocket narrowed to 23 wide. Its front comes from the
+//                   pocket and its rear from the pocket eroded by slot_back,
+//                   so the rear edge stays parallel to the back wall.
+//   mark_letter     the debossed letter, centred on its measured ink box and
+//                   placed twice: in the front elevation, and in plan on the
+//                   slab, spun 180 so it reads from behind.
 //   cut_profile     the front cutaway, drawn in elevation rather than plan —
 //                   an opening 37 wide, floor 5 down from the rim, its bottom
 //                   corners rounded 5, which is the whole depth, so the sides
@@ -39,7 +52,7 @@
 // the lean costs nothing. The reference is built the same way — the outline
 // fits at z=10 and z=30 are identical to the hundredth, only translated.
 //
-// FOUR DEPARTURES FROM THE REFERENCE. The first is old; the rest are
+// FIVE DEPARTURES FROM THE REFERENCE. The first is old; the rest are
 // deliberate changes to the design, not corrections to the measurement. The
 // mesh itself was re-measured on 2026-09-04 and the pocket matched it to 0.03
 // in depth and 0.10 in width at every height before the squeeze below was
@@ -66,12 +79,17 @@
 //   lifted, because the closed rim is what stops that, not friction lower
 //   down.
 //
-//   The slot runs the pocket's full depth. The reference's stops 13.54 from
-//   the front face, its rear corners rounded 4.5, its rear edge ramped back
-//   from z 4.5 at 60 degrees so a plug had something to lean on. With the
-//   rear open to the back wall there is nothing left to lean against, so the
-//   ramp is gone and the rear face is vertical, flush with the inside of the
-//   back wall.
+//   The slot is bigger and squarer. The reference's stops 13.54 from the front
+//   face, its rear corners rounded 4.5, its rear edge ramped back from z 4.5
+//   at 60 degrees so a plug had something to lean on. Here the pocket bounds
+//   it: hard against the inside of the front wall, and slot_back short of the
+//   inside of the back one. The ramp is gone with the edge it belonged to and
+//   the rear face is vertical.
+//
+//   The marks. The reference has none. mark cuts a letter into the front wall,
+//   and base_mark repeats it in the slab reading from the back. Both are cut
+//   the way the chalk holder's wordmark is — see mark_cut for why the taper is
+//   there and what it costs.
 //
 // THE CHAMFERS. Every edge on the reference is either sharp or a 45-degree
 // chamfer, bar two 0.5 fillets on the slot rim, which are drawn here as
@@ -87,7 +105,8 @@
 //
 // PRINT IT AS BUILT, flat on the slab. The back wall leans 15 degrees from
 // vertical, which is nothing; neither the cutaway nor the deeper slot adds an
-// overhang; the only bridge is the slot's rim chamfer, half a millimetre.
+// overhang; the marks are tapered so no stroke has a roof over it; the only
+// bridge is the slot's rim chamfer, half a millimetre.
 //
 // HOW IT WAS MEASURED. The mesh was sliced at a dozen heights and along both
 // vertical axes, the section polygons chained into loops, and each loop cut
@@ -122,20 +141,32 @@ tube_corner_r  = 11;     // round where the back arc meets the sides (mm)
 tube_h         = 30;     // height above the slab (mm)
 tilt           = 15;     // lean back, degrees from vertical
 wall           = 2.0;    // the reference's wall thickness (mm)
-pocket_squeeze = 0.2;    // taken off every pocket wall for fit (mm) — 0 is the reference
+pocket_squeeze = 0.3;    // taken off every pocket wall for fit (mm) — 0 is the reference
 foot_chamfer   = 1.0;    // inside, where the wall meets the floor (mm)
 lip_chamfer    = 0.5;    // inside top edge (mm)
 
 /* [Cable slot] */
 slot_w         = 23;     // width (mm)
+slot_back      = 3.0;    // how far short of the back wall the slot stops (mm)
 slot_corner_r  = 1.0;    // round on the corners (mm)
-slot_rim       = 0.5;    // chamfer on the slot's top rim, sides only (mm)
+slot_rim       = 0.5;    // chamfer on the slot's top rim, sides and rear (mm)
 
 /* [Front cutaway] */
 cut_side       = 5.0;    // wall left standing each side of the cutaway (mm)
 cut_depth      = 5;      // how far down from the rim the cutaway reaches (mm)
 cut_corner_r   = 5.0;    // round on the cutaway's two bottom corners (mm)
 cut_top_r      = 2.0;    // round where the cutaway breaks the rim (mm)
+
+/* [Front mark] */
+mark           = "none"; // [none, Z, R]
+mark_h         = 14.0;   // cap height of the letter in the front elevation (mm)
+mark_z         = 21.0;   // its centre above the build plate (mm)
+mark_depth     = 0.70;   // deboss depth (mm)
+mark_taper     = 70;     // deg from horizontal; 90 is a prismatic cut
+mark_steps     = 5;      // bands the taper is built from
+mark_font      = "Helvetica Neue:style=Bold";
+base_mark      = true;   // repeat the letter in the slab's top face
+base_mark_y    = 12.0;   // its centre behind the part's middle (mm)
 
 /* [Output] */
 show = "part";           // [part, cut]
@@ -159,6 +190,29 @@ wall_t    = wall + pocket_squeeze;             // what actually prints — land 
 cut_half  = tube_w / 2 - cut_side;             // half-width of the cutaway
 cut_z     = tube_h - cut_depth;                // its floor, in the tube's own frame
 
+// Ink boxes, measured once at size = 100 in mark_font, the same way
+// slim-can-holder-3in.scad records its own: OpenSCAD cannot measure a string at
+// render time unless it is run with --enable=textmetrics, which render.sh and
+// build.sh do not pass and should not have to. [position, size], both in the
+// units text() itself uses, so a letter set at size S has ink S/100 times these.
+// position is needed as well as size because it is what centres the letter on
+// its INK rather than on its advance width, which for an R is 14.8 wider.
+// Re-measure with:
+//
+//     openscad --enable=textmetrics -o /dev/null --export-format asciistl f.scad
+//
+// where f.scad echoes textmetrics(s, size = 100, font = mark_font). Measure a
+// face you know is missing at the same time — a name that does not resolve
+// falls back silently, and the giveaway is metrics that match the fallback.
+function mark_ink(s) =
+    s == "Z" ? [[3.136, 0], [83.712, 99.136]] :
+    s == "R" ? [[9.536, 0], [85.504, 99.200]] :
+    undef;
+
+// Set by cap height, so the two letters stand the same height rather than the
+// same point size. Their widths then differ, which is correct.
+mark_size = is_undef(mark_ink(mark)) ? 0 : mark_h * 100 / mark_ink(mark)[1][1];
+
 assert(tube_w + 2 * base_chamfer < base_w, "tube is wider than the base");
 assert(tube_d < base_d, "tube is deeper than the base");
 assert(slot_w + 2 * slot_rim < tube_w - 2 * (wall_t + foot_chamfer), "slot is wider than the pocket floor");
@@ -166,13 +220,27 @@ assert(2 * (wall_t + foot_chamfer) < tube_d, "no floor left inside the tube");
 assert(cut_side >= wall_t, "cutaway would undercut the tube's side wall");
 assert(cut_corner_r <= cut_depth && cut_corner_r <= cut_half, "cutaway corner round does not fit");
 assert(cut_top_r < cut_side, "cutaway's rim round eats the whole standing wall");
+assert(mark == "none" || !is_undef(mark_ink(mark)), "no ink box recorded for this mark");
+assert(mark == "none" || wall_t - mark_depth >= 1.20, "not enough wall left behind the mark");
+assert(mark == "none" || mark_z + mark_h / 2 < base_h + cut_z, "the mark runs into the cutaway");
+assert(mark == "none" || mark_z - mark_h / 2 > base_h, "the mark runs below the tube");
+assert(mark == "none" || !base_mark || base_mark_y - mark_h / 2 > front_y + tube_d,
+       "the slab's mark runs under the tube");
+assert(mark == "none" || !base_mark || base_mark_y + mark_h / 2 < base_d / 2 - base_chamfer,
+       "the slab's mark runs off the back of the slab");
+assert(mark == "none" || !base_mark || mark_depth < base_h - slot_rim,
+       "the slab's mark cuts through the slab");
+assert(slot_back >= 0 && slot_back + slot_corner_r < tube_d - 2 * wall_t,
+       "the slot has no depth left");
 assert(cut_z > foot_h + lip_chamfer, "cutaway reaches into the pocket floor");
 
 // ---- 2D -------------------------------------------------------------------
 
-// Everything on the part's side of the front arc.
-module front_clip()
-    translate([0, front_y + front_r]) circle(r = front_r);
+// Everything on the part's side of the front arc. `inset` moves the arc back
+// into the material, which is how the mark's bands are held at a constant depth
+// below a face that is curved.
+module front_clip(inset = 0)
+    translate([0, front_y + front_r]) circle(r = front_r - inset);
 
 // The ellipse, cut by the front arc, front corners rounded.
 module base_outline()
@@ -197,16 +265,30 @@ module tube_outline()
 module pocket_outline()
     offset(delta = -wall_t) tube_outline();
 
-// The slot's footprint: the pocket floor narrowed to slot_w. Front and rear
-// are both the pocket wall where the foot chamfer ends, so the slot runs the
-// whole depth, from the inside of the front wall to the inside of the back
-// one. `grow` widens the sides only — the pocket clip is not grown, which is
-// how the rim chamfer is drawn without nicking either wall.
+// What bounds the slot front and rear: the pocket floor with its rear edge
+// pulled forward by `back`. The front edge is left exactly where the pocket
+// puts it — the hull is a forward sweep, so it reaches out past the pocket's
+// own front and the un-eroded copy is what governs there. Eroding rather than
+// cutting on a straight line keeps the rear edge parallel to the back wall.
+module slot_clip(back = 0)
+    translate([0, foot_h * shear])
+        intersection() {
+            pocket_outline();
+            hull() {
+                offset(delta = -back) pocket_outline();
+                translate([0, -big]) offset(delta = -back) pocket_outline();
+            }
+        }
+
+// The slot's footprint: the pocket floor narrowed to slot_w and stopped
+// slot_back short of the back wall. `grow` widens the sides and the rear, which
+// is where the rim chamfer belongs; the front edge lies on the pocket wall,
+// where a chamfer would undercut the tube, and the un-grown clip holds it there.
 module slot_outline(grow = 0)
     offset(r = slot_corner_r) offset(delta = -slot_corner_r)
         intersection() {
             square([slot_w + 2 * grow, 2 * big], center = true);
-            translate([0, foot_h * shear]) pocket_outline();
+            slot_clip(slot_back - grow);
         }
 
 // The scoop in front elevation: sides at ±cut_half, floor at cut_z, open
@@ -240,6 +322,29 @@ module cut_profile()
         }
         cut_scoop();
     }
+
+// The letter, centred on its ink at the origin. Centred on the INK and not on
+// the advance width, which for an R runs 14.8 wider to the right of the glyph
+// and would throw it visibly off centre.
+module mark_letter() {
+    m = mark_ink(mark);
+    k = mark_size / 100;
+    translate([-(m[0][0] + m[1][0] / 2) * k, -(m[0][1] + m[1][1] / 2) * k])
+        text(mark, size = mark_size, font = mark_font,
+             halign = "left", valign = "baseline");
+}
+
+// On the front wall, in elevation. Drawn in the tube's own frame, so the 2D y
+// is height above the slab.
+module mark_glyph()
+    translate([0, mark_z - base_h]) mark_letter();
+
+// On the slab's top face, in plan, turned to read from behind the stand. To a
+// reader standing at the back the surface's "up" runs -y and their right runs
+// -x, so the letter is spun 180 degrees; drawn unspun it would read correctly
+// only to someone leaning over the front, which is where the tube is.
+module base_mark_glyph()
+    translate([0, base_mark_y]) rotate([0, 0, 180]) mark_letter();
 
 // What the cutaway is allowed to reach, in plan: the pocket and everything in
 // front of it, narrowed to the opening plus the rim round, which reaches
@@ -315,6 +420,75 @@ module front_cut()
             translate([0, big / 2, 0]) rotate([90, 0, 0]) linear_extrude(big) cut_profile();
         }
 
+// The mark, debossed into the front wall.
+//
+// A prismatic cut leaves a horizontal roof over the top of every stroke, and a
+// slicer's answer to that is support material inside the lettering. Sloping
+// every face removes the roof. The cost is stroke width, because the cut narrows
+// as it deepens: the deepest section is the letter eroded by depth / tan(taper).
+// 90 is prismatic. 45 is the classic self-supporting chamfer and costs 1.00 mm
+// per mm of depth. 70 is still 20 degrees off vertical, well inside what prints
+// unsupported, and costs 0.36 — 0.25 off each edge at this depth, against stems
+// of about 2.5 mm on a 14 mm cap.
+//
+// The taper is a stack of prismatic bands, not a true draft, because
+// linear_extrude cannot loft between two offsets of a 2D shape. Each band leaves
+// a ledge as deep as itself: 5 over 0.70 is 0.14, under one layer.
+//
+// Erosion is taken from each band's OUTER face, so band 0 is the letter at full
+// size and it reads its true width from outside; eroding by the inner figure
+// would thin the visible outline and bury the widest part of the cut.
+//
+// The shell is what makes the depth constant. This face is an arc, not a plane —
+// it falls away 0.20 mm over the half-width of a letter this size — so a cut
+// bounded by a flat plane would come out that much shallower at the letter's
+// edges than at its middle. Bounding each band between two insets of the same
+// arc instead keeps it 0.14 deep everywhere. Both shells are faceted at the same
+// $fn as the face itself, so their vertices line up with it and the band comes
+// out exactly its nominal thickness rather than a sliver more or less.
+module mark_cut() {
+    if (mark != "none") {
+        steps = mark_taper >= 90 ? 1 : max(1, mark_steps);
+        band  = mark_depth / steps;
+        translate([0, 0, base_h]) lean()
+            for (k = [0 : steps - 1]) {
+                d_out = band * k;
+                d_in  = band * (k + 1);
+                erode = mark_taper >= 90 ? 0 : d_out / tan(mark_taper);
+                intersection() {
+                    translate([0, big / 2, 0]) rotate([90, 0, 0])
+                        linear_extrude(big) offset(delta = -erode) mark_glyph();
+                    // Band 0 reaches eps out past the face; the rest reach into
+                    // the band above, so no two meet on a shared plane.
+                    translate([0, 0, -big / 2]) linear_extrude(big)
+                        difference() {
+                            front_clip(d_out - eps);
+                            front_clip(d_in);
+                        }
+                }
+            }
+    }
+}
+
+// The same letter again, sunk into the slab's top face. No shell here: that face
+// is flat, so a band is simply the letter extruded between two heights. Nor does
+// the taper do any structural work on a face that points up — there is no roof
+// to bridge either way — but it matches the front and it reads better than a
+// prismatic cut catching the light on a horizontal surface.
+module base_mark_cut() {
+    if (mark != "none" && base_mark) {
+        steps = mark_taper >= 90 ? 1 : max(1, mark_steps);
+        band  = mark_depth / steps;
+        for (k = [0 : steps - 1]) {
+            d_in  = band * (k + 1);
+            erode = mark_taper >= 90 ? 0 : (band * k) / tan(mark_taper);
+            // Band 0 reaches eps above the face; the rest into the band above.
+            translate([0, 0, base_h - d_in]) linear_extrude(band + eps)
+                offset(delta = -erode) base_mark_glyph();
+        }
+    }
+}
+
 module roku_stand()
     difference() {
         union() {
@@ -324,6 +498,8 @@ module roku_stand()
         pocket();
         slot();
         front_cut();
+        mark_cut();
+        base_mark_cut();
     }
 
 if (show == "cut")
