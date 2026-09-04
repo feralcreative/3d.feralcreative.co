@@ -7,8 +7,8 @@
 //
 // THE FORM. An egg-shaped slab with its narrow end cut off, and a D-section
 // tube standing on the cut end, flush with it, leaning back 15 degrees. The
-// tube is open at the top and its floor is the slab. The top 10 mm of its
-// front wall is cut away so the controls of whatever stands in it are not
+// tube is open at the top and its floor is the slab. The top 5 mm of its
+// front wall is scooped away so the controls of whatever stands in it are not
 // crowded against it, and a slot runs the whole depth of the floor so a
 // charging cable has somewhere to go — what is left of the floor is two side
 // strips. That is the whole part.
@@ -21,34 +21,50 @@
 //                   rounded 11 — which is so large the round runs from the
 //                   back arc all the way down to the front — then cut by the
 //                   same front arc as the base, so the two stand flush.
-//   pocket_outline  the tube outline eroded by the wall.
+//   pocket_outline  the tube outline eroded by wall_t.
 //   slot_outline    the pocket narrowed to 23 wide. Front and rear both come
 //                   from the pocket, so the slot spans its full depth.
 //   cut_profile     the front cutaway, drawn in elevation rather than plan —
-//                   an opening 43 wide, floor 10 down from the rim, bottom
-//                   corners rounded 3. cut_reach bounds it in plan: the
-//                   pocket swept forward, which is the front wall and open
-//                   air and nothing else.
+//                   an opening 37 wide, floor 5 down from the rim, its bottom
+//                   corners rounded 5, which is the whole depth, so the sides
+//                   are pure quarter-rounds and it reads as a scoop rather
+//                   than a slot. Where it breaks the rim the wall is rounded
+//                   2 as well, which is done on the wall's elevation rather
+//                   than the cutter's — the note on the module says why.
+//                   cut_reach bounds it in plan: the pocket swept forward,
+//                   which is the front wall and open air and nothing else.
 //
 // The tube is a linear extrusion of its outline run through a Y-shear of
 // tan(tilt): every horizontal section is the same D, the top stays flat, and
 // the lean costs nothing. The reference is built the same way — the outline
 // fits at z=10 and z=30 are identical to the hundredth, only translated.
 //
-// THREE DEPARTURES FROM THE REFERENCE. The first is old; the other two are
-// deliberate changes to the design, not corrections to the measurement.
+// FOUR DEPARTURES FROM THE REFERENCE. The first is old; the rest are
+// deliberate changes to the design, not corrections to the measurement. The
+// mesh itself was re-measured on 2026-09-04 and the pocket matched it to 0.03
+// in depth and 0.10 in width at every height before the squeeze below was
+// applied — see round 03's notes.
 //
 //   Uniform wall. The reference's inner front arc is not an offset of its
 //   outer one (R143 against R125), so its front wall thins from 2.00 at the
-//   centre to about 1.6 at the corners. Here the pocket is offset(-wall) of
-//   the tube outline and the wall is 2.00 all round. On a 0.4 nozzle that is
-//   a bad number either way — the slicing reference's rungs are 1.68 and 2.10
-//   — so set wall to one of those before printing. 1.68 moves nothing else;
-//   2.10 needs cut_side raised to match, or the cutaway would undercut the
-//   side wall, and an assert says so rather than letting it happen.
+//   centre to about 1.6 at the corners. Here the pocket is offset(-wall_t) of
+//   the tube outline and the wall is the same all round.
+//
+//   The pocket is squeezed for fit. wall_t is wall plus pocket_squeeze, so
+//   the outside stays the reference's and the pocket loses 2 x pocket_squeeze
+//   in both width and depth. It exists because the PETG original gripped the
+//   remote and a PLA reprint did not: PETG shrinks a shade more, and its
+//   surface is grippier. Set pocket_squeeze to 0 to get the reference's fit
+//   back. On a 0.4 nozzle it is wall_t, not wall, that has to land on a
+//   nozzle rung — the slicing reference's are 1.68 and 2.10, so with a 0.2
+//   squeeze that means wall 1.48 or 1.90.
 //
 //   The front cutaway. The reference has none: its front wall runs the full
-//   30 mm up to the rim.
+//   30 mm up to the rim. Keep it shallow. The first attempt took the top
+//   10 mm across 43 of the 47 mm width, which opened the top of the pocket
+//   into a U — the remote pivoted straight out of it when the stand was
+//   lifted, because the closed rim is what stops that, not friction lower
+//   down.
 //
 //   The slot runs the pocket's full depth. The reference's stops 13.54 from
 //   the front face, its rear corners rounded 4.5, its rear edge ramped back
@@ -105,7 +121,8 @@ tube_back_r    = 27.7;   // radius of the back arc (mm)
 tube_corner_r  = 11;     // round where the back arc meets the sides (mm)
 tube_h         = 30;     // height above the slab (mm)
 tilt           = 15;     // lean back, degrees from vertical
-wall           = 2.0;    // wall thickness (mm) — 1.68 or 2.10 to land on a rung
+wall           = 2.0;    // the reference's wall thickness (mm)
+pocket_squeeze = 0.2;    // taken off every pocket wall for fit (mm) — 0 is the reference
 foot_chamfer   = 1.0;    // inside, where the wall meets the floor (mm)
 lip_chamfer    = 0.5;    // inside top edge (mm)
 
@@ -115,9 +132,10 @@ slot_corner_r  = 1.0;    // round on the corners (mm)
 slot_rim       = 0.5;    // chamfer on the slot's top rim, sides only (mm)
 
 /* [Front cutaway] */
-cut_side       = 2.0;    // wall left standing each side of the cutaway (mm)
-cut_depth      = 10;     // how far down from the rim the cutaway reaches (mm)
-cut_corner_r   = 3.0;    // round on the cutaway's two bottom corners (mm)
+cut_side       = 5.0;    // wall left standing each side of the cutaway (mm)
+cut_depth      = 5;      // how far down from the rim the cutaway reaches (mm)
+cut_corner_r   = 5.0;    // round on the cutaway's two bottom corners (mm)
+cut_top_r      = 2.0;    // round where the cutaway breaks the rim (mm)
 
 /* [Output] */
 show = "part";           // [part, cut]
@@ -137,15 +155,17 @@ tube_cy   = front_y + tube_d - tube_back_r;    // centre of the tube's back arc
 foot_h    = foot_chamfer * cos(tilt);          // the chamfers are equal-legged along the leaning wall,
 lip_h     = lip_chamfer  * cos(tilt);          // so their vertical rise is a little less than their size
 shear     = tan(tilt);                         // y per unit z
+wall_t    = wall + pocket_squeeze;             // what actually prints — land THIS on a nozzle rung
 cut_half  = tube_w / 2 - cut_side;             // half-width of the cutaway
 cut_z     = tube_h - cut_depth;                // its floor, in the tube's own frame
 
 assert(tube_w + 2 * base_chamfer < base_w, "tube is wider than the base");
 assert(tube_d < base_d, "tube is deeper than the base");
-assert(slot_w + 2 * slot_rim < tube_w - 2 * (wall + foot_chamfer), "slot is wider than the pocket floor");
-assert(2 * (wall + foot_chamfer) < tube_d, "no floor left inside the tube");
-assert(cut_side >= wall, "cutaway would undercut the tube's side wall");
+assert(slot_w + 2 * slot_rim < tube_w - 2 * (wall_t + foot_chamfer), "slot is wider than the pocket floor");
+assert(2 * (wall_t + foot_chamfer) < tube_d, "no floor left inside the tube");
+assert(cut_side >= wall_t, "cutaway would undercut the tube's side wall");
 assert(cut_corner_r <= cut_depth && cut_corner_r <= cut_half, "cutaway corner round does not fit");
+assert(cut_top_r < cut_side, "cutaway's rim round eats the whole standing wall");
 assert(cut_z > foot_h + lip_chamfer, "cutaway reaches into the pocket floor");
 
 // ---- 2D -------------------------------------------------------------------
@@ -175,7 +195,7 @@ module tube_outline()
     }
 
 module pocket_outline()
-    offset(delta = -wall) tube_outline();
+    offset(delta = -wall_t) tube_outline();
 
 // The slot's footprint: the pocket floor narrowed to slot_w. Front and rear
 // are both the pocket wall where the foot chamfer ends, so the slot runs the
@@ -189,24 +209,50 @@ module slot_outline(grow = 0)
             translate([0, foot_h * shear]) pocket_outline();
         }
 
-// The cutaway in front elevation: sides at ±cut_half, floor at cut_z, open
+// The scoop in front elevation: sides at ±cut_half, floor at cut_z, open
 // upward. Its two bottom corners are convex on the cutter, so they come out
-// as fillets in the finished wall.
-module cut_profile()
+// as fillets in the finished wall; with cut_corner_r at the full depth the
+// sides are pure quarter-rounds and there is no straight left between them.
+module cut_scoop()
     offset(r = cut_corner_r) offset(delta = -cut_corner_r)
         translate([-cut_half, cut_z]) square([2 * cut_half, big]);
 
+// Everything below the rim, wider than the tube: the stock the scoop is taken
+// out of, and the shape whose corners are rounded below.
+module cut_stock()
+    translate([-big, tube_h - big]) square([2 * big, big]);
+
+// The cutaway. Where the scoop breaks the rim it leaves the wall a sharp
+// 90-degree corner, and that corner belongs to the wall rather than to the
+// cutter — the cutter has no corner there at all, its side simply runs on up
+// past the rim. So it is rounded on the wall's own elevation, by an opening
+// (shrink sharp, grow round, which rounds convex corners), and the difference
+// taken back. The scoop is unioned in again to carry the cutter above the rim.
+module cut_profile()
+    union() {
+        difference() {
+            cut_stock();
+            offset(r = cut_top_r) offset(delta = -cut_top_r)
+                difference() {
+                    cut_stock();
+                    cut_scoop();
+                }
+        }
+        cut_scoop();
+    }
+
 // What the cutaway is allowed to reach, in plan: the pocket and everything in
-// front of it, narrowed to the opening. The hull is an exact forward sweep
-// because the outline is convex. A fixed y limit instead of this would bite
-// into the side walls where they curve inward.
+// front of it, narrowed to the opening plus the rim round, which reaches
+// wider than the scoop itself. The hull is an exact forward sweep because the
+// outline is convex. A fixed y limit instead of this would bite into the side
+// walls where they curve inward.
 module cut_reach()
     intersection() {
         hull() {
             pocket_outline();
             translate([0, -big]) pocket_outline();
         }
-        square([2 * cut_half, 2 * big], center = true);
+        square([2 * (cut_half + cut_top_r), 2 * big], center = true);
     }
 
 // ---- 3D -------------------------------------------------------------------
