@@ -30,6 +30,26 @@
 // receiver's lean is 8.5 degrees off vertical, which is nothing to an overhang.
 // The receiver leans toward -y, so the "front" render looks into the lean.
 //
+// MATERIAL AND PLATE. PETG. Two consequences worth knowing before printing:
+//
+// PRINT THE WHOLE SET ON ONE PLATE TYPE, and note which. The groove's mouth is
+// a first-layer feature, and §5.2 of the design reference measures a ~0.1 mm
+// squish difference between the textured and smooth plates. The crush ribs only
+// have rib_proud_bot - joint_clear = 0.20 mm of interference to work with, so a
+// plate swap between printing a base and printing its shims moves half of it.
+// A base off one plate and a shim off the other may not fit each other.
+//
+// The pocket is NOT first-layer-critical — it starts slab_h up, around 4 mm
+// above the plate — so pocket_clear does not care about the plate. The fit
+// coupon's bore does start at the plate, which is why both its mouths are
+// flared; if anything the real receiver will read a hair looser than the coupon
+// did.
+//
+// Elephant's foot is worst with PETG on the textured plate [FIELD], and PETG
+// over-adheres to bare smooth PEI. Every bottom outside edge here carries a
+// base_cham relief for the first, and the base is a ~2300 mm2 footprint, so use
+// glue as a release layer for the second.
+//
 // DRAINAGE. This lives outdoors. The leg is an open tube, so water runs down
 // the inside of it into the pocket. The pocket floor, every shim and the base
 // pad are bored through with the same slot, biased to the low side of the
@@ -96,21 +116,27 @@ wall_t = 2.64;
 // Floor left under the pocket's LOW corner (mm). The pocket floor is tilted,
 // so its low corner is what sets how tall the receiver's bottom slab has to
 // be; the high corner ends up with floor_t + floor_drop of material over it.
-floor_t = 3.5;
+//
+// This is measured from the receiver's BOTTOM FACE, not from the groove floor,
+// because the groove ring is held outboard of the pocket — see joint_gap. That
+// is what keeps joint_h out of the height budget.
+floor_t = 3.0;
 // Lead-in flare at the pocket mouth (mm). Kept well under wall_t so the rim
 // does not thin to nothing.
 mouth_cham = 1.2;
 
 /* [Stack] */
 
-// Ledge the slab, shims and base stand proud of the leaning tube, per side
-// (mm). Must be at least enough to cover the tube's footprint where it is cut
-// flat at the slab top, which is why the depth is divided by cos(lean).
-stack_over = 1.0;
-// Shim plate thickness — the adjustment step (mm).
+// Smallest ledge the slab, shims and base stand proud of the leaning tube, per
+// side (mm). The real figure is derived and may be larger — see stack_over.
+stack_over_min = 1.0;
+// Shim plate thickness — the adjustment step (mm). Has to stay comfortably
+// above joint_h or the web between the groove's floor and the tongue's root
+// gets too thin to be worth anything.
 shim_h = 5.0;
-// Base pad thickness (mm).
-base_h = 4.0;
+// Base pad thickness (mm). It is a flat pad fully supported by the ground, so
+// it works in pure compression and does not need much.
+base_h = 3.0;
 // How far the base pad stands proud of the stack, per side (mm). Sized so the
 // top of the leaning receiver still lands inside the pad's outline.
 base_over = 5.0;
@@ -122,11 +148,24 @@ base_cham = 0.5;
 /* [Joint] */
 
 // Tongue height and groove depth (mm).
-joint_h = 3.0;
-// Tongue thickness (mm). 0.84 + 3 x 0.45.
-tongue_t = 2.19;
-// Material outboard of the groove (mm) — the wall the crush ribs flex.
-joint_wall = 2.19;
+joint_h = 2.5;
+// Tongue thickness (mm). 0.84 + 0.45 — two outer lines and one inner.
+//
+// Thin on purpose. The tongue carries no load (the full mating faces do), and
+// a slim joint keeps the whole groove ring narrow enough to sit outboard of
+// the pocket, which is worth more in height than a fat tongue is in strength.
+tongue_t = 1.29;
+// Material outboard of the groove (mm) — the wall the crush ribs flex. Thin
+// here is a feature: it flexes rather than resisting, so the ribs crush
+// instead of the joint refusing to seat.
+joint_wall = 1.29;
+// Clearance kept between the groove's inner face and the pocket wall's outer
+// face (mm). This is the whole trick: hold the groove ring outboard of the
+// pocket and the pocket floor bears on solid slab from z = 0, so joint_h stops
+// counting toward how far the chair goes up.
+joint_gap = 0.8;
+// Material left over the groove where the receiver's wall lands on it (mm).
+groove_roof = 1.5;
 // Groove clearance per side (mm), before the ribs. A slip fit on purpose.
 joint_clear = 0.20;
 // Chamfer on the tongue's top edges (mm).
@@ -137,8 +176,10 @@ groove_cham = 0.5;
 
 /* [Crush ribs] */
 
-// Fillet radius of a rib (mm). Half-buried in the tongue face.
-rib_r = 1.0;
+// Fillet radius of a rib (mm). Half-buried in the tongue face, so it has to be
+// small enough not to break out through the tongue's far side and interfere
+// with the groove's inner wall as well — asserted below.
+rib_r = 0.6;
 // How far a rib stands proud of the tongue face at its root (mm).
 //
 // ⚠️ THE NUMBER TO TUNE. Interference per rib is rib_proud_bot - joint_clear,
@@ -217,10 +258,23 @@ tube_w = pocket_w + 2 * wall_t;
 tube_d = pocket_d + 2 * wall_t;
 tube_r = pocket_r + wall_t;
 
+// --- joint offsets, all measured inward from the stack outline ---
+groove_out = joint_wall;
+tongue_out = joint_wall + joint_clear;
+tongue_in  = tongue_out + tongue_t;
+groove_in  = tongue_in + joint_clear;
+
 // --- the stack outline, shared by slab, shim and the base's tongue ---
 // Depth is the tube's footprint where a horizontal plane cuts it, which is
 // stretched by 1/cos(lean), plus the ledge. That way the slab is never
 // narrower than the tube standing on it.
+//
+// The ledge is also what pushes the groove ring outboard of the pocket. Widen
+// it until the groove's inner face clears the pocket wall's outer face by
+// joint_gap, and the pocket floor then sits on solid slab all the way to z = 0
+// instead of on the groove's roof — which is worth joint_h of ride height.
+stack_over = max(stack_over_min, groove_in + joint_gap - wall_t);
+
 stack_w = tube_w + 2 * stack_over;
 stack_d = tube_d / cos(lean) + 2 * stack_over;
 stack_r = tube_r + stack_over;
@@ -232,18 +286,13 @@ base_r = stack_r + base_over;
 // --- receiver slab ---
 // How far the tilted pocket floor drops below its centre at the pocket edge.
 floor_drop = (pocket_d / 2) * tan(lean);
-// Slab tall enough that the floor's low corner still clears the groove floor
-// by floor_t.
-slab_h = joint_h + floor_t + floor_drop;
+// Tall enough for two independent things: floor_t under the pocket's low
+// corner, and groove_roof over the groove out where the wall lands on it.
+// Whichever binds, wins.
+slab_h = max(floor_t + floor_drop, joint_h + groove_roof);
 // How far the tube has to be extended below the tilt origin so that, once it
 // is cut flat at the slab top, no wedge of it is left hanging in the air.
 tube_under = (tube_d / 2) * tan(lean) + 1;
-
-// --- joint offsets, all measured inward from the stack outline ---
-groove_out = joint_wall;
-tongue_out = joint_wall + joint_clear;
-tongue_in  = tongue_out + tongue_t;
-groove_in  = tongue_in + joint_clear;
 
 // Half-dimensions of the tongue's outer face, where the ribs sit.
 rib_face_x = stack_w / 2 - tongue_out;
@@ -306,6 +355,12 @@ echo(str("pocket ", pocket_w, " x ", pocket_d,
 // groove ring or out through the pocket wall.
 assert(rib_run_x > 0 && rib_run_y > 0,
        "no straight run left on a tongue face for a crush rib");
+assert(2 * rib_r - rib_proud_bot < tongue_t,
+       "crush rib breaks out through the back of the tongue");
+assert(wall_t + stack_over - groove_in >= joint_gap - eps,
+       "groove ring is under the pocket floor, so joint_h is back in the ride height");
+assert(shim_h > joint_h + 1.0,
+       "shim web between groove floor and tongue root is too thin");
 assert(drain_room_x > 0 && drain_room_y > 0,
        "drain slot has no room inside the groove rings");
 assert(abs(drain_in_x ? drain_half : 0) + drain_d / 2 < pocket_w / 2 &&
