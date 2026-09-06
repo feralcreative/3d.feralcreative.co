@@ -72,9 +72,21 @@ lean = 8.5;
 
 /* [Receiver] */
 
-// Pocket clearance per side (mm). Snug sliding for the 0.4 nozzle. This is a
-// slip fit onto painted metal, so it wants to go on by hand but not rattle.
-pocket_clear = 0.20;
+// Pocket clearance per side (mm).
+//
+// MEASURED, not taken from the table. The fit coupon went on the real legs at
+// 0.10, 0.20 and 0.30 per side and 0.10 was both the tightest offered and the
+// best of the three. That is the press/interference rung for a 0.4 nozzle, not
+// the snug-sliding one — this receiver is meant to be pushed on and stay on,
+// not to slip.
+//
+// ⚠️ The coupon rings are coupon_h tall and the pocket is pocket_h. Friction
+// goes with engagement length, so the real receiver takes roughly pocket_h /
+// coupon_h times the force the coupon did. If it turns out to need a mallet,
+// the fix is a relief band through the middle of the pocket rather than more
+// clearance everywhere — that keeps the mouth and the floor tight so the leg
+// cannot rock.
+pocket_clear = 0.10;
 // Pocket depth measured along the leg axis, floor to mouth (mm). Needs that
 // much STRAIGHT prismatic tube on the leg to slide over.
 pocket_h = 30.0;
@@ -265,10 +277,27 @@ drain_half = (drain_in_x ? drain_room_x : drain_room_y) * drain_reach;
 drain_bias = drain_low_bias * (drain_in_x ? -drain_room_y
                                           : -(drain_room_y - drain_half));
 
-// Overall lift under the leg with no shims, measured at the leg's centreline.
+// Height of the pocket floor above the ground with no shims, at the leg's
+// centreline. Not the same thing as how far the chair goes up.
 min_lift = base_h + slab_h;
-echo(str("min lift ", min_lift, " mm, then ", shim_h, " mm a shim; ",
-         "receiver slab ", slab_h, " mm"));
+
+// How far the chair actually rises. A square-cut raked leg rests on ONE EDGE of
+// its end face, not on the whole face, so the bare leg's contact with the patio
+// is its low corner — and in the foot that corner sits on the low corner of the
+// tilted pocket floor, which is lower than the centreline by the leg's own
+// half-depth times the rake. That difference is why the useful number is not
+// min_lift.
+leg_lift = min_lift - (leg_d / 2) * tan(lean);
+
+// Overall height of the foot with no shims. The mouth is a tilted plane, so the
+// tallest point is its high edge.
+receiver_h = slab_h + pocket_h * cos(lean) + (tube_d / 2) * sin(lean);
+foot_h     = base_h + receiver_h;
+
+echo(str("lifts the leg ", leg_lift, " mm, then ", shim_h, " mm a shim; ",
+         "pocket floor at ", min_lift, " mm on the centreline"));
+echo(str("base + receiver stands ", foot_h, " mm tall overall; ",
+         "receiver ", receiver_h, ", slab ", slab_h));
 echo(str("pocket ", pocket_w, " x ", pocket_d,
          "; stack ", stack_w, " x ", stack_d,
          "; base ", base_w, " x ", base_d));
