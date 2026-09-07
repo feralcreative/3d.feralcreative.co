@@ -3,7 +3,8 @@
 // Levelling feet for a patio set whose legs are rectangular tube raked off
 // plumb. Three printed pieces that stack:
 //
-//   base      a flat pad, proud of the column, that sits on the patio
+//   base      a pad that sits on the patio, flush with the column at its top
+//             and flared out at the ground so no ledge shows
 //   shim      a 5 mm plate — one per 5 mm of correction a given leg needs
 //   receiver  a deep socket the leg drops into, tilted so the square-cut end
 //             of the tube seats flat on the pocket floor
@@ -12,6 +13,17 @@
 // matching groove in the bottom face. So base -> receiver, or base -> shim ->
 // shim -> receiver, in any combination. All four legs get base + receiver; the
 // short ones get shims.
+//
+// There is a fourth part that is not in that system:
+//
+//   foot      the receiver with the joint deleted and its slab grown into a
+//             flared plinth — one piece, flat underneath but for the drain, a
+//             fixed lift set by foot_lift, and its own shorter pocket
+//
+// It is the same socket module on a different slab, so it inherits every
+// measured number — leg section, pocket_clear, the rake — rather than being a
+// copy that drifts. Use it once a leg's correction is known and settled and the
+// adjustability is just seams; use the stack while you are still finding out.
 //
 // THE ANGLE LIVES IN THE RECEIVER, not the base. Gravity is vertical, so a
 // vertical stack loads every joint below the receiver in pure compression
@@ -47,8 +59,8 @@
 //
 // Elephant's foot is worst with PETG on the textured plate [FIELD], and PETG
 // over-adheres to bare smooth PEI. Every bottom outside edge here carries a
-// base_cham relief for the first, and the base is a ~2300 mm2 footprint, so use
-// glue as a release layer for the second.
+// base_cham relief for the first, and the base and the foot both put a large
+// flat footprint on the plate, so use glue as a release layer for the second.
 //
 // DRAINAGE. This lives outdoors. The leg is an open tube, so water runs down
 // the inside of it into the pocket. The pocket floor, every shim and the base
@@ -61,7 +73,7 @@
 // "plate" is the three parts laid out for one print. "stack" is an assembly
 // preview — base + 2 shims + receiver — for checking the thing looks right.
 // Not for printing; build a variant with --name if you ever want it as an STL.
-show = "receiver";  // [receiver, shim, base, plate, stack, coupon]
+show = "receiver";  // [receiver, shim, base, foot, plate, stack, coupon]
 
 // COUPON-COMPONENTS: receiver=receiver shim=shim base=base
 // COUPON-PLATE: plate
@@ -137,9 +149,16 @@ shim_h = 5.0;
 // Base pad thickness (mm). It is a flat pad fully supported by the ground, so
 // it works in pure compression and does not need much.
 base_h = 3.0;
-// How far the base pad stands proud of the stack, per side (mm). Sized so the
-// top of the leaning receiver still lands inside the pad's outline.
-base_over = 5.0;
+// How far the base flares out at the GROUND, per side (mm).
+//
+// It is a flare, not a step. The base's top matches the stack outline exactly,
+// so nothing shows as a ledge ringing the part above it; all the width is won
+// at the bottom where it does the work. Printed bottom-down every layer is
+// smaller than the one below it, so the taper is the safe direction.
+base_flare = 1.5;
+// Height of one slice of a smooth flare (mm). Sets how finely the curve is
+// stepped; smaller is smoother and slower to build.
+flare_seg = 0.3;
 // Relief on the bottom outside edge of every piece (mm), at 45 degrees. More
 // reliable than the slicer's elephant-foot compensation, and it is what keeps
 // a stacked joint from rocking on a squashed first layer.
@@ -212,6 +231,29 @@ drain_low_bias = 1.00;
 // Margin kept between the slot and the groove ring (mm).
 drain_margin = 1.0;
 
+/* [One-piece foot] */
+
+// The foot is the receiver with the joint deleted and the slab grown: flat
+// underneath but for the drain, nothing stacking on it, a fixed lift. For a leg
+// whose correction is known and settled, where the shim stack is just a seam.
+
+// Lift the foot is built to give (mm). 12.5 is half an inch.
+foot_lift = 12.5;
+// Pocket depth for the foot alone (mm), kept separate from the receiver's
+// pocket_h. The foot stands its socket on a 13.7 mm plinth, so the same 30 mm
+// of socket that suits the receiver makes the whole thing tall. Shorter also
+// asks for less straight tube on the leg and takes less force to push on.
+//
+// The receiver is deliberately left at pocket_h. Changing that would strand the
+// receivers already printed, and it has not been asked for.
+foot_pocket_h = 20.0;
+// Smallest skirt the foot stands proud of the tube, per side (mm). The real
+// figure is derived and will normally be larger — see foot_over.
+foot_over_min = 0.0;
+// Margin kept between the leaning mouth's outermost point and the edge of the
+// foot it stands on (mm).
+foot_margin = 1.5;
+
 /* [Fit coupon] */
 
 // The coupon is a short open ring of the pocket section and nothing else — no
@@ -279,9 +321,9 @@ stack_w = tube_w + 2 * stack_over;
 stack_d = tube_d / cos(lean) + 2 * stack_over;
 stack_r = tube_r + stack_over;
 
-base_w = stack_w + 2 * base_over;
-base_d = stack_d + 2 * base_over;
-base_r = stack_r + base_over;
+base_w = stack_w + 2 * base_flare;
+base_d = stack_d + 2 * base_flare;
+base_r = stack_r + base_flare;
 
 // --- receiver slab ---
 // How far the tilted pocket floor drops below its centre at the pocket edge.
@@ -293,6 +335,35 @@ slab_h = max(floor_t + floor_drop, joint_h + groove_roof);
 // How far the tube has to be extended below the tilt origin so that, once it
 // is cut flat at the slab top, no wedge of it is left hanging in the air.
 tube_under = (tube_d / 2) * tan(lean) + 1;
+
+// --- one-piece foot ---
+// Slab height that produces foot_lift. Inverts the leg_lift relation below: the
+// leg rests on the pocket floor's LOW corner, so the floor's centreline has to
+// sit that much higher than the lift being asked for.
+foot_slab_h = foot_lift + (leg_d / 2) * tan(lean);
+
+// How far the leaning mouth's outermost point reaches from the part's centre.
+// With no base under it the foot has to carry that itself, or the socket hangs
+// out past the thing it stands on.
+mouth_reach = foot_pocket_h * sin(lean) + (tube_d / 2) * cos(lean);
+
+// The plinth's TOP is the tube's own footprint where the horizontal cut plane
+// takes it — stretched by 1/cos(lean), exactly what the leaning tube presents
+// at that height. Growing from that instead of from the stack outline is what
+// removes the last ledge: the socket rises out of the flare with no step,
+// because the two outlines are the same curve. The foot has no groove, so it
+// does not need the stack_over the receiver's slab does.
+foot_top_w = tube_w;
+foot_top_d = tube_d / cos(lean);
+foot_top_r = tube_r;
+
+foot_over = max(foot_over_min, mouth_reach + foot_margin - foot_top_d / 2);
+
+foot_w = foot_top_w + 2 * foot_over;
+foot_d = foot_top_d + 2 * foot_over;
+foot_r = foot_top_r + foot_over;
+
+foot_total_h = foot_slab_h + foot_pocket_h * cos(lean) + (tube_d / 2) * sin(lean);
 
 // Half-dimensions of the tongue's outer face, where the ribs sit.
 rib_face_x = stack_w / 2 - tongue_out;
@@ -347,6 +418,11 @@ echo(str("lifts the leg ", leg_lift, " mm, then ", shim_h, " mm a shim; ",
          "pocket floor at ", min_lift, " mm on the centreline"));
 echo(str("base + receiver stands ", foot_h, " mm tall overall; ",
          "receiver ", receiver_h, ", slab ", slab_h));
+echo(str("one-piece foot lifts ", foot_lift, " mm, stands ", foot_total_h,
+         " mm tall, footprint ", foot_w, " x ", foot_d,
+         ", plinth ", foot_slab_h));
+assert(foot_slab_h >= floor_t + floor_drop,
+       "foot_lift is too small to leave floor_t under the pocket's low corner");
 echo(str("pocket ", pocket_w, " x ", pocket_d,
          "; stack ", stack_w, " x ", stack_d,
          "; base ", base_w, " x ", base_d));
@@ -456,12 +532,65 @@ module groove() {
     }
 }
 
-// A plate of the stack outline with the bottom outside edge relieved.
-module stack_plate(h) {
+// A flat plate with a 45-degree relief on its bottom outside edge.
+module relieved_plate(w, d, r, h) {
     hull() {
-        linear_extrude(eps) offset(delta = -base_cham) stack_outline();
-        translate([0, 0, base_cham]) linear_extrude(eps) stack_outline();
-        translate([0, 0, h - eps]) linear_extrude(eps) stack_outline();
+        linear_extrude(eps)
+            rrect(w - 2 * base_cham, d - 2 * base_cham, max(r - base_cham, 0.01));
+        translate([0, 0, base_cham]) linear_extrude(eps) rrect(w, d, r);
+        translate([0, 0, h - eps]) linear_extrude(eps) rrect(w, d, r);
+    }
+}
+
+// Cosine ease for the flare profile. t runs 0 at the top to 1 at the ground.
+// Its derivative is zero at t = 0, and that is the whole point: the flare
+// leaves the column vertically instead of running into it at an angle, so
+// there is no crease where the two meet. At the ground the slope is steepest,
+// so the pad lands on the patio at an angle rather than feathering to nothing.
+function flare_off(over, t) = over * (1 - cos(90 * t));
+
+// A pad that flares SMOOTHLY out toward the ground. It matches the outline it
+// is given exactly at its top, is widest at the bottom, and is tangent to
+// vertical where the two meet — so nothing shows at the join at all, neither a
+// ledge nor a crease. The caller picks the top outline: the base hands it the
+// stack outline because shims land on it, the foot hands it the tube's own
+// silhouette because nothing does.
+//
+// A single hull() cannot do this. The profile is concave, and a hull of the two
+// ends would just span them as a straight cone — which is the crease this
+// replaces. It is built as a stack of slices with consecutive pairs hulled.
+//
+// Printed bottom-down every slice is smaller than the one below it, so the
+// whole flare is an inward taper and wants no support.
+module flared_plate(tw, td, tr, over, h) {
+    steps = max(6, ceil((h - base_cham) / flare_seg));
+
+    // z of the slice at t, sitting above the bottom relief. The top slice is
+    // placed an eps low so its extrusion tops out exactly at h.
+    function fz(t) = base_cham + (h - base_cham - eps) * (1 - t);
+
+    // The relieved bottom edge, at the flare's full width.
+    ow = tw + 2 * over;
+    od = td + 2 * over;
+    orr = tr + over;
+    hull() {
+        linear_extrude(eps)
+            rrect(ow - 2 * base_cham, od - 2 * base_cham, max(orr - base_cham, 0.01));
+        translate([0, 0, base_cham]) linear_extrude(eps) rrect(ow, od, orr);
+    }
+
+    // The flare itself.
+    for (i = [0 : steps - 1]) {
+        t0 = i / steps;
+        t1 = (i + 1) / steps;
+        o0 = flare_off(over, t0);
+        o1 = flare_off(over, t1);
+        hull() {
+            translate([0, 0, fz(t0)]) linear_extrude(eps)
+                rrect(tw + 2 * o0, td + 2 * o0, tr + o0);
+            translate([0, 0, fz(t1)]) linear_extrude(eps)
+                rrect(tw + 2 * o1, td + 2 * o1, tr + o1);
+        }
     }
 }
 
@@ -469,10 +598,53 @@ module drain(h) {
     translate([0, 0, -eps]) linear_extrude(h + 2 * eps) drain_outline();
 }
 
-// The tilted frame the receiver's tube and pocket are drawn in. Its origin sits
-// on the slab's top face at the part's centre, and its z axis is the leg axis.
-module tilted() {
-    translate([0, 0, slab_h]) rotate([lean, 0, 0]) children();
+// The tilted frame the tube and pocket are drawn in. Its origin sits on the
+// slab's top face at the part's centre, and its z axis is the leg axis.
+module tilted(h) {
+    translate([0, 0, h]) rotate([lean, 0, 0]) children();
+}
+
+// The leaning socket, standing on whatever slab is handed to it as children and
+// drained through it. Everything that makes a socket a socket lives here; the
+// stacking receiver and the one-piece foot differ only in the slab they pass in
+// and in whether a groove comes out afterwards.
+//
+// The pocket is cut from the slab as well as the tube, not from the tube alone.
+// Its floor is tilted, so on the low side that plane dips BELOW the slab's top
+// face — cutting only the tube would leave the floor flat there instead of
+// square to the leg, and the leg would then rock on the ridge between the two.
+module socket_on(h, ph) {
+    difference() {
+        union() {
+            children();
+
+            // The leaning tube, sliced off flat where it meets the slab.
+            intersection() {
+                tilted(h)
+                    translate([0, 0, -tube_under])
+                        linear_extrude(tube_under + ph) tube_outline();
+                translate([-big / 2, -big / 2, h]) cube([big, big, big]);
+            }
+        }
+
+        tilted(h) {
+            // Pocket. Its floor is the plane z = 0 of the tilted frame, so it
+            // is square to the leg and the tube's cut end seats flat on it.
+            translate([0, 0, -eps])
+                linear_extrude(ph + 2 * eps) pocket_outline();
+
+            // Mouth flare.
+            hull() {
+                translate([0, 0, ph - mouth_cham])
+                    linear_extrude(eps) pocket_outline();
+                translate([0, 0, ph + eps])
+                    linear_extrude(eps) offset(delta = mouth_cham) pocket_outline();
+            }
+        }
+
+        // Tall enough to break through the tilted floor at the slot's high end.
+        drain(h + floor_drop + 1);
+    }
 }
 
 // ------------------------------------------------------------------- parts --
@@ -480,11 +652,7 @@ module tilted() {
 module base() {
     difference() {
         union() {
-            hull() {
-                linear_extrude(eps) offset(delta = -base_cham) base_outline();
-                translate([0, 0, base_cham]) linear_extrude(eps) base_outline();
-                translate([0, 0, base_h - eps]) linear_extrude(eps) base_outline();
-            }
+            flared_plate(stack_w, stack_d, stack_r, base_flare, base_h);
             translate([0, 0, base_h]) tongue();
         }
         drain(base_h + joint_h);
@@ -494,7 +662,7 @@ module base() {
 module shim() {
     difference() {
         union() {
-            stack_plate(shim_h);
+            relieved_plate(stack_w, stack_d, stack_r, shim_h);
             translate([0, 0, shim_h]) tongue();
         }
         groove();
@@ -504,37 +672,18 @@ module shim() {
 
 module receiver() {
     difference() {
-        union() {
-            stack_plate(slab_h);
-
-            // The leaning tube, sliced off flat where it meets the slab.
-            intersection() {
-                tilted()
-                    translate([0, 0, -tube_under])
-                        linear_extrude(tube_under + pocket_h) tube_outline();
-                translate([-big / 2, -big / 2, slab_h]) cube([big, big, big]);
-            }
-        }
-
-        tilted() {
-            // Pocket. Its floor is the plane z = 0 of the tilted frame, so it
-            // is square to the leg and the tube's cut end seats flat on it.
-            translate([0, 0, -eps])
-                linear_extrude(pocket_h + 2 * eps) pocket_outline();
-
-            // Mouth flare.
-            hull() {
-                translate([0, 0, pocket_h - mouth_cham])
-                    linear_extrude(eps) pocket_outline();
-                translate([0, 0, pocket_h + eps])
-                    linear_extrude(eps) offset(delta = mouth_cham) pocket_outline();
-            }
-        }
-
+        socket_on(slab_h, pocket_h)
+            relieved_plate(stack_w, stack_d, stack_r, slab_h);
         groove();
-        // Tall enough to break through the tilted floor at the slot's high end.
-        drain(slab_h + floor_drop + 1);
     }
+}
+
+// The one-piece foot. The same socket on a taller, wider plinth, with no groove
+// taken out of it — flat underneath but for the drain, and nothing stacks on
+// it. For a leg that needs a known fixed correction and no adjustment.
+module foot() {
+    socket_on(foot_slab_h, foot_pocket_h)
+        flared_plate(foot_top_w, foot_top_d, foot_top_r, foot_over, foot_slab_h);
 }
 
 // ------------------------------------------------------------------ output --
@@ -611,4 +760,5 @@ else if (show == "base")   base();
 else if (show == "plate")  plate();
 else if (show == "stack")  stack();
 else if (show == "coupon") coupon();
+else if (show == "foot")   foot();
 else                       receiver();

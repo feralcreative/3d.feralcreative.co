@@ -7,10 +7,11 @@ hobbs-chalk-holder-coupon 5
 large-door-stop 2
 large-door-stop-coupon 2
 large-door-stop-coupon-profile 1
-patio-leg-spacer-base 5
+patio-leg-foot 3
+patio-leg-spacer-base 8
 patio-leg-spacer-coupon 1
-patio-leg-spacer-receiver 6
-patio-leg-spacer-shim 5
+patio-leg-spacer-receiver 7
+patio-leg-spacer-shim 6
 phone-shower-holder 5
 phone-shower-holder-assembled 1
 roku-stand 5
