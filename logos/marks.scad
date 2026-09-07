@@ -34,11 +34,13 @@
 // rather than their own. Easy to get wrong by hand; impossible to get wrong from
 // here, which is the whole reason the split layers share one box below.
 //
-// WHAT CAN BE CUT THROUGH: the Hobbs figure, and nothing else. Everything else
-// carries counters that a through-cut drops on the floor — HOBBS has three, the
-// feral logo has its entire wordmark floating inside the frame, and the Vampires
-// rocker is knocked out of a solid banner, so every letter in it is a hole.
-// Deboss or raise those.
+// WHAT CAN BE CUT THROUGH: the Hobbs figure and both ZR marks. Everything
+// else carries counters that a through-cut drops on the floor — HOBBS has three,
+// the feral logo has its entire wordmark floating inside the frame, and the
+// Vampires rocker is knocked out of a solid banner, so every letter in it is a
+// hole. Deboss or raise those. The two ZRs are safe because neither has a
+// counter at all: extruded, they come out as three and four disjoint solids
+// with nothing enclosed, so a through-cut leaves holes and nothing loose.
 //
 // NATIVE SIZES are measured off OpenSCAD's own import rather than read off the
 // viewBox, because the two do not agree — the importer works in millimetres at
@@ -53,6 +55,8 @@ HOBBS_BOX      = [[  0.000, 0.180], [705.551, 471.131]];  // figure and word tog
 HOBBS_WORD_BOX = [[121.237, 0.180], [401.015,  75.219]];  // the wordmark on its own
 FERAL_BOX      = [[  0.000, 0.000], [292.453, 342.019]];
 VMC_BOX        = [[  0.000, 3.845], [352.777, 256.928]];
+ZR_BOX         = [[  0.000, 0.000], [333.309, 270.705]];
+ZR_MONO_BOX    = [[  0.000, 0.000], [181.150, 123.472]];
 
 // What a mark stands to when it is placed `width` across.
 function mark_height(box, width)   = width * box[1][1] / box[1][0];
@@ -60,6 +64,8 @@ function hobbs_mark_height(width)  = mark_height(HOBBS_BOX, width);
 function hobbs_word_height(width)  = mark_height(HOBBS_WORD_BOX, width);
 function feral_logo_height(width)  = mark_height(FERAL_BOX, width);
 function vmc_rocker_height(width)  = mark_height(VMC_BOX, width);
+function zr_mark_height(width)     = mark_height(ZR_BOX, width);
+function zr_monogram_height(width) = mark_height(ZR_MONO_BOX, width);
 
 // Scale to width, centre on the origin.
 module place_mark(box, width) {
@@ -100,4 +106,25 @@ module feral_logo(width = 30, $fn = 0) {
 
 module vmc_top_rocker(width = 30, $fn = 0) {
     place_mark(VMC_BOX, width) import("vmc-top-rocker.svg");
+}
+
+// The ZR mark: heavy, blocky, no counters. The one to reach for on a material
+// that swallows fine detail, and — with the monogram below and the Hobbs figure
+// — one of the three here that survives a through-cut.
+module zr_mark(width = 30, $fn = 0) {
+    place_mark(ZR_BOX, width) import("logo-zr.svg");
+}
+
+// The ZR monogram: the same two letters as a high-contrast serif, four disjoint
+// pieces and no counters.
+//
+// ⚠️ IT IS A HAIRLINE DESIGN and the thins are what set its size. They are
+// 1.4% of its height — 0.58 mm on a 60 mm mark, 0.70 on 50, and the artwork
+// would have to stand 86 mm wide before they reached two 0.42 lines on their
+// own. Below that, swell the whole mark with offset(delta = ) before cutting
+// and let the thicks carry the extra: +0.25 takes a 50 mm mark's thins to
+// 1.20 mm while the heavy diagonal only goes 4.2 to 4.7, which at reading
+// distance is the same drawing. parts/deck-door-stop.scad does exactly that.
+module zr_monogram(width = 30, $fn = 0) {
+    place_mark(ZR_MONO_BOX, width) import("monogram-zr.svg");
 }

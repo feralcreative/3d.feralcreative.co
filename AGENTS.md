@@ -98,7 +98,7 @@ Follow `parts/example-spacer.scad`, which exists as the template:
 5. `eps = 0.01` overshoot on every subtracted solid, so no cut face is coplanar with its parent.
 6. Multi-variant parts expose `show = "…";` with the choices in a trailing `// [a, b, c]` comment, and select with `-D 'show="coupon"'`.
 7. Prefix parameter names per sub-assembly in merged files (`ring_collar_d`, not `collar_d`). OpenSCAD has no namespaces and the last top-level assignment wins file-wide.
-8. Artwork goes through `logos/marks.scad`: `hobbs_mark(width)`, `hobbs_mark_figure`, `hobbs_mark_word`, `hobbs_word_alone`, `feral_logo`, `vmc_top_rocker`, each centred on the origin and scaled to the width given, plus `*_height(width)` functions. Only the Hobbs figure may be cut through; everything else has counters that a through-cut drops out.
+8. Artwork goes through `logos/marks.scad`: `hobbs_mark(width)`, `hobbs_mark_figure`, `hobbs_mark_word`, `hobbs_word_alone`, `feral_logo`, `vmc_top_rocker`, `zr_mark`, `zr_monogram`, each centred on the origin and scaled to the width given, plus `*_height(width)` functions. Only the Hobbs figure and the two ZR marks may be cut through; everything else has counters that a through-cut drops out. `zr_monogram` is a hairline design — swell it before cutting, see the ⚠️ on that module.
 
 Scripts live in `utils/`, never `scripts/`. Documentation other than `README.md` and this file lives in `docs/`. Bash scripts are `set -euo pipefail` with a header comment explaining why the script exists, not what it does.
 
@@ -117,6 +117,7 @@ Scripts live in `utils/`, never `scripts/`. Documentation other than `README.md`
 - **The Flash Studio CLI does not walk `inherits` chains.** Point it at a bare child profile and only the keys physically in that file take effect; everything else falls back to slicer built-ins, not to the parent. That is why `ffprofile.py` exists, and why slicing straight from the bundle's PETG profile produced a PLA job with zero-width walls.
 - **Legacy parts in `_incoming/` are measured, not authored.** The chalk holder and pyramid were remade from SketchUp-era meshes, so a number in those files may be a faithfully copied mistake rather than a decision—the thread groove was 0.596 mm deeper than anything needed.
 - **Camera flags are verified on OpenSCAD 2026.06.12**, checked with a deliberately asymmetric rig. If you ever re-verify, do not use a rotationally symmetric part: its front and right views are pixel-identical whether the flags work or not.
+- **A render that looks broken may be the preview, not the part.** `render.sh` runs OpenSCAD in preview mode, and OpenCSG gives up on some parts — `deck-door-stop.scad` with its deboss loses its whole body and draws a few stray walls. Pass `--render=cgal` through `render.sh` before believing a part is broken; `build.sh` evaluates the real geometry and is never affected.
 - **Do not rebuild knowledge that is already written down.** The two references below were expensive to produce; read them rather than re-reading the app bundle or the web.
 
 ## 7. Commit and PR conventions
