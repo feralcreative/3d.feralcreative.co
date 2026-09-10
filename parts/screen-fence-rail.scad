@@ -24,15 +24,33 @@
 // the inner face of one wall, because those are the surfaces a part inside the
 // channel actually touches. Each wall carries three inward features:
 //
-//     z 4.77 - 5.65   LEDGE      reaches 3.14 mm inboard   (gap 15.76 mm)
-//     z 6.96 - 9.01   MID HOOK   reaches 1.35 mm inboard   (gap 19.34 mm)
-//     z 13.28 - 15.15 TOP LIP    reaches 1.35 mm inboard   (gap 19.34 mm)
+//     z 4.77 - 5.65   LEDGE      reaches 5.47 mm inboard   (gap 11.11 mm)
+//     z 6.96 - 9.01   MID HOOK   reaches 3.12 mm inboard   (gap 15.80 mm)
+//     z 13.28 - 15.15 TOP LIP    reaches 3.12 mm inboard   (gap 15.80 mm)
 //
-// ⚠️ These are read off a drawing, not off the rail. The outline is drawn with
-// a 0.26 mm line and the readings take its inner edge, so the real clear space
-// is up to ~0.13 mm larger than assumed here — i.e. the part errs small, which
-// is the safe direction. The one figure worth a caliper before printing 200 mm
-// is the 22.04 mm clear width; print show="coupon" and try the three fits.
+// ---------------------------------------------------------------------------
+// THE DRAWING IS NOT THE RAIL — CORRECTED 2026-09-10
+// ---------------------------------------------------------------------------
+// Ziad put a caliper across the real rail: 11.11 mm between the two fins (the
+// lower ledges), 15.80 mm between the top two rolls. The drawing gives 15.76
+// and 19.34. It is generous at BOTH apertures, by 4.65 and 3.54 mm, and the
+// two errors are not a common scale factor (1.418 and 1.224), so the drawing
+// is a similar section and not this one. Nothing may be re-derived from it.
+//
+// What that changes: both apertures are much tighter than assumed, and both
+// undercuts are much DEEPER — 5.47 mm of fin and 3.12 mm of rolled lip to hook
+// under, against 3.14 and 1.35. Tighter entry, better hold, once something can
+// get in at all.
+//
+// ⚠️ Three numbers in this block are still drawing-derived and one of them
+// carries the other two:
+//
+//   * trk_clear_w 22.04 — the clear bore. The two measured gaps are converted
+//     to inboard reaches through it, so an error here lands as half of itself
+//     on each reach. Worth a caliper.
+//   * the mid hook's reach — not measured. Held equal to the top lip's, which
+//     is the relationship the drawing shows.
+//   * every z height — not measured.
 //
 // ---------------------------------------------------------------------------
 // WHY THIS SHAPE
@@ -49,8 +67,8 @@
 // grip comes off the near wall alone, and the far side does its work by pinching
 // rather than by hooking under anything it has to fight its way past.
 //
-// Of the three features on that wall the LEDGE is the one worth having: 3.14 mm
-// of positive undercut against 1.35 mm at either hook, and the chamber beneath
+// Of the three features on that wall the LEDGE is the one worth having: 5.47 mm
+// of positive undercut against 3.12 mm at either hook, and the chamber beneath
 // it is the one region of the section the mesh cannot reach (the far ledge stops
 // the mesh descending past z 5.65). So the part carries a wedge-shaped tongue
 // that slides under the near ledge, and stands on the channel floor.
@@ -127,13 +145,24 @@ show = "assembly";  // [fence, coupon, track, assembly, fitcheck, compare, conce
 /* [Track — MEASURED, see header. Do not change without re-measuring] */
 
 // Clear width of the channel, inner wall face to inner wall face (mm).
+// ⚠️ Drawing-derived, and it converts both measured gaps into reaches. Mike it.
 trk_clear_w  = 22.04;
 // Inner floor to the top of the walls (mm).
 trk_depth    = 15.15;
+
+// THE TWO APERTURES, CALIPER'D OFF THE REAL RAIL 2026-09-10 (mm).
+// These are the measured facts of this section; the inboard reaches below are
+// derived from them rather than the other way round, because a gap is what a
+// caliper reads and what an insertion has to pass through.
+trk_fin_gap  = 11.11;   // between the two fins  (the lower ledges)
+trk_lip_gap  = 15.80;   // between the two top rolled lips
+
 // How far the mid hooks and the top lips reach inboard of the wall face (mm).
-trk_hook_x   = 1.35;
+// The mid hook is NOT measured — held equal to the top lip, as drawn.
+trk_hook_x   = (trk_clear_w - trk_lip_gap) / 2;   // 3.120
 // How far the lower ledge reaches inboard of the wall face (mm).
-trk_ledge_x  = 3.14;
+trk_ledge_x  = (trk_clear_w - trk_fin_gap) / 2;   // 5.465
+
 // Underside of the lower ledge, above the inner floor (mm).
 trk_ledge_z0 = 4.77;
 // Top face of the lower ledge, above the inner floor (mm).
@@ -211,20 +240,36 @@ drop_barb = 1.50;
 // here. That puts every internal face vertical, so the ledges' undersides and
 // the rolled hooks come out as walls rather than overhangs, and the two
 // apertures the insertion actually depends on are formed accurately. Printed
-// lying down, the ledge undersides are 3.14 mm of unsupported horizontal
+// lying down, the ledge undersides are 5.47 mm of unsupported horizontal
 // overhang and the apertures would close up. Use it lying down once printed.
+//
+// It is NOT a replica in outside size either: 3 mm of solid wall around the
+// cavity puts it about 4 mm wider than the rail's own 23.80. Only the cavity
+// is meant to match, and only the cavity is worth measuring.
 fixture_len  = 60;
 // Solid wall around the cavity (mm).
 fixture_wall = 3.0;
-// Grow every aperture by this much per face (mm).
+// TWO compensations, because the first printed fixture's two errors ran in
+// OPPOSITE directions and one knob cannot correct both. Measured 2026-09-09 on
+// the uncompensated print (designed / printed):
 //
-// Start at 0, print it, then mike the three numbers that matter and compare:
-// overall clear width 22.04, the mouth between the top lips 19.34, and the gap
-// between the ledge tips 15.76. This machine has no XY compensation set and a
-// bore has measured 0.3 mm undersize per side in PETG, which would make the
-// fixture TIGHTER than the real rail — the wrong direction, since it would
-// fail parts that actually fit. Dial this until the printed apertures match.
-fixture_comp = 0.00;
+//     clear bore        22.04 / 21.75   -0.29   the cavity closed up, as bores do
+//     top lip to lip    19.34 / 19.58   +0.24   the bead tips printed blunt, so
+//                                               they reached less far inboard
+//
+// In the printed part's own frame that is 0.145 mm of bore lost per side, and
+// 0.265 mm of reach lost per bead tip (0.145 of wall movement on top of the
+// 0.12 the aperture itself opened). Both are grown here so the printed cavity
+// comes out at the rail's numbers rather than the model's.
+//
+// Set both to 0 to build the fixture at nominal.
+//
+// ⚠️ The 0.265 is a tip-blunting figure taken from beads that reached 1.35 mm.
+// The real ones reach 3.12 and 5.47. Blunting is a tip-radius effect and should
+// not scale with reach, but that is an assumption — re-mike this print.
+fixture_bore_comp = 0.145;
+// Extra inboard reach given to every bead and fin tip (mm).
+fixture_bead_comp = 0.265;
 
 /* [Preview] */
 
@@ -631,41 +676,61 @@ module fence() {
 
 // A rolled edge — the mid hook and the top lip are both one of these. Sized to
 // fill the measured envelope exactly: it spans z0..z1 and reaches x_reach
-// inboard, and its far side runs back into the wall, which is what joins it on.
-// solid = true gives a plain bead instead of the curl. Same envelope — the
-// bead's innermost point is still x_reach at its mid height, which is the only
-// thing an aperture depends on — but printable and properly attached.
+// inboard. solid = true gives a plain bead instead of the curl. Same envelope —
+// the bead's innermost point is still x_reach at its mid height, which is the
+// only thing an aperture depends on — but printable and properly attached.
 //
-// The curl is only worth drawing in a picture. In a printed fixture it is
-// unbuildable and unsafe: the wall between the void and the outside works out
-// at 0.75 mm, under two perimeters, and the slot that opens the void downward
-// severs the bead from the wall over part of its height, leaving a lug the
-// test part would snap off on its way past.
+// THE WEB IS NOT OPTIONAL. The bead is a circle centred x_reach - r, so it
+// touches the wall only while x_reach <= 2r. It did, on the drawing's 1.35 mm
+// reach against a 1.87 mm bead. The rail's real 3.12 mm reach leaves it
+// floating — a loose rod down the middle of the fixture's channel, and a
+// detached island in the preview. The web is also what the rail actually is:
+// the wall's own skin folds inboard along the TOP of the band and the curl
+// hangs down off its end, opening downward, which is how the drawing reads.
+//
+// The curl itself is only worth drawing in a picture. In a printed fixture it
+// is unbuildable and unsafe: the wall between the void and the outside works
+// out under two perimeters, and the slot that opens the void downward severs
+// the bead from the wall over part of its height, leaving a lug the test part
+// would snap off on its way past.
 module rolled(x_reach, z0, z1, solid = false) {
     r = (z1 - z0) / 2;
-    if (solid)
-        translate([x_reach - r, (z0 + z1) / 2]) circle(r = r);
-    else
-        difference() {
-            translate([x_reach - r, (z0 + z1) / 2]) circle(r = r);
-            translate([x_reach - r, (z0 + z1) / 2]) circle(d = trk_roll_void);
-            translate([x_reach - r - trk_roll_void / 2, z0 - eps])
-                square([trk_roll_void, r + eps]);
-        }
+    cx = x_reach - r;
+    union() {
+        translate([-eps, z1 - trk_skin])
+            square([max(cx, 0) + eps, trk_skin]);              // web, off the wall
+        if (solid)
+            translate([cx, (z0 + z1) / 2]) circle(r = r);
+        else
+            difference() {
+                translate([cx, (z0 + z1) / 2]) circle(r = r);
+                translate([cx, (z0 + z1) / 2]) circle(d = trk_roll_void);
+                translate([cx - trk_roll_void / 2, z0 - eps])
+                    square([trk_roll_void, r + eps]);
+            }
+    }
 }
 
 // The three inward features carried by one wall, drawn at the near wall.
-module track_features(solid = false) {
+// dx pushes every tip further inboard — the fixture's bead compensation. It is
+// a reach offset and NOT an isotropic offset(), deliberately: growing the ledge
+// in every direction would thicken it and drop the underside the tongue datums
+// against, which is a face, not a tip, and prints accurately as it is.
+module track_features(solid = false, dx = 0) {
     // Ledge, with the rounded tip the drawing shows. Left at its measured
     // 0.88 mm: that is two perimeters printed as a vertical wall, and its top
     // and bottom faces are the real datums the tongue hooks under, so it is
     // not a thickness to round up for printability.
+    // The root circle is pushed eps INTO the wall on purpose. Sitting exactly on
+    // the wall face it is tangent, and a tangency is not a join: the fixture
+    // built that way came out as three shells, the two fins loose in the
+    // channel. Same reason the rolled web starts at -eps.
     t = trk_ledge_z1 - trk_ledge_z0;
-    hull() for (x = [t / 2, trk_ledge_x - t / 2])
+    hull() for (x = [t / 2 - eps, trk_ledge_x + dx - t / 2])
         translate([x, trk_ledge_z0 + t / 2]) circle(d = t);
 
-    rolled(trk_hook_x, trk_hook_z0, trk_hook_z1, solid);
-    rolled(trk_hook_x, trk_lip_z0,  trk_depth,   solid);
+    rolled(trk_hook_x + dx, trk_hook_z0, trk_hook_z1, solid);
+    rolled(trk_hook_x + dx, trk_lip_z0,  trk_depth,   solid);
 }
 
 module track_profile() {
@@ -684,22 +749,26 @@ module track_profile() {
 }
 
 // The channel's free space: the bore, less the features that intrude into it.
+// The bore is widened by fixture_bore_comp per side and the walls move out with
+// it, so every feature's reach stays measured from the face it hangs off.
 module fixture_cavity2d() {
+    b = fixture_bore_comp;
+    w = trk_clear_w + 2 * b;
     difference() {
-        square([trk_clear_w, trk_depth + 10]);      // bore, open at the top
-        offset(delta = -fixture_comp)
-            for (m = [0, 1])
-                translate([m * trk_clear_w, 0]) mirror([m, 0])
-                    track_features(solid = true);
+        translate([-b, 0]) square([w, trk_depth + 10]);   // bore, open at the top
+        for (m = [0, 1])
+            translate([-b + m * w, 0]) mirror([m, 0])
+                track_features(solid = true, dx = fixture_bead_comp);
     }
 }
 
 module fixture(len = fixture_len) {
     fw = fixture_wall;
+    b  = fixture_bore_comp;
     linear_extrude(height = len, convexity = 10)
         difference() {
-            translate([-fw, -fw])
-                square([trk_clear_w + 2 * fw, trk_depth + fw]);
+            translate([-fw - b, -fw])
+                square([trk_clear_w + 2 * (fw + b), trk_depth + fw]);
             fixture_cavity2d();
         }
 }
