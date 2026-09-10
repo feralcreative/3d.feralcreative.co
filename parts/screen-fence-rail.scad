@@ -364,6 +364,25 @@ clip_tab_floor = 0.30;
 // same squeeze, so it is clamped to hook - 0.10 and says so when it clamps.
 twin_bump = 0.80;
 
+// Widen everything ABOVE the rail out to the rail's own outside width, so the
+// part caps the whole extrusion instead of standing on it as a narrow U.
+//
+// It is a SKIRT, not a slab, and that is not a style choice. The legs are
+// rooted at the crossbar and their length is the only thing keeping the strain
+// down — filling the space above the rail with solid material would re-root
+// them at the rail top, cut them from 26.3 mm to 10.6, and take the deepest
+// rung from 1.3 % to about 8 %. So the two side walls come down inside the cap
+// and the legs still hang free between them, with 4.3 mm of air on the side
+// they flex toward.
+//
+// The skirt stops clip_cap_clr above the rail rather than resting on it: the
+// feet on the fins are the datum and there must be only one. Flush at the
+// outside, 1/32 in of rail wall in from that, so it cannot pass the rail top
+// on the way down and does not try to.
+twin_cap = true;
+// Air between the skirt's bottom and the top of the rail (mm).
+clip_cap_clr = 0.15;
+
 // Which wall feature the twin clip catches.
 //
 //   roll  the top rolled lip. 1/8 in of undercut, in a pocket 4.27 mm tall
@@ -1291,11 +1310,26 @@ module twin2d(hook = clip_hook, splay = 0) {
     xo   = catch_reach + clip_clr + splay;
     ztop = trk_depth + clip_fence_h;
     zbar = ztop - clip_bridge_t;
+    cx0  = -trk_skin;                       // flush with the rail's outside
+    cx1  = w + trk_skin;
+    cz0  = trk_depth + clip_cap_clr;
 
     union() {
         twin_side(hook, splay);
         translate([w, 0]) mirror([1, 0]) twin_side(hook, splay);
-        polygon([[xo, zbar], [w - xo, zbar], [w - xo, ztop], [xo, ztop]]);
+
+        // Crossbar. Full width once capped, and FIXED — the skirt is rigid, so
+        // unlike the legs it must not move with splay.
+        if (twin_cap)
+            polygon([[cx0, zbar], [cx1, zbar], [cx1, ztop], [cx0, ztop]]);
+        else
+            polygon([[xo, zbar], [w - xo, zbar], [w - xo, ztop], [xo, ztop]]);
+
+        if (twin_cap)
+            for (m = [0, 1])
+                translate([m * w, 0]) mirror([m, 0])
+                    polygon([[cx0, cz0], [cx0 + clip_out_t, cz0],
+                             [cx0 + clip_out_t, zbar], [cx0, zbar]]);
     }
 }
 
