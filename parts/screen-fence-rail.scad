@@ -157,7 +157,9 @@
 // "fitcheck" is the interference test — see the module.
 //
 // This defaults to a PREVIEW, not the part, so that opening the file in
-// OpenSCAD shows the fence in the rail without touching anything. The cost is
+// OpenSCAD shows the live design sitting in the corrected rail without
+// touching anything. That is now "clipassembly" — the wall clip on the near
+// wall — and no longer "assembly", which draws the dead rotate-in fence. The cost is
 // that building the part now needs the flag:
 //
 //     utils/build.sh parts/screen-fence-rail.scad -D 'show="fence"'
@@ -165,7 +167,7 @@
 // A bare build.sh run would otherwise stamp the assembly into the fence's own
 // version series and leave stl/screen-fence-rail.stl pointing at a rail with a
 // fence inside it. There is an echo at the bottom of this file to catch that.
-show = "assembly";  // [fence, coupon, track, assembly, fitcheck, compare, concepts, fixture]
+show = "twinassembly";  // [fence, coupon, twin, twincoupon, twinfit, twinpath, twinassembly, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
 
 // COUPON-COMPONENTS: fit=coupon
 // COUPON-PLATE: coupon
@@ -253,6 +255,136 @@ key_push = 2.40;
 // of hook — and costs 1.50 mm of inward flex on insertion, which needs a leg
 // of at least 10.2 mm at 1.29 mm thick to stay inside PETG's strain budget.
 drop_barb = 1.50;
+
+/* [Wall clip — the current design] */
+
+// A hairpin that snaps over the NEAR WALL from above, outside the channel.
+// This is round 01h's concept made real: nothing has to squeeze through the
+// mouth, nothing is glued, and the deep 1/8 in roll the corrected profile
+// exposed is what it hooks.
+//
+// WHY A HAIRPIN AND NOT A RIGID CLIP. Work it through and the rigid version is
+// impossible, for the same reason round 01f's rotate-in was:
+//
+//   * To descend, the clip's slot has to pass over wall + roll = 3.97 mm.
+//   * To hook, its slot has to end up NARROWER than 3.97 by the engagement.
+//   * Shifting the part inboard to let the tab clear the roll on the way down
+//     puts the outer prong inboard of the wall face, where the roll blocks it.
+//   * Rotating about the wall's top-outer corner does not reach either: the
+//     tab's top corner sweeps to x 2.95 at best, and the roll tip is at 3.175.
+//
+// So the slot must SPRING OPEN by the engagement, and close under the roll.
+// That is the whole design. It is also why the crossbar is at the TOP of the
+// fence and not over the rail: legs rooted at the rail top are ~5 mm long and
+// 0.6 mm of splay strains them 4.8 %, past PETG. Rooted at the fence top they
+// are 16 and 20 mm, and the same splay is 0.57 % and 0.45 %.
+//
+// Seated, it is held by:
+//
+//   DOWN      the foot, resting on top of the roll.
+//   UP        the tab, hooked under the roll's underside 1.80 mm below it.
+//   INBOARD   the outer prong, against the wall's outside face.
+//   OUTBOARD  the inner leg, against the roll's tip.
+//
+// PRINT IT STANDING UP, section in the bed's XY, length vertical — same as the
+// fixture and the same reason. Every face of this section is then a vertical
+// wall: the tab's hook face comes out flat instead of as a 1.2 mm overhang,
+// and the legs bend within a layer rather than across one. It is why the real
+// part wants Ziad's original three interlocking segments rather than one
+// 200 mm extrusion.
+
+// How far the tab reaches past the roll's tip, seated (mm). THE variable the
+// coupon ladders: it is both the engagement and the splay the legs must give.
+clip_hook = 1.00;
+// Clearance from the inner leg's outboard face to the roll's tip (mm).
+clip_clr = 0.15;
+// Clearance from the outer prong's inboard face to the wall's outside (mm).
+// It is slop the part can take up by sliding inboard, so it comes straight off
+// the engagement: net hook is clip_hook - clip_out_clr.
+clip_out_clr = 0.10;
+// Clearance between the tab's top face and the roll's underside (mm). The foot
+// is the down-stop, so this is what is left over.
+clip_tab_clr = 0.15;
+// Inner leg and outer prong thickness (mm). Upright, EVERY dimension of this
+// section is a wall width, so these are line counts, not round numbers: 1.74
+// is four lines and 2.19 is five, at 0.42 outer and 0.45 inner. A leg at 1.60
+// is 3.6 lines and prints with a void down the middle of a spring.
+clip_in_t = 1.74;
+clip_out_t = 2.19;
+// Tab height (mm). The pocket between the mid hook's top and the roll's
+// underside is 4.27 mm; the tab has to enter it sideways, so it is shorter.
+clip_tab_h = 3.54;
+// How far the foot reaches over the top of the roll (mm), and how thick it is.
+clip_foot = 1.80;
+clip_foot_t = 1.74;
+// How far the outer prong descends below the top of the rail (mm).
+clip_out_drop = 6.00;
+// Fence height above the top of the rail (mm), and the crossbar's thickness.
+// It is a STRAIN parameter before it is a fence: it sets how long the legs
+// are. 14 was enough for the hairpin, where the two legs shared the splay
+// between them. The twin clip makes each leg travel the full engagement on its
+// own, which doubles the strain, and 18 is what brings the deepest rung back
+// under half of PETG's budget. It costs plate area, not print height.
+clip_fence_h = 18.00;
+clip_bridge_t = 2.19;
+
+// How much further than its own engagement the clip is sprung for the
+// insertion check (mm). Negative values are how you prove the check can fail:
+// at -0.50 the tab overlaps the roll by 0.45 and clippath must report facets.
+clip_path_slack = 0.05;
+
+// Length of one printed segment (mm). Standing up, this is the print height,
+// and it is why the part is segmented rather than one 200 mm extrusion.
+clip_seg_len = 60;
+
+// Lead-in ramp on the underside of every tab, as a RISE PER UNIT OF RUN. 1.00
+// is the 45 deg wedge this started as; higher is a gentler wedge that cams in
+// more easily and costs height.
+//
+// It is capped, and the cap is not cosmetic. The space under the fin is only
+// 4.76 mm and the ramp is subtracted from the tab, so at the deepest rung a
+// 45 deg ramp already consumed the entire tab and left a knife edge with no
+// bearing face at all. clip_bear_min is the flat that always survives.
+clip_lead = 1.35;
+// Flat bearing height every tab keeps, whatever the ramp wants (mm).
+clip_bear_min = 0.80;
+// Gap from a tab's bottom to whatever is below it — the channel floor under
+// the fin, the mid hook's top under the roll (mm).
+clip_tab_floor = 0.30;
+
+// Secondary bump on each leg, snapping into the pocket under the TOP ROLL.
+// Engagement past the roll's tip, per side (mm), 0 for none.
+//
+// It is a second catch at a second height, so the part is hooked twice on each
+// wall: the tab under the fin at z 4.76 and the bump under the roll at 13.28.
+// Both are set 0.15 below their feature, so both bear at once.
+//
+// It cannot be deeper than the tab's own engagement. The legs squeeze by the
+// tab's hook plus a whisker, and the bump has to clear the roll tip on that
+// same squeeze, so it is clamped to hook - 0.10 and says so when it clamps.
+twin_bump = 0.80;
+
+// Which wall feature the twin clip catches.
+//
+//   roll  the top rolled lip. 1/8 in of undercut, in a pocket 4.27 mm tall
+//         between the mid hook's top and the roll's underside.
+//   fin   the lower ledge. 7/32 in of undercut, nearly twice as deep, and the
+//         jaw closes on a 1/32 in flange instead of on a curl.
+//
+// The fin is the better catch and it is not close. It is deeper, it is flat on
+// both faces where the roll is round on one, and reaching it makes the legs
+// LONGER — root to tab goes 17.8 -> 24.1 mm, so the strain falls even as the
+// engagement grows. What it costs is the squeeze: the aperture the tabs have
+// to pass is the 7/16 in fin gap, 11.11 mm, not the 5/8 in mouth.
+twin_catch = "fin";  // [roll, fin]
+
+// Coupon: one slice per engagement, notched 1..n so they can be told apart.
+// Engagement per side. The roll's ladder was 0.50-1.70 because a 3.175 mm
+// feature and 17.8 mm legs would not carry more. The fin is 5.556 deep and the
+// legs reaching it are 24.1 mm, so the whole ladder moves down and out.
+clip_coupon_hook = [1.00, 1.80, 2.60, 3.40];
+clip_coupon_len = 25;
+clip_coupon_gap = 7;
 
 /* [Test fixture — a printable stand-in for the real rail] */
 
@@ -975,13 +1107,272 @@ module coupon() {
             coupon_slice(coupon_pinch[i], i + 1);
 }
 
+// ---------------------------------------------------------------------------
+// WALL CLIP
+// ---------------------------------------------------------------------------
+
+// The clip's cross-section. splay opens the slot by moving the whole inner
+// group inboard, which is the elastic state it passes the roll in; splay = 0
+// is the seated, relaxed shape.
+module clip2d(hook = clip_hook, splay = 0) {
+    xo1 = -trk_skin - clip_out_clr - clip_out_t;   // outer prong, outside face
+    xo2 = -trk_skin - clip_out_clr;                // outer prong, against the wall
+    xi1 = trk_hook_x + clip_clr + splay;           // inner leg, against the roll tip
+    xi2 = xi1 + clip_in_t;
+    ztop = trk_depth + clip_fence_h;
+    zbar = ztop - clip_bridge_t;
+    tz1  = trk_lip_z0 - clip_tab_clr;              // tab top, under the roll
+    tz0  = tz1 - clip_tab_h;
+    tipx = trk_hook_x - hook + splay;              // tab tip
+    fx   = trk_hook_x - clip_foot + splay;         // foot, over the roll's top
+
+    union() {
+        polygon([[xo1, zbar], [xi2, zbar], [xi2, ztop], [xo1, ztop]]);
+        polygon([[xo1, trk_depth - clip_out_drop], [xo2, trk_depth - clip_out_drop],
+                 [xo2, zbar], [xo1, zbar]]);
+        polygon([[xi1, tz0], [xi2, tz0], [xi2, zbar], [xi1, zbar]]);
+        polygon([[fx, trk_depth], [xi1, trk_depth],
+                 [xi1, trk_depth + clip_foot_t], [fx, trk_depth + clip_foot_t]]);
+        // Tab, with a 45 deg lead-in on its underside so the roll's tip cams
+        // the leg open on the way down. Its TOP is flat, and stays flat
+        // because the part prints standing up.
+        polygon([[xi1, tz0], [xi1, tz1], [tipx, tz1], [tipx, tz0 + (xi1 - tipx)]]);
+    }
+}
+
+module clip_length(len = clip_seg_len, hook = clip_hook, splay = 0) {
+    translate([0, len, 0])
+        rotate([90, 0, 0])
+            linear_extrude(height = len, convexity = 10) clip2d(hook, splay);
+}
+
+// Seated interference. Empty is the pass, exactly as fitcheck.
+module clipfit(len = preview_len) {
+    intersection() { clip_length(len); track(len); }
+}
+
+// The INSERTION check, and the one round 01f says is the only one that counts.
+// The clip is sprung open by its own engagement plus a whisker, then walked
+// down through every height from clear of the rail to seated. Any facet in the
+// result is metal the clip cannot pass on its way in — not on its way out, and
+// not once it is home.
+//
+// It is a legitimate stand-in for a path search here, and was not for the
+// rotate-in: this motion has one degree of freedom, straight down, with the
+// splay a known elastic state. There is no pose to search for.
+module clippath(len = preview_len, hook = clip_hook, steps = 24, lift = 9) {
+    for (i = [0 : steps])
+        intersection() {
+            translate([0, 0, i * lift / steps])
+                clip_length(len, hook, hook + clip_path_slack);
+            track(len);
+        }
+}
+
+module clipassembly(len = preview_len) {
+    color("silver", track_alpha) track(len);
+    color("darkorange")          clip_length(len);
+}
+
+// PRINTING ORIENTATION. Everything above is built lying down so it can be
+// intersected with track(), which is how the two checks read. Anything meant
+// for the plate is built UPRIGHT instead — extruded along Z, exactly as the
+// fixture is — so the STL already stands the way it must print and nothing
+// depends on the slicer being told to rotate it.
+module clip_upright(len = clip_seg_len, hook = clip_hook) {
+    linear_extrude(height = len, convexity = 10) clip2d(hook);
+}
+
+// One coupon slice, notched n times down the outside of the outer prong.
+module clip_slice(hook, n) {
+    difference() {
+        clip_upright(clip_coupon_len, hook);
+        for (i = [0 : n - 1])
+            translate([-trk_skin - clip_out_clr - clip_out_t - eps,
+                       trk_depth + clip_fence_h - coupon_notch_d,
+                       clip_coupon_len / 2 + (i - (n - 1) / 2) * coupon_notch_pitch
+                           - coupon_notch_w / 2])
+                cube([coupon_notch_d + eps, coupon_notch_d + eps, coupon_notch_w]);
+    }
+}
+
+// Laid out ACROSS the section, not along the length: upright, the slices have
+// to stand side by side on the plate rather than end to end 121 mm in the air.
+module clipcoupon() {
+    n = len(clip_coupon_hook);
+    w = clip_in_t + trk_hook_x + clip_clr + trk_skin + clip_out_clr + clip_out_t;
+    for (i = [0 : n - 1])
+        translate([i * (w + clip_coupon_gap), 0, 0])
+            clip_slice(clip_coupon_hook[i], i + 1);
+}
+
+// ---------------------------------------------------------------------------
+// TWIN CLIP — both prongs inside the channel
+// ---------------------------------------------------------------------------
+//
+// Ziad's call, and the corrected profile is what makes it possible. Round 01
+// ruled a two-sided snap out on the grounds that a part cannot engage an
+// undercut on both walls at once and still get in. True of a RIGID part. These
+// legs flex, and the 1/8 in rolls the real rail turned out to have give both
+// sides a pocket 3.175 mm deep and 4.27 mm tall to snap into — where the
+// drawing had promised 1.35.
+//
+// It is the hairpin with the outer prong replaced by a mirror of the inner
+// one. Everything else is the same and every parameter is shared, so the
+// coupon ladders the same variable.
+//
+//   DOWN      both feet, on the tops of both rolls.
+//   UP        both tabs, under both rolls.
+//   SIDEWAYS  each leg against its own roll tip. Nothing can shift, because
+//             shifting toward one wall drives the far tab deeper.
+//
+// Insertion is straight down with both legs squeezed INWARD by the engagement
+// and released under the rolls, so the mouth it has to pass is 15.875 less
+// twice the hook, and the legs are rooted at the crossbar 14 mm above the rail
+// for the same reason as before — length is what keeps the strain down.
+//
+// ⚠️ THE MESH IS NOT SOLVED HERE. The crossbar spans the channel above the
+// rail, and that is where the mesh comes up out of it. This is a clamp test:
+// it answers whether a two-sided snap seats and holds, and nothing else. The
+// mesh will move the crossbar or split the part.
+
+// The feature being caught, resolved once: how far it reaches inboard, the
+// underside the tab hooks, and the top face the foot lands on.
+catch_reach = twin_catch == "fin" ? trk_ledge_x  : trk_hook_x;
+catch_under = twin_catch == "fin" ? trk_ledge_z0 : trk_lip_z0;
+catch_top   = twin_catch == "fin" ? trk_ledge_z1 : trk_depth;
+// What sits below the tab: the channel floor under the fin, the mid hook's top
+// under the roll.
+catch_floor = twin_catch == "fin" ? 0            : trk_hook_z1;
+
+// One side, drawn at the near wall. splay moves it toward the channel centre,
+// which is the elastic state it passes the aperture in.
+//
+// Foot and tab together are a C-jaw closing on the feature: the foot lands on
+// its top face, the tab hooks its underside, and the 0.15 between them is all
+// the vertical play the part has. On the fin that jaw grips a flat 1/32 in
+// flange, which is why it is the better of the two.
+// A tab: flat on top where it bears, ramped underneath where it cams in.
+// The ramp wants clip_lead x its own run and gets whatever height is left
+// after clip_bear_min, so a deep tab in a shallow space degrades to a steeper
+// wedge rather than to a knife edge.
+module twin_tab(xface, tipx, z0, z1) {
+    run   = xface - tipx;
+    rise  = min(run * clip_lead, (z1 - z0) - clip_bear_min);
+    polygon([[xface, z0], [xface, z1], [tipx, z1], [tipx, z0 + rise]]);
+}
+
+module twin_side(hook = clip_hook, splay = 0) {
+    xo   = catch_reach + clip_clr + splay;   // leg, against the feature's tip
+    xi   = xo + clip_in_t;
+    tz1  = catch_under - clip_tab_clr;
+    tz0  = catch_floor + clip_tab_floor;
+    fx   = catch_reach - clip_foot + splay;
+    zbar = trk_depth + clip_fence_h - clip_bridge_t;
+
+    // The bump can never out-reach the squeeze that has to carry it past the
+    // roll, which is set by the tab.
+    bump = min(twin_bump, hook - 0.10);
+    bz1  = trk_lip_z0 - clip_tab_clr;
+    bz0  = trk_hook_z1 + clip_tab_floor;
+
+    union() {
+        polygon([[xo, tz0], [xi, tz0], [xi, zbar], [xo, zbar]]);
+        polygon([[fx, catch_top], [xo, catch_top],
+                 [xo, catch_top + clip_foot_t], [fx, catch_top + clip_foot_t]]);
+        twin_tab(xo, catch_reach - hook + splay, tz0, tz1);
+        if (bump > 0.05 && catch_under < trk_lip_z0)
+            twin_tab(xo, trk_hook_x - bump + splay, bz0, bz1);
+    }
+}
+
+module twin2d(hook = clip_hook, splay = 0) {
+    w    = trk_clear_w;                     // mirror line is the channel centre
+    xo   = catch_reach + clip_clr + splay;
+    ztop = trk_depth + clip_fence_h;
+    zbar = ztop - clip_bridge_t;
+
+    union() {
+        twin_side(hook, splay);
+        translate([w, 0]) mirror([1, 0]) twin_side(hook, splay);
+        polygon([[xo, zbar], [w - xo, zbar], [w - xo, ztop], [xo, ztop]]);
+    }
+}
+
+module twin_length(len = clip_seg_len, hook = clip_hook, splay = 0) {
+    translate([0, len, 0])
+        rotate([90, 0, 0])
+            linear_extrude(height = len, convexity = 10) twin2d(hook, splay);
+}
+
+module twin_upright(len = clip_seg_len, hook = clip_hook) {
+    linear_extrude(height = len, convexity = 10) twin2d(hook);
+}
+
+module twinfit(len = preview_len) {
+    intersection() { twin_length(len); track(len); }
+}
+
+// Same insertion check as clippath, and the same reason it is sound: one
+// degree of freedom, straight down, with the squeeze a known elastic state.
+// Prove it can fail with -D clip_path_slack=-0.50 before believing a pass.
+module twinpath(len = preview_len, hook = clip_hook, steps = 24, lift = 9) {
+    for (i = [0 : steps])
+        intersection() {
+            translate([0, 0, i * lift / steps])
+                twin_length(len, hook, hook + clip_path_slack);
+            track(len);
+        }
+}
+
+module twinassembly(len = preview_len) {
+    color("silver", track_alpha) track(len);
+    color("darkorange")          twin_length(len);
+}
+
+module twin_slice(hook, n) {
+    ztop = trk_depth + clip_fence_h;
+    difference() {
+        twin_upright(clip_coupon_len, hook);
+        for (i = [0 : n - 1])
+            translate([trk_clear_w / 2 - coupon_notch_w / 2,
+                       ztop - coupon_notch_d,
+                       clip_coupon_len / 2 + (i - (n - 1) / 2) * coupon_notch_pitch
+                           - coupon_notch_w / 2])
+                cube([coupon_notch_w, coupon_notch_d + eps, coupon_notch_w]);
+    }
+}
+
+module twincoupon() {
+    n = len(clip_coupon_hook);
+    w = trk_clear_w + clip_coupon_gap;
+    for (i = [0 : n - 1])
+        translate([i * w, 0, 0])
+            twin_slice(clip_coupon_hook[i], i + 1);
+}
+
+if (twin_bump > clip_hook - 0.10)
+    echo(str("twin_bump clamped ", twin_bump, " -> ", clip_hook - 0.10,
+             ": it cannot out-reach the squeeze the tab provides."));
+
 // The default is a preview. Say so on every run, so an accidental unnamed
 // build is caught in the log rather than in the printer.
-if (show == "track" || show == "assembly" || show == "compare" || show == "concepts")
+if (show == "track" || show == "assembly" || show == "compare" || show == "concepts"
+    || show == "clipassembly" || show == "twinassembly")
     echo(str("PREVIEW ONLY (show=\"", show, "\") — NOT printable. ",
              "Build the part with -D 'show=\"fence\"'."));
 
-if      (show == "coupon")   coupon();
+if      (show == "coupon")     coupon();
+else if (show == "clip")         clip_upright();
+else if (show == "clipcoupon")   clipcoupon();
+else if (show == "clipfit")      clipfit();
+else if (show == "clippath")     clippath();
+else if (show == "clipassembly") clipassembly();
+else if (show == "twin")         twin_upright();
+else if (show == "twincoupon")   twincoupon();
+else if (show == "twinfit")      twinfit();
+else if (show == "twinpath")     twinpath();
+else if (show == "twinassembly") twinassembly();
 else if (show == "track")    track();
 else if (show == "assembly") assembly();
 else if (show == "fitcheck") fitcheck();
