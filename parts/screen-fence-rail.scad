@@ -167,7 +167,7 @@
 // A bare build.sh run would otherwise stamp the assembly into the fence's own
 // version series and leave stl/screen-fence-rail.stl pointing at a rail with a
 // fence inside it. There is an echo at the bottom of this file to catch that.
-show = "twinassembly";  // [fence, coupon, twin, twincoupon, twinfit, twinpath, twinassembly, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
+show = "twinassembly";  // [fence, coupon, pair, twin, twincoupon, twinfit, twinpath, twinassembly, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
 
 // COUPON-COMPONENTS: fit=coupon
 // COUPON-PLATE: coupon
@@ -503,6 +503,19 @@ fixture_wall = 3.0;
 fixture_bore_comp = 0.145;
 // Extra inboard reach given to every bead and fin tip (mm).
 fixture_bead_comp = 0.265;
+
+/* [Fit pair — one rail and one insert, to try against each other] */
+
+// A short length of both halves on one plate, so the snap can be tried on the
+// bench without a full segment or the whole ladder.
+pair_len = 40;
+// Air between them on the plate (mm).
+pair_gap = 8;
+// Engagement for the insert in the pair. Mid-ladder on purpose: 2.60 uses 56 %
+// of the repeated-use strain allowance and leaves 2.96 mm of fin beyond the
+// tab, so it is the rung most likely to answer the question rather than the
+// one most likely to be at a limit. utils/legcheck.py --hook to check another.
+pair_hook = 2.60;
 
 /* [Preview] */
 
@@ -1492,6 +1505,17 @@ module twin_slice(hook, n) {
     }
 }
 
+// One rail and one insert, side by side, both standing as they must print.
+// Deliberately NOT nested one inside the other: they have to be separate
+// objects on the plate for the fit to mean anything, and an insert printed
+// inside a rail would fuse to it at the first layer.
+module pair(len = pair_len) {
+    right = trk_clear_w + fixture_wall + fixture_bore_comp;   // fixture's edge
+    left  = -trk_skin;                                        // insert's edge
+    fixture(len);
+    translate([right + pair_gap - left, 0, 0]) twin_upright(len, pair_hook);
+}
+
 module twincoupon() {
     n = len(clip_coupon_hook);
     w = trk_clear_w + clip_coupon_gap;
@@ -1522,6 +1546,7 @@ else if (show == "twincoupon")   twincoupon();
 else if (show == "twinfit")      twinfit();
 else if (show == "twinpath")     twinpath();
 else if (show == "twinassembly") twinassembly();
+else if (show == "pair")         pair();
 else if (show == "track")    track();
 else if (show == "assembly") assembly();
 else if (show == "fitcheck") fitcheck();
