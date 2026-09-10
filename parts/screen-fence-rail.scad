@@ -24,9 +24,9 @@
 // the inner face of one wall, because those are the surfaces a part inside the
 // channel actually touches. Each wall carries three inward features:
 //
-//     z 4.77 - 5.65   LEDGE      reaches 5.47 mm inboard   (gap 11.11 mm)
-//     z 6.96 - 9.01   MID HOOK   reaches 3.12 mm inboard   (gap 15.80 mm)
-//     z 13.28 - 15.15 TOP LIP    reaches 3.12 mm inboard   (gap 15.80 mm)
+//     z 4.76 - 5.56   LEDGE      reaches 5.56 mm inboard   (gap 11.11 mm)
+//     z 6.96 - 9.01   MID HOOK   reaches 3.18 mm inboard   (gap 15.88 mm)
+//     z 13.28 - 15.08 TOP LIP    reaches 3.18 mm inboard   (gap 15.88 mm)
 //
 // ---------------------------------------------------------------------------
 // THE DRAWING IS NOT THE RAIL — CORRECTED 2026-09-10
@@ -38,19 +38,47 @@
 // is a similar section and not this one. Nothing may be re-derived from it.
 //
 // What that changes: both apertures are much tighter than assumed, and both
-// undercuts are much DEEPER — 5.47 mm of fin and 3.12 mm of rolled lip to hook
+// undercuts are much DEEPER — 5.56 mm of fin and 3.18 mm of rolled lip to hook
 // under, against 3.14 and 1.35. Tighter entry, better hold, once something can
 // get in at all.
 //
-// ⚠️ Three numbers in this block are still drawing-derived and one of them
-// carries the other two:
+// ---------------------------------------------------------------------------
+// THE RAIL IS IMPERIAL, ON A 1/32 INCH GRID
+// ---------------------------------------------------------------------------
+// The bore cannot be caliper'd with the rail screwed to the floor, so it is
+// inferred instead — and the inference is a strong one, because every number
+// anyone has produced for this section is a sixteenth of an inch:
 //
-//   * trk_clear_w 22.04 — the clear bore. The two measured gaps are converted
-//     to inboard reaches through it, so an error here lands as half of itself
-//     on each reach. Worth a caliper.
-//   * the mid hook's reach — not measured. Held equal to the top lip's, which
-//     is the relationship the drawing shows.
-//   * every z height — not measured.
+//     drawing   23.8 -> 15/16 = 23.8125     15.9 -> 5/8  = 15.8750
+//                6.4 ->  1/4  =  6.3500      9.5 -> 3/8  =  9.5250
+//     measured  11.11 -> 7/16 = 11.1125    15.80 -> 5/8  = 15.8750
+//
+// 11.11 lands on 7/16 to two microns. So take the envelope as 15/16 x 5/8 on a
+// 1/32 skin, which the drawing gives directly, and the bore follows:
+//
+//     bore = 15/16 - 2 x 1/32 = 7/8 = 22.2250
+//
+// The CHECK is that this was not fitted to anything. Feed that bore back into
+// Ziad's two gaps and both reaches come out exact:
+//
+//     fin  reach = (22.2250 - 11.1125) / 2 = 5.5563 = 7/32   exact
+//     roll reach = (22.2250 - 15.8750) / 2 = 3.1750 = 1/8    exact
+//
+// Two independent quantities landing on 32nds is what a right bore looks like.
+// The old 22.04 puts them at 5.465 and 3.120 — both off-grid, and both off by
+// the same half of the same 0.185 mm error.
+//
+// The ledge falls on the grid the same way once you use it: its top face is
+// 1/4 - 1/32 = 7/32 above the inner floor and its underside 3/16, against 5.65
+// and 4.77 read off the pixels.
+//
+// ⚠️ Confirmable without getting inside the channel: the outside width, jaws
+// across the two outer wall faces, should read 23.81. If it does, the bore is
+// settled. If it reads anything else, everything in this block moves.
+//
+// ⚠️ Still NOT on the grid and still drawing-derived: the mid hook's reach
+// (held equal to the top lip's, as drawn) and the two rolled bands' heights.
+// Nothing has confirmed those.
 //
 // ---------------------------------------------------------------------------
 // WHY THIS SHAPE
@@ -67,8 +95,8 @@
 // grip comes off the near wall alone, and the far side does its work by pinching
 // rather than by hooking under anything it has to fight its way past.
 //
-// Of the three features on that wall the LEDGE is the one worth having: 5.47 mm
-// of positive undercut against 3.12 mm at either hook, and the chamber beneath
+// Of the three features on that wall the LEDGE is the one worth having: 5.56 mm
+// of positive undercut against 3.18 mm at either hook, and the chamber beneath
 // it is the one region of the section the mesh cannot reach (the far ledge stops
 // the mesh descending past z 5.65). So the part carries a wedge-shaped tongue
 // that slides under the near ledge, and stands on the channel floor.
@@ -145,28 +173,31 @@ show = "assembly";  // [fence, coupon, track, assembly, fitcheck, compare, conce
 /* [Track — MEASURED, see header. Do not change without re-measuring] */
 
 // Clear width of the channel, inner wall face to inner wall face (mm).
-// ⚠️ Drawing-derived, and it converts both measured gaps into reaches. Mike it.
-trk_clear_w  = 22.04;
-// Inner floor to the top of the walls (mm).
-trk_depth    = 15.15;
+// 7/8 in. Not measurable with the rail down — inferred off the imperial grid,
+// see the header, and confirmable from the OUTSIDE width alone.
+trk_clear_w  = 22.2250;
+// Inner floor to the top of the walls (mm). 5/8 - 1/32 in.
+trk_depth    = 15.0813;
 
-// THE TWO APERTURES, CALIPER'D OFF THE REAL RAIL 2026-09-10 (mm).
-// These are the measured facts of this section; the inboard reaches below are
-// derived from them rather than the other way round, because a gap is what a
-// caliper reads and what an insertion has to pass through.
-trk_fin_gap  = 11.11;   // between the two fins  (the lower ledges)
-trk_lip_gap  = 15.80;   // between the two top rolled lips
+// THE TWO APERTURES, CALIPER'D OFF THE REAL RAIL 2026-09-10 (mm), and taken to
+// the nearest 1/32 in — 7/16 and 5/8. These are the measured facts of this
+// section; the inboard reaches below are derived from them rather than the
+// other way round, because a gap is what a caliper reads and what an insertion
+// has to pass through.
+trk_fin_gap  = 11.1125;   // 7/16 in, between the two fins (the lower ledges)
+trk_lip_gap  = 15.8750;   // 5/8 in,  between the two top rolled lips
 
 // How far the mid hooks and the top lips reach inboard of the wall face (mm).
 // The mid hook is NOT measured — held equal to the top lip, as drawn.
-trk_hook_x   = (trk_clear_w - trk_lip_gap) / 2;   // 3.120
+trk_hook_x   = (trk_clear_w - trk_lip_gap) / 2;   // 3.1750 = 1/8 in
 // How far the lower ledge reaches inboard of the wall face (mm).
-trk_ledge_x  = (trk_clear_w - trk_fin_gap) / 2;   // 5.465
+trk_ledge_x  = (trk_clear_w - trk_fin_gap) / 2;   // 5.5563 = 7/32 in
 
-// Underside of the lower ledge, above the inner floor (mm).
-trk_ledge_z0 = 4.77;
-// Top face of the lower ledge, above the inner floor (mm).
-trk_ledge_z1 = 5.65;
+// Underside of the lower ledge, above the inner floor (mm). 3/16 in.
+trk_ledge_z0 = 4.7625;
+// Top face of the lower ledge, above the inner floor (mm). 1/4 - 1/32 in, which
+// is the drawing's 6.4 datum less the base skin.
+trk_ledge_z1 = 5.5563;
 // Underside and top of the mid hook, above the inner floor (mm).
 trk_hook_z0  = 6.96;
 trk_hook_z1  = 9.01;
@@ -177,20 +208,17 @@ trk_lip_z0   = 13.28;
 
 // Outside of the extrusion (mm) — the two figures the drawing dimensions
 // directly, and the two that fixed its scale.
-trk_outer_w = 23.80;
-trk_outer_h = 15.90;
+trk_outer_w = 23.8125;   // 15/16 in
+trk_outer_h = 15.8750;   // 5/8 in
 
 // Wall and base skin (mm), from the centre-to-centre spacing of the drawn wall
 // lines.
 //
-// NOTE the deliberate inconsistency: 23.80 - 2 x 0.77 is 22.26, but
-// trk_clear_w above is 22.04. That is not an error. 22.04 is the reading taken
-// from the INNER edges of those same lines, and the fence is designed against
-// it precisely because it is the pessimistic one — the part comes out up to
-// 0.22 mm narrower than it needs to be, which is the safe direction. So the
-// preview shows about 0.11 mm more room per side than the fence assumes. Below
-// the drawing's resolution, and it errs the right way.
-trk_skin = 0.77;
+// These now CLOSE with the bore rather than disagreeing with it: 15/16 less
+// two 1/32 skins is 7/8 exactly. Under the old pixel readings they missed by
+// 0.22 mm and the gap had to be explained away as line width. It was not line
+// width; it was the wrong bore.
+trk_skin = 0.79375;   // 1/32 in
 
 // Diameter of the void inside the rolled hook and the rolled top lip (mm).
 // Cosmetic — it is what makes them read as curls rather than plain beads.
@@ -240,7 +268,7 @@ drop_barb = 1.50;
 // here. That puts every internal face vertical, so the ledges' undersides and
 // the rolled hooks come out as walls rather than overhangs, and the two
 // apertures the insertion actually depends on are formed accurately. Printed
-// lying down, the ledge undersides are 5.47 mm of unsupported horizontal
+// lying down, the ledge undersides are 5.56 mm of unsupported horizontal
 // overhang and the apertures would close up. Use it lying down once printed.
 //
 // It is NOT a replica in outside size either: 3 mm of solid wall around the
@@ -265,7 +293,7 @@ fixture_wall = 3.0;
 // Set both to 0 to build the fixture at nominal.
 //
 // ⚠️ The 0.265 is a tip-blunting figure taken from beads that reached 1.35 mm.
-// The real ones reach 3.12 and 5.47. Blunting is a tip-radius effect and should
+// The real ones reach 3.18 and 5.56. Blunting is a tip-radius effect and should
 // not scale with reach, but that is an assumption — re-mike this print.
 fixture_bore_comp = 0.145;
 // Extra inboard reach given to every bead and fin tip (mm).
