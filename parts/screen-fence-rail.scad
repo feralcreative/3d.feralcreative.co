@@ -382,6 +382,20 @@ twin_bump = 0.80;
 twin_cap = true;
 // Air between the skirt's bottom and the top of the rail (mm).
 clip_cap_clr = 0.15;
+// Close the bottom of the two side slots, so the cap reads as a closed box
+// rather than an open frame. Thickness of that floor (mm).
+clip_cap_floor = 2.19;
+// ...and the slot left between that floor and the leg it passes (mm).
+//
+// THE FLOOR MUST NOT TOUCH THE LEG. It attaches to the skirt only. Joining the
+// two would root the leg at the rail top instead of at the crossbar, which is
+// the same 26.3 -> 10.6 mm collapse the skirt exists to avoid. 0.80 is two
+// lines wide, so the slicer draws it rather than bridging it, and the leg
+// flexes AWAY from this edge, so it is a print clearance and nothing more.
+clip_relief = 0.80;
+// Rounding on the cap's two top corners (mm) — front generous, back barely.
+clip_cap_r_front = 6.00;
+clip_cap_r_back  = 1.00;
 
 // Which wall feature the twin clip catches.
 //
@@ -1313,23 +1327,59 @@ module twin2d(hook = clip_hook, splay = 0) {
     cx0  = -trk_skin;                       // flush with the rail's outside
     cx1  = w + trk_skin;
     cz0  = trk_depth + clip_cap_clr;
+    xo0  = catch_reach + clip_clr;          // leg face, unsplayed
 
     union() {
         twin_side(hook, splay);
         translate([w, 0]) mirror([1, 0]) twin_side(hook, splay);
 
-        // Crossbar. Full width once capped, and FIXED — the skirt is rigid, so
-        // unlike the legs it must not move with splay.
-        if (twin_cap)
-            polygon([[cx0, zbar], [cx1, zbar], [cx1, ztop], [cx0, ztop]]);
-        else
+        // Crossbar. Narrow and splay-following when uncapped; once capped it is
+        // part of the cap and takes the cap's rounded corners with it, which
+        // is why it has to be INSIDE the intersection below rather than
+        // unioned alongside it.
+        if (!twin_cap)
             polygon([[xo, zbar], [w - xo, zbar], [w - xo, ztop], [xo, ztop]]);
 
         if (twin_cap)
-            for (m = [0, 1])
-                translate([m * w, 0]) mirror([m, 0])
-                    polygon([[cx0, cz0], [cx0 + clip_out_t, cz0],
-                             [cx0 + clip_out_t, zbar], [cx0, zbar]]);
+            intersection() {
+                union() {
+                    polygon([[cx0, zbar], [cx1, zbar], [cx1, ztop], [cx0, ztop]]);
+                    for (m = [0, 1])
+                        translate([m * w, 0]) mirror([m, 0]) {
+                            // skirt wall
+                            polygon([[cx0, cz0], [cx0 + clip_out_t, cz0],
+                                     [cx0 + clip_out_t, zbar], [cx0, zbar]]);
+                            // floor closing the bottom of the side slot, held
+                            // off the leg. Measured from the UNSPLAYED leg, so
+                            // it stays put while the leg moves.
+                            polygon([[cx0 + clip_out_t, cz0],
+                                     [xo0 - clip_relief, cz0],
+                                     [xo0 - clip_relief, cz0 + clip_cap_floor],
+                                     [cx0 + clip_out_t, cz0 + clip_cap_floor]]);
+                        }
+                }
+                cap_outline();
+            }
+    }
+}
+
+// The cap's silhouette: square at the bottom, rounded at the top, and the two
+// top corners are DIFFERENT — generous at the front, a break at the back. Hull
+// of two circles and two points, so each side comes out tangent-vertical and
+// the top tangent-horizontal without drawing any arcs by hand.
+module cap_outline() {
+    w   = trk_clear_w;
+    cx0 = -trk_skin;
+    cx1 = w + trk_skin;
+    cz0 = trk_depth + clip_cap_clr;
+    zt  = trk_depth + clip_fence_h;
+    rf  = clip_cap_r_front;
+    rb  = clip_cap_r_back;
+    hull() {
+        translate([cx0 + rf, zt - rf]) circle(r = rf);
+        translate([cx1 - rb, zt - rb]) circle(r = rb);
+        translate([cx0, cz0]) circle(r = 0.001);
+        translate([cx1, cz0]) circle(r = 0.001);
     }
 }
 
