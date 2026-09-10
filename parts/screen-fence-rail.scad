@@ -419,9 +419,21 @@ clip_cap_floor = 2.19;
 // lines wide, so the slicer draws it rather than bridging it, and the leg
 // flexes AWAY from this edge, so it is a print clearance and nothing more.
 clip_relief = 0.80;
-// Rounding on the cap's two top corners (mm) — front generous, back barely.
+// Rounding on the cap's top corners (mm) — front generous, back barely. The
+// back radius now lands on the top of the back wall rather than on the cap.
 clip_cap_r_front = 6.00;
 clip_cap_r_back  = 1.00;
+
+// BACK WALL. The back does not stop at the cap: it carries on up as a wall,
+// and that wall is the actual barrier — everything below it is just what
+// holds the barrier to the rail.
+//
+// Printed standing, this wall's height runs across the bed, so a push on it
+// bends it with the stress running WITHIN a layer rather than across the layer
+// boundaries. That is the strong direction, and it is a consequence of the
+// print orientation the fit already forced rather than a separate decision.
+clip_back_h = 20.00;
+clip_back_t = 2.19;
 // Fillet on every INSIDE corner of the cap (mm).
 //
 // Not optional once the outside is rounded. An outside radius with a square
@@ -1422,6 +1434,10 @@ module twin2d(hook = clip_hook, splay = 0) {
                 offset(r = -clip_cap_fillet) offset(r = clip_cap_fillet)
                 union() {
                     polygon([[cx0, zbar], [cx1, zbar], [cx1, ztop], [cx0, ztop]]);
+                    if (clip_back_h > 0)
+                        polygon([[cx1 - clip_back_t, ztop], [cx1, ztop],
+                                 [cx1, ztop + clip_back_h],
+                                 [cx1 - clip_back_t, ztop + clip_back_h]]);
                     for (m = [0, 1])
                         translate([m * w, 0]) mirror([m, 0]) {
                             // skirt wall
@@ -1453,11 +1469,25 @@ module cap_outline() {
     zt  = trk_depth + clip_fence_h;
     rf  = clip_cap_r_front;
     rb  = clip_cap_r_back;
-    hull() {
-        translate([cx0 + rf, zt - rf]) circle(r = rf);
-        translate([cx1 - rb, zt - rb]) circle(r = rb);
-        translate([cx0, cz0]) circle(r = 0.001);
-        translate([cx1, cz0]) circle(r = 0.001);
+    tb  = clip_back_t;
+    h   = clip_back_h;
+    union() {
+        // The cap. Its back top corner is square, because the wall stands on
+        // it and there is no corner there to break.
+        hull() {
+            translate([cx0 + rf, zt - rf]) circle(r = rf);
+            translate([cx1, zt]) circle(r = 0.001);
+            translate([cx0, cz0]) circle(r = 0.001);
+            translate([cx1, cz0]) circle(r = 0.001);
+        }
+        // The wall, rounded at both of its own top corners.
+        if (h > 0)
+            hull() {
+                translate([cx1 - tb + rb, zt + h - rb]) circle(r = rb);
+                translate([cx1 - rb,      zt + h - rb]) circle(r = rb);
+                translate([cx1 - tb, zt]) circle(r = 0.001);
+                translate([cx1,      zt]) circle(r = 0.001);
+            }
     }
 }
 
