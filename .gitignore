@@ -276,6 +276,16 @@ stl/*
 !stl/.gitkeep
 !stl/*.stl
 stl/*-v[0-9][0-9]*.stl
+
+# The one case the rule above cannot see: while a series is still moving,
+# stl/<name>.stl is a SYMLINK to the newest -vNN, and -vNN is ignored. The
+# re-include catches the link by name and git happily commits it, so the repo
+# ends up carrying a pointer to a file nobody else has. finalize.sh is what
+# turns a series into a real file worth committing; until it has been run,
+# list the name here.
+stl/screen-fence-test-rail.stl
+stl/screen-fence-clip-coupon.stl
+stl/screen-fence-twin-coupon.stl
 slice/
 _incoming
 MODELS
