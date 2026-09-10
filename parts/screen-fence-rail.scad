@@ -352,6 +352,32 @@ clip_bear_min = 0.80;
 // the fin, the mid hook's top under the roll (mm).
 clip_tab_floor = 0.30;
 
+// LEG SECTION — the part is optimised to be snapped in and squeezed out
+// repeatedly, so the leg is a spring first and a structure second.
+//
+// A prismatic leg wastes itself: the bending moment is zero at the tab and
+// maximum at the root, so a constant thickness is over-thick everywhere except
+// the root and the peak strain sits exactly on the root corner, which is also
+// the worst possible place for it. Thickness proportional to sqrt(distance
+// from the load) is the constant-stress cantilever, and it buys twice the
+// deflection at the same root thickness.
+//
+// Measured on the real section by utils/legcheck.py, not assumed:
+//
+//     prismatic 1.74 (before)   2.65 mm of travel at 1 % strain
+//     prismatic 1.05            4.39 mm, but a limp leg at 0.11 N/mm
+//     taper 1.74 -> 1.05        4.71 mm at 0.28 N/mm
+//
+// The taper also moves the peak strain about 10 mm off the root, away from the
+// fillet, which is the second reason to prefer it over simply thinning.
+clip_leg_root_t = 1.74;
+clip_leg_tip_t  = 1.05;
+// Fillet where the leg meets the crossbar (mm). The OUTBOARD one carries the
+// tension when the leg is squeezed inward, so it is the crack site if it is
+// left square — the cap's own fillet does not reach here, because the legs are
+// deliberately not part of that shape.
+clip_leg_fillet = 2.50;
+
 // Secondary bump on each leg, snapping into the pocket under the TOP ROLL.
 // Engagement past the roll's tip, per side (mm), 0 for none.
 //
@@ -1323,14 +1349,38 @@ module twin_side(hook = clip_hook, splay = 0) {
     bz1  = trk_lip_z0 - clip_tab_clr;
     bz0  = trk_hook_z1 + clip_tab_floor;
 
+    // Tapered leg. Outboard face stays flat against the feature tips; the
+    // inboard face carries the taper, thickening toward the root.
+    aa   = zbar - tz1;                       // free length under load
+    nseg = 24;
+    // Built root-first so the polygon winds without needing a reverse().
+    prof = [for (i = [0 : nseg])
+                let (z = zbar - i * aa / nseg)
+                [xo + max(clip_leg_tip_t, clip_leg_root_t * sqrt((z - tz1) / aa)), z]];
+
     union() {
-        polygon([[xo, tz0], [xi, tz0], [xi, zbar], [xo, zbar]]);
+        polygon(concat([[xo, tz0], [xo, zbar]], prof,
+                       [[xo + clip_leg_tip_t, tz0]]));
         polygon([[fx, catch_top], [xo, catch_top],
                  [xo, catch_top + clip_foot_t], [fx, catch_top + clip_foot_t]]);
         twin_tab(xo, catch_reach - hook + splay, tz0, tz1);
         if (bump > 0.05 && catch_under < trk_lip_z0)
             twin_tab(xo, trk_hook_x - bump + splay, bz0, bz1);
+
+        // Root fillets, both faces. Outboard is the tension side.
+        fillet_in(xo, zbar, -1, clip_leg_fillet);
+        fillet_in(xo + clip_leg_root_t, zbar, 1, clip_leg_fillet);
     }
+}
+
+// Fills the concave corner at (x, z) between a vertical face and the
+// horizontal underside above it. dir -1 puts the fillet on the -x side.
+module fillet_in(x, z, dir, r) {
+    translate([x, z]) scale([dir, 1])
+        difference() {
+            translate([0, -r]) square([r, r]);
+            translate([r, -r]) circle(r = r);
+        }
 }
 
 module twin2d(hook = clip_hook, splay = 0) {

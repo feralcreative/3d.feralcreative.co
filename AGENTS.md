@@ -26,6 +26,8 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Build a coupon of only what changed since the last print | `utils/coupon.sh parts/<part>.scad` |
 | Coupon with every component, ignoring the log | `utils/coupon.sh parts/<part>.scad --all` |
 | Record that the last coupon was printed | `utils/coupon.sh parts/<part>.scad --printed` |
+| Bend budget for the screen-fence clip's legs | `utils/legcheck.py` |
+| Compare leg section options | `utils/legcheck.py --sweep` |
 | Slice and verify the job | `utils/slice.sh stl/<part>.stl` or `utils/slice.sh parts/<part>.scad` |
 | Slice against untuned FlashForge stack | `utils/slice.sh stl/<part>.stl --stock` |
 | One-off slicer override | `utils/slice.sh stl/<part>.stl --set filament:nozzle_temperature=235` |
