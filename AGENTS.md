@@ -17,6 +17,10 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Build with no version stamp at all | `utils/build.sh parts/<part>.scad --no-version` |
 | Collapse a finished part to one unversioned file | `utils/finalize.sh <name>` |
 | Collapse every finished series | `utils/finalize.sh --all` |
+| Show what generated output could go (deletes nothing) | `utils/clean.sh` |
+| Delete it | `utils/clean.sh --apply` |
+| Also age out past models — renders, 3mf and slice jobs untouched for N days | `utils/clean.sh --stale 7 --apply` |
+| Every regenerable byte, keeping only `.keep` and tracked files | `utils/clean.sh --all --apply` |
 | Build ASCII STL (to read or diff a mesh) | `utils/build.sh parts/<part>.scad --ascii` |
 | Publish STL to the printer site's NAS | `utils/build.sh parts/<part>.scad --push` (needs explicit permission) |
 | Build a coupon of only what changed since the last print | `utils/coupon.sh parts/<part>.scad` |

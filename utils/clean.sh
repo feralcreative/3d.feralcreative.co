@@ -7,6 +7,9 @@
 #   utils/clean.sh --apply         # actually delete it
 #   utils/clean.sh --keep 4        # keep more versions than the default 2
 #   utils/clean.sh --scratch       # only the exp- throwaways, nothing else
+#   utils/clean.sh --stale 7       # ALSO renders, 3mf and slice jobs untouched
+#                                  # for 7 days
+#   utils/clean.sh --all           # --keep 0 --stale 0: every regenerable byte
 #
 # DRY RUN IS THE DEFAULT and --apply is the only way to remove anything. This
 # deletes tens of megabytes at a time and some of it took an hour of slicing to
@@ -48,9 +51,35 @@
 #     thing you printed is the reference for everything measured off it
 #   - any slice/ directory whose STL survives the pass
 #
-# renders/ and 3mf/ are not versioned and cost seconds to rebuild, so they are
-# cleared wholesale apart from .keep. If you are mid-review of a render, mark it
-# or re-run utils/render.sh afterwards.
+# renders/ and 3mf/ are not versioned, so the version rules cannot speak about
+# them at all. They are judged on age alone, which means a plain run LEAVES
+# THEM ALONE and only --stale or --all touches them.
+#
+# They used to be cleared wholesale on every run, on the reasoning that they
+# cost seconds to rebuild. True of the four standard views, false of everything
+# else in there: a zoomed detail render made with -D flags to answer one
+# question has no record of the flags that produced it, so "regenerable" was
+# only ever true of the renders nobody minded losing. A default run wiping the
+# tree you are in the middle of reading is also just a bad default.
+#
+# PAST MODELS, AND WHY --stale EXISTS
+# -----------------------------------
+# Every rule above is about a file's rank within its own name. None of them is
+# about time, so nothing ever ages out: a part you finished months ago keeps
+# its newest two versions and its slice job for ever, because the rules can
+# only ever ask "is this the newest?" and the answer stays yes.
+#
+# slice/ is where that bites. A slice job is protected as long as the STL it
+# came from is still on disk, and a finished part's STL is COMMITTED — so its
+# job is protected permanently. One of them is a 73 MB plate_1.gcode. That is
+# the single biggest tree in the repo and every byte of it rebuilds in about a
+# minute with utils/slice.sh.
+#
+# --stale N adds the missing axis: anything regenerable that has not been
+# touched in N days goes, whatever its rank. It still honours .keep, still
+# refuses tracked files, and still spares a coupon the print log says was
+# printed. --stale 0 means everything. If a name loses every version that way,
+# its stl/<name>.stl symlink is removed too rather than left dangling.
 
 set -euo pipefail
 
@@ -61,17 +90,21 @@ LOG="${PRINT_LOG:-docs/print-log.txt}"
 KEEP_N=2
 APPLY=0
 SCRATCH_ONLY=0
+STALE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --apply|-y)  APPLY=1; shift ;;
     --keep)      KEEP_N="$2"; shift 2 ;;
+    --stale)     STALE="$2"; shift 2 ;;
+    --all)       KEEP_N=0; STALE=0; shift ;;
     --scratch)   SCRATCH_ONLY=1; shift ;;
-    *) echo "usage: $0 [--apply] [--keep N] [--scratch]" >&2; exit 64 ;;
+    *) echo "usage: $0 [--apply] [--keep N] [--stale DAYS] [--all] [--scratch]" >&2; exit 64 ;;
   esac
 done
 
 [[ "$KEEP_N" =~ ^[0-9]+$ ]] || { echo "error: --keep wants a number" >&2; exit 64; }
+[[ -z "$STALE" || "$STALE" =~ ^[0-9]+$ ]] || { echo "error: --stale wants a number of days" >&2; exit 64; }
 
 DOOMED=()
 BYTES=0
@@ -85,6 +118,19 @@ doom() {  # path reason
 
 # git's own opinion, not a guess from the path. A tracked file is never output.
 tracked() { git ls-files --error-unmatch "$1" >/dev/null 2>&1; }
+
+# Untouched for --stale days? False when --stale was not given, so every caller
+# can ask unconditionally. Recurses, so a slice/ directory is judged by the
+# newest file inside it and not by the directory's own mtime.
+#
+# -mtime and not -newermt: `find` on this machine is bfs, which rejects
+# GNU's relative "-N days" argument. -mtime is understood by every find there
+# is. Test the OUTPUT, not the exit status — a find that matches nothing still
+# exits 0.
+stale() {
+  [[ -n "$STALE" ]] || return 1
+  [[ -z "$(find "$1" -mtime -"$STALE" -print -quit 2>/dev/null)" ]]
+}
 
 # --- what the print log says was printed ------------------------------------
 #
@@ -133,45 +179,76 @@ if [[ "$SCRATCH_ONLY" -eq 0 ]]; then
   for name in $(ls stl 2>/dev/null | sed -n 's/^\(.*\)-v[0-9][0-9]*\.stl$/\1/p' \
                  | grep -v '^exp-' | sort -u); do
     n=0
+    survived=0
     for f in $(ls stl/"$name"-v*.stl 2>/dev/null | sort -r); do
       base="$(basename "$f" .stl)"
-      [[ "$f" == *.keep.* ]] && { echo "  $f — kept by name"; continue; }
-      tracked "$f" && continue
+      [[ "$f" == *.keep.* ]] && { echo "  $f — kept by name"; survived=1; continue; }
+      tracked "$f" && { survived=1; continue; }
       n=$((n + 1))
-      if [[ "$n" -le "$KEEP_N" ]]; then continue; fi
-      if is_linked "$(basename "$f")"; then
-        echo "  $f — the latest symlink points here"
-        continue
-      fi
+      old=0
+      stale "$f" && old=1
+      if [[ "$n" -le "$KEEP_N" && "$old" -eq 0 ]]; then survived=1; continue; fi
       if is_printed "$base"; then
         echo "  $f — printed, per $LOG"
+        survived=1
         continue
       fi
-      doom "$f" "older than the newest $KEEP_N"
+      if is_linked "$(basename "$f")" && [[ "$old" -eq 0 ]]; then
+        echo "  $f — the latest symlink points here"
+        survived=1
+        continue
+      fi
+      if [[ "$old" -eq 1 ]]; then
+        doom "$f" "not touched in $STALE days"
+      else
+        doom "$f" "older than the newest $KEEP_N"
+      fi
     done
+
+    # Nothing of this name left to point at. A dangling stl/<name>.stl is worse
+    # than no link at all: every doc path and every downstream script resolves
+    # through it.
+    if [[ "$survived" -eq 0 && -L "stl/$name.stl" ]] && ! tracked "stl/$name.stl"; then
+      doom "stl/$name.stl" "symlink with nothing left to point at"
+    fi
   done
 
   echo
-  echo "== renders and 3mf (not versioned, seconds to rebuild)"
-  for tree in renders 3mf; do
-    [[ -d "$tree" ]] || continue
-    for p in "$tree"/*; do
-      [[ -e "$p" ]] || continue
-      [[ "$p" == *.keep.* ]] && { echo "  $p — kept by name"; continue; }
-      tracked "$p" && continue
-      [[ "$p" == */exp-* ]] && continue     # already doomed as scratch
-      doom "$p" "regenerable"
+  if [[ -n "$STALE" ]]; then
+    echo "== renders and 3mf, untouched in $STALE days"
+    for tree in renders 3mf; do
+      [[ -d "$tree" ]] || continue
+      for p in "$tree"/*; do
+        [[ -e "$p" ]] || continue
+        [[ "$p" == *.keep.* ]] && { echo "  $p — kept by name"; continue; }
+        tracked "$p" && continue
+        [[ "$p" == */exp-* ]] && continue     # already doomed as scratch
+        stale "$p" || continue
+        doom "$p" "not touched in $STALE days"
+      done
     done
-  done
+  else
+    echo "== renders and 3mf — left alone; --stale N or --all to clear them"
+  fi
 
   echo
-  echo "== slice jobs whose STL is gone"
+  if [[ -n "$STALE" ]]; then
+    echo "== slice jobs, orphaned or untouched in $STALE days"
+  else
+    echo "== slice jobs whose STL is gone"
+  fi
   if [[ -d slice ]]; then
     for d in slice/*/; do
       [[ -d "$d" ]] || continue
       base="$(basename "${d%/}")"
       [[ "$base" == *.keep ]] && { echo "  $d — kept by name"; continue; }
       [[ "$base" == exp-* ]] && continue    # already doomed as scratch
+      # Age first: a finished part's STL is committed, so the rule below would
+      # protect its job for ever. This is the one that lets a past model go.
+      if stale "$d"; then
+        doom "$d" "not touched in $STALE days"
+        continue
+      fi
       # Survives if the STL it was sliced from is still there, under either the
       # plain name or any surviving version of it.
       if [[ -e "stl/${base}.stl" ]] || compgen -G "stl/${base}-v*.stl" >/dev/null; then
@@ -192,7 +269,9 @@ fi
 
 echo "would delete ${#DOOMED[@]} items, $(( BYTES / 1024 )) MB:"
 for entry in "${DOOMED[@]}"; do
-  printf '  %-52s %s\n' "${entry%%|*}" "${entry##*|}"
+  path="${entry%%|*}"
+  printf '  %-52s %6s MB  %s\n' "$path" \
+    "$(awk -v k="$(size_of "$path")" 'BEGIN{printf "%.1f", k/1024}')" "${entry##*|}"
 done
 
 if [[ "$APPLY" -eq 0 ]]; then
