@@ -43,6 +43,7 @@ For a geometry change:
 1. `utils/render.sh parts/<part>.scad`, then **read all four PNGs**. One view hides things—a tab on the wrong side is invisible head-on.
 2. `utils/build.sh parts/<part>.scad`, then read the geometry summary. `Status: NoError` means manifold. `Genus` counts through-holes: a part with one bore reports `Genus: 1`. If you punched a hole and genus came back `0`, the cut did not go through.
 3. Hand the renders to Ziad for the visual call. Do not self-certify appearance in a loop.
+4. **If the part has to go into or onto something, prove it can GET there — not just that it fits once seated.** Model the mating part, boolean-intersect the seated pose, and then run a configuration-space path search from outside. A clean intersection is not a pass; neither is "collision-free placements exist at every tilt". `screen-fence-rail.scad` shipped twice on that mistake. Method and the specific traps are in [docs/debugging.md](docs/debugging.md).
 
 For a print-setting change (rare—see Prohibitions):
 

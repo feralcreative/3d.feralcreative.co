@@ -11,8 +11,27 @@ What each artifact proves, where the logs are, and the failure modes already see
 | `slice/<part>/plate_1.gcode` via `gcode-probe.py` | Height, layer count, commanded temperatures, real retraction distances, per-layer extrusion mix | Anything about the physical machine |
 | `slice/<part>/resolved.json` | The full settings the slicer used | Whether the printer received them |
 | `slice/<part>/slice.log` | Slicer stdout/stderr; where a failed slice explains itself | — |
+| `show="fitcheck"` — boolean intersection of part and mating part | That the **seated** pose does not overlap | **Whether the seated pose can be reached at all.** See below. |
 
 Nothing here proves a print. Only a printed part does that, and printing is Ziad's step.
+
+## A part that fits is not a part that goes in
+
+The screen fence cost two printed parts to this, so it is worth stating flatly: **an empty `fitcheck` proves the part fits where it ends up, and says nothing about whether it can get there.** For anything that has to enter a channel, a slot, or past a lip, those are different questions and the second is the hard one.
+
+Three ways of answering it, in increasing order of how much they actually prove:
+
+1. **A swept arc about an assumed pivot.** Cheap, and worth doing first for intuition. But it answers "can it rotate once engaged", not "can it get in", because it presupposes the engagement. The fence's tongue analysis passed this and the part still would not go in.
+2. **Free placements at each tilt.** Also not enough on its own. Reporting "collision-free placements exist at every tilt from 0° to 30°" reads like a pass and is not one — it establishes local freedom near the seated pose, not a connected path from outside. That is the specific mistake that shipped a part that could not be inserted.
+3. **A configuration-space path search.** The real answer. Rasterise the mating part once; for each tilt, rasterise the part and get every collision-free translation in one shot by FFT cross-correlation; then flood-fill reachability from "part entirely clear of the mating part" to the seated pose. Rotation about any fixed point plus arbitrary translation covers every rigid motion, so the space is complete. If the seated pose is not in the reachable set, no amount of rocking, tilting or force will seat it.
+
+Sanity rules learned the hard way:
+
+- **Cover the whole tilt range.** An early run swept −16° to +70° and missed the near-vertical, face-first motion the part was actually designed for. Widening it to ±100° did not change that answer, but only because it was checked.
+- **Search from outside, not from nearby.** Restricting the translation search to a few millimetres around the seated pose is what made a dead design look feasible.
+- **One colliding sample is a finding, not noise.** A single overlapping cell on a 0.15 mm grid got written off as "the pinch camming home". It was the top lip fouling the rib, and it was the whole problem.
+- **Report obstructions by region.** Splitting collisions into near-half and far-half made the real signal readable; lumped together, a known artifact at one end masked the genuine block at the other.
+- **When a physical test disagrees with the model, the model is wrong.** Ziad reported twice that the part would not rotate past the back corner while the analysis said it cleared by 0.40 mm. It did clear — but the tongue at the *other* end forced a tilt the channel could not accommodate, so he felt it at the back. Symptom and cause were at opposite ends of the part.
 
 ## Silent failure modes
 

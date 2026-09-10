@@ -21,8 +21,12 @@ reversible-door-stop 1
 roku-stand 5
 roku-stand-r 2
 roku-stand-z 3
+screen-fence-flex 1
 screen-fence-rail 1
-screen-fence-rail-coupon 3
+screen-fence-rail-coupon 4
+screen-fence-rail-loose 2
+screen-fence-rigid 1
+screen-fence-test-rail 1
 slim-can-adapter 1
 slim-can-holder-3in 2
 slim-can-holder-3in-12oz 2
