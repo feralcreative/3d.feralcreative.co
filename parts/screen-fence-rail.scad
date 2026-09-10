@@ -396,6 +396,20 @@ clip_relief = 0.80;
 // Rounding on the cap's two top corners (mm) — front generous, back barely.
 clip_cap_r_front = 6.00;
 clip_cap_r_back  = 1.00;
+// Fillet on every INSIDE corner of the cap (mm).
+//
+// Not optional once the outside is rounded. An outside radius with a square
+// corner behind it is a stress riser with a wedge of section feeding it, and
+// it cracks at the corner. Default is the front radius less the wall, which
+// puts the inside arc CONCENTRIC with the outside one — 1.396 + 3.81 = 5.206
+// and 28.69 - 3.81 = 24.88, the same centre the outer arc is struck from — so
+// the wall runs a constant 2.19 mm right around the bend.
+//
+// It is applied as a closing (dilate, then erode) on the cap alone. The legs
+// are not part of that shape, so the 0.80 mm relief slot cannot be swallowed
+// by the dilation — which it would be, permanently, if this were applied to
+// the whole section.
+clip_cap_fillet = clip_cap_r_front - clip_out_t;
 
 // Which wall feature the twin clip catches.
 //
@@ -1342,6 +1356,7 @@ module twin2d(hook = clip_hook, splay = 0) {
 
         if (twin_cap)
             intersection() {
+                offset(r = -clip_cap_fillet) offset(r = clip_cap_fillet)
                 union() {
                     polygon([[cx0, zbar], [cx1, zbar], [cx1, ztop], [cx0, ztop]]);
                     for (m = [0, 1])
