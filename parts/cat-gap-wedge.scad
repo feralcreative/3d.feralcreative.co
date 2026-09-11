@@ -7,36 +7,55 @@
 //
 // THE FORM. A trapezoidal prism standing on end: 100 mm tall, an 18 mm back
 // face, two 32 mm facets running forward from it, and a 5 mm front face where
-// they would otherwise have met. The back sits against the hinge-side jamb,
-// the front aims out into the swing. Those four numbers are given, not
-// derived; everything else here falls out of them.
+// they would otherwise have met. A 15 mm cylinder runs the full height of that
+// front face as a knob, bored 12 mm down its axis. The back sits against the
+// hinge-side jamb, the knob aims out into the swing.
 //
-//   depth        31.333 mm   sqrt(32^2 - 6.5^2)
+//   depth        31.333 mm   sqrt(32^2 - 6.5^2), to the front face
 //   taper angle  23.440 deg  2 * asin(6.5 / 32)
+//   overall      38.833 mm   depth + knob_r
 //
-// THE FRONT FACE IS A TRUNCATION, NOT A SHORTENING. The facets stay 32 mm and
-// the back stays 18, so blunting the point pushed the depth OUT from 30.708 to
-// 31.333 and closed the taper from 32.671 degrees to 23.440. If what you want
-// instead is the original triangle with its nose cut off, that is a shallower
-// part — 22.178 mm deep on 23.111 mm facets — so set facet_len to 23.111.
+// THE KNOB IS ADDED, NOT BLENDED. It is centred on the front face and simply
+// unioned on, which is what keeps the wedge angle exactly what it was. It is
+// 15 mm across a 5 mm face, so it stands 5 mm proud on each side and crosses
+// the facets rather than meeting them: there is a shallow notch where the
+// circle cuts each facet, 6.444 mm back from the front face. That notch is
+// deliberate — the alternative is a tangent knob, and a tangent circle between
+// two converging lines is an inscribed circle, so holding both the taper and
+// the 32 mm facets would have forced the back face out from 18 to 27.687. The
+// angle was the thing worth keeping.
+//
+// THE BORE IS CONCENTRIC WITH THE KNOB, so the wall around it is a constant
+// 1.5 mm — 12 in 15 — the whole way round. It never breaks out: the bore's
+// rearmost point lands 6.0 mm inside the wedge at x = 25.333, and everything
+// within r = 7.5 of the axis is knob. Behind that the trapezoid piles more
+// material on, so only the front arc is actually 1.5 mm thick.
+//
+// ⚠️ 1.5 mm IS OFF THE WALL LADDER. On a 0.4 nozzle it is 3.57 passes of a
+// 0.42 line, which prints as gaps or over-extrusion; the neighbouring good
+// numbers are 1.26 (3 passes) and 1.68 (4). Holding the 12 mm bore, a
+// knob_d of 15.36 gives 1.68. Holding the 15 mm knob, a bore_d of 11.64 does.
+// Both of those are Ziad's call, so the file builds 12-in-15 as asked.
+//
+// The bore is drawn at its nominal diameter. This machine loses 0.55-0.65 mm
+// on a small bore by measurement, so if something has to pass through this
+// hole rather than it just being a hole, put that back with bore_comp.
 //
 // The taper is what makes it work. A hinge gap is a wedge itself — it closes
 // as the door swings — so a matching taper seats on two faces and jams rather
 // than sitting on a point and squirting out. The 18 mm back is the stop: that
 // is the gap it will hold, less whatever the door's own hinge-side clearance
-// already gives away. The 5 mm front is what the door's edge actually lands
-// on, so it is also the part that stops the wedge burying itself.
+// already gives away.
 //
-// ORIENTATION. Modelled as the user described it — profile in XY, extruded up
-// Z, standing on end. DO NOT PRINT IT THIS WAY. On end it is a 100 mm tower on
-// a 31 x 18 footprint and every layer is a thin trapezoid. Lay it on a 32 mm
-// facet instead: a 100 x 32 face on the plate, ~26 mm tall, layers running
-// across the wedge so the taper is in the plane of the layers and not a stack
-// of shrinking outlines. The slicer does that; nothing here needs to change.
+// ORIENTATION. Modelled standing on end: profile in XY, extruded up Z. DO NOT
+// PRINT IT THIS WAY — on end it is a 100 mm tower on a 39 x 18 footprint and
+// the knob is a 100 mm column of unsupported curve. Lay it on a facet instead:
+// a 100 x 32 face on the plate, layers running across the wedge, the knob a
+// bead along one edge. The slicer does that; nothing here needs to change.
 //
-// tip_r rounds all four corners of the profile without moving the flats
-// (erode, then dilate). Give it 1-2 mm if you want the front edges softened
-// where the door bears on them.
+// tip_r rounds the profile's corners without moving the flats (erode, then
+// dilate). It reaches the two back corners and the two notches where the knob
+// crosses the facets; the knob is already round and is unaffected.
 
 /* [Output] */
 
@@ -57,27 +76,56 @@ front_thick = 5.0;
 // Corner radius on the profile (mm). 0 leaves the corners sharp.
 tip_r = 0.0;
 
+/* [Knob] */
+
+// Diameter of the cylinder running down the front edge (mm).
+knob_d = 15.0;
+// Position of the knob's axis, measured forward from the front face (mm).
+// 0 centres it on the face. Positive pushes it out and leaves less of it
+// buried in the wedge.
+knob_offset = 0.0;
+// Diameter of the bore down the knob's axis (mm). 0 leaves it solid.
+bore_d = 12.0;
+// Added to bore_d to cover this machine's bore shrinkage (mm). Left at 0 the
+// hole is drawn at its nominal size. See the note in the header before
+// putting anything through it that has to fit.
+bore_comp = 0.0;
+
 /* [Derived — do not edit] */
 
 half_back = back_thick / 2;
 half_front = front_thick / 2;
+knob_r = knob_d / 2;
+bore_r = (bore_d + bore_comp) / 2;
 wedge_depth = sqrt(facet_len * facet_len - pow(half_back - half_front, 2));
+knob_x = wedge_depth + knob_offset;
 taper_angle = 2 * asin((half_back - half_front) / facet_len);
 
 module cat_gap_wedge() {
-  linear_extrude(height = wedge_height, convexity = 4)
-    offset(r = tip_r)
-      offset(r = -tip_r)
-        polygon([
-          [0, -half_back],                // back face, right side
-          [wedge_depth, -half_front],     // front face, right side
-          [wedge_depth, half_front],      // front face, left side
-          [0, half_back],                 // back face, left side
-        ]);
+  linear_extrude(height = wedge_height, convexity = 6)
+    difference() {
+      offset(r = tip_r)
+        offset(r = -tip_r)
+          union() {
+            polygon([
+              [0, -half_back],                // back face, right side
+              [wedge_depth, -half_front],     // front face, right side
+              [wedge_depth, half_front],      // front face, left side
+              [0, half_back],                 // back face, left side
+            ]);
+            translate([knob_x, 0]) circle(r = knob_r);
+          }
+      // Cut in 2D, after the rounding, so tip_r cannot reach the bore and the
+      // extrude caps the ends itself — no coplanar faces to overshoot past.
+      if (bore_r > 0) translate([knob_x, 0]) circle(r = bore_r);
+    }
 }
 
 cat_gap_wedge();
 
-echo(str("depth = ", wedge_depth, " mm"));
+echo(str("depth to the front face = ", wedge_depth, " mm"));
+echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
 echo(str("taper angle = ", taper_angle, " deg"));
-echo(str("facet angle off the back face = ", 90 - taper_angle / 2, " deg"));
+echo(str("knob stands proud of the front face by = ", knob_offset + knob_r, " mm"));
+echo(str("knob stands proud of each facet by = ", knob_r - half_front, " mm at its widest"));
+echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
