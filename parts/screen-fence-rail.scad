@@ -499,10 +499,23 @@ key_lift = 1.20;
 // standing up. It lies on its side instead, on the face of the stem — every
 // part of it is then a slab of the same thickness sitting on the bed, the
 // ring and the stem included, and the pull load runs in the plane of the
-// layers rather than across them. The one thing that had to give for that is
-// the flange, which cannot stick out below the face the key lies on: it is
-// now one-sided, flush with the stem toward the front and reaching past it
-// only toward the back wall. It only ever had to be wider than the window.
+// layers rather than across them.
+//
+// THE FLANGE IS GONE — key_head_ext = 0, Ziad's call, 2026-09-11. It was a
+// lip wider than the window, and it never had a job: key_z0 puts the stem on
+// the channel floor, so the floor is what stops the key going down and the
+// flange floated key_lift clear of the cap bearing nothing. Printing it lying
+// down had already forced it one-sided, flush toward the front and reaching
+// past the stem only toward the back, and a one-sided lip is a key with a
+// wrong way round.
+//
+// WITHOUT IT THE KEY IS OMNIDIRECTIONAL. Stem, head band, and ring are all
+// key_w wide and all centred on the same plane, so the key is a constant
+// slab, mirror-symmetric across its faces and along its length: either face
+// down on the bed, either way round in the window, either end leading. There
+// is nothing left to get backwards. key_head_ext is kept as a parameter and
+// now splits evenly on both sides, so a lip can come back two-sided if one
+// is ever wanted — it cannot come back one-sided.
 //
 // Bore, radial width, and thickness (mm). The bore is measured ALONG the
 // rail, across the widest part of the head: 32 there is two fingertips side
@@ -548,11 +561,14 @@ cat_round = 0.040;
 // Step height for the ring's rounded edge (mm), which is built as a stack
 // rather than swept — see key_ring().
 cat_step = 0.10;
-// Flange thickness (mm) and how far it reaches past the stem toward the back
-// wall (mm). The window is key_w + 2 x key_clr = 7.33; the stem is 6.93; a
-// 4.00 one-sided lip lands 3.80 on the bridge and stops 2.25 short of the
-// back wall's inner face.
-key_head_ext = 4.00;
+// How far the head band reaches past the stem (mm), SPLIT EVENLY between the
+// two faces. 0 is the design: no lip, nothing protruding, the key symmetric
+// across its faces. Anything above 0 is a two-sided lip and costs the key its
+// flat-slab print — the window is only key_w + 2 x key_clr = 7.33 against a
+// 6.93 stem, so there is 0.20 a side before it fouls the crossbar anyway.
+key_head_ext = 0;
+// Height of the head band: the plain stub of stem between the window and the
+// ring, which is what key_ring_sink sinks the ring into (mm).
 key_head_t = 2.19;
 // Chamfer on the key's two bottom corners (mm), so it finds the gap rather
 // than catching a leg on the way down.
@@ -1761,9 +1777,11 @@ module key2d() {
         polygon([[cx - k + L, key_z0], [cx + k - L, key_z0],
                  [cx + k, key_z0 + L], [cx + k, hz],
                  [cx - k, hz], [cx - k, key_z0 + L]]);
-        // Flush with the stem's front face, past it only toward the back —
-        // the front face is what the key lies on to print.
-        translate([cx - k, hz]) square([key_w + key_head_ext, key_head_t]);
+        // Centred on the stem, so key_head_ext splits evenly and the key has
+        // no front and no back. At the design value of 0 this is the stem
+        // carried straight on up to the ring.
+        translate([cx - k - key_head_ext / 2, hz])
+            square([key_w + key_head_ext, key_head_t]);
     }
 }
 
@@ -1903,11 +1921,12 @@ module key_upright(len = clip_seg_len) {
             key_solid(key_len(len) - 2 * key_end_clr);
 }
 
-// The keys on a plate: lying on the stem's front face, the ring flat on the
-// bed. Not the insert's pose any more — the ring is not a prism along the
-// rail, and stood up it would be a 42 mm arch printed on edge. Laid down,
-// nothing on the key is thicker than the stem and nothing overhangs but the
-// ring's rounded lower edge and the 1.2 mm lead chamfer. Keys go side by side
+// The keys on a plate: lying on a stem face, the ring flat on the bed. Not
+// the insert's pose any more — the ring is not a prism along the rail, and
+// stood up it would be a 42 mm arch printed on edge. Laid down, the key is a
+// slab of one thickness end to end and nothing overhangs but the ring's
+// rounded lower edge and the 1.2 mm lead chamfer. With the flange gone it no
+// longer matters which face goes down; this picks one. Keys go side by side
 // along what was the rail, ring to ring, pair_gap apart.
 module key_plate(len = clip_seg_len) {
     cx    = trk_clear_w / 2;

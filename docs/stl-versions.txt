@@ -29,7 +29,7 @@ screen-fence-flex 1
 screen-fence-insert 1
 screen-fence-insert-220 2
 screen-fence-key 4
-screen-fence-key-220 2
+screen-fence-key-220 3
 screen-fence-rail 1
 screen-fence-rail-coupon 4
 screen-fence-rail-loose 2
