@@ -481,39 +481,78 @@ key_z0 = 0;
 // Gap between the cap's top face and the underside of the key's head (mm).
 key_lift = 1.20;
 
-// THE KNOB. A plain cylinder running ALONG the rail, on a web that lifts it
-// clear of the flange so a finger goes under it.
+// THE RING, WHICH IS A CAT FACE. A pull ring standing in the plane of the
+// rail — its face runs ALONG the rail and its hole faces across the channel,
+// so two fingers hook through it from the side and lift. The outline is a
+// cat's head rather than a circle: Ziad's call, and the thing being kept out
+// of the screen is a cat, so the handle may as well say so. It costs nothing
+// mechanically — the band is the same constant 5 mm of section all the way
+// round, the ears are solid where the hole erodes away, and the hole across
+// the rail is still key_ring_id.
 //
-// It was briefly a tapered barrel lying ACROSS the channel, and that made the
-// key the one thing here that was not a prism: its axis crossed the extrusion,
-// so standing the key the way the insert prints would have started the barrel
-// in mid-air, and it had to be laid on its side with the underside of a
-// horizontal rod as an overhang. Turning it a quarter turn gives up the two
-// cones and gets back a pure extrusion — the whole key is a vertical wall
-// again, the cylinder prints as a circle on every layer, and there is no
-// overhang anywhere on the part.
+// It replaces a tube lying along the rail. That printed as a clean circle on
+// every layer and could not be held: 2026-09-10, on the real rail with the
+// key home, Ziad could not get a grip on a 14 mm cylinder and the edges hurt
+// to pull on. The snugness was right; the handle was not.
 //
-// Barrel outside diameter and wall (mm) — a tube, not a rod.
+// The ring is not a prism along the rail, so the key no longer prints
+// standing up. It lies on its side instead, on the face of the stem — every
+// part of it is then a slab of the same thickness sitting on the bed, the
+// ring and the stem included, and the pull load runs in the plane of the
+// layers rather than across them. The one thing that had to give for that is
+// the flange, which cannot stick out below the face the key lies on: it is
+// now one-sided, flush with the stem toward the front and reaching past it
+// only toward the back wall. It only ever had to be wider than the window.
 //
-// 14 across a 9.62 bore. Centred on the stem it spans x 4.11 to 18.11, which
-// keeps 2.72 mm clear of the back wall's inner face at 20.83, and its top lands
-// at ztop + 19.89, just under that wall's 20. Those two are what cap it: wider
-// and it fouls the wall, taller and it stands proud of the barrier.
+// Bore, radial width, and thickness (mm). The bore is measured ALONG the
+// rail, across the widest part of the head: 32 there is two fingertips side
+// by side. The head's overall width is key_ring_id + 2 x key_ring_w, and the
+// ears carry it taller than that — the top stands well proud of the 20 mm
+// back wall, which is the point. The thickness is the stem's, so the ring is
+// the stem carried on up.
+key_ring_id = 32.00;
+key_ring_w  = 5.00;
+key_ring_t  = 0;            // 0 = the stem's own width, key_w
+// Round on the ring's edges (mm). Sharp edges were the other half of the
+// complaint. Must be under half of both key_ring_w and the thickness.
+key_ring_r  = 1.50;
+// How far the ring's bottom sinks into the flange (mm), so the two overlap
+// over a real area rather than meeting on a plane. Never below the flange's
+// underside: the ring hangs past the window along the rail, and anything of
+// it under the flange lands on the crossbar.
+key_ring_sink = 1.50;
+
+// THE CAT, AS NUMBERS. Traced off the reference silhouette and normalised to
+// a head ONE UNIT WIDE, origin at the head's centre, y up. Scale by cat_w()
+// and everything follows. The head is a hull of four circles — a small radius
+// at the top corners so the crown stays full out to the ear bases, a big one
+// at the bottom so the chin is round — and each ear is a triangle overlapped
+// into it, so the union needs no matching and cannot leave a seam.
 //
-// Hollow costs nothing here. The bore runs along the rail like everything else,
-// so it prints as a circle on every layer with no bridging, and it turns a
-// pinch across 14 mm into a finger through 9.62 — a fingertip enters from
-// either end of the key.
-key_knob_d = 14.00;
-key_knob_t = 2.19;
-// The web: how far it lifts the barrel clear of the flange, and how wide it is
-// across the channel (mm). Lifting it still matters — it is what lets a finger
-// come at the tube from underneath rather than only through it.
-key_neck_h = 2.50;
-key_neck_t = 2.19;
-// Flange width and thickness (mm). Its only job is to be wider than the 7.33 mm
-// window so the key cannot drop through, and to land flat when it does.
-key_head_w = 12.00;
+// The crown is deliberately lower than the chin is deep (0.42 against 0.47).
+// The reference domes slightly between the ears and the flat-topped hull
+// cannot, so the notch would fill in and the ears would read as bumps; taking
+// the crown down 0.05 gives the notch its depth back instead.
+cat_head_top   =  0.42;
+cat_head_bot   = -0.47;
+cat_head_r_top =  0.20;
+cat_head_r_bot =  0.40;
+// One ear, left side: tip, then inner base, then outer base. Both bases are
+// carried well inside the head — only the two edges above the crown are read.
+cat_ear = [[-0.458, 0.620], [-0.073, 0.340], [-0.471, 0.180]];
+// Corner rounding, as a fraction of the head width. Applied both ways, so it
+// rounds the notch between the ears AND the ear tips — nothing on a handle
+// wants a point. It trims about 1.7 mm off each tip at a 42 mm head, which is
+// why the tips are traced long.
+cat_round = 0.040;
+// Step height for the ring's rounded edge (mm), which is built as a stack
+// rather than swept — see key_ring().
+cat_step = 0.10;
+// Flange thickness (mm) and how far it reaches past the stem toward the back
+// wall (mm). The window is key_w + 2 x key_clr = 7.33; the stem is 6.93; a
+// 4.00 one-sided lip lands 3.80 on the bridge and stops 2.25 short of the
+// back wall's inner face.
+key_head_ext = 4.00;
 key_head_t = 2.19;
 // Chamfer on the key's two bottom corners (mm), so it finds the gap rather
 // than catching a leg on the way down.
@@ -548,17 +587,33 @@ key_lead = 1.20;
 // three 40 mm keys with four 20 mm bridges, which is half the crossbar intact.
 key_bridge = 20.00;
 key_win    = 40.00;
+// How many keys a segment gets. 0 = as many as the pitch fits, which is the
+// scheme above. Ziad, 2026-09-10, after the coupon held: "We only need one key
+// per section." So one, centred, with the crossbar intact everywhere else — a
+// 220 mm segment is one 40 mm window between two 90 mm bridges.
+//
+// ⚠️ That holds the leg over 40 mm and leaves the other 180 to the cap: the
+// 53 mm tall back wall and cap make a beam stiff enough along the rail that
+// lifting one end while the key holds the middle means bending it, which is
+// what is being relied on. First full-length print is where that gets looked
+// at, not here.
+key_count_fixed = 1;
 // End clearance on each key, each end (mm).
 key_end_clr = 0.30;
 
-// How that divides into a given length. The pitch picks the count, then the
-// bridges are held at key_bridge and the windows take up the remainder, so any
-// segment length works and a short coupon does not end up with a zero-length
+// How that divides into a given length. The count is fixed or picked by the
+// pitch; each window is key_win, or less if the length cannot fit that many
+// with bridges no shorter than a third of the share; the bridges take up
+// whatever remains. A short coupon still cannot end up with a zero-length
+// window, and a long segment with one key keeps the crossbar rather than the
 // window.
-function key_count(len) = max(1, round(len / (key_win + key_bridge)));
-function key_gap(len)   = min(key_bridge, len / (3 * key_count(len)));
-function key_len(len)   = (len - (key_count(len) + 1) * key_gap(len))
-                          / key_count(len);
+function key_count(len) = key_count_fixed > 0 ? key_count_fixed
+                        : max(1, round(len / (key_win + key_bridge)));
+function key_gap_min(len) = min(key_bridge, len / (3 * key_count(len)));
+function key_len(len)   = min(key_win, (len - (key_count(len) + 1) * key_gap_min(len))
+                                       / key_count(len));
+function key_gap(len)   = (len - key_count(len) * key_len(len))
+                          / (key_count(len) + 1);
 
 // Widen everything ABOVE the rail out to the rail's own outside width, so the
 // part caps the whole extrusion instead of standing on it as a narrow U.
@@ -1692,36 +1747,150 @@ assert(!is_undef(key_w) && key_w > 0,
 assert(!is_undef(twin_hook) && !is_undef(twin_bump),
        "twin_hook/twin_bump are undef — a name they read is assigned below them");
 
-// The key. A straight strip with a head that stands key_lift clear of the cap,
-// so there is a slot to get a fingernail into and nothing bearing coplanar on
-// anything. Chamfered at the bottom so it finds the gap between the legs.
+// The key's stem and flange, as a section across the rail. A straight strip
+// with a one-sided flange that stands key_lift clear of the cap, chamfered at
+// the bottom so it finds the gap between the legs. The ring is not in here —
+// it is not a prism along the rail — see key_solid.
 module key2d() {
     cx   = trk_clear_w / 2;
     ztop = trk_depth + clip_fence_h;
     k    = key_w / 2;
     L    = key_lead;
     hz   = ztop + key_lift;               // flange underside
-    ny   = hz + key_head_t;               // web root
-    ky   = ny + key_neck_h + key_knob_d / 2;   // barrel axis
-    difference() {
-        union() {
-            polygon([[cx - k + L, key_z0], [cx + k - L, key_z0],
-                     [cx + k, key_z0 + L], [cx + k, hz],
-                     [cx - k, hz], [cx - k, key_z0 + L]]);
-            translate([cx - key_head_w / 2, hz]) square([key_head_w, key_head_t]);
-            // Web, taken from the flange's UNDERSIDE rather than its top face —
-            // two shapes meeting exactly on a plane are in contact over no
-            // volume at all, and CGAL leaves them as separate shells. That is
-            // how the key came off the plate as two objects last round, with
-            // the build still reporting NoError.
-            //
-            // It is run all the way up to the barrel's AXIS rather than to its
-            // underside, so the two overlap over a real area instead of meeting
-            // at a tangent. The bore below is what trims it back.
-            translate([cx - key_neck_t / 2, hz]) square([key_neck_t, ky - hz]);
-            translate([cx, ky]) circle(d = key_knob_d);
+    union() {
+        polygon([[cx - k + L, key_z0], [cx + k - L, key_z0],
+                 [cx + k, key_z0 + L], [cx + k, hz],
+                 [cx - k, hz], [cx - k, key_z0 + L]]);
+        // Flush with the stem's front face, past it only toward the back —
+        // the front face is what the key lies on to print.
+        translate([cx - k, hz]) square([key_w + key_head_ext, key_head_t]);
+    }
+}
+
+// The head's width, which is the one length every cat number scales by. The
+// hole runs key_ring_id across the widest part of the head, with a band of
+// key_ring_w each side of it.
+function cat_w() = key_ring_id + 2 * key_ring_w;
+
+// The head alone, with no ears: a hull of four circles, in the cat's own
+// coordinates — x across the face, y up, origin at the head's centre.
+module cat_head_2d(w = undef) {
+    cw = is_undef(w) ? cat_w() : w;
+    hull()
+        for (sx = [-1, 1]) {
+            translate([sx * (0.5 - cat_head_r_top) * cw,
+                       (cat_head_top - cat_head_r_top) * cw])
+                circle(r = cat_head_r_top * cw, $fn = 64);
+            translate([sx * (0.5 - cat_head_r_bot) * cw,
+                       (cat_head_bot + cat_head_r_bot) * cw])
+                circle(r = cat_head_r_bot * cw, $fn = 64);
         }
-        translate([cx, ky]) circle(d = key_knob_d - 2 * key_knob_t);
+}
+
+// The whole face, ears on: head, plus a triangle for each ear overlapped well
+// into it, then offset(-k) offset(+2k) offset(-k) — erode, dilate, erode —
+// which is the plain-OpenSCAD way to round EVERY corner rather than only the
+// convex or only the concave ones. Order matters: the first erode is what
+// rounds the notch between the ears.
+module cat_face_2d(w = undef) {
+    cw = is_undef(w) ? cat_w() : w;
+    k  = cat_round * cw;
+    offset(r = -k) offset(r = 2 * k) offset(r = -k)
+        union() {
+            cat_head_2d(cw);
+            for (sx = [-1, 1])
+                polygon([for (pt = cat_ear) [sx * pt[0] * cw, pt[1] * cw]]);
+        }
+}
+
+// The hole the fingers go through: the HEAD eroded by the band width, not the
+// whole face eroded by it. Erode the face and the hole runs up into the ears,
+// which then read as two horns with a gap down the middle of each; taking the
+// hole off the head leaves the ears solid, which is what the reference
+// silhouette has. It comes out key_ring_id across and 27.4 tall, with a
+// constant key_ring_w of band everywhere the two boundaries face.
+module cat_hole_2d(w = undef) {
+    offset(r = -key_ring_w) cat_head_2d(w);
+}
+
+// A 2D shape extruded t tall with both faces rolled over by r, built as a
+// stack: a full-thickness core, and above and below it n slabs offset by
+// r x (1 - cos a) reaching to the height r x sin a, sampled at equal angles
+// along the true roundover arc. Each slab takes the offset of its OUTER
+// edge, so for the body (sgn -1) the staircase sits inside the ideal surface
+// and for a cutter (sgn +1) outside it — either way the error is never
+// material left proud. The step is cat_step, half a layer, so the slicer
+// sees a curve rather than a stair.
+//
+// EVERY SLAB RUNS FROM THE MIDDLE OF THE CORE, not from the core's face, and
+// that is not tidiness. Slabs stacked exactly face to face touch over zero
+// volume and the union comes out as a pile of SEPARATE SHELLS — a plain
+// solid disc built that way reported genus -7, which is eight components
+// rather than any hole count. Starting each slab at t/2 buries every join in
+// solid material: one shell, and genus means what it says again. Starting
+// them at the core's own face would be no better, because the two faces
+// would then be coplanar.
+//
+// Not minkowski() with a sphere, which is the textbook answer and the wrong
+// one here: these outlines are non-convex in a dozen places, so OpenSCAD
+// would decompose them and the build would go from a quarter-second to a
+// long wait.
+module cat_slab(t, r, sgn = -1) {
+    n = max(3, ceil(r / cat_step));
+    translate([0, 0, r])
+        linear_extrude(height = t - 2 * r, convexity = 10) children();
+    for (i = [0 : n - 1]) {
+        z  = r * sin(90 * (i + 1) / n);
+        d  = sgn * r * (1 - cos(90 * (i + 1) / n));
+        // The last slab of a cutter is the one that reaches the face, so it
+        // is the one that gets the usual overshoot through it.
+        ov = (sgn > 0 && i == n - 1) ? eps : 0;
+        h  = t / 2 - r + z + ov;
+        translate([0, 0, t / 2])
+            linear_extrude(height = h, convexity = 10) offset(r = d) children();
+        translate([0, 0, r - z - ov])
+            linear_extrude(height = h, convexity = 10) offset(r = d) children();
+    }
+}
+
+// The ring on its own: the cat standing in the y-z plane, thickness centred
+// on x so its axis lies across the channel, origin at the head's centre.
+//
+// BODY MINUS CUTTER, NOT A STACK OF BANDS. Stacking the band — the face with
+// the hole already taken out of it — builds the same solid and reports a
+// genus of 7 on a part with one hole in it, rising with the slab count: each
+// eroded annulus meets its neighbours in a way CGAL resolves into extra
+// handles. Rolling the outside and the inside as two separate simply-
+// connected stacks and differencing them once gives one tunnel and genus 1,
+// which is the number that says the hole goes through.
+module key_ring() {
+    t  = key_ring_t > 0 ? key_ring_t : key_w;
+    r  = key_ring_r;
+    cw = cat_w();
+    assert(r < key_ring_w / 2 && r < t / 2, "key_ring_r too large for the ring section");
+    rotate([0, 90, 0]) translate([0, 0, -t / 2])
+        difference() {
+            cat_slab(t, r, -1) cat_face_2d(cw);
+            cat_slab(t, r, +1) cat_hole_2d(cw);
+        }
+}
+
+// One key, in rail coordinates: x across the channel, y up, z along the
+// rail from 0 to len_k. The ring is centred on the key's length and sunk
+// key_ring_sink into the flange, from the flange's TOP face down — two
+// shapes meeting exactly on a plane are separate shells, which is how the
+// key came off the plate as two objects once already.
+module key_solid(len_k) {
+    cx   = trk_clear_w / 2;
+    ztop = trk_depth + clip_fence_h;
+    hz   = ztop + key_lift;
+    // The cat's origin is its head centre, so the sink is measured to the
+    // chin: drop the flange's top face by key_ring_sink, then lift by however
+    // far the chin hangs below that origin.
+    yc   = hz + key_head_t - key_ring_sink - cat_head_bot * cat_w();
+    union() {
+        linear_extrude(height = len_k, convexity = 10) key2d();
+        translate([cx, yc, len_k / 2]) key_ring();
     }
 }
 
@@ -1731,17 +1900,27 @@ module key_upright(len = clip_seg_len) {
     g = key_gap(len);
     for (i = [0 : key_count(len) - 1])
         translate([0, 0, g + key_end_clr + i * (key_len(len) + g)])
-            linear_extrude(height = key_len(len) - 2 * key_end_clr,
-                           convexity = 10) key2d();
+            key_solid(key_len(len) - 2 * key_end_clr);
 }
 
-// The keys on a plate: standing with the rail length vertical, the same pose
-// the insert and the fixture print in, because the key is a prism again.
+// The keys on a plate: lying on the stem's front face, the ring flat on the
+// bed. Not the insert's pose any more — the ring is not a prism along the
+// rail, and stood up it would be a 42 mm arch printed on edge. Laid down,
+// nothing on the key is thicker than the stem and nothing overhangs but the
+// ring's rounded lower edge and the 1.2 mm lead chamfer. Keys go side by side
+// along what was the rail, ring to ring, pair_gap apart.
 module key_plate(len = clip_seg_len) {
+    cx    = trk_clear_w / 2;
+    lk    = key_len(len) - 2 * key_end_clr;
+    // Pitch is along what was the rail, which is the cat's width — the ears
+    // run up in y and take no room beside the next key.
+    od    = cat_w();
+    pitch = max(lk, od) + pair_gap;
     for (i = [0 : key_count(len) - 1])
-        translate([i * (key_head_w + pair_gap), 0, 0])
-            linear_extrude(height = key_len(len) - 2 * key_end_clr,
-                           convexity = 10) key2d();
+        translate([i * pitch + max(lk, od) / 2, 0, 0])
+            rotate([0, -90, 0])
+                translate([-(cx - key_w / 2), 0, -lk / 2])
+                    key_solid(lk);
 }
 
 // The key seated: it must foul neither the rail nor the insert. Both are asked
@@ -1870,7 +2049,7 @@ module pair(len = pair_len) {
     right = trk_clear_w + fixture_wall + fixture_bore_comp;   // fixture's edge
     left  = -trk_skin;                                        // insert's edge
     ins   = right + pair_gap - left;                    // insert's offset
-    kleft = trk_clear_w / 2 - key_head_w / 2;            // key's own left edge
+    kleft = 0;                                           // key plate starts at 0
     fixture(len);
     translate([ins, 0, 0]) twin_upright(len, pair_hook);
     // The key, beside the insert rather than in it — same reason the insert is
