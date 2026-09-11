@@ -8,8 +8,11 @@
 // THE FORM. A trapezoidal prism standing on end: 100 mm tall, an 18 mm back
 // face, two 32 mm facets running forward from it, and a 5 mm front face where
 // they would otherwise have met. A 15 mm cylinder runs the full height of that
-// front face as a knob, bored 12 mm down its axis. The back sits against the
-// hinge-side jamb, the knob aims out into the swing.
+// front face as a knob, bored 12 mm down its axis — but only for the top 5 mm.
+// Below that the knob's own 15 mm cylinder is subtracted instead, so what runs
+// down the front of the wedge is a concave channel and what is left at the top
+// is a ring. The back sits against the hinge-side jamb, the ring aims out into
+// the swing.
 //
 //   depth        31.333 mm   sqrt(32^2 - 6.5^2), to the front face
 //   taper angle  23.440 deg  2 * asin(6.5 / 32)
@@ -25,8 +28,27 @@
 // the 32 mm facets would have forced the back face out from 18 to 27.687. The
 // angle was the thing worth keeping.
 //
+// THE RING AND THE CHANNEL ARE THE SAME CYLINDER, used twice. Above
+// z = 95 it is added and bored; below, the same 15 mm circle on the same axis
+// is cut away, which takes the nose of the trapezoid with it:
+//
+//   channel floor   23.833 mm from the back face — 7.5 mm deep on the axis
+//   channel mouth   24.889 mm, where the arc meets each facet
+//   mouth tips      3.837 mm off the axis, a 70.95 deg included angle
+//
+// So below the ring the wedge is 24.889 mm deep at two blunt tips rather than
+// 38.833 at a knob, and the 5 mm front face is gone entirely — the channel
+// swallowed it. The tips are not feather edges; 70.95 degrees prints, and
+// edge_r takes them back another millimetre on top of that.
+//
+// THE RING'S UNDERSIDE IS A FLAT ANNULAR CEILING at z = 95 over open air.
+// Standing on end that is a bridge; on a facet, which is how this prints, it
+// is a side wall and the channel is a groove running along the plate. One
+// more reason not to print it upright.
+//
 // THE BORE IS CONCENTRIC WITH THE KNOB, so the wall around it is a constant
-// 1.5 mm — 12 in 15 — the whole way round. It never breaks out: the bore's
+// 1.5 mm — 12 in 15 — the whole way round, for the 5 mm it exists. It never
+// breaks out: the bore's
 // rearmost point lands 6.0 mm inside the wedge at x = 25.333, and everything
 // within r = 7.5 of the axis is knob. Behind that the trapezoid piles more
 // material on, so only the front arc is actually 1.5 mm thick.
@@ -53,9 +75,11 @@
 // a 100 x 32 face on the plate, layers running across the wedge, the knob a
 // bead along one edge. The slicer does that; nothing here needs to change.
 //
-// tip_r rounds the profile's corners without moving the flats (erode, then
-// dilate). It reaches the two back corners and the two notches where the knob
-// crosses the facets; the knob is already round and is unaffected.
+// EVERY VERTICAL EDGE IS ROUNDED at edge_r = 1.5 mm, convex and concave alike:
+// the two back corners, the two mouth tips, and the two notches where the ring
+// crosses the facets. A 70.95 degree tip pulls back by rr/sin(35.48) - rr when
+// it is rounded, so the mouth tips land about 1.084 mm shy of the 24.889 mm
+// quoted above. The flats and the arcs themselves do not move.
 
 /* [Output] */
 
@@ -73,8 +97,10 @@ facet_len = 32.0;
 back_thick = 18.0;
 // Thickness of the front face (mm). 0 brings the facets to a point.
 front_thick = 5.0;
-// Corner radius on the profile (mm). 0 leaves the corners sharp.
-tip_r = 0.0;
+// Radius on every vertical edge (mm). Rounds convex and concave corners alike
+// — the back corners, the two mouth tips, and the notches where the ring meets
+// the facets. 0 leaves them all sharp.
+edge_r = 1.5;
 
 /* [Knob] */
 
@@ -90,6 +116,9 @@ bore_d = 12.0;
 // hole is drawn at its nominal size. See the note in the header before
 // putting anything through it that has to fit.
 bore_comp = 0.0;
+// Height of cylinder kept at the very top as a ring (mm). The rest of it is
+// subtracted from the wedge and becomes the channel.
+ring_h = 5.0;
 
 /* [Derived — do not edit] */
 
@@ -101,24 +130,56 @@ wedge_depth = sqrt(facet_len * facet_len - pow(half_back - half_front, 2));
 knob_x = wedge_depth + knob_offset;
 taper_angle = 2 * asin((half_back - half_front) / facet_len);
 
-module cat_gap_wedge() {
-  linear_extrude(height = wedge_height, convexity = 6)
+// Round every corner of a 2D profile by rr without moving the flats: open by
+// rr (erode, dilate — rounds the convex corners), then close by rr (dilate,
+// erode — rounds the concave ones). The two dilations merge into one, which is
+// why the middle offset is 2 * rr. Arcs already larger than rr come through
+// untouched, so the channel and the bore are unaffected.
+module round_all(rr) {
+  if (rr > 0) offset(r = -rr) offset(r = 2 * rr) offset(r = -rr) children();
+  else children();
+}
+
+module wedge_trapezoid() {
+  polygon([
+    [0, -half_back],                // back face, right side
+    [wedge_depth, -half_front],     // front face, right side
+    [wedge_depth, half_front],      // front face, left side
+    [0, half_back],                 // back face, left side
+  ]);
+}
+
+// Below the ring: the wedge with the channel scooped out of its nose.
+module lower_profile() {
+  round_all(edge_r)
     difference() {
-      offset(r = tip_r)
-        offset(r = -tip_r)
-          union() {
-            polygon([
-              [0, -half_back],                // back face, right side
-              [wedge_depth, -half_front],     // front face, right side
-              [wedge_depth, half_front],      // front face, left side
-              [0, half_back],                 // back face, left side
-            ]);
-            translate([knob_x, 0]) circle(r = knob_r);
-          }
-      // Cut in 2D, after the rounding, so tip_r cannot reach the bore and the
-      // extrude caps the ends itself — no coplanar faces to overshoot past.
-      if (bore_r > 0) translate([knob_x, 0]) circle(r = bore_r);
+      wedge_trapezoid();
+      translate([knob_x, 0]) circle(r = knob_r);
     }
+}
+
+// The ring course. Rounded BEFORE the bore is cut, because the ring wall is
+// only 1.5 mm and an erode of edge_r would delete it outright.
+module upper_profile() {
+  difference() {
+    round_all(edge_r)
+      union() {
+        wedge_trapezoid();
+        translate([knob_x, 0]) circle(r = knob_r);
+      }
+    translate([knob_x, 0]) circle(r = bore_r);
+  }
+}
+
+// Two constant sections stacked, rather than one extrude cut by a cylinder.
+// Each course is a plain 2D profile, so the rounding is a 2D offset and the
+// knob's r = 7.5 surface is never both added and subtracted over the same z.
+module cat_gap_wedge() {
+  linear_extrude(height = wedge_height - ring_h, convexity = 6)
+    lower_profile();
+  translate([0, 0, wedge_height - ring_h])
+    linear_extrude(height = ring_h, convexity = 6)
+      upper_profile();
 }
 
 cat_gap_wedge();
@@ -129,3 +190,5 @@ echo(str("taper angle = ", taper_angle, " deg"));
 echo(str("knob stands proud of the front face by = ", knob_offset + knob_r, " mm"));
 echo(str("knob stands proud of each facet by = ", knob_r - half_front, " mm at its widest"));
 echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
+echo(str("ring from z = ", wedge_height - ring_h, " to ", wedge_height, " mm"));
+echo(str("channel floor = ", knob_x - knob_r, " mm from the back face"));

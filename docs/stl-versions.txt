@@ -1,5 +1,5 @@
 batleth 6
-cat-gap-wedge 3
+cat-gap-wedge 5
 deck-door-stop 4
 deck-door-stop-coupon 3
 deck-door-stop-truss 5
