@@ -1,16 +1,40 @@
 // Cat gap wedge — holds the laundry/litter room door open a cat's width.
 //
-// This file is the WEDGE BODY ONLY. It hangs on the hinge side of the door so
-// the door cannot close past it, leaving a permanent gap at the latch edge.
-// The hook that carries it off the hinge is a separate, later job — model it
-// against the numbers echoed at the bottom of this file rather than guessing.
+// HOW IT INSTALLS. The ring drops over the TOP HINGE PIN, on the inside of the
+// jamb, and the wedge hangs down from it into the gap between the door's hinge
+// stile and the jamb. The door closes onto the taper until it pinches, and
+// cannot go past — which leaves a 6-7 inch gap at the latch edge for the cats.
+// Ziad, 2026-09-11.
+//
+// SO THE RING END IS THE BACK, as you install it: the ring is at the hinge and
+// the 18 mm face points out into the opening. Earlier revisions of this header
+// had that backwards and described the 18 mm face as bearing on the jamb. It
+// does not bear on anything; it is the far end.
+//
+// THE BORE IS THE MOUNT, and it is vertical in use. Modelled ring-up, the bore
+// runs down the part's height, so hanging on the door it is a vertical hole
+// that drops straight over the pin from above. The 12 mm bore has to clear the
+// pin's head; the ring then rests on the top of the hinge barrel, which on a
+// typical residential hinge is wider than 12 mm and so is the thing that
+// actually carries the weight. ⚠️ Neither the pin head nor the barrel has been
+// measured — if the head is over 12 mm the part will not go on at all.
+//
+// WHAT SETS THE GAP is leverage, not the wedge's thickness on its own. The
+// door stops at roughly t/r radians, where t is the wedge's thickness where it
+// pinches and r is that point's distance from the pin; the latch-edge gap is
+// that angle times the door's width. Being a wedge, it self-seats — the door
+// closes until the local thickness matches the local gap — so the achieved
+// number depends on the jamb as much as on this part. At the 18 mm face,
+// r = 51.333, which is about 20 degrees and roughly 11 inches on a 32 inch
+// door. That is MORE than the 6-7 asked for, so expect it to seat short of
+// the 18 mm face rather than on it. Print the coupon and try it.
 //
 // THE FORM. A trapezoidal prism standing on end: 100 mm tall, an 18 mm flat
 // face at one end, two facets running from it to a 5 mm face at the other, and
 // a 15 mm cylinder on that 5 mm face. The cylinder is kept for only the top
 // 5 mm, as a bored ring; everywhere below it the same cylinder is subtracted
-// instead, which leaves a concave channel down the nose. The 18 mm face bears
-// on the jamb, the ring aims out into the swing.
+// instead, which leaves a concave channel down the nose. The ring end hangs at
+// the hinge; the 18 mm face is the far end, out in the opening.
 //
 //   depth        51.333 mm   18 mm face to the 5 mm face
 //   facet        51.743 mm   each, derived from the depth
@@ -66,15 +90,14 @@
 // on a small bore by measurement, so if something has to pass through this
 // hole rather than it just being a hole, put that back with bore_comp.
 //
-// The taper is what makes it work. A hinge gap is a wedge itself — it closes
-// as the door swings — so a matching taper seats on two faces and jams rather
-// than sitting on a point and squirting out. The 18 mm face is the stop: that
-// is the gap it will hold, less whatever the door's own hinge-side clearance
-// already gives away.
+// The taper is what makes it work. The gap it hangs in closes as the door
+// swings, so a matching taper seats on two faces and jams rather than sitting
+// on a point and squirting out. The 18 mm face is the far limit, not the
+// working thickness — see WHAT SETS THE GAP above.
 //
-// ORIENTATION. Modelled ring-up, because that is where the ring belongs on the
-// door and every number above is quoted from the 18 mm face with z running up
-// the door's edge. It is BUILT ring-down — flip = true rotates it 180 about X
+// ORIENTATION. Modelled ring-up, which is how it hangs — the ring is at the
+// top, on the pin. Every number above is quoted from the 18 mm face, with z
+// running up the door's edge. It is BUILT ring-down — flip = true rotates it 180 about X
 // before output — and that is the orientation to print.
 //
 // Ring-down there is not a single overhang in the part. The channel is a
@@ -114,12 +137,13 @@ eps = 0.01;
 
 // Height standing on end (mm). The dimension along the door's edge.
 wedge_height = 100.0;
-// Distance from the 18 mm face to the 5 mm face (mm). THIS is the input —
+// Distance from the 18 mm face to the ring's axis, which is the pin (mm).
+// THIS is the input —
 // facet_len is derived from it. 51.3329 is the original 31.3329 plus the 20
 // Ziad asked for on 2026-09-11.
 wedge_depth = 51.3329;
-// Thickness of the flat face at the jamb end (mm). This is the gap the door is
-// held to, and the stretch does not change it.
+// Thickness of the far face, the end away from the hinge (mm). The stretch
+// does not change it.
 back_thick = 18.0;
 // Thickness of the face the knob sits on (mm). 0 brings the facets to a point.
 front_thick = 5.0;
@@ -226,5 +250,6 @@ echo(str("facet length = ", facet_len, " mm"));
 echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
 echo(str("taper angle = ", taper_angle, " deg"));
 echo(str("channel floor = ", knob_x - knob_r, " mm from the 18 mm face"));
+echo(str("18 mm face sits ", wedge_depth, " mm from the hinge pin"));
 echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
 echo(str("ring from z = ", wedge_height - ring_h, " to ", wedge_height, " mm"));
