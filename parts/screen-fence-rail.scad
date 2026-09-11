@@ -478,28 +478,43 @@ key_clr = 0.20;
 // the cap, so the floor is the only datum and there is nothing coplanar to
 // bear on.
 key_z0 = 0;
-// Flange width and thickness (mm). Its only job is to be wider than the window
-// so the key cannot fall through, and to give the grip something to stand on.
-// It has to stay inboard of the cap's 6 mm front radius, ceiling near 12.
-key_head_w = 11.00;
-key_head_t = 2.19;
-// Gap between the cap's top face and the underside of the flange (mm).
+// Gap between the cap's top face and the underside of the key's head (mm).
 key_lift = 1.20;
 
-// THE GRIP. A flange and a fingernail slot is how you get a screwdriver under
-// something, not how a hand pulls it out, and this gets pulled out by hand.
+// THE KNOB. A plain cylinder running ALONG the rail, on a web that lifts it
+// clear of the flange so a finger goes under it.
 //
-// So the flange carries an upstand: a blade 2.19 thick — five lines, and the
-// same wall every other vertical face here is — standing key_grip_h proud with
-// a fully rounded top edge. It is pinched between finger and thumb across a
-// 40 x 9 mm face and pulled straight up, which is a real grip rather than a
-// fingernail trick, and it gives leverage to rock the key if it is tight.
+// It was briefly a tapered barrel lying ACROSS the channel, and that made the
+// key the one thing here that was not a prism: its axis crossed the extrusion,
+// so standing the key the way the insert prints would have started the barrel
+// in mid-air, and it had to be laid on its side with the underside of a
+// horizontal rod as an overhang. Turning it a quarter turn gives up the two
+// cones and gets back a pure extrusion — the whole key is a vertical wall
+// again, the cylinder prints as a circle on every layer, and there is no
+// overhang anywhere on the part.
 //
-// It stands 12.4 mm above the cap, well under the back wall's 20, and 2.19 mm
-// wide in the middle of a 22 mm channel. Printing standing up it is a vertical
-// wall like everything else.
-key_grip_t = 2.19;
-key_grip_h = 9.00;
+// Barrel outside diameter and wall (mm) — a tube, not a rod.
+//
+// 14 across a 9.62 bore. Centred on the stem it spans x 4.11 to 18.11, which
+// keeps 2.72 mm clear of the back wall's inner face at 20.83, and its top lands
+// at ztop + 19.89, just under that wall's 20. Those two are what cap it: wider
+// and it fouls the wall, taller and it stands proud of the barrier.
+//
+// Hollow costs nothing here. The bore runs along the rail like everything else,
+// so it prints as a circle on every layer with no bridging, and it turns a
+// pinch across 14 mm into a finger through 9.62 — a fingertip enters from
+// either end of the key.
+key_knob_d = 14.00;
+key_knob_t = 2.19;
+// The web: how far it lifts the barrel clear of the flange, and how wide it is
+// across the channel (mm). Lifting it still matters — it is what lets a finger
+// come at the tube from underneath rather than only through it.
+key_neck_h = 2.50;
+key_neck_t = 2.19;
+// Flange width and thickness (mm). Its only job is to be wider than the 7.33 mm
+// window so the key cannot drop through, and to land flat when it does.
+key_head_w = 12.00;
+key_head_t = 2.19;
 // Chamfer on the key's two bottom corners (mm), so it finds the gap rather
 // than catching a leg on the way down.
 key_lead = 1.20;
@@ -702,6 +717,15 @@ fixture_root_r = 0.50;
 pair_len = 40;
 // Air between them on the plate (mm).
 pair_gap = 8;
+// Put the keys on the pair's plate too, or leave them to their own file.
+//
+// Off, because the two are different prints of the same test: the pair is the
+// fit, and it is worth reprinting on its own whenever a clearance moves; the
+// key only changes when the key changes. They also divide differently — a
+// 40 mm coupon carries one 12.73 mm key, a 200 mm segment three 40 mm ones —
+// so keeping them apart means the key file can be built at whatever length is
+// actually being made.
+pair_key = false;
 // Engagement for the insert in the pair. It follows twin_hook now rather than
 // sitting mid-ladder: the pair is the thing that goes on the real rail, so it
 // should carry the matched barbs the rail trial asked for, not a rung.
@@ -1656,6 +1680,18 @@ module twin2d(hook = twin_hook, splay = 0) {
 key_w = trk_clear_w - 2 * (catch_reach + clip_clr + clip_leg_root_t
                            + clip_leg_fillet_in + key_clr);
 
+// THE GUARD, and it has earned its place three times in one session.
+//
+// A top-level assignment that reads a name assigned BELOW it gets undef. It is
+// a WARNING, the build still exits 0, and what comes out is a degenerate solid
+// that every intersection check then calls clean — key_w did it once and
+// key_knob_x did it again twenty minutes later. An assert turns that into a
+// stop, which is what it always should have been.
+assert(!is_undef(key_w) && key_w > 0,
+       "key_w is undef or non-positive — a name it reads is assigned below it");
+assert(!is_undef(twin_hook) && !is_undef(twin_bump),
+       "twin_hook/twin_bump are undef — a name they read is assigned below them");
+
 // The key. A straight strip with a head that stands key_lift clear of the cap,
 // so there is a slot to get a fingernail into and nothing bearing coplanar on
 // anything. Chamfered at the bottom so it finds the gap between the legs.
@@ -1665,17 +1701,27 @@ module key2d() {
     k    = key_w / 2;
     L    = key_lead;
     hz   = ztop + key_lift;               // flange underside
-    gz   = hz + key_head_t;               // grip root
-    r    = key_grip_t / 2;
-    union() {
-        polygon([[cx - k + L, key_z0], [cx + k - L, key_z0],
-                 [cx + k, key_z0 + L], [cx + k, hz],
-                 [cx - k, hz], [cx - k, key_z0 + L]]);
-        translate([cx - key_head_w / 2, hz]) square([key_head_w, key_head_t]);
-        hull() {
-            translate([cx - r, gz]) square([key_grip_t, eps]);
-            translate([cx, gz + key_grip_h - r]) circle(r = r);
+    ny   = hz + key_head_t;               // web root
+    ky   = ny + key_neck_h + key_knob_d / 2;   // barrel axis
+    difference() {
+        union() {
+            polygon([[cx - k + L, key_z0], [cx + k - L, key_z0],
+                     [cx + k, key_z0 + L], [cx + k, hz],
+                     [cx - k, hz], [cx - k, key_z0 + L]]);
+            translate([cx - key_head_w / 2, hz]) square([key_head_w, key_head_t]);
+            // Web, taken from the flange's UNDERSIDE rather than its top face —
+            // two shapes meeting exactly on a plane are in contact over no
+            // volume at all, and CGAL leaves them as separate shells. That is
+            // how the key came off the plate as two objects last round, with
+            // the build still reporting NoError.
+            //
+            // It is run all the way up to the barrel's AXIS rather than to its
+            // underside, so the two overlap over a real area instead of meeting
+            // at a tangent. The bore below is what trims it back.
+            translate([cx - key_neck_t / 2, hz]) square([key_neck_t, ky - hz]);
+            translate([cx, ky]) circle(d = key_knob_d);
         }
+        translate([cx, ky]) circle(d = key_knob_d - 2 * key_knob_t);
     }
 }
 
@@ -1689,8 +1735,8 @@ module key_upright(len = clip_seg_len) {
                            convexity = 10) key2d();
 }
 
-// The same keys on a plate: all standing on the bed, side by side, because
-// that is how they print and they are not stacked end to end in the assembly.
+// The keys on a plate: standing with the rail length vertical, the same pose
+// the insert and the fixture print in, because the key is a prism again.
 module key_plate(len = clip_seg_len) {
     for (i = [0 : key_count(len) - 1])
         translate([i * (key_head_w + pair_gap), 0, 0])
@@ -1829,7 +1875,7 @@ module pair(len = pair_len) {
     translate([ins, 0, 0]) twin_upright(len, pair_hook);
     // The key, beside the insert rather than in it — same reason the insert is
     // beside the rail and not in it.
-    if (twin_key)
+    if (twin_key && pair_key)
         translate([ins + trk_clear_w + trk_skin + pair_gap - kleft, 0, 0])
             key_plate(len);
 }

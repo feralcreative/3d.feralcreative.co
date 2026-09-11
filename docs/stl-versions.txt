@@ -22,8 +22,10 @@ roku-stand 5
 roku-stand-r 2
 roku-stand-z 3
 screen-fence-clip-coupon 1
-screen-fence-fit-pair 9
+screen-fence-fit-pair 15
 screen-fence-flex 1
+screen-fence-insert 1
+screen-fence-key 2
 screen-fence-rail 1
 screen-fence-rail-coupon 4
 screen-fence-rail-loose 2
