@@ -69,11 +69,20 @@
 // is the gap it will hold, less whatever the door's own hinge-side clearance
 // already gives away.
 //
-// ORIENTATION. Modelled standing on end: profile in XY, extruded up Z. DO NOT
-// PRINT IT THIS WAY — on end it is a 100 mm tower on a 39 x 18 footprint and
-// the knob is a 100 mm column of unsupported curve. Lay it on a facet instead:
-// a 100 x 32 face on the plate, layers running across the wedge, the knob a
-// bead along one edge. The slicer does that; nothing here needs to change.
+// ORIENTATION. Modelled ring-up, because that is where the ring belongs on the
+// door and every number above is quoted from the back face with z running up
+// the door's edge. It is BUILT ring-down — flip = true rotates it 180 about X
+// before output — and that is the orientation to print.
+//
+// Ring-down there is not a single overhang in the part. The channel is a
+// vertical groove, the bore is a vertical hole, and the ring's flat underside
+// is on the plate instead of bridging 15 mm of open air at z = 95. Going up
+// from the top of the ring the section only ever loses material, which is a
+// ledge, not an overhang. Printed the other way up that same face is the one
+// bridge in the part and it is directly over the channel.
+//
+// The cost is a 100 mm tower on a 38.8 x 18 footprint. It is stable enough
+// across the wedge and marginal along it — run a brim.
 //
 // EVERY VERTICAL EDGE IS ROUNDED at edge_r = 1.5 mm, convex and concave alike:
 // the two back corners, the two mouth tips, and the two notches where the ring
@@ -82,6 +91,17 @@
 // quoted above. The flats and the arcs themselves do not move.
 
 /* [Output] */
+
+// "coupon" is the bottom coupon_h of the printed orientation — the ring and
+// the start of the channel — for checking the fit and the bore without
+// printing 100 mm. Build it with --name cat-gap-wedge-coupon.
+show = "part";   // [part, coupon]
+// Print the part ring-down. The ring is modelled at the top because that is
+// where it belongs on the door; it is printed at the bottom because that is
+// the only way the ring's underside is not a bridge.
+flip = true;
+// Height of the coupon, measured from the bottom of the printed orientation.
+coupon_h = 20.0;
 
 $fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
 $fs = 0.4;
@@ -182,7 +202,21 @@ module cat_gap_wedge() {
       upper_profile();
 }
 
-cat_gap_wedge();
+// Printed orientation. The flip is a rotate, not a mirror — the part is
+// symmetric about y = 0, so nothing is handed either way.
+module cat_gap_wedge_oriented() {
+  if (flip) translate([0, 0, wedge_height]) rotate([180, 0, 0]) cat_gap_wedge();
+  else cat_gap_wedge();
+}
+
+if (show == "coupon") {
+  intersection() {
+    cat_gap_wedge_oriented();
+    translate([-50, -50, 0]) cube([200, 100, coupon_h]);
+  }
+} else {
+  cat_gap_wedge_oriented();
+}
 
 echo(str("depth to the front face = ", wedge_depth, " mm"));
 echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
