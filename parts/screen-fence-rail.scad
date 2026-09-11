@@ -601,6 +601,12 @@ key_head_t = key_ring_sink;
 // Chamfer on the key's two bottom corners (mm), so it finds the gap rather
 // than catching a leg on the way down.
 key_lead = 1.20;
+// Round on the key's two SHOULDERS (mm) — the top corners of the stem, where
+// its 39.40 mm run along the rail meets the band's top face. They are the last
+// square corners on the handle and they sit right where a hand lands. Must not
+// exceed key_head_t, or the round reaches below the band and starts narrowing
+// the stem where it passes through the window.
+key_shoulder_r = 3.00;
 
 // SEVERAL SHORT WINDOWS, NOT ONE LONG SLOT — and this is not a detail.
 //
@@ -1936,6 +1942,19 @@ module key_ring() {
 // key_ring_sink into the flange, from the flange's TOP face down — two
 // shapes meeting exactly on a plane are separate shells, which is how the
 // key came off the plate as two objects once already.
+// The shoulder mask, drawn in the (along the rail, up) plane: the stem's own
+// rectangle with its two TOP corners rounded, open-ended downward so it only
+// ever touches the shoulders. Hull of two circles and a bottom bar, which is
+// how cap_outline draws the same kind of shape.
+module key_shoulder_2d(len_k, ytop, ybot) {
+    r = key_shoulder_r;
+    hull() {
+        translate([r, ytop - r])          circle(r = r);
+        translate([len_k - r, ytop - r])  circle(r = r);
+        translate([0, ybot])              square([len_k, eps]);
+    }
+}
+
 module key_solid(len_k) {
     cx   = trk_clear_w / 2;
     ztop = trk_depth + clip_fence_h;
@@ -1944,8 +1963,20 @@ module key_solid(len_k) {
     // chin: drop the flange's top face by key_ring_sink, then lift by however
     // far the chin hangs below that origin.
     yc   = hz + key_head_t - key_ring_sink - cat_head_bot * cat_w();
+    assert(key_shoulder_r <= key_head_t,
+           "key_shoulder_r reaches below the head band and narrows the stem in the window");
     union() {
-        linear_extrude(height = len_k, convexity = 10) key2d();
+        // The stem, with the shoulders taken off it. The mask is applied to
+        // the stem ALONE — the ring is unioned after, so its cheeks keep
+        // their own outline.
+        intersection() {
+            linear_extrude(height = len_k, convexity = 10) key2d();
+            translate([cx, 0, 0])
+                rotate([0, -90, 0])
+                    linear_extrude(height = trk_clear_w * 2, center = true,
+                                   convexity = 4)
+                        key_shoulder_2d(len_k, hz + key_head_t, key_z0 - 1);
+        }
         translate([cx, yc, len_k / 2]) key_ring();
     }
 }
