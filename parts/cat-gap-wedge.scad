@@ -59,18 +59,23 @@
 // lines is an inscribed circle — holding both the taper and the facets would
 // force the 18 mm face wider. The angle was the thing worth keeping.
 //
-// THE RING AND THE CHANNEL ARE THE SAME CYLINDER, used twice. Above z = 95 it
-// is added and bored; below, the same 15 mm circle on the same axis is cut
-// away, which takes the nose of the trapezoid with it:
+// THE RING EXISTS ONLY IN THE TOP 5 mm; BELOW IT, THE BORE CARRIES ON. Above
+// z = 95 the 15 mm knob is added and bored 12. Below, the knob is simply gone
+// — not subtracted, absent — and the 12 mm bore continues down as a cut. The
+// channel wall is therefore the very same cylinder as the inside of the ring,
+// flush with it the whole way down:
 //
-//   channel floor   43.833 mm from the 18 mm face — 7.5 mm deep on the axis
-//   channel mouth   44.623 mm, where the arc meets each facet
-//   mouth tips      3.350 mm off the axis, a 70.689 deg included angle
+//   channel floor   45.333 mm from the 18 mm face
+//   channel mouth   46.224 mm, where the arc meets each facet
+//   mouth tips      3.147 mm off the axis, a 65.583 deg included angle
 //
-// So below the ring the wedge is 44.623 mm deep at two blunt tips rather than
-// 58.833 at a knob, and the 5 mm face is gone entirely — the channel swallowed
-// it. The tips are not feather edges; 70.689 degrees prints, and edge_r takes
-// them back another 1.093 mm on top of that.
+// Ziad, 2026-09-11: *"delete the ring but leave the overlap."* Cutting the
+// knob's own 15 mm circle — which is what "subtract the rest of the ring"
+// produced — put the channel 1.5 mm outboard of the bore, so the groove the
+// pin hangs in stepped outward the moment it left the ring. It does not now.
+//
+// The tips are not feather edges; 65.583 degrees prints, and edge_r takes them
+// back another 1.270 mm on top of that.
 //
 // THE RING'S UNDERSIDE IS A FLAT ANNULAR CEILING at z = 95 over open air.
 // Ring-down, which is how it prints, that face is on the plate instead.
@@ -196,12 +201,16 @@ module wedge_trapezoid() {
   ]);
 }
 
-// Below the ring: the wedge with the channel scooped out of its nose.
+// Below the ring: the wedge with the channel scooped out of its nose. The cut
+// is the BORE, not the knob — below the top course the ring itself is simply
+// not there, and what continues down is the hole through it. So the channel
+// wall is the same cylinder as the inside of the ring and runs flush with it,
+// rather than standing knob_r - bore_r = 1.5 mm proud of it.
 module lower_profile() {
   round_all(edge_r)
     difference() {
       wedge_trapezoid();
-      translate([knob_x, 0]) circle(r = knob_r);
+      translate([knob_x, 0]) circle(r = bore_r);
     }
 }
 
@@ -249,7 +258,7 @@ echo(str("depth, 18 mm face to 5 mm face = ", wedge_depth, " mm"));
 echo(str("facet length = ", facet_len, " mm"));
 echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
 echo(str("taper angle = ", taper_angle, " deg"));
-echo(str("channel floor = ", knob_x - knob_r, " mm from the 18 mm face"));
+echo(str("channel floor = ", knob_x - bore_r, " mm from the 18 mm face"));
 echo(str("18 mm face sits ", wedge_depth, " mm from the hinge pin"));
 echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
 echo(str("ring from z = ", wedge_height - ring_h, " to ", wedge_height, " mm"));
