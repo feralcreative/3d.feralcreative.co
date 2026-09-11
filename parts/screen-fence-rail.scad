@@ -350,7 +350,16 @@ clip_path_slack = 0.05;
 
 // Length of one printed segment (mm). Standing up, this is the print height,
 // and it is why the part is segmented rather than one 200 mm extrusion.
-clip_seg_len = 60;
+//
+// 219.82 IS THE PART, not a variant. Ziad, 2026-09-10: "do 220mm and we'll
+// print it on its edge straight up." 219.82 rather than 220.00 because it
+// lands on a layer boundary at every layer height from 0.12 to 0.30 — a
+// 220.00 object tops out at 220.02 and Orca refuses it. It is the default
+// here so that the insert and the key build at the real length with no -D
+// and no second name: there is ONE insert and ONE key.
+//
+// ⚠️ 219.82 standing up is 4.82 past the reference's 215 mm derived-safe Z.
+clip_seg_len = 219.82;
 
 // Lead-in ramp on the underside of every tab, as a RISE PER UNIT OF RUN. 1.00
 // is the 45 deg wedge this started as; higher is a gentler wedge that cams in
