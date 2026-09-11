@@ -833,9 +833,19 @@ pair_hook = twin_hook;
 
 /* [Preview] */
 
-// Length of track and fence drawn for "track" and "assembly" (mm). Short, so
-// the section stays legible in a render.
-preview_len = 60;
+// Length of track and fence drawn for the preview and check views (mm).
+//
+// IT IS THE SEGMENT LENGTH, not a short stand-in. It used to be 60, which was
+// fine while a preview only had to show a cross-section — but the key's size
+// is DERIVED from the segment length (key_len() fits key_count() windows into
+// it), so a 60 mm preview draws a 19.40 mm key that does not exist and never
+// will. keyfit and keyblock inherit this default, so a short preview was also
+// clearing and blocking a key that was not the part.
+//
+// The cost is that previews now draw the whole 219.82 mm. That is the honest
+// picture; pass -D 'preview_len=60' for a quick legible section, knowing the
+// key in it is wrong.
+preview_len = clip_seg_len;
 
 // Thickness of the mesh drawn in the slot (mm), and how far it stands above the
 // top of the rail. Representative only — the mesh floats and is not modelled
