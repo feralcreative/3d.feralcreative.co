@@ -167,7 +167,7 @@
 // A bare build.sh run would otherwise stamp the assembly into the fence's own
 // version series and leave stl/screen-fence-rail.stl pointing at a rail with a
 // fence inside it. There is an echo at the bottom of this file to catch that.
-show = "key";  // [fence, coupon, pair, pairfit, twin, twincoupon, twinfit, twinpath, twinassembly, key, keyfit, keyblock, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
+show = "twinassembly";  // [fence, coupon, pair, pairfit, twin, twincoupon, twinfit, twinpath, twinassembly, key, keyfit, keyblock, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
 
 // COUPON-COMPONENTS: fit=coupon
 // COUPON-PLATE: coupon
