@@ -5,53 +5,56 @@
 // The hook that carries it off the hinge is a separate, later job — model it
 // against the numbers echoed at the bottom of this file rather than guessing.
 //
-// THE FORM. A trapezoidal prism standing on end: 100 mm tall, an 18 mm back
-// face, two 32 mm facets running forward from it, and a 5 mm front face where
-// they would otherwise have met. A 15 mm cylinder runs the full height of that
-// front face as a knob, bored 12 mm down its axis — but only for the top 5 mm.
-// Below that the knob's own 15 mm cylinder is subtracted instead, so what runs
-// down the front of the wedge is a concave channel and what is left at the top
-// is a ring. The back sits against the hinge-side jamb, the ring aims out into
-// the swing.
+// THE FORM. A trapezoidal prism standing on end: 100 mm tall, an 18 mm flat
+// face at one end, two facets running from it to a 5 mm face at the other, and
+// a 15 mm cylinder on that 5 mm face. The cylinder is kept for only the top
+// 5 mm, as a bored ring; everywhere below it the same cylinder is subtracted
+// instead, which leaves a concave channel down the nose. The 18 mm face bears
+// on the jamb, the ring aims out into the swing.
 //
-//   depth        31.333 mm   sqrt(32^2 - 6.5^2), to the front face
-//   taper angle  23.440 deg  2 * asin(6.5 / 32)
-//   overall      38.833 mm   depth + knob_r
+//   depth        51.333 mm   18 mm face to the 5 mm face
+//   facet        51.743 mm   each, derived from the depth
+//   taper angle  14.433 deg  2 * asin(6.5 / 51.743)
+//   overall      58.833 mm   depth + knob_r
 //
-// THE KNOB IS ADDED, NOT BLENDED. It is centred on the front face and simply
-// unioned on, which is what keeps the wedge angle exactly what it was. It is
-// 15 mm across a 5 mm face, so it stands 5 mm proud on each side and crosses
-// the facets rather than meeting them: there is a shallow notch where the
-// circle cuts each facet, 6.444 mm back from the front face. That notch is
-// deliberate — the alternative is a tangent knob, and a tangent circle between
-// two converging lines is an inscribed circle, so holding both the taper and
-// the 32 mm facets would have forced the back face out from 18 to 27.687. The
-// angle was the thing worth keeping.
+// IT IS DRIVEN BY THE DEPTH, NOT THE FACETS. The facets were the given number
+// to begin with — 32 mm, which put the 18 mm face 31.333 mm from the ring.
+// Ziad, 2026-09-11: the 18 mm face wants to be 20 mm further out, at the same
+// 18 mm width. That stretches the part rather than reshaping it, and it is the
+// depth that is now the input: wedge_depth = 51.333, facet_len falls out of it
+// at 51.743, and the taper closes from 23.440 degrees to 14.433. A more acute
+// wedge reaches further into a closing gap before it jams, which is the whole
+// point of moving it.
 //
-// THE RING AND THE CHANNEL ARE THE SAME CYLINDER, used twice. Above
-// z = 95 it is added and bored; below, the same 15 mm circle on the same axis
-// is cut away, which takes the nose of the trapezoid with it:
+// THE KNOB IS ADDED, NOT BLENDED. It is centred on the 5 mm face and simply
+// unioned on, which keeps the wedge angle exactly what it was asked to be. It
+// is 15 mm across a 5 mm face, so it stands 5 mm proud on each side and
+// crosses the facets rather than meeting them: there is a shallow notch where
+// the circle cuts each facet, 6.710 mm back from the 5 mm face. The
+// alternative is a tangent knob, and a tangent circle between two converging
+// lines is an inscribed circle — holding both the taper and the facets would
+// force the 18 mm face wider. The angle was the thing worth keeping.
 //
-//   channel floor   23.833 mm from the back face — 7.5 mm deep on the axis
-//   channel mouth   24.889 mm, where the arc meets each facet
-//   mouth tips      3.837 mm off the axis, a 70.95 deg included angle
+// THE RING AND THE CHANNEL ARE THE SAME CYLINDER, used twice. Above z = 95 it
+// is added and bored; below, the same 15 mm circle on the same axis is cut
+// away, which takes the nose of the trapezoid with it:
 //
-// So below the ring the wedge is 24.889 mm deep at two blunt tips rather than
-// 38.833 at a knob, and the 5 mm front face is gone entirely — the channel
-// swallowed it. The tips are not feather edges; 70.95 degrees prints, and
-// edge_r takes them back another millimetre on top of that.
+//   channel floor   43.833 mm from the 18 mm face — 7.5 mm deep on the axis
+//   channel mouth   44.623 mm, where the arc meets each facet
+//   mouth tips      3.350 mm off the axis, a 70.689 deg included angle
+//
+// So below the ring the wedge is 44.623 mm deep at two blunt tips rather than
+// 58.833 at a knob, and the 5 mm face is gone entirely — the channel swallowed
+// it. The tips are not feather edges; 70.689 degrees prints, and edge_r takes
+// them back another 1.093 mm on top of that.
 //
 // THE RING'S UNDERSIDE IS A FLAT ANNULAR CEILING at z = 95 over open air.
-// Standing on end that is a bridge; on a facet, which is how this prints, it
-// is a side wall and the channel is a groove running along the plate. One
-// more reason not to print it upright.
+// Ring-down, which is how it prints, that face is on the plate instead.
 //
 // THE BORE IS CONCENTRIC WITH THE KNOB, so the wall around it is a constant
 // 1.5 mm — 12 in 15 — the whole way round, for the 5 mm it exists. It never
-// breaks out: the bore's
-// rearmost point lands 6.0 mm inside the wedge at x = 25.333, and everything
-// within r = 7.5 of the axis is knob. Behind that the trapezoid piles more
-// material on, so only the front arc is actually 1.5 mm thick.
+// breaks out: everything within r = 7.5 of the axis is knob, and behind that
+// the trapezoid piles more material on, so only the front arc is 1.5 mm thick.
 //
 // ⚠️ 1.5 mm IS OFF THE WALL LADDER. On a 0.4 nozzle it is 3.57 passes of a
 // 0.42 line, which prints as gaps or over-extrusion; the neighbouring good
@@ -65,12 +68,12 @@
 //
 // The taper is what makes it work. A hinge gap is a wedge itself — it closes
 // as the door swings — so a matching taper seats on two faces and jams rather
-// than sitting on a point and squirting out. The 18 mm back is the stop: that
+// than sitting on a point and squirting out. The 18 mm face is the stop: that
 // is the gap it will hold, less whatever the door's own hinge-side clearance
 // already gives away.
 //
 // ORIENTATION. Modelled ring-up, because that is where the ring belongs on the
-// door and every number above is quoted from the back face with z running up
+// door and every number above is quoted from the 18 mm face with z running up
 // the door's edge. It is BUILT ring-down — flip = true rotates it 180 about X
 // before output — and that is the orientation to print.
 //
@@ -78,17 +81,17 @@
 // vertical groove, the bore is a vertical hole, and the ring's flat underside
 // is on the plate instead of bridging 15 mm of open air at z = 95. Going up
 // from the top of the ring the section only ever loses material, which is a
-// ledge, not an overhang. Printed the other way up that same face is the one
-// bridge in the part and it is directly over the channel.
+// ledge, not an overhang.
 //
-// The cost is a 100 mm tower on a 38.8 x 18 footprint. It is stable enough
-// across the wedge and marginal along it — run a brim.
+// The cost is a 100 mm tower on a 58.8 x 18 footprint. The stretch helps here:
+// it is 20 mm longer in the one direction that was short, so it is less tippy
+// than it was. Run a brim anyway.
 //
 // EVERY VERTICAL EDGE IS ROUNDED at edge_r = 1.5 mm, convex and concave alike:
-// the two back corners, the two mouth tips, and the two notches where the ring
-// crosses the facets. A 70.95 degree tip pulls back by rr/sin(35.48) - rr when
-// it is rounded, so the mouth tips land about 1.084 mm shy of the 24.889 mm
-// quoted above. The flats and the arcs themselves do not move.
+// the two corners of the 18 mm face, the two mouth tips, and the two notches
+// where the ring crosses the facets. A 70.689 degree tip pulls back by
+// rr/sin(35.34) - rr when it is rounded, so the mouth tips land about 1.093 mm
+// shy of the 44.623 quoted above. The flats and the arcs do not move.
 
 /* [Output] */
 
@@ -111,30 +114,30 @@ eps = 0.01;
 
 // Height standing on end (mm). The dimension along the door's edge.
 wedge_height = 100.0;
-// Length of each of the two facets, back face to front face (mm).
-facet_len = 32.0;
-// Thickness of the back face (mm). This is the gap the door is held to.
+// Distance from the 18 mm face to the 5 mm face (mm). THIS is the input —
+// facet_len is derived from it. 51.3329 is the original 31.3329 plus the 20
+// Ziad asked for on 2026-09-11.
+wedge_depth = 51.3329;
+// Thickness of the flat face at the jamb end (mm). This is the gap the door is
+// held to, and the stretch does not change it.
 back_thick = 18.0;
-// Thickness of the front face (mm). 0 brings the facets to a point.
+// Thickness of the face the knob sits on (mm). 0 brings the facets to a point.
 front_thick = 5.0;
-// Radius on every vertical edge (mm). Rounds convex and concave corners alike
-// — the back corners, the two mouth tips, and the notches where the ring meets
-// the facets. 0 leaves them all sharp.
+// Radius on every vertical edge (mm). Rounds convex and concave corners alike.
+// 0 leaves them all sharp.
 edge_r = 1.5;
 
 /* [Knob] */
 
 // Diameter of the cylinder running down the front edge (mm).
 knob_d = 15.0;
-// Position of the knob's axis, measured forward from the front face (mm).
-// 0 centres it on the face. Positive pushes it out and leaves less of it
-// buried in the wedge.
+// Position of the knob's axis, measured forward from the 5 mm face (mm).
+// 0 centres it on the face.
 knob_offset = 0.0;
 // Diameter of the bore down the knob's axis (mm). 0 leaves it solid.
 bore_d = 12.0;
 // Added to bore_d to cover this machine's bore shrinkage (mm). Left at 0 the
-// hole is drawn at its nominal size. See the note in the header before
-// putting anything through it that has to fit.
+// hole is drawn at its nominal size.
 bore_comp = 0.0;
 // Height of cylinder kept at the very top as a ring (mm). The rest of it is
 // subtracted from the wedge and becomes the channel.
@@ -146,8 +149,8 @@ half_back = back_thick / 2;
 half_front = front_thick / 2;
 knob_r = knob_d / 2;
 bore_r = (bore_d + bore_comp) / 2;
-wedge_depth = sqrt(facet_len * facet_len - pow(half_back - half_front, 2));
 knob_x = wedge_depth + knob_offset;
+facet_len = sqrt(wedge_depth * wedge_depth + pow(half_back - half_front, 2));
 taper_angle = 2 * asin((half_back - half_front) / facet_len);
 
 // Round every corner of a 2D profile by rr without moving the flats: open by
@@ -162,10 +165,10 @@ module round_all(rr) {
 
 module wedge_trapezoid() {
   polygon([
-    [0, -half_back],                // back face, right side
-    [wedge_depth, -half_front],     // front face, right side
-    [wedge_depth, half_front],      // front face, left side
-    [0, half_back],                 // back face, left side
+    [0, -half_back],                // 18 mm face, right side
+    [wedge_depth, -half_front],     // 5 mm face, right side
+    [wedge_depth, half_front],      // 5 mm face, left side
+    [0, half_back],                 // 18 mm face, left side
   ]);
 }
 
@@ -212,17 +215,16 @@ module cat_gap_wedge_oriented() {
 if (show == "coupon") {
   intersection() {
     cat_gap_wedge_oriented();
-    translate([-50, -50, 0]) cube([200, 100, coupon_h]);
+    translate([-80, -80, 0]) cube([300, 160, coupon_h]);
   }
 } else {
   cat_gap_wedge_oriented();
 }
 
-echo(str("depth to the front face = ", wedge_depth, " mm"));
+echo(str("depth, 18 mm face to 5 mm face = ", wedge_depth, " mm"));
+echo(str("facet length = ", facet_len, " mm"));
 echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
 echo(str("taper angle = ", taper_angle, " deg"));
-echo(str("knob stands proud of the front face by = ", knob_offset + knob_r, " mm"));
-echo(str("knob stands proud of each facet by = ", knob_r - half_front, " mm at its widest"));
+echo(str("channel floor = ", knob_x - knob_r, " mm from the 18 mm face"));
 echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
 echo(str("ring from z = ", wedge_height - ring_h, " to ", wedge_height, " mm"));
-echo(str("channel floor = ", knob_x - knob_r, " mm from the back face"));
