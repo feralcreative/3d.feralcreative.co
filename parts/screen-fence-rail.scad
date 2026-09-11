@@ -538,11 +538,27 @@ key_ring_t  = 0;            // 0 = the stem's own width, key_w
 // Round on the ring's edges (mm). Sharp edges were the other half of the
 // complaint. Must be under half of both key_ring_w and the thickness.
 key_ring_r  = 1.50;
-// How far the ring's bottom sinks into the flange (mm), so the two overlap
-// over a real area rather than meeting on a plane. Never below the flange's
-// underside: the ring hangs past the window along the rail, and anything of
-// it under the flange lands on the crossbar.
-key_ring_sink = 1.50;
+// How far the ring's bottom sinks into the head band (mm) — the stem's top
+// face, measured down to the cat's chin.
+//
+// IT IS key_ring_w, WHICH IS THE MOST IT CAN BE. The hole is the head inset
+// by key_ring_w, so the hole's lowest point sits exactly key_ring_w above the
+// chin: sink that much and the stem's top face lands tangent to the floor of
+// the finger hole, which is as far up as the stem can go without eating the
+// grip. Everything of the ring below the hole is then stem, so the two read
+// as one piece rather than a head perched on a neck.
+//
+// It does not merge the OUTLINE. The stem is key_len - 2 x key_end_clr =
+// 39.40 along the rail and the head is cat_w() = 42.00, but at the hole's
+// floor the head is only 32.32 wide — so the cheeks still step out about
+// 3.5 mm each side above the stem's top corners. Closing that gap too would
+// need the stem 10.32 mm above the chin, which is 5.32 mm into the hole.
+// Ziad's call, 2026-09-11: keep the hole.
+//
+// Never below the band's underside — the head hangs past the window along the
+// rail, and anything of it under the band lands on the crossbar. key_head_t
+// is held equal to this for exactly that reason.
+key_ring_sink = key_ring_w;
 
 // THE CAT, AS NUMBERS. Traced off the reference silhouette and normalised to
 // a head ONE UNIT WIDE, origin at the head's centre, y up. Scale by cat_w()
@@ -577,8 +593,11 @@ cat_step = 0.10;
 // 6.93 stem, so there is 0.20 a side before it fouls the crossbar anyway.
 key_head_ext = 0;
 // Height of the head band: the plain stub of stem between the window and the
-// ring, which is what key_ring_sink sinks the ring into (mm).
-key_head_t = 2.19;
+// ring, which is what key_ring_sink sinks the ring into (mm). Held equal to
+// the sink, so the chin lands exactly on the band's underside and no part of
+// the ring reaches down toward the crossbar. It was 2.19 when the sink was
+// 1.50, which left the head standing on a visible neck.
+key_head_t = key_ring_sink;
 // Chamfer on the key's two bottom corners (mm), so it finds the gap rather
 // than catching a leg on the way down.
 key_lead = 1.20;
