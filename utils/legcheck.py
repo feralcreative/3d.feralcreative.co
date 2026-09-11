@@ -91,6 +91,11 @@ class Leg:
         self.t_tip = p["clip_leg_tip_t"]
         self.xo = self.reach + p["clip_clr"]
         self.bore = p["trk_clear_w"]
+        self.fillet_in = p.get("clip_leg_fillet_in", 0.0)
+        # The key's near edge, from the same wall the leg is referenced to. It
+        # is set by the root, because that is where the key has to squeeze past.
+        self.key_edge = self.xo + self.t_root + self.fillet_in + p.get("key_clr", 0.20)
+        self.has_key = bool(p.get("twin_key_on", 1))
         self.n = n
 
     def t(self, s):
@@ -146,6 +151,40 @@ class Leg:
                 worst, at = gap, s
         return worst, at
 
+    def fillet(self, s):
+        """How far the inboard root fillet stands proud of the leg face at s."""
+        r = self.fillet_in
+        if r <= 0:
+            return 0.0
+        u = r - (self.a - s)            # distance up into the fillet
+        return r - math.sqrt(max(r * r - u * u, 0.0)) if 0 <= u <= r else 0.0
+
+    def key_gap(self, delta):
+        """Smallest gap between ONE leg's inboard face and the key, and where.
+
+        Against the key the leg is alone, so this uses the true deflected shape
+        for the leg and a fixed edge for the key — unlike the leg-to-leg case
+        there is nothing moving on the other side.
+        """
+        worst, at = 1e9, 0.0
+        for i in range(self.n + 1):
+            s = i * self.a / self.n
+            gap = self.key_edge - (self.xo + self.t(s) + self.fillet(s)
+                                   + self.shape(delta, s))
+            if gap < worst:
+                worst, at = gap, s
+        return worst, at
+
+    def travel_to_key(self):
+        lo, hi = 0.0, 40.0
+        for _ in range(60):
+            mid = (lo + hi) / 2
+            if self.key_gap(mid)[0] < 0:
+                hi = mid
+            else:
+                lo = mid
+        return lo
+
     def travel_to_touch(self, margin=0.40):
         lo, hi = 0.0, 40.0
         for _ in range(60):
@@ -163,6 +202,10 @@ def report(p, hooks, slack):
           % (leg.t_root, leg.t_tip, leg.a, p["twin_catch"]))
     print("travel   = hook + %.2f, and both legs move it, so the pair closes by twice\n" % slack)
 
+    kt = leg.travel_to_key()
+    print("key      %.3f mm wide, near edge at %.3f; it stops the leg after %.2f mm\n"
+          % (leg.bore - 2 * leg.key_edge, leg.key_edge, kt))
+
     print("  hook   move   strain   peak at   force      leg gap   verdict")
     for h in hooks:
         d = h + slack
@@ -172,6 +215,10 @@ def report(p, hooks, slack):
             "STRAIN" if e > 0.010 else "TOUCHING")
         print("  %5.2f  %5.2f   %5.2f%%   %4.1f mm   %4.2f N/mm  %6.2f    %s"
               % (h, d, e * 100, at, f, gap, flag))
+    th = p.get("twin_hook", hooks[0])
+    print("\n  with the key home a leg reaches %.2f mm of the %.2f it needs to release,"
+          % (kt, th + slack))
+    print("  so the barb stays %.2f mm of its %.2f under the fin." % (th - kt, th))
 
     print("\n  limits")
     for tgt, note in ((0.010, "repeated use, ~30% of yield"),

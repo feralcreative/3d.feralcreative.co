@@ -302,9 +302,22 @@ clip_clr = 0.15;
 // It is slop the part can take up by sliding inboard, so it comes straight off
 // the engagement: net hook is clip_hook - clip_out_clr.
 clip_out_clr = 0.10;
-// Clearance between the tab's top face and the roll's underside (mm). The foot
-// is the down-stop, so this is what is left over.
-clip_tab_clr = 0.15;
+// Drop from a feature's underside to the tab's top face (mm).
+//
+// This was 0.15, and 0.15 was the leftover of a JAW: a foot resting on the
+// fin's top face set the height, and the tab got whatever the fin's thickness
+// left over. That jaw is the thing that failed on the rail — the foot landed
+// on the fin and the tab never reached under it — so the foot is gone (see
+// twin_side) and this is no longer a leftover. It is deliberate slack.
+//
+// trk_ledge_z0 and trk_lip_z0 are the last drawing-derived numbers the catches
+// still depend on, and the drawing is discredited. The skirt on the rail's top
+// face is the datum now, so the whole error between it and a feature's
+// underside lands here. Too little and the tab fouls the underside and the
+// part will not seat; too much and the part can lift by that much before the
+// barb bears. Half a millimetre of lift on a fence costs nothing. A no-go
+// costs a print.
+clip_tab_clr = 0.50;
 // Inner leg and outer prong thickness (mm). Upright, EVERY dimension of this
 // section is a wall width, so these are line counts, not round numbers: 1.74
 // is four lines and 2.19 is five, at 0.42 outer and 0.45 inner. A leg at 1.60
@@ -315,6 +328,8 @@ clip_out_t = 2.19;
 // underside is 4.27 mm; the tab has to enter it sideways, so it is shorter.
 clip_tab_h = 3.54;
 // How far the foot reaches over the top of the roll (mm), and how thick it is.
+// HAIRPIN ONLY. The twin clip has no foot — nothing it carries touches the top
+// face of anything inside the channel.
 clip_foot = 1.80;
 clip_foot_t = 1.74;
 // How far the outer prong descends below the top of the rail (mm).
@@ -377,18 +392,158 @@ clip_leg_tip_t  = 1.05;
 // left square — the cap's own fillet does not reach here, because the legs are
 // deliberately not part of that shape.
 clip_leg_fillet = 2.50;
+// ...and the inboard one, which is a separate number because the key has to
+// get past it.
+//
+// At 2.50 the two of them reached 5.00 mm into the middle of the channel right
+// at the crossbar, which is the narrowest place the key has to pass and the
+// one place it cannot be narrowed to suit — a key thin enough to clear them is
+// 1.93 mm wide and gives back 3.39 mm of the 4.05 it is there to stop.
+//
+// It is the cheap one to give up. Squeezing a leg inward puts the OUTBOARD
+// face in tension and this one in compression, and PETG cracks in tension, so
+// the fillet that matters keeps its full 2.50. What is lost here is root
+// section on the compression side. Set it back above zero and key_w follows
+// automatically, at two millimetres of key for every one of fillet.
+clip_leg_fillet_in = 0;
 
-// Secondary bump on each leg, snapping into the pocket under the TOP ROLL.
-// Engagement past the roll's tip, per side (mm), 0 for none.
+// Engagement of the FIN tab, per side (mm) — the primary catch.
 //
-// It is a second catch at a second height, so the part is hooked twice on each
-// wall: the tab under the fin at z 4.76 and the bump under the roll at 13.28.
-// Both are set 0.15 below their feature, so both bear at once.
+// Straight-down insertion costs one millimetre of leg squeeze for every
+// millimetre of reach past a feature's tip, so this number IS the squeeze, and
+// what caps it is the two legs meeting in the middle of the channel. At the
+// 1.05 mm leg tip they touch at 4.11 with a 0.40 mm margin, and 4.00 keeps a
+// little of that back. utils/legcheck.py prices any other value; the strain at
+// 4.00 is 0.85 %, against a 1.0 % repeated-use allowance.
 //
-// It cannot be deeper than the tab's own engagement. The legs squeeze by the
-// tab's hook plus a whisker, and the bump has to clear the roll tip on that
-// same squeeze, so it is clamped to hook - 0.10 and says so when it clamps.
-twin_bump = 0.80;
+// It was briefly 3.1813, derived to make the two barbs protrude equally from
+// the leg face. That was the wrong invariant and it cost the roll most of its
+// grip: what the design has to ration is SQUEEZE, and equal protrusion spends
+// it unequally because the two features do not reach equally far inboard.
+twin_hook = 4.00;
+
+// Engagement of the ROLL bump, per side (mm), 0 for none.
+//
+// A second catch at a second height, so each wall is hooked twice: the tab
+// under the fin at z 4.76 and this under the roll at 13.28. Both sit
+// clip_tab_clr below their feature, so both bear at once.
+//
+// It is FREE. The bump rides the same legs through the same aperture on the
+// same squeeze the fin tab has already paid for, so anything up to that squeeze
+// costs nothing — which is why it is derived rather than chosen, and why 0.80
+// sat here for four rounds giving away three quarters of the roll's 3.175 mm
+// undercut for no reason at all.
+//
+// Two things limit it. The wall behind the roll, which is what actually binds:
+// the tip stops twin_bump_gap short of it. And the squeeze, hook - 0.10, which
+// is slack at any hook past 2.98 but still clamps and still says so.
+twin_bump_gap = 0.30;
+twin_bump = min(trk_hook_x - twin_bump_gap, twin_hook - 0.10);
+
+/* [Key — the block that makes the snap one-way for a cat] */
+
+// A separate strip that drops into the channel between the two legs after the
+// insert is seated, so they physically cannot bend back in far enough to
+// release. Ziad's call, and it is the right shape of answer: the legs give a
+// human an easy push-on and an easy pull-off, and the key takes that same
+// easiness away from anything without thumbs.
+//
+// It is also what fills the middle of the channel. Nothing attached to the
+// legs ever could — that void is the flex space, and each leg needs 4.05 mm of
+// it to get in at all.
+twin_key = true;
+
+// Clearance per side between the key and a leg (mm).
+key_clr = 0.20;
+
+// key_w, the width of the key, is derived beside key2d rather than here.
+// It reads catch_reach, which is assigned further down the file, and a
+// top-level assignment that reads a name defined BELOW it gets undef — not an
+// error, and not a failed build: it produced a 12-triangle degenerate key that
+// every check then declared clean. OpenSCAD's last-assignment-wins rule
+// applies to later readers, not to earlier ones.
+//
+// What key_w leaves: with the key in, each leg can still retract by
+//
+//     (bore - 2 x (leg face + tip thickness) - key_w) / 2  =  0.89 mm
+//
+// against the 4.00 mm it needs to clear the fin. So the barbs stay 3.11 mm
+// under their fins with the key home, and a cat is not the thing that gets it
+// out. A thinner clip_leg_root_t would shrink that 0.89 — it opens the root
+// gap and softens a spring whose retention job the key has taken over — but it
+// is not free, because the legs are what holds the part if the key is lost.
+
+// Where the key's bottom sits, above the channel floor (mm). It hangs from
+// nothing: the stem bottoms out on the floor and the head stands clear above
+// the cap, so the floor is the only datum and there is nothing coplanar to
+// bear on.
+key_z0 = 0;
+// Flange width and thickness (mm). Its only job is to be wider than the window
+// so the key cannot fall through, and to give the grip something to stand on.
+// It has to stay inboard of the cap's 6 mm front radius, ceiling near 12.
+key_head_w = 11.00;
+key_head_t = 2.19;
+// Gap between the cap's top face and the underside of the flange (mm).
+key_lift = 1.20;
+
+// THE GRIP. A flange and a fingernail slot is how you get a screwdriver under
+// something, not how a hand pulls it out, and this gets pulled out by hand.
+//
+// So the flange carries an upstand: a blade 2.19 thick — five lines, and the
+// same wall every other vertical face here is — standing key_grip_h proud with
+// a fully rounded top edge. It is pinched between finger and thumb across a
+// 40 x 9 mm face and pulled straight up, which is a real grip rather than a
+// fingernail trick, and it gives leverage to rock the key if it is tight.
+//
+// It stands 12.4 mm above the cap, well under the back wall's 20, and 2.19 mm
+// wide in the middle of a 22 mm channel. Printing standing up it is a vertical
+// wall like everything else.
+key_grip_t = 2.19;
+key_grip_h = 9.00;
+// Chamfer on the key's two bottom corners (mm), so it finds the gap rather
+// than catching a leg on the way down.
+key_lead = 1.20;
+
+// SEVERAL SHORT WINDOWS, NOT ONE LONG SLOT — and this is not a detail.
+//
+// The channel between the two legs has exactly one opening, and it is upward
+// through the crossbar. Everything else is closed: the rail on three sides,
+// the legs and the skirts on the fourth. But that crossbar is ALSO the only
+// thing joining the left half of the part to the right half — below it the two
+// halves share nothing but the ends. Cut it away and the insert is two
+// C-channels, which is not subtle and is not caught by any check here: the
+// build said Genus -3 where -1 was expected, four shells on a plate meant to
+// hold three, and nothing else complained.
+//
+// One window with a few millimetres of crossbar at each end has the same
+// problem wearing a disguise. At 200 mm long — the real segment — it is two
+// C-channels tied at the extreme ends and nothing in between.
+//
+// So the crossbar is interrupted rather than removed: key_bridge of it between
+// every pair of windows and at both ends, and a separate key in each.
+//
+// WHAT SETS key_bridge is the leg, not the crossbar. A key holds the leg only
+// where it is; between windows the leg can still bow inboard, and a cantilever
+// plate spreads a point load over roughly its own free length — 26.63 mm here.
+// A gap much past that is not supported at all, so 20 mm keeps every point of
+// the leg within one cantilever length of a block, with room to spare.
+//
+// key_win is then free, and 40 mm is chosen for the hand: big enough to pinch
+// and lift, few enough to keep track of. A 200 mm segment comes out at exactly
+// three 40 mm keys with four 20 mm bridges, which is half the crossbar intact.
+key_bridge = 20.00;
+key_win    = 40.00;
+// End clearance on each key, each end (mm).
+key_end_clr = 0.30;
+
+// How that divides into a given length. The pitch picks the count, then the
+// bridges are held at key_bridge and the windows take up the remainder, so any
+// segment length works and a short coupon does not end up with a zero-length
+// window.
+function key_count(len) = max(1, round(len / (key_win + key_bridge)));
+function key_gap(len)   = min(key_bridge, len / (3 * key_count(len)));
+function key_len(len)   = (len - (key_count(len) + 1) * key_gap(len))
+                          / key_count(len);
 
 // Widen everything ABOVE the rail out to the rail's own outside width, so the
 // part caps the whole extrusion instead of standing on it as a narrow U.
@@ -401,13 +556,19 @@ twin_bump = 0.80;
 // and the legs still hang free between them, with 4.3 mm of air on the side
 // they flex toward.
 //
-// The skirt stops clip_cap_clr above the rail rather than resting on it: the
-// feet on the fins are the datum and there must be only one. Flush at the
-// outside, 1/32 in of rail wall in from that, so it cannot pass the rail top
-// on the way down and does not try to.
+// THE SKIRT IS THE DOWN-STOP. It used to float 0.15 mm clear because the feet
+// on the fins were the datum and there can only be one; with the feet gone it
+// lands on the rail's top face instead, ~2.19 mm of bearing each side across
+// the wall top and the top of the roll beside it.
+//
+// That is the better datum by some distance. The fin's thickness and the
+// height of its underside are both drawing-derived and unmeasurable with the
+// rail screwed down; the rail's own top face is neither — it is the surface
+// the part sits on and it can be seen. Nothing else in the part now depends
+// on how thick the fin is.
 twin_cap = true;
-// Air between the skirt's bottom and the top of the rail (mm).
-clip_cap_clr = 0.15;
+// Air between the skirt's bottom and the top of the rail (mm). Zero: it bears.
+clip_cap_clr = 0;
 // Close the bottom of the two side slots, so the cap reads as a closed box
 // rather than an open frame. Thickness of that floor (mm).
 clip_cap_floor = 2.19;
@@ -419,6 +580,7 @@ clip_cap_floor = 2.19;
 // lines wide, so the slicer draws it rather than bridging it, and the leg
 // flexes AWAY from this edge, so it is a print clearance and nothing more.
 clip_relief = 0.80;
+
 // Rounding on the cap's top corners (mm) — front generous, back barely. The
 // back radius now lands on the top of the back wall rather than on the cap.
 clip_cap_r_front = 6.00;
@@ -515,6 +677,23 @@ fixture_wall = 3.0;
 fixture_bore_comp = 0.145;
 // Extra inboard reach given to every bead and fin tip (mm).
 fixture_bead_comp = 0.265;
+// Root fillet on every feature standing in the fixture's cavity (mm).
+//
+// The first printed fixture's fins broke off the moment the insert was tried,
+// and one of them may never have been attached. They are a 0.79 mm PETG wall
+// cantilevered 5.56 mm off a square corner, which is a stress riser feeding
+// the thinnest section in the part — aluminium does not care and PETG does.
+//
+// Applied as a closing on the fixture's SOLID section, so it fills the concave
+// corner at the root of every feature and touches no convex one: tip positions and the two
+// apertures are untouched, and the tab still meets 4.56 mm of flat underside
+// where it only needs the outer 3.18. It is capped well under half the 1.40 mm
+// gap between the fin's top and the mid hook, or the closing would weld them.
+//
+// Only the FIXTURE gets this. track() stays the true section, so every fit and
+// path check is still run against the rail as measured. Set to 0 to print a
+// faithful-but-fragile fixture.
+fixture_root_r = 0.50;
 
 /* [Fit pair — one rail and one insert, to try against each other] */
 
@@ -523,11 +702,11 @@ fixture_bead_comp = 0.265;
 pair_len = 40;
 // Air between them on the plate (mm).
 pair_gap = 8;
-// Engagement for the insert in the pair. Mid-ladder on purpose: 2.60 uses 56 %
-// of the repeated-use strain allowance and leaves 2.96 mm of fin beyond the
-// tab, so it is the rung most likely to answer the question rather than the
-// one most likely to be at a limit. utils/legcheck.py --hook to check another.
-pair_hook = 2.60;
+// Engagement for the insert in the pair. It follows twin_hook now rather than
+// sitting mid-ladder: the pair is the thing that goes on the real rail, so it
+// should carry the matched barbs the rail trial asked for, not a rung.
+// utils/legcheck.py --hook to price a different one first.
+pair_hook = twin_hook;
 
 /* [Preview] */
 
@@ -1024,6 +1203,11 @@ module fixture(len = fixture_len) {
     fw = fixture_wall;
     b  = fixture_bore_comp;
     linear_extrude(height = len, convexity = 10)
+        // Closing on the SOLID, which fills its concave corners — the root of
+        // every feature — and leaves every convex one, so no tip moves. Note
+        // the polarity: the same pair of offsets applied to the CAVITY is an
+        // opening of the solid and deletes the fins outright.
+        offset(r = -fixture_root_r) offset(r = fixture_root_r)
         difference() {
             translate([-fw - b, -fw])
                 square([trk_clear_w + 2 * (fw + b), trk_depth + fw]);
@@ -1319,10 +1503,19 @@ module clipcoupon() {
 // one. Everything else is the same and every parameter is shared, so the
 // coupon ladders the same variable.
 //
-//   DOWN      both feet, on the tops of both rolls.
-//   UP        both tabs, under both rolls.
-//   SIDEWAYS  each leg against its own roll tip. Nothing can shift, because
+//   DOWN      the skirt, bearing on the rail's top face across both walls.
+//   UP        two barbs per leg: the tab under the fin at z 4.76 and the bump
+//             under the top roll at z 13.28.
+//   SIDEWAYS  each leg against its own feature tip. Nothing can shift, because
 //             shifting toward one wall drives the far tab deeper.
+//
+// NOTHING BEARS ON THE TOP FACE OF A FEATURE INSIDE THE CHANNEL. There was a
+// foot on each leg sitting on the fin's top face, making a C-jaw with the tab
+// 0.15 mm under the fin's underside — a jaw sized to a fin thickness taken off
+// the discredited drawing and impossible to caliper on an installed rail. On
+// the real rail the foot rested on the fin and the tab never got around it,
+// which is exactly what a jaw does when it is too small. The foot is gone; the
+// fin's thickness is now a number the part does not care about.
 //
 // Insertion is straight down with both legs squeezed INWARD by the engagement
 // and released under the rolls, so the mouth it has to pass is 15.875 less
@@ -1334,11 +1527,11 @@ module clipcoupon() {
 // it answers whether a two-sided snap seats and holds, and nothing else. The
 // mesh will move the crossbar or split the part.
 
-// The feature being caught, resolved once: how far it reaches inboard, the
-// underside the tab hooks, and the top face the foot lands on.
+// The feature being caught, resolved once: how far it reaches inboard, and the
+// underside the tab hooks. There is deliberately no top face here — see the
+// note above about the foot.
 catch_reach = twin_catch == "fin" ? trk_ledge_x  : trk_hook_x;
 catch_under = twin_catch == "fin" ? trk_ledge_z0 : trk_lip_z0;
-catch_top   = twin_catch == "fin" ? trk_ledge_z1 : trk_depth;
 // What sits below the tab: the channel floor under the fin, the mid hook's top
 // under the roll.
 catch_floor = twin_catch == "fin" ? 0            : trk_hook_z1;
@@ -1346,10 +1539,6 @@ catch_floor = twin_catch == "fin" ? 0            : trk_hook_z1;
 // One side, drawn at the near wall. splay moves it toward the channel centre,
 // which is the elastic state it passes the aperture in.
 //
-// Foot and tab together are a C-jaw closing on the feature: the foot lands on
-// its top face, the tab hooks its underside, and the 0.15 between them is all
-// the vertical play the part has. On the fin that jaw grips a flat 1/32 in
-// flange, which is why it is the better of the two.
 // A tab: flat on top where it bears, ramped underneath where it cams in.
 // The ramp wants clip_lead x its own run and gets whatever height is left
 // after clip_bear_min, so a deep tab in a shallow space degrades to a steeper
@@ -1360,12 +1549,10 @@ module twin_tab(xface, tipx, z0, z1) {
     polygon([[xface, z0], [xface, z1], [tipx, z1], [tipx, z0 + rise]]);
 }
 
-module twin_side(hook = clip_hook, splay = 0) {
+module twin_side(hook = twin_hook, splay = 0) {
     xo   = catch_reach + clip_clr + splay;   // leg, against the feature's tip
-    xi   = xo + clip_in_t;
     tz1  = catch_under - clip_tab_clr;
     tz0  = catch_floor + clip_tab_floor;
-    fx   = catch_reach - clip_foot + splay;
     zbar = trk_depth + clip_fence_h - clip_bridge_t;
 
     // The bump can never out-reach the squeeze that has to carry it past the
@@ -1386,15 +1573,14 @@ module twin_side(hook = clip_hook, splay = 0) {
     union() {
         polygon(concat([[xo, tz0], [xo, zbar]], prof,
                        [[xo + clip_leg_tip_t, tz0]]));
-        polygon([[fx, catch_top], [xo, catch_top],
-                 [xo, catch_top + clip_foot_t], [fx, catch_top + clip_foot_t]]);
         twin_tab(xo, catch_reach - hook + splay, tz0, tz1);
         if (bump > 0.05 && catch_under < trk_lip_z0)
             twin_tab(xo, trk_hook_x - bump + splay, bz0, bz1);
 
         // Root fillets, both faces. Outboard is the tension side.
         fillet_in(xo, zbar, -1, clip_leg_fillet);
-        fillet_in(xo + clip_leg_root_t, zbar, 1, clip_leg_fillet);
+        if (clip_leg_fillet_in > 0)
+            fillet_in(xo + clip_leg_root_t, zbar, 1, clip_leg_fillet_in);
     }
 }
 
@@ -1408,7 +1594,7 @@ module fillet_in(x, z, dir, r) {
         }
 }
 
-module twin2d(hook = clip_hook, splay = 0) {
+module twin2d(hook = twin_hook, splay = 0) {
     w    = trk_clear_w;                     // mirror line is the channel centre
     xo   = catch_reach + clip_clr + splay;
     ztop = trk_depth + clip_fence_h;
@@ -1418,6 +1604,7 @@ module twin2d(hook = clip_hook, splay = 0) {
     cz0  = trk_depth + clip_cap_clr;
     xo0  = catch_reach + clip_clr;          // leg face, unsplayed
 
+    difference() {
     union() {
         twin_side(hook, splay);
         translate([w, 0]) mirror([1, 0]) twin_side(hook, splay);
@@ -1455,6 +1642,84 @@ module twin2d(hook = clip_hook, splay = 0) {
                 cap_outline();
             }
     }
+    }
+}
+
+// Width of the key (mm), and it is not a choice.
+//
+// The key drops in from the top, so its widest section has to pass the
+// NARROWEST part of the gap between the legs, which is at their roots where
+// the taper has them at clip_leg_root_t. Everything below is wider, and the
+// key cannot be tapered to suit, because the wide end would be the leading
+// one. So it is a straight strip sized to the root, and the surplus shows up
+// as play down at the barbs.
+key_w = trk_clear_w - 2 * (catch_reach + clip_clr + clip_leg_root_t
+                           + clip_leg_fillet_in + key_clr);
+
+// The key. A straight strip with a head that stands key_lift clear of the cap,
+// so there is a slot to get a fingernail into and nothing bearing coplanar on
+// anything. Chamfered at the bottom so it finds the gap between the legs.
+module key2d() {
+    cx   = trk_clear_w / 2;
+    ztop = trk_depth + clip_fence_h;
+    k    = key_w / 2;
+    L    = key_lead;
+    hz   = ztop + key_lift;               // flange underside
+    gz   = hz + key_head_t;               // grip root
+    r    = key_grip_t / 2;
+    union() {
+        polygon([[cx - k + L, key_z0], [cx + k - L, key_z0],
+                 [cx + k, key_z0 + L], [cx + k, hz],
+                 [cx - k, hz], [cx - k, key_z0 + L]]);
+        translate([cx - key_head_w / 2, hz]) square([key_head_w, key_head_t]);
+        hull() {
+            translate([cx - r, gz]) square([key_grip_t, eps]);
+            translate([cx, gz + key_grip_h - r]) circle(r = r);
+        }
+    }
+}
+
+// The keys where they end up: one per window, sized to it. This is the pose
+// keyfit and keyblock ask about.
+module key_upright(len = clip_seg_len) {
+    g = key_gap(len);
+    for (i = [0 : key_count(len) - 1])
+        translate([0, 0, g + key_end_clr + i * (key_len(len) + g)])
+            linear_extrude(height = key_len(len) - 2 * key_end_clr,
+                           convexity = 10) key2d();
+}
+
+// The same keys on a plate: all standing on the bed, side by side, because
+// that is how they print and they are not stacked end to end in the assembly.
+module key_plate(len = clip_seg_len) {
+    for (i = [0 : key_count(len) - 1])
+        translate([i * (key_head_w + pair_gap), 0, 0])
+            linear_extrude(height = key_len(len) - 2 * key_end_clr,
+                           convexity = 10) key2d();
+}
+
+// The key seated: it must foul neither the rail nor the insert. Both are asked
+// at once, because a key that clears one and not the other is no use.
+module keyfit(len = preview_len) {
+    intersection() {
+        key_upright(len);
+        union() { track(len); twin_upright(len); }
+    }
+}
+
+// THE ONLY CHECK HERE THAT PASSES BY REPORTING FACETS. Every other one asks
+// whether two solids stay out of each other's way; this one asks whether the
+// key gets IN the way, so an empty result is the failure.
+//
+// The legs are splayed by exactly the travel that would release them — the
+// engagement plus the insertion whisker — and intersected with the key. If the
+// key is doing its job the two overlap, and the size of that overlap is how
+// much of the release it eats.
+module keyblock(len = preview_len) {
+    intersection() {
+        key_upright(len);
+        twin_upright(len, twin_hook, twin_hook + clip_path_slack);
+    }
 }
 
 // The cap's silhouette: square at the bottom, rounded at the top, and the two
@@ -1491,14 +1756,27 @@ module cap_outline() {
     }
 }
 
-module twin_length(len = clip_seg_len, hook = clip_hook, splay = 0) {
-    translate([0, len, 0])
-        rotate([90, 0, 0])
-            linear_extrude(height = len, convexity = 10) twin2d(hook, splay);
+// The same solid twin_upright builds, lying down. It is defined in terms of
+// that one rather than re-extruding the section, because the section is no
+// longer the whole story: the key windows are cut along the length, and a
+// preview that re-extrudes twin2d shows an uncut crossbar with a full-length
+// key running through it. That preview is what made the part look bisected.
+module twin_length(len = clip_seg_len, hook = twin_hook, splay = 0) {
+    translate([0, len, 0]) rotate([90, 0, 0]) twin_upright(len, hook, splay);
 }
 
-module twin_upright(len = clip_seg_len, hook = clip_hook) {
-    linear_extrude(height = len, convexity = 10) twin2d(hook);
+module twin_upright(len = clip_seg_len, hook = twin_hook, splay = 0) {
+    zbar = trk_depth + clip_fence_h - clip_bridge_t;
+    g = key_gap(len);
+    difference() {
+        linear_extrude(height = len, convexity = 10) twin2d(hook, splay);
+        if (twin_key)
+            for (i = [0 : key_count(len) - 1])
+                translate([trk_clear_w / 2 - key_w / 2 - key_clr, zbar - eps,
+                           g + i * (key_len(len) + g)])
+                    cube([key_w + 2 * key_clr, clip_bridge_t + 2 * eps,
+                          key_len(len)]);
+    }
 }
 
 module twinfit(len = preview_len) {
@@ -1508,7 +1786,7 @@ module twinfit(len = preview_len) {
 // Same insertion check as clippath, and the same reason it is sound: one
 // degree of freedom, straight down, with the squeeze a known elastic state.
 // Prove it can fail with -D clip_path_slack=-0.50 before believing a pass.
-module twinpath(len = preview_len, hook = clip_hook, steps = 24, lift = 9) {
+module twinpath(len = preview_len, hook = twin_hook, steps = 24, lift = 9) {
     for (i = [0 : steps])
         intersection() {
             translate([0, 0, i * lift / steps])
@@ -1520,6 +1798,9 @@ module twinpath(len = preview_len, hook = clip_hook, steps = 24, lift = 9) {
 module twinassembly(len = preview_len) {
     color("silver", track_alpha) track(len);
     color("darkorange")          twin_length(len);
+    if (twin_key)
+        color("steelblue") translate([0, len, 0]) rotate([90, 0, 0])
+            key_upright(len);
 }
 
 module twin_slice(hook, n) {
@@ -1542,8 +1823,33 @@ module twin_slice(hook, n) {
 module pair(len = pair_len) {
     right = trk_clear_w + fixture_wall + fixture_bore_comp;   // fixture's edge
     left  = -trk_skin;                                        // insert's edge
+    ins   = right + pair_gap - left;                    // insert's offset
+    kleft = trk_clear_w / 2 - key_head_w / 2;            // key's own left edge
     fixture(len);
-    translate([right + pair_gap - left, 0, 0]) twin_upright(len, pair_hook);
+    translate([ins, 0, 0]) twin_upright(len, pair_hook);
+    // The key, beside the insert rather than in it — same reason the insert is
+    // beside the rail and not in it.
+    if (twin_key)
+        translate([ins + trk_clear_w + trk_skin + pair_gap - kleft, 0, 0])
+            key_plate(len);
+}
+
+// Seated interference against the FIXTURE rather than against track(), which
+// is a different question and worth asking separately: twinfit says the insert
+// fits the rail as measured, this says it fits the plastic rail it is about to
+// be tried in — bore compensation, blunted bead tips, root fillets and all. A
+// failure here is a fixture problem, not a design one.
+// The insert is lifted by eps first, and that is not a fudge: the skirt now
+// BEARS on the rail top, so those two faces are coplanar, and CGAL answers a
+// coplanar intersection with zero-volume slivers rather than with nothing. All
+// eight vertices of them came back at y = 15.0813 exactly. Lifting clear of the
+// contact restores the pass/fail signal, at the cost of not seeing an overlap
+// below 0.01 mm — which is a quarter of a layer and half a nozzle's rounding.
+module pairfit(len = preview_len) {
+    intersection() {
+        translate([0, eps, 0]) twin_upright(len, pair_hook);   // +y is up
+        fixture(len);
+    }
 }
 
 module twincoupon() {
@@ -1554,8 +1860,8 @@ module twincoupon() {
             twin_slice(clip_coupon_hook[i], i + 1);
 }
 
-if (twin_bump > clip_hook - 0.10)
-    echo(str("twin_bump clamped ", twin_bump, " -> ", clip_hook - 0.10,
+if (trk_hook_x - twin_bump_gap > twin_hook - 0.10)
+    echo(str("twin_bump clamped ", trk_hook_x - twin_bump_gap, " -> ", twin_hook - 0.10,
              ": it cannot out-reach the squeeze the tab provides."));
 
 // The default is a preview. Say so on every run, so an accidental unnamed
@@ -1577,6 +1883,10 @@ else if (show == "twinfit")      twinfit();
 else if (show == "twinpath")     twinpath();
 else if (show == "twinassembly") twinassembly();
 else if (show == "pair")         pair();
+else if (show == "pairfit")      pairfit();
+else if (show == "key")          key_plate();
+else if (show == "keyfit")       keyfit();
+else if (show == "keyblock")     keyblock();
 else if (show == "track")    track();
 else if (show == "assembly") assembly();
 else if (show == "fitcheck") fitcheck();
