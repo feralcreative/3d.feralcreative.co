@@ -23,11 +23,15 @@ const CONFIG = {
   ],
 
   // Stream URL configuration
+  // Both point at the local proxy rather than at the NAS directly. Browsers will
+  // not render an MJPEG feed in an <img> over HTTP/2, and proxying keeps the
+  // Surveillance Station StmKey out of this file, which is served to the browser.
+  // Set the real feed URL as CAMERA_STREAM_URL in printer-proxy-server.js.
   STREAM_URL: {
-    // Development: Local network access to your NAS
-    DEV: "http://YOUR_NAS_IP:5000/webapi/entry.cgi?api=SYNO.SurveillanceStation.Stream.VideoStreaming&version=1&method=Stream&format=mjpeg&cameraId=YOUR_CAMERA_ID&StmKey=YOUR_STREAM_KEY",
-    // Production: HTTPS via your NAS domain
-    PROD: "https://nas.yourdomain.com/webapi/entry.cgi?api=SYNO.SurveillanceStation.Stream.VideoStreaming&version=1&method=Stream&format=mjpeg&cameraId=YOUR_CAMERA_ID&StmKey=YOUR_STREAM_KEY",
+    // Development: Direct connection to local proxy server
+    DEV: "http://localhost:3001/stream",
+    // Production: Reverse proxied through domain (handled by nginx/reverse proxy)
+    PROD: "/api/stream",
   },
 
   // FlashForge Printer Configuration

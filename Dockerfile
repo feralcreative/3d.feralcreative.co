@@ -79,6 +79,11 @@ RUN mkdir -p /var/run/nginx && \
     echo '    location /api/ {' >> /etc/nginx/sites-available/default && \
     echo '        proxy_pass http://127.0.0.1:6199/;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_http_version 1.1;' >> /etc/nginx/sites-available/default && \
+    echo '        # /api/stream is a long-lived MJPEG feed. Buffering it would mean' >> /etc/nginx/sites-available/default && \
+    echo '        # the browser never receives a frame, and the default read timeout' >> /etc/nginx/sites-available/default && \
+    echo '        # would cut the connection every 60s.' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_buffering off;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_read_timeout 3600s;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_set_header Host $host;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/sites-available/default && \

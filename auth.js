@@ -202,18 +202,11 @@ class GoogleAuth {
         }
       }
 
-      // Set the appropriate stream URL based on environment (only once)
+      // Start the video stream (only once). MjpegStream decodes the multipart
+      // feed itself and handles its own reconnects and offline image.
       if (!this.streamUrlSet) {
-        const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-        const streamUrl = isLocalhost ? CONFIG.STREAM_URL.DEV : CONFIG.STREAM_URL.PROD;
-
-        // Set up error handler to show offline image
-        streamImage.onerror = function () {
-          this.src = "/images/offline.jpg";
-          this.onerror = null; // Prevent infinite loop
-        };
-
-        streamImage.src = streamUrl;
+        window.mjpegStream = new MjpegStream(streamImage, this.getStreamUrl());
+        window.mjpegStream.start();
         this.streamUrlSet = true;
 
         // Initialize printer status monitoring
@@ -230,7 +223,7 @@ class GoogleAuth {
       loginScreen.style.display = "flex";
       streamContainer.style.display = "none";
       hamburgerMenu.style.display = "none";
-      streamImage.src = ""; // Clear the stream URL
+      if (window.mjpegStream) window.mjpegStream.stop();
       this.streamUrlSet = false;
 
       // Stop printer status monitoring
@@ -240,27 +233,17 @@ class GoogleAuth {
     }
   }
 
+  // Resolve the stream endpoint for the current environment
+  getStreamUrl() {
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    return isLocalhost ? CONFIG.STREAM_URL.DEV : CONFIG.STREAM_URL.PROD;
+  }
+
   // Refresh the video stream (useful for PWA/iOS when returning to app)
   refreshStream() {
-    if (!this.user) return;
+    if (!this.user || !window.mjpegStream) return;
 
-    const streamImage = document.getElementById("stream-image");
-    if (!streamImage) return;
-
-    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const streamUrl = isLocalhost ? CONFIG.STREAM_URL.DEV : CONFIG.STREAM_URL.PROD;
-
-    // Set up error handler to show offline image (in case refresh fails)
-    streamImage.onerror = function () {
-      this.src = "/images/offline.jpg";
-      this.onerror = null; // Prevent infinite loop
-    };
-
-    // Force reload the stream by adding a timestamp to bypass cache
-    // Use & instead of ? since the URL already has query parameters
-    const timestamp = new Date().getTime();
-    streamImage.src = `${streamUrl}&_t=${timestamp}`;
-
+    window.mjpegStream.restart();
     console.log("[STREAM] Refreshed video stream");
   }
 
@@ -578,13 +561,11 @@ window.addEventListener("pageshow", (event) => {
 });
 
 // Additional fallback: refresh stream periodically to handle stale connections
-// This helps when the MJPEG stream dies but the page is still visible
+// This helps when the connection stays open but frames stop arriving
 setInterval(() => {
-  if (auth && auth.user && !document.hidden) {
-    const streamImage = document.getElementById("stream-image");
-    if (streamImage && streamImage.complete && streamImage.naturalHeight === 0) {
-      // Image failed to load, refresh it
-      console.log("[STREAM] Detected broken stream, refreshing");
+  if (auth && auth.user && !document.hidden && window.mjpegStream) {
+    if (window.mjpegStream.isStalled()) {
+      console.log("[STREAM] Detected stalled stream, refreshing");
       auth.refreshStream();
     }
   }
