@@ -34,11 +34,13 @@
 // cover over a wire that was bare before, not a load path, and Ziad asked
 // why the walls were so thick.
 //
-// THE CAP'S EDGES ARE THE SAME ROUND, rw_r. It had a 6.5 mm half-cosine
-// blend down to a two-layer edge for a while — the raceway wore it too,
-// briefly, and looked worse for it — and Ziad brought the cap into line
-// with the raceway (2026-09-13). One radius everywhere, and the run comes
-// in over the cap's top edge with the same corner it has along its length.
+// THE CAP'S EDGE IS A QUARTER ELLIPSE, cap_round_in deep by cap_round_up
+// tall, over a short vertical edge. It had a 6.5 mm half-cosine blend down
+// to a two-layer edge for a while — the raceway wore it too, briefly, and
+// looked worse for it — then the raceway's 1.2 round, which Ziad found too
+// little; this is the middle ("rounded more, but not as flat as it just
+// was", 2026-09-13). Vertical where it meets the wall, so it reads as a
+// rounded plate rather than a blended one.
 //
 // THE CAP IS AS THICK AS THE RACEWAY. The old cap was 0.8. Here the groove
 // has to cross the cap to reach the plug, and cap and raceway have to share
@@ -76,11 +78,11 @@
 //
 // PRINTED FACE DOWN. flip = true (the default) turns each piece over so
 // the front face is on the bed and the groove, rails and plug are on top.
-// The plug is why: it has to stand up off the cap's back. The 1.2 round on
-// every front edge is then a small overhang off the bed — under a
-// millimetre of ledge over the first few layers — and prints without
-// support. (The long blend the cap had for a while did need support; it
-// is gone.) Ziad's call, 2026-09-13, over a separate glued plug sleeve or a
+// The plug is why: it has to stand up off the cap's back. Every front
+// round is then an overhang off the bed, worst in the first layers where
+// the curve is flattest: the raceway's 1.2 round steps out 0.7 mm over
+// layer two, the cap's ellipse about 1.2 mm. PETG will droop a little
+// there; if the cap's edge comes out ragged, slice it with support. Ziad's call, 2026-09-13, over a separate glued plug sleeve or a
 // steeper bevel. flip = false draws it the way it goes on the wall: x to
 // the right, y up, z out of the wall, the wall at z = 0, the hole's centre
 // at the origin.
@@ -126,9 +128,11 @@ slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is th
 
 /* [Cap] */
 cap_left   = 18.5;  // hole centre to the left edge; was 21, Ziad took 2.5 off looking at the front view (mm)
-cap_right  = 21.0;  // hole centre to the right edge; the run's edge is at jog + rw_w/2 and has to land inside it (mm)
+cap_right  = 21.5;  // hole centre to the right edge; the run's edge at jog + rw_w/2 has to land on the flat, inside the round (mm)
 cap_margin = 6.5;   // past the far edge of a screw hole, above and below (mm)
 cap_r      = 8.0;   // corner radius, in plan (mm)
+cap_round_in = 3.0; // the edge round, in from the edge (mm)
+cap_round_up = 2.4; // the edge round, up from the wall; what is left below it is a vertical edge (mm)
 
 /* [Plug] */
 plug_depth = 14.0;  // into the hole; the old one went 8 (mm)
@@ -175,8 +179,9 @@ assert(stray < (rw_w - slot_w) / 2 - 0.8, "the bend leaves the raceway before it
 
 assert(slot_d > wire_t && slot_w > wire_w, "the wire does not fit the groove");
 assert(2 * rw_r <= rw_w - slot_w && rw_r < rw_h, "rw_r is bigger than the rails");
-assert(cap_right >= jog + rw_w / 2 + rw_r, "the run's edge lands on the cap's round: widen cap_right");
-assert(cap_left > plug_hw + rw_r && cap_h / 2 > plug_hh + rw_r, "the cap's flat does not clear the plug");
+assert(cap_round_up < cap_t, "cap_round_up is the whole thickness: no edge left");
+assert(cap_right >= jog + rw_w / 2 + cap_round_in, "the run's edge lands on the cap's round: widen cap_right");
+assert(cap_left > plug_hw + cap_round_in && cap_h / 2 > plug_hh + cap_round_in, "the cap's flat does not clear the plug");
 assert(lower_run + lap + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
@@ -194,12 +199,13 @@ module rw_slot() translate([-slot_w / 2, -eps]) square([slot_w, slot_d + eps]);
 module along_y(a, b) translate([0, b, 0]) rotate([90, 0, 0]) linear_extrude(b - a) children();
 module along_x(a, b) rotate([0, 0, -90]) along_y(a, b) children();
 
-// The cap plate, centred cap_x right of the hole, its front edge rounded
-// rw_r all round: a hull of slices, each the plate inset and raised along
-// a quarter circle. Plate and round are both convex, so one hull is exact.
+// The cap plate, centred cap_x right of the hole, its front edge a quarter
+// ellipse all round: a hull of slices, each the plate inset and raised
+// along the curve. Plate and round are both convex, so one hull is exact.
 module cap_plate() translate([cap_x, 0, 0]) hull()
-  for (a = [0 : 10 : 90])
-    linear_extrude(cap_t - rw_r + rw_r * sin(a)) offset(delta = -rw_r * (1 - cos(a))) rr(cap_w, cap_h, cap_r);
+  for (a = [0 : 7.5 : 90])
+    linear_extrude(cap_t - cap_round_up + cap_round_up * sin(a))
+      offset(delta = -cap_round_in * (1 - cos(a))) rr(cap_w, cap_h, cap_r);
 
 // The plug, hanging below z = 0: a shell of the hole's section, ribbed,
 // with a lead-in, hollow to the back of the cap.
