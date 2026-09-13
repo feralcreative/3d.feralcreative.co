@@ -37,12 +37,14 @@
 // down onto the cap's top edge and the jog happens inside the plate, as a
 // turn in the groove, rather than as a visible elbow beside it.
 //
-// THE TURN IS A DIAGONAL. The groove leaves the vertical run on a bend_r
-// arc through 45 and heads straight for the plug's nearest corner — the top
-// right — so the wire bends 45 twice instead of 90 once (Ziad, 2026-09-13:
-// the square turn was too tight, then the sharp 45 was rounded). It passes
-// through a notch in the plug's wall at that corner, on the same diagonal,
-// and is inside the plug.
+// THE TURN IS ONE LONG ARC. The groove leaves the vertical run on an arc
+// through 45 that arrives at the plug's nearest corner — the top right —
+// heading diagonally into it; by default the arc is as big as will still
+// reach the corner (about 24 mm radius), so there is no straight and no
+// kink anywhere (Ziad, 2026-09-13: the square turn was too tight, then the
+// sharp 45 was rounded, then "as gradually as possible"). It passes through
+// a notch in the plug's wall at that corner, on the same diagonal, and is
+// inside the plug.
 //
 // THE PLUG IS A SHELL, open to the hole: plug_wall of wall around the hole's
 // section and the cap as its front, like the old one but plug_depth deep and
@@ -96,7 +98,7 @@ jog       = 15.0;   // the run's centreline is this far right of the hole (mm)
 lower_run = 120.0;  // of run_len, on the lower piece; the rest is the upper (mm)
 lap       = 10.0;   // the lap joint (mm)
 lap_clr   = 0.2;    // between tongue end and the upper's back plate (mm)
-bend_r    = 6.0;    // centreline radius of the groove's bend out of the run into the diagonal (mm)
+bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as large as will reach the corner (mm)
 
 /* [Raceway] */
 rw_w     = 8.0;   // across (mm)
@@ -135,14 +137,24 @@ plug_hw   = hole_w / 2;
 plug_hh   = hole_h / 2;
 // The diagonal runs at 45 down to the plug's top-right corner; a straight
 // line from the run would leave it diag_y above the hole's centre. The bend
-// is an arc of bend_r tangent to both, so the run's groove actually ends
-// bend_y up, and the straight part of the diagonal starts at (diag_x0,
-// diag_y0) and is diag_len long to the corner.
+// is an arc tangent to both, so the run's groove actually ends bend_y up,
+// and the straight part of the diagonal starts at (diag_x0, diag_y0) and is
+// diag_len long to the corner. The biggest arc that still reaches the
+// corner is bend_max, at which the straight part vanishes and the arc runs
+// from the run to the corner in one sweep; that is the default, Ziad having
+// asked for the bend to be as gradual as possible.
 diag_y    = plug_hh + (jog - plug_hw);            // 16.5
-bend_y    = diag_y + bend_r * (sqrt(2) - 1);      // 18.99
-diag_x0   = jog - bend_r * (1 - sqrt(2) / 2);     // 13.24
-diag_y0   = bend_y - bend_r * sqrt(2) / 2;        // 14.74
-diag_len  = (diag_x0 - plug_hw) * sqrt(2);        // 7.41
+bend_max  = (jog - plug_hw) / (1 - sqrt(2) / 2);  // 23.90
+bend      = bend_r > 0 ? min(bend_r, bend_max) : bend_max;
+bend_y    = diag_y + bend * (sqrt(2) - 1);        // 26.40 at bend_max
+diag_x0   = jog - bend * (1 - sqrt(2) / 2);       // 8.00 at bend_max
+diag_y0   = bend_y - bend * sqrt(2) / 2;          // 9.50 at bend_max
+diag_len  = (diag_x0 - plug_hw) * sqrt(2);        // 0 at bend_max
+// Where the arc starts above the cap's top edge, it has to stay inside the
+// raceway's rails; this is how far it has strayed from the centreline by
+// the time it reaches the cap.
+stray     = bend_y > cap_h / 2 ? bend - sqrt(bend * bend - pow(bend_y - cap_h / 2, 2)) : 0;
+assert(stray < (rw_w - slot_w) / 2 - 0.8, "the bend leaves the raceway before it reaches the cap");
 
 assert(slot_d > wire_t && slot_w > wire_w, "the wire does not fit the groove");
 assert(lower_run + lap + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
@@ -194,14 +206,14 @@ module rib(p, v, s) hull() {
     cube([max(eps, s[0]), max(eps, s[1]), eps], center = true);
 }
 
-// The wire's way from the vertical run into the plug: a 45 arc of bend_r
-// out of the run, a straight groove on the diagonal to the plug's top-right
-// corner, then a notch through the corner's wall on the same line, notch_d
-// deep. The arc's centre is bend_r left of the run, level with where the
-// run's groove ends.
+// The wire's way from the vertical run into the plug: a 45 arc of radius
+// bend out of the run, a straight groove on the diagonal to the plug's
+// top-right corner (none at all at bend_max), then a notch through the
+// corner's wall on the same line, notch_d deep. The arc's centre is bend
+// left of the run, level with where the run's groove ends.
 module diagonal_wire() {
-  translate([jog - bend_r, bend_y, 0]) rotate([0, 0, -45])
-    rotate_extrude(angle = 45 + eps) translate([bend_r, 0]) rw_slot();
+  translate([jog - bend, bend_y, 0]) rotate([0, 0, -45])
+    rotate_extrude(angle = 45 + eps) translate([bend, 0]) rw_slot();
   translate([diag_x0, diag_y0, 0]) rotate([0, 0, -135]) {
     along_x(-eps, diag_len + eps) rw_slot();
     translate([diag_len - hole_r, -slot_w / 2, -notch_d])
@@ -233,7 +245,7 @@ module upper() difference() {
 // the way the run would bring it.
 module cap_only() difference() {
   union() { cap_plate(); plug(); }
-  translate([jog, 0, 0]) along_y(bend_y - eps, cap_h / 2 + eps) rw_slot();
+  translate([jog, 0, 0]) along_y(min(bend_y, cap_h / 2) - eps, cap_h / 2 + eps) rw_slot();
   diagonal_wire();
 }
 
