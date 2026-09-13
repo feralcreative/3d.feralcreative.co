@@ -407,7 +407,7 @@ clip_leg_fillet = 2.50;
 // At 2.50 the two of them reached 5.00 mm into the middle of the channel right
 // at the crossbar, which is the narrowest place the key has to pass and the
 // one place it cannot be narrowed to suit — a key thin enough to clear them is
-// 1.93 mm wide and gives back 3.39 mm of the 4.05 it is there to stop.
+// 1.93 mm wide and lets a leg retract 3.39 mm, past the 2.55 it is there to stop.
 //
 // It is the cheap one to give up. Squeezing a leg inward puts the OUTBOARD
 // face in tension and this one in compression, and PETG cracks in tension, so
@@ -421,15 +421,23 @@ clip_leg_fillet_in = 0;
 // Straight-down insertion costs one millimetre of leg squeeze for every
 // millimetre of reach past a feature's tip, so this number IS the squeeze, and
 // what caps it is the two legs meeting in the middle of the channel. At the
-// 1.05 mm leg tip they touch at 4.11 with a 0.40 mm margin, and 4.00 keeps a
-// little of that back. utils/legcheck.py prices any other value; the strain at
-// 4.00 is 0.85 %, against a 1.0 % repeated-use allowance.
+// 1.05 mm leg tip they touch at 4.11. utils/legcheck.py prices any value.
+//
+// It was 4.00 while the legs were the only thing holding the part in, and it
+// left 0.40 mm of margin before the legs met. That margin was spent the first
+// time the insert was printed in PETG instead of PLA: PETG comes out fatter
+// in XY, the PLA coupon snapped in and the PETG rails would not (2026-09-12).
+// Now that the key does the holding, the tab only has to outreach the 0.89 mm
+// a leg can still retract with the key home, and 2.50 leaves 1.61 mm under
+// the fin with the key in, 3.61 mm between the leg tips on the way in, and
+// 0.53 % strain. It also makes the human push-on and pull-off easier, which
+// is the point of putting the retention in the key.
 //
 // It was briefly 3.1813, derived to make the two barbs protrude equally from
 // the leg face. That was the wrong invariant and it cost the roll most of its
 // grip: what the design has to ration is SQUEEZE, and equal protrusion spends
 // it unequally because the two features do not reach equally far inboard.
-twin_hook = 4.00;
+twin_hook = 2.50;
 
 // Engagement of the ROLL bump, per side (mm), 0 for none.
 //
@@ -458,7 +466,7 @@ twin_bump = min(trk_hook_x - twin_bump_gap, twin_hook - 0.10);
 // easiness away from anything without thumbs.
 //
 // It is also what fills the middle of the channel. Nothing attached to the
-// legs ever could — that void is the flex space, and each leg needs 4.05 mm of
+// legs ever could — that void is the flex space, and each leg needs 2.55 mm of
 // it to get in at all.
 twin_key = true;
 
@@ -476,7 +484,7 @@ key_clr = 0.20;
 //
 //     (bore - 2 x (leg face + tip thickness) - key_w) / 2  =  0.89 mm
 //
-// against the 4.00 mm it needs to clear the fin. So the barbs stay 3.11 mm
+// against the 2.50 mm it needs to clear the fin. So the barbs stay 1.61 mm
 // under their fins with the key home, and a cat is not the thing that gets it
 // out. A thinner clip_leg_root_t would shrink that 0.89 — it opens the root
 // gap and softens a spring whose retention job the key has taken over — but it
