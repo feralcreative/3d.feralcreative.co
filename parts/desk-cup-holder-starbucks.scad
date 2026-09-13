@@ -5,12 +5,19 @@
 // changed are the bore and the outside that follows it, so a diff between the
 // two files is exactly the list of things the cup forced. The bore is a cone,
 // Ø65 at the floor and Ø80 at the rim — the cup's two diameters plus 5 mm of
-// wiggle room each — and the outside follows it at the sibling's wall, 12.5
-// thick at the foot and 7.5 at the rim, so it is Ø89 at the foot and Ø95 at
-// the rim (both Ziad, 2026-09-13). That makes it the one part here that is
-// wider at the top than the bottom: a 2.9° lean outward, which prints without
-// support. Four handle slots, 25 wide, let a mug sit with its handle out in
-// any of four directions. Everything the hand or the mug meets is rounded:
+// wiggle room each. The outside keeps the sibling's rim wall, 7.5, so it is
+// Ø95 at the rim, and the sibling's 10 mm of taper on top of that, so it is
+// Ø105 at the foot — a 20 mm wall down there, against the bore's 12.5.
+//
+// THE OUTSIDE IS ALWAYS WIDER AT THE FOOT, whatever the bore does. That is
+// the whole point of these collars: they add width to the bottom of a cup so
+// it is harder to knock over, and an outside that followed this cup's bore
+// would have been Ø89 at the foot and Ø95 at the rim — the first draft, and
+// exactly backwards (Ziad, 2026-09-13). The rule holds for every variation
+// of this part, and the assert below enforces it.
+//
+// Four handle slots, 25 wide, let a mug sit with its handle out in any of
+// four directions. Everything the hand or the mug meets is rounded:
 // the rim and every edge of every slot carry the same 1.9 round, so the top
 // outline reads as one continuous lip that dips into each slot and comes
 // back up.
@@ -44,7 +51,8 @@
 // centre of the floor.
 //
 // ORIENTATION. Printed as drawn, floor down. The outside leans inward going
-// up, so it is a 4.8° overhang everywhere and needs nothing. The slot bottoms
+// up, so it is a 4.8° overhang everywhere and needs nothing; the bore leans
+// outward 7.7°, an overhang the same way, also fine. The slot bottoms
 // are half-rounds, 25 across, which the slicer handles as a shallow arch.
 
 /* [Envelope] */
@@ -56,9 +64,11 @@
 bore_bot_d = 65;   // mm, at the floor
 bore_top_d = 80;   // mm, at the rim
 
-// Outside at the foot and at the rim: the bore plus the sibling's wall (12.5
-// at the foot, 7.5 at the rim). The wall between is a straight cone.
-outer_bot_d = 89;    // mm
+// Outside at the foot and at the rim: the rim is the bore plus the sibling's
+// 7.5 wall; the foot is the rim plus the sibling's 10 mm of taper, so the
+// collar is wider at the bottom no matter what the bore does. The wall
+// between is a straight cone.
+outer_bot_d = 105;   // mm
 outer_top_d = 95;    // mm
 
 // Overall height, floor to top of the lip.
@@ -101,6 +111,9 @@ pad_recess_h = 0;    // mm
 $fn = 120;
 sphere_fn = 32;
 eps = 0.01;
+
+assert(outer_bot_d > outer_top_d,
+       "the outside must be wider at the foot than the rim: the collar exists to widen the cup's base");
 
 bore_br   = bore_bot_d / 2;
 bore_tr   = bore_top_d / 2;

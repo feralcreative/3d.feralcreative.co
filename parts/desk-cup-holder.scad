@@ -3,7 +3,11 @@
 //
 // Three fixed numbers from Ziad: a Ø90 bore, Ø115 outside at the foot, Ø105
 // outside at the rim, so the wall runs from 12.5 thick at the bottom to 7.5 at
-// the top. Four handle slots, 25 wide, let a mug sit with its handle out in
+// the top. THE OUTSIDE IS ALWAYS WIDER AT THE FOOT, in this and every
+// variation of it, whatever the bore does — the collar exists to add width to
+// the bottom of a cup so it is harder to knock over (Ziad, 2026-09-13, after
+// the Starbucks copy came out the other way round). The assert below holds
+// the rule. Four handle slots, 25 wide, let a mug sit with its handle out in
 // any of four directions. Everything the hand or the mug meets is rounded:
 // the rim and every edge of every slot carry the same 1.9 round, so the top
 // outline reads as one continuous lip that dips into each slot and comes
@@ -91,6 +95,9 @@ pad_recess_h = 0;    // mm
 $fn = 120;
 sphere_fn = 32;
 eps = 0.01;
+
+assert(outer_bot_d > outer_top_d,
+       "the outside must be wider at the foot than the rim: the collar exists to widen the cup's base");
 
 bore_r    = bore_d / 2;
 r_bot     = outer_bot_d / 2;
