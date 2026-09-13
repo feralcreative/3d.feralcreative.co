@@ -6,38 +6,38 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 
 ## 1. Commands
 
-| Task | Command |
-| --- | --- |
-| Install deps (BOSL2 submodule) | `git submodule update --init` |
-| Render a part to PNGs (iso, front, right, top) | `utils/render.sh parts/<part>.scad` |
-| Render a variant without editing the file | `utils/render.sh parts/<part>.scad -D 'outer_d=30'` |
-| Build STL (binary, versioned, reports manifold + genus) | `utils/build.sh parts/<part>.scad` |
-| Build a named variant, with its own version series | `utils/build.sh parts/<part>.scad -D 'show="coupon"' --name <part>-coupon` |
-| Restamp instead of incrementing | `utils/build.sh parts/<part>.scad --version 3` |
-| Build with no version stamp at all | `utils/build.sh parts/<part>.scad --no-version` |
-| Collapse a finished part to one unversioned file | `utils/finalize.sh <name>` |
-| Collapse every finished series | `utils/finalize.sh --all` |
-| Show what generated output could go (deletes nothing) | `utils/clean.sh` |
-| Delete it | `utils/clean.sh --apply` |
-| Also age out past models — renders, 3mf and slice jobs untouched for N days | `utils/clean.sh --stale 7 --apply` |
-| Every regenerable byte, keeping only `.keep` and tracked files | `utils/clean.sh --all --apply` |
-| Build ASCII STL (to read or diff a mesh) | `utils/build.sh parts/<part>.scad --ascii` |
-| Publish STL to the printer site's NAS | `utils/build.sh parts/<part>.scad --push` (needs explicit permission) |
-| Mirror every finished (unversioned, no drafts beside it) STL to the NAS | `utils/deploy/prod.sh` (needs explicit permission; `--dry-run` to preview, `--all` to include parts still moving) |
-| Build a coupon of only what changed since the last print | `utils/coupon.sh parts/<part>.scad` |
-| Coupon with every component, ignoring the log | `utils/coupon.sh parts/<part>.scad --all` |
-| Record that the last coupon was printed | `utils/coupon.sh parts/<part>.scad --printed` |
-| Bend budget for the screen-fence clip's legs | `utils/legcheck.py` |
-| Compare leg section options | `utils/legcheck.py --sweep` |
-| Slice and verify the job | `utils/slice.sh stl/<part>.stl` or `utils/slice.sh parts/<part>.scad` |
-| Slice against untuned FlashForge stack | `utils/slice.sh stl/<part>.stl --stock` |
-| One-off slicer override | `utils/slice.sh stl/<part>.stl --set filament:nozzle_temperature=235` |
-| Role breakdown at a height | `utils/slice.sh stl/<part>.stl --at-z 38` |
-| Read a sliced job back | `utils/gcode-probe.py slice/<part>/plate_1.gcode` |
-| Resolve slicer profile inheritance | `utils/ffprofile.py --machine … --process … --filament … --outdir …` |
-| Preset drift report (app vs repo) | `utils/profiles-check.sh` |
-| Push presets repo → app | `utils/profiles-check.sh --install` (then restart Flash Studio) |
-| Capture presets app → repo | `utils/profiles-check.sh --capture` |
+| Task                                                                        | Command                                                                                                           |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Install deps (BOSL2 submodule)                                              | `git submodule update --init`                                                                                     |
+| Render a part to PNGs (iso, front, right, top)                              | `utils/render.sh parts/<part>.scad`                                                                               |
+| Render a variant without editing the file                                   | `utils/render.sh parts/<part>.scad -D 'outer_d=30'`                                                               |
+| Build STL (binary, versioned, reports manifold + genus)                     | `utils/build.sh parts/<part>.scad`                                                                                |
+| Build a named variant, with its own version series                          | `utils/build.sh parts/<part>.scad -D 'show="coupon"' --name <part>-coupon`                                        |
+| Restamp instead of incrementing                                             | `utils/build.sh parts/<part>.scad --version 3`                                                                    |
+| Build with no version stamp at all                                          | `utils/build.sh parts/<part>.scad --no-version`                                                                   |
+| Collapse a finished part to one unversioned file                            | `utils/finalize.sh <name>`                                                                                        |
+| Collapse every finished series                                              | `utils/finalize.sh --all`                                                                                         |
+| Show what generated output could go (deletes nothing)                       | `utils/clean.sh`                                                                                                  |
+| Delete it                                                                   | `utils/clean.sh --apply`                                                                                          |
+| Also age out past models — renders, 3mf and slice jobs untouched for N days | `utils/clean.sh --stale 7 --apply`                                                                                |
+| Every regenerable byte, keeping only `.keep` and tracked files              | `utils/clean.sh --all --apply`                                                                                    |
+| Build ASCII STL (to read or diff a mesh)                                    | `utils/build.sh parts/<part>.scad --ascii`                                                                        |
+| Publish STL to the printer site's NAS                                       | `utils/build.sh parts/<part>.scad --push` (needs explicit permission)                                             |
+| Mirror every finished (unversioned, no drafts beside it) STL to the NAS     | `utils/deploy/prod.sh` (needs explicit permission; `--dry-run` to preview, `--all` to include parts still moving) |
+| Build a coupon of only what changed since the last print                    | `utils/coupon.sh parts/<part>.scad`                                                                               |
+| Coupon with every component, ignoring the log                               | `utils/coupon.sh parts/<part>.scad --all`                                                                         |
+| Record that the last coupon was printed                                     | `utils/coupon.sh parts/<part>.scad --printed`                                                                     |
+| Bend budget for the screen-fence clip's legs                                | `utils/legcheck.py`                                                                                               |
+| Compare leg section options                                                 | `utils/legcheck.py --sweep`                                                                                       |
+| Slice and verify the job                                                    | `utils/slice.sh stl/<part>.stl` or `utils/slice.sh parts/<part>.scad`                                             |
+| Slice against untuned FlashForge stack                                      | `utils/slice.sh stl/<part>.stl --stock`                                                                           |
+| One-off slicer override                                                     | `utils/slice.sh stl/<part>.stl --set filament:nozzle_temperature=235`                                             |
+| Role breakdown at a height                                                  | `utils/slice.sh stl/<part>.stl --at-z 38`                                                                         |
+| Read a sliced job back                                                      | `utils/gcode-probe.py slice/<part>/plate_1.gcode`                                                                 |
+| Resolve slicer profile inheritance                                          | `utils/ffprofile.py --machine … --process … --filament … --outdir …`                                              |
+| Preset drift report (app vs repo)                                           | `utils/profiles-check.sh`                                                                                         |
+| Push presets repo → app                                                     | `utils/profiles-check.sh --install` (then restart Flash Studio)                                                   |
+| Capture presets app → repo                                                  | `utils/profiles-check.sh --capture`                                                                               |
 
 There is no lint, format, typecheck, or dev server. OpenSCAD lives at `/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD` and is not on `PATH`; the scripts fall back to it. Flash Studio lives at `/Applications/Flash Studio.app`; override with `FS_APP`.
 
@@ -68,7 +68,7 @@ Not required: nothing here needs a full print to be considered done by you. Prin
 - **Never verify a print setting in the slicer GUI.** Verify in the G-code with `utils/gcode-probe.py`. On 2026-08-09 a correct, correctly-selected filament preset contributed nothing to a job, the print ran 25 °C too hot, and it cost the top 6.41 mm of a collet.
 - **Never reintroduce a hardcoded override array in `utils/slice.sh`.** It used to carry `LOW_STRING` `--set` flags and apply them by default; command-line overrides outrank presets, so it silently beat everything in `docs/profiles/`—including a retraction length of 1.6 mm that kept being applied for hours after the preset had been corrected to 0.4, and which ground the extruder. If a value needs changing, change the preset.
 - **Be very reluctant to tune print settings at all.** Retraction length and temperature both trade against feed reliability. The 2026-08-10 session traded three working prints for a cosmetic stringing complaint and jammed the feed drive three times. Change one thing, print a part, then change the next.
-- **Never `import()` an SVG from a part.** Use `include <../logos/marks.scad>` and the modules there. Reasons in [docs/decisions.md](docs/decisions.md); the failure is silent—a missing import prints an ERROR and then *exits 0*, so `build.sh` reports success and hands you an STL with no artwork on it.
+- **Never `import()` an SVG from a part.** Use `include <../logos/marks.scad>` and the modules there. Reasons in [docs/decisions.md](docs/decisions.md); the failure is silent—a missing import prints an ERROR and then _exits 0_, so `build.sh` reports success and hands you an STL with no artwork on it.
 - **Do not hand-edit generated trees:** `renders/`, `stl/`, `slice/`, `3mf/`, and the `MODELS` symlink (it points into the printer-site repo). All are gitignored and reproducible.
 - **Do not edit `lib/BOSL2`.** It is a git submodule (v2.0.755); changes belong upstream.
 - **Do not investigate Ziad's machine to answer questions about his setup.** If you need to know whether something is installed or how it is configured, ask him.
@@ -82,7 +82,8 @@ There is no runtime. The pipeline is four stages, each with its own verification
 2. `utils/render.sh` → `renders/<part>-{iso,front,right,top}.png`. Fast preview; elevations are orthographic, iso is perspective. Verifies shape.
 3. `utils/build.sh` → `stl/<part>-v01.stl`, zero padded to two digits, binary, plus OpenSCAD's manifold/genus summary. Verifies topology. `stl/<part>.stl` is a real copy of the newest version — never a symlink (Ziad's call, 2026-09-12: a link is a pointer to a file nobody else has and dangles the moment its target is cleaned) — and is what every other stage and every path quoted in the docs uses. The numbered drafts beside it keep their numbers.
 
-    **A finished part carries no version at all.** Versions are for a part that is still moving; once it stops, `utils/finalize.sh <name>` keeps `stl/<name>.stl` and deletes the numbered drafts beside it, so there is exactly one file and nothing stale beside it to print by mistake. It trusts the plain file rather than the highest number — those differ (`slim-can-adapter` carried a v02 while both the ledger and the plain name said v01). `docs/stl-versions.txt` is deliberately left alone, so rebuilding a finished part resumes at the next number rather than colliding with its own history. `build.sh --no-version` writes the plain name directly when a part is known to be done up front.
+   **A finished part carries no version at all.** Versions are for a part that is still moving; once it stops, `utils/finalize.sh <name>` keeps `stl/<name>.stl` and deletes the numbered drafts beside it, so there is exactly one file and nothing stale beside it to print by mistake. It trusts the plain file rather than the highest number — those differ (`slim-can-adapter` carried a v02 while both the ledger and the plain name said v01). `docs/stl-versions.txt` is deliberately left alone, so rebuilding a finished part resumes at the next number rather than colliding with its own history. `build.sh --no-version` writes the plain name directly when a part is known to be done up front.
+
 4. `utils/slice.sh` → `slice/<part>/{plate_1.gcode,out.gcode.3mf,resolved.json,slice.log}`, plus a copy of the job as `3mf/<part>.3mf` — the file that goes to the printer, named after the part instead of the slicer's fixed `out.gcode.3mf`. Internally: `ffprofile.py` flattens the profile inheritance chain, Flash Studio slices, `gcode-probe.py` reads the result back. Verifies settings.
 
 Dependency direction: parts include `lib/BOSL2` and `logos/marks.scad`; nothing includes a part except another part reading its numbers (`hobbs-chalk-holder.scad` is written to be includable for that). Scripts depend on parts, never the reverse.
@@ -144,11 +145,11 @@ Scripts live in `utils/`, never `scripts/`. Documentation other than `README.md`
 
 No secrets are required to build, render, or slice. `--push` uses Ziad's existing SSH agent identity for the NAS; there is no key material, token, or `.env` in this repo, and none should be added.
 
-| Variable | Source | Notes |
-| --- | --- | --- |
-| `OPENSCADPATH` | set by `render.sh` / `build.sh` | Points at `lib/`. Not a secret. |
-| `FS_APP` | optional env override | Path to Flash Studio, defaults to `/Applications/Flash Studio.app`. |
-| `APP_DIR` | optional env override | Flash Studio user preset tree, defaults to `~/Library/Application Support/Orca-Flashforge/user/default`. |
+| Variable       | Source                          | Notes                                                                                                    |
+| -------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `OPENSCADPATH` | set by `render.sh` / `build.sh` | Points at `lib/`. Not a secret.                                                                          |
+| `FS_APP`       | optional env override           | Path to Flash Studio, defaults to `/Applications/Flash Studio.app`.                                      |
+| `APP_DIR`      | optional env override           | Flash Studio user preset tree, defaults to `~/Library/Application Support/Orca-Flashforge/user/default`. |
 
 ## 8. Deep-dive index
 
@@ -159,7 +160,7 @@ No secrets are required to build, render, or slice. `--push` uses Ziad's existin
 - [docs/flashforge-ad5m-pro-scad-reference.md](docs/flashforge-ad5m-pro-scad-reference.md) — the machine's constraint set: safe build envelope, wall-thickness ladders per nozzle, clearance ladders, faceting rules, materials matrix, OpenSCAD constants block. Read before picking a wall thickness, clearance, facet count, or plate position.
 - [docs/flash-studio-slicing-reference.md](docs/flash-studio-slicing-reference.md) — the slicer as installed: profile paths, inheritance chains, resolved values, headless CLI. **Outranks the reference above wherever they disagree.** Read before quoting any print setting.
 - [docs/printer-profile-research-prompt.md](docs/printer-profile-research-prompt.md) — the prompt that produced the design reference. Only needed if the hardware changes or someone wants the same document for another printer.
-- [docs/_PLANS/](docs/_PLANS/) — running record, one file per round, `part-NN-<UTC stamp>.md`. **Read the highest-numbered file before starting anything**, and check any siblings it references (a reverted patch parked for later sits next to the note explaining it). Write the next one at a stopping point rather than leaving state in a conversation.
+- [docs/\_PLANS/](docs/_PLANS/) — running record, one file per round, `part-NN-<UTC stamp>.md`. **Read the highest-numbered file before starting anything**, and check any siblings it references (a reverted patch parked for later sits next to the note explaining it). Write the next one at a stopping point rather than leaving state in a conversation.
 
 Evidence markers in the two references are not interchangeable: `[SPEC]` is a hard constraint, `[FIELD]` a field report, `[DERIVED]` arithmetic done inside the document, and ⚠️ contested or unverified. A ⚠️ is something to raise with Ziad, not something to quietly design around.
 
