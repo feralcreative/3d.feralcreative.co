@@ -43,6 +43,11 @@ slim-can-holder-3in-coupon 1
 slim-can-holder-3in-explicit 6
 slim-can-screwdriver-stubby 2
 slim-can-screwdriver-tall 2
+sofa-monitor-stand 1
+sofa-monitor-stand-base 9
+sofa-monitor-stand-base-coupon 3
+sofa-monitor-stand-base-slice 6
+sofa-monitor-stand-coupon 1
 tpu-door-stop 2
 tpu-door-stop-deck 1
 zr-cube 3
