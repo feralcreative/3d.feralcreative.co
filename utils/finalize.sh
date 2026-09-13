@@ -25,6 +25,11 @@
 # said v01 was current. Builds before 2026-09-12 left a symlink at the plain
 # name instead of a copy; one of those is still followed and promoted.
 #
+# COUPONS GO TOO. A finished part has nothing left to test, so every
+# stl/<name>-*coupon*.stl — plain or versioned, whatever the build named it —
+# is deleted with the drafts (Ziad, 2026-09-13). Only untracked files: a
+# coupon that has somehow been committed is left where it is and named.
+#
 # THE LEDGER IS LEFT ALONE. docs/stl-versions.txt keeps its count for the name.
 # Finishing a part is not a promise never to touch it again, and if it is rebuilt
 # the next build should be v07 rather than a v01 that collides with the history.
@@ -128,10 +133,23 @@ finalize_one() {
     removed=$((removed + 1))
   done
 
+  # The coupons: every output name that starts with this one and says so.
+  local coupons=0
+  while IFS= read -r f; do
+    [[ -n "$f" ]] || continue
+    if git -C "$REPO_ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
+      printf '  %-40s note: %s is tracked, left alone\n' "" "$(basename "$f")"
+      continue
+    fi
+    rm -f "$f"
+    coupons=$((coupons + 1))
+  done < <(find "$OUTDIR" -maxdepth 1 -name "${name}-*coupon*.stl")
+
   local kept_tag="already a plain file"
   [[ -n "$keep" ]] && kept_tag="was $(basename "$keep")"
-  printf '  %-40s final (%s)%s\n' "$name" "$kept_tag" \
-    "$( [[ "$removed" -gt 0 ]] && echo ", $removed older version(s) removed" )"
+  printf '  %-40s final (%s)%s%s\n' "$name" "$kept_tag" \
+    "$( [[ "$removed" -gt 0 ]] && echo ", $removed older version(s) removed" )" \
+    "$( [[ "$coupons" -gt 0 ]] && echo ", $coupons coupon file(s) removed" )"
 }
 
 echo "== finalizing in $OUTDIR"

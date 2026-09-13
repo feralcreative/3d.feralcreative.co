@@ -93,7 +93,7 @@
 //               the arm fit — cavity width, crown, bend radius, deck and leg
 //               thickness — is in that section; the leg length proves
 //               nothing but costs most of the print
-show = "top";  // [top, base, plug, coupon, base-slice]
+show = "base";  // [top, base, plug, coupon, base-slice]
 
 /* [Top] */
 stand_top_d      = 160.8;  // disc diameter (mm)
