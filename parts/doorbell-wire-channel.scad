@@ -49,8 +49,9 @@
 // THE PLUG IS A SHELL, open to the hole: plug_wall of wall around the hole's
 // section and the cap as its front, like the old one but plug_depth deep and
 // ribbed. The wire comes through the corner notch into the hollow and down
-// into the hole from there; the notch is notch_d deep so the corner keeps
-// its last few millimetres of wall at the tip.
+// into the hole from there. The notch runs the whole depth, splitting the
+// corner open to the tip, so the wire is laid into it from the side rather
+// than threaded through a hole (Ziad, 2026-09-13).
 //
 // TWO PIECES, because 260 does not fit a 220 bed. The lower piece is the
 // cap, the jog, and lower_run of the vertical; the upper is the rest. They
@@ -119,7 +120,7 @@ plug_rib   = 0.3;   // crush ribs proud of the hole's size, per side (mm)
 rib_w      = 1.2;   // (mm)
 plug_lead  = 1.0;   // chamfer on the plug's leading edge (mm)
 plug_wall  = 1.68;  // the shell, four loops on the 0.4 nozzle (mm)
-notch_d    = 8.0;   // the wire notch through the top-right corner, from the cap's back (mm)
+notch_d    = plug_depth + 1;  // the wire notch through the top-right corner: the full depth, so the wire is laid in from the side, not threaded (mm)
 
 /* [Quality] */
 $fn = 48;
