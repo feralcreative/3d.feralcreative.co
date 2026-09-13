@@ -100,7 +100,7 @@
 // upper — the rest of the vertical run
 // cap   — cap and plug alone, the fit coupon
 // both  — lower and upper laid side by side, to look at
-show = "lower";  // [lower, upper, cap, both]
+show = "both";  // [lower, upper, cap, both]
 
 // Printed orientation, front face on the bed. false draws it as it mounts.
 flip = true;

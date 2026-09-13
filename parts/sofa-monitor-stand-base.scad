@@ -10,6 +10,13 @@
 // rounded arm on the previous sofa; this is not that part and shares nothing
 // with it except the plug and the 95 mm run along the arm.
 //
+// EXCEPT THE TOP OF THE ARM IS NOT FLAT. It has some poof: the first coupon,
+// with a flat ceiling, sat on the crown with 10 mm of daylight at each side
+// (Ziad, 2026-09-13). So the cavity's ceiling is a shallow circular arch,
+// arm_crown high at the centre, meeting the legs at the sides. The deck's
+// top face stays flat for the disc; the deck is deck_t at the centre and
+// deck_t + arm_crown at the sides.
+//
 // THE FORM. An inverted U: a flat deck across the arm with a plate leg down
 // each side, every outside edge above the feet rounded 10 mm with spherical
 // corners, the two inside bends rounded 5, and the outside edge of
@@ -55,6 +62,7 @@ flip = true;
 
 /* [Arm — measured] */
 arm_w          = 180.0;  // sofa arm, across (mm)
+arm_crown      = 10.0;   // how much higher the arm's top is at the centre than at its edges (mm)
 base_clearance = 0.5;    // air between arm and leg, per side (mm)
 
 /* [Saddle] */
@@ -77,14 +85,22 @@ $fn = 64;
 
 cavity_w = arm_w + 2 * base_clearance;   // 181.0
 base_w   = cavity_w + 2 * leg_t;         // 189.88
-base_h   = leg_drop + deck_t;            // 98.0, foot of the legs to the deck face
+base_h   = leg_drop + arm_crown + deck_t; // 108.0, foot of the legs to the deck face
+// The arch: a circle through the cavity's two top corners and arm_crown
+// above their chord.
+crown_r  = (cavity_w * cavity_w / 4 + arm_crown * arm_crown) / (2 * arm_crown);   // 414.5
 
-// A w-wide, h-tall rectangle standing on y = 0 with its two top corners
-// rounded r. The bottom corners stay square: they are below the part.
-module rounded_top(w, h, r) {
-  hull() {
-    translate([-w / 2, 0]) square([w, h - r]);
-    for (sx = [-1, 1]) translate([sx * (w / 2 - r), h - r]) circle(r = r);
+// The cavity in section: cavity_w wide, legs h tall, the ceiling arched
+// arm_crown above that at the centre, and the two corners where arch meets
+// leg rounded bend_r. Open at the bottom, well past y = 0, so the rounding
+// pass never reaches the feet.
+module cavity_profile(h) {
+  offset(r = bend_r) offset(delta = -bend_r) union() {
+    translate([-cavity_w / 2, -bend_r - 1]) square([cavity_w, h + bend_r + 1]);
+    intersection() {
+      translate([0, h + arm_crown - crown_r]) circle(r = crown_r, $fn = 1440);
+      translate([-cavity_w / 2, h - 1]) square([cavity_w, arm_crown + 1]);
+    }
   }
 }
 
@@ -115,7 +131,7 @@ module stand_base() {
     outer_body();
     rotate([90, 0, 0])
       linear_extrude(base_depth + 2 * eps, center = true, convexity = 4)
-        translate([0, -eps]) rounded_top(cavity_w, leg_drop + eps, bend_r);
+        cavity_profile(leg_drop);
   }
   // Sunk into the deck by the sphere's polar gap: an OpenSCAD sphere has no
   // vertex at its pole, its top ring sits at r * cos(180 / $fn), so the
@@ -141,11 +157,11 @@ module rounded_box(w, h, r_top, r_bot) {
 // so it prints as a short U outline in one go. Not a slice of stand_base —
 // that would be plug-down or standing on its feet, and either way tall.
 module stand_base_slice() {
-  h = slice_leg + deck_t;
+  h = slice_leg + arm_crown + deck_t;
   linear_extrude(base_slice_depth, convexity = 4)
     difference() {
       rounded_box(base_w, h, round_r, foot_r);
-      translate([0, -eps]) rounded_top(cavity_w, slice_leg + eps, bend_r);
+      cavity_profile(slice_leg);
     }
 }
 
@@ -158,4 +174,5 @@ if (show == "base")  oriented() stand_base();
 if (show == "slice") stand_base_slice();
 
 echo(str("saddle = ", base_w, " x ", base_depth, " x ", base_h + stand_plug_h,
-         " mm over the plug; cavity = ", cavity_w, " wide x ", leg_drop, " deep"));
+         " mm over the plug; cavity = ", cavity_w, " wide x ", leg_drop, " deep at the sides, ",
+         leg_drop + arm_crown, " at the crown"));
