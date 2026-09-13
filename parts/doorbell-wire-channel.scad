@@ -108,7 +108,7 @@ hole_r = 3.0;    // the hole's corner radius, from the old plug (mm)
 screw_off = 10.0;  // old screw holes, from the hole's edge, above and below (mm)
 
 /* [Run] */
-run_len   = 260.0;  // doorbell to the jog's centreline (mm)
+run_len   = 255.0;  // doorbell to the jog's centreline; was 260, Ziad measured the upper piece at 135 (mm)
 jog       = 15.0;   // the run's centreline is this far right of the hole (mm)
 lower_run = 120.0;  // of run_len, on the lower piece; the rest is the upper (mm)
 lap       = 10.0;   // the lap joint (mm)
