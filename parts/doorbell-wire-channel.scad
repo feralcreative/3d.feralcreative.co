@@ -123,7 +123,7 @@ bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as larg
 /* [Raceway] */
 rw_w     = 8.0;   // across (mm)
 rw_h     = 3.2;   // off the wall; also the cap's thickness at its plateau (mm)
-rw_r     = 1.2;   // round on the two front edges; 0.8 was a touch crisp for Ziad (mm)
+rw_r     = 1.6;   // round on the two front edges; 1.2 was the one Ziad liked and may come back to, 0.8 a touch crisp; 1.9 is the rail (mm)
 slot_w   = 4.2;   // the groove, for the wire's 3.8 (mm)
 slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is the skin (mm)
 
