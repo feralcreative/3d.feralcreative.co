@@ -66,15 +66,19 @@
 // corner open to the tip, so the wire is laid into it from the side rather
 // than threaded through a hole (Ziad, 2026-09-13).
 //
-// TWO PIECES, because 260 does not fit a 220 bed. The lower piece is the
+// TWO PIECES, because 255 does not fit a 220 bed. The lower piece is the
 // cap, the jog, and lower_run of the vertical; the upper is the rest. They
-// meet in a half-lap IN PLAN: the lower's left half carries on lap mm past
-// its right half, and the upper's left half is cut back the same, so the
-// seam steps across the width. Full height everywhere, so both pieces print
-// face down with nothing in the air — a lap in the thickness would put one
-// half of the joint 0.8 mm off the bed. The tape does the holding; the lap
-// only keeps them in line. Set lower_run so the lower piece — lower_run +
-// lap + cap_h/2 tall — and upper_run both stay under 205.
+// meet in a DOVETAIL IN PLAN: the lower ends in a pin dt_neck wide flaring
+// to dt_head over dt_len, the upper in the matching socket, dt_clr looser a
+// side, and the groove runs straight through both. Full height everywhere,
+// so both pieces print face down with nothing in the air — a lap in the
+// thickness would put one half of the joint 0.8 mm off the bed. Ziad glues
+// the two before mounting (2026-09-13) and wanted something positive to
+// glue against; it was a plain half-lap before. The pin's middle is skin
+// only (the groove is there) and the socket's walls at the head are 0.8 mm
+// of rail, so it locates and it holds glue — it is not a structural joint,
+// and does not need to be under tape. Set lower_run so the lower piece —
+// lower_run + dt_len + cap_h/2 tall — and upper_run both stay under 205.
 //
 // PRINTED FACE DOWN. flip = true (the default) turns each piece over so
 // the front face is on the bed and the groove, rails and plug are on top.
@@ -115,8 +119,10 @@ screw_off = 10.0;  // old screw holes, from the hole's edge, above and below (mm
 run_len   = 255.0;  // doorbell to the jog's centreline; was 260, Ziad measured the upper piece at 135 (mm)
 jog       = 15.0;   // the run's centreline is this far right of the hole (mm)
 lower_run = 120.0;  // of run_len, on the lower piece; the rest is the upper (mm)
-lap       = 10.0;   // the lap joint (mm)
-lap_clr   = 0.2;    // between tongue end and the upper's back plate (mm)
+dt_len    = 6.0;    // the dovetail, along the run (mm)
+dt_neck   = 3.4;    // the pin at its root (mm)
+dt_head   = 5.3;    // the pin at its end; the socket's walls are (rw_w - dt_head)/2 (mm)
+dt_clr    = 0.15;   // socket over pin, each side (mm)
 bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as large as will reach the corner (mm)
 
 /* [Raceway] */
@@ -182,7 +188,8 @@ assert(2 * rw_r <= rw_w - slot_w && rw_r < rw_h, "rw_r is bigger than the rails"
 assert(cap_round_up < cap_t, "cap_round_up is the whole thickness: no edge left");
 assert(cap_right >= jog + rw_w / 2 + cap_round_in, "the run's edge lands on the cap's round: widen cap_right");
 assert(cap_left > plug_hw + cap_round_in && cap_h / 2 > plug_hh + cap_round_in, "the cap's flat does not clear the plug");
-assert(lower_run + lap + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
+assert(lower_run + dt_len + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
+assert(dt_head + 2 * dt_clr < rw_w - 1.0 && dt_neck < dt_head, "the dovetail leaves no socket wall");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
 
@@ -258,20 +265,28 @@ module lower() difference() {
   union() {
     cap_plate();
     plug();
-    translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap - lap_clr) rw_outer();
+    translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + dt_len) rw_outer();
   }
-  // The right half stops at lower_run; the left carries on as the tongue.
-  translate([jog, lower_run, -eps]) cube([rw_w / 2 + eps, lap + eps, rw_h + 2 * eps]);
-  translate([jog, 0, 0]) along_y(bend_y - eps, lower_run + lap + eps) rw_slot();
+  // Past lower_run only the pin remains.
+  translate([0, 0, -eps]) linear_extrude(rw_h + 2 * eps) difference() {
+    translate([jog - rw_w / 2 - eps, lower_run]) square([rw_w + 2 * eps, dt_len + 1]);
+    dovetail(lower_run, 0);
+  }
+  translate([jog, 0, 0]) along_y(bend_y - eps, lower_run + dt_len + eps) rw_slot();
   diagonal_wire();
 }
 
-// From y = 0 at the joint to upper_run at the doorbell; the left half is
-// cut back lap mm to take the lower's tongue.
+// The dovetail pin in plan, its root at y0, grown g a side for the socket.
+module dovetail(y0, g) polygon([
+  [jog - dt_neck / 2 - g, y0 - eps - g], [jog + dt_neck / 2 + g, y0 - eps - g],
+  [jog + dt_head / 2 + g, y0 + dt_len + g], [jog - dt_head / 2 - g, y0 + dt_len + g]]);
+
+// From y = 0 at the joint to upper_run at the doorbell, the socket cut
+// into its lower end.
 module upper() difference() {
   along_y(0, upper_run) rw_outer();
   along_y(-eps, upper_run + eps) rw_slot();
-  translate([-rw_w / 2 - eps, -eps, -eps]) cube([rw_w / 2 + eps, lap + eps, rw_h + 2 * eps]);
+  translate([-jog, 0, -eps]) linear_extrude(rw_h + 2 * eps) dovetail(0, dt_clr);
 }
 
 // The fit coupon: cap and plug, with the groove in from the cap's top edge
@@ -297,4 +312,4 @@ if (show == "both") {
 
 echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right); plug ", hole_w, " x ", hole_h,
          " + ", plug_rib, " ribs, ", plug_depth, " deep; lower piece ",
-         lower_run + lap + cap_h / 2, " tall, upper ", upper_run));
+         lower_run + dt_len + cap_h / 2, " tall, upper ", upper_run));
