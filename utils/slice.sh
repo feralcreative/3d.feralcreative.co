@@ -9,7 +9,10 @@
 #   utils/slice.sh stl/x.stl --set filament:nozzle_temperature=235
 #   utils/slice.sh stl/x.stl --at-z 38                    # role breakdown up the collet
 #
-# Output lands in slice/<part>/ — plate_1.gcode, out.gcode.3mf, resolved.json.
+# Output lands in slice/<part>/ — plate_1.gcode, out.gcode.3mf, resolved.json —
+# and the sliced job is also copied to 3mf/<part>.3mf, which is the file to
+# hand to the printer: named after the part rather than the slicer's fixed
+# "out.gcode.3mf", and in one flat tree rather than a directory per job.
 #
 # This EXPORTS NOTHING TO THE PRINTER. It slices and reports. Sending a job is a
 # deliberate, separate act.
@@ -35,6 +38,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTROOT="${OUTROOT:-${REPO_ROOT}/slice}"
+MF_ROOT="${MF_ROOT:-${REPO_ROOT}/3mf}"
 
 FS_APP="${FS_APP:-/Applications/Flash Studio.app}"
 FS_BIN="${FS_APP}/Contents/MacOS/Flash Studio"
@@ -51,6 +55,13 @@ MACHINE="${MACHINE:-Flashforge Adventurer 5M Pro 0.4 Nozzle}"
 # change it in docs/profiles/ and reinstall, so the repo and the app agree.
 PROCESS="${PROCESS:-0.12mm Fine @AD5M Pro 0.4 - Low String}"
 FILAMENT="${FILAMENT:-Rapid PETG Burnt Titanium}"
+
+# The plate on the machine. This is a project setting, not a preset one, so
+# it cannot live in docs/profiles/ — it selects which of a filament preset's
+# *_plate_temp values the slicer reads, and without it every job was sliced
+# for a "Cool Plate" the printer does not have. The AD5M Pro ships with a
+# double-sided textured PEI plate.
+BED_TYPE="${BED_TYPE:-Textured PEI Plate}"
 
 # --stock drops back to the untuned FlashForge stack, for comparison only.
 STOCK_PROCESS="0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle"
@@ -123,6 +134,7 @@ echo "== resolving profiles"
   --machine "$MACHINE" \
   --process "$PROCESS" \
   --filament "$FILAMENT" \
+  --bed-type "$BED_TYPE" \
   "${SETS[@]+"${SETS[@]}"}" \
   --outdir "$PROFDIR" >/dev/null
 
@@ -163,6 +175,13 @@ PROBE_ARGS=("$GCODE")
 [[ -n "$AT_Z" ]] && PROBE_ARGS+=(--at-z "$AT_Z")
 "${REPO_ROOT}/utils/gcode-probe.py" "${PROBE_ARGS[@]}"
 
+# The named copy. Flash Studio always writes out.gcode.3mf, so the part's name
+# is put back on the file here, where the printer-bound copy lives.
+mkdir -p "$MF_ROOT"
+MF_OUT="${MF_ROOT}/${BASE}.3mf"
+cp "${OUTDIR}/out.gcode.3mf" "$MF_OUT"
+
 echo
 echo "wrote $OUTDIR"
+echo "wrote $MF_OUT"
 echo "NOT sent to the printer."
