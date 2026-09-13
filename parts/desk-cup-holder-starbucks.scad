@@ -1,14 +1,16 @@
 // Desk cup holder, Starbucks — the desk-cup-holder.scad collar rebored for
 // a cup that is Ø60 at its base and Ø75 at 60 mm up.
 //
-// A copy of desk-cup-holder.scad, and meant to stay one: the only thing that
-// changed is the bore, so a diff between the two files is exactly the list of
-// things the cup forced. The bore is a cone, Ø65 at the floor and Ø80 at the
-// rim — the cup's two diameters plus 5 mm of wiggle room each (Ziad,
-// 2026-09-13) — and the outside is still Ø115 at the foot and Ø105 at the
-// rim, so the wall runs from 25 thick at the bottom to 12.5 at the top. Four
-// handle slots, 25 wide, let a mug sit with its handle out in any of four
-// directions. Everything the hand or the mug meets is rounded:
+// A copy of desk-cup-holder.scad, and meant to stay one: the only things that
+// changed are the bore and the outside that follows it, so a diff between the
+// two files is exactly the list of things the cup forced. The bore is a cone,
+// Ø65 at the floor and Ø80 at the rim — the cup's two diameters plus 5 mm of
+// wiggle room each — and the outside follows it at the sibling's wall, 12.5
+// thick at the foot and 7.5 at the rim, so it is Ø89 at the foot and Ø95 at
+// the rim (both Ziad, 2026-09-13). That makes it the one part here that is
+// wider at the top than the bottom: a 2.9° lean outward, which prints without
+// support. Four handle slots, 25 wide, let a mug sit with its handle out in
+// any of four directions. Everything the hand or the mug meets is rounded:
 // the rim and every edge of every slot carry the same full round, so the top
 // outline reads as one continuous rolled lip that dips into each slot and
 // comes back up.
@@ -54,9 +56,10 @@
 bore_bot_d = 65;   // mm, at the floor
 bore_top_d = 80;   // mm, at the rim
 
-// Outside at the foot and at the rim. The wall between is a straight cone.
-outer_bot_d = 115;   // mm
-outer_top_d = 105;   // mm
+// Outside at the foot and at the rim: the bore plus the sibling's wall (12.5
+// at the foot, 7.5 at the rim). The wall between is a straight cone.
+outer_bot_d = 89;    // mm
+outer_top_d = 95;    // mm
 
 // Overall height, floor to top of the lip.
 total_h = 60;     // mm
