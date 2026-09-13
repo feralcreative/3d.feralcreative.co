@@ -35,7 +35,7 @@
 // under a 3.6 raceway would print in the air. So cap_t = rw_h, and the
 // groove runs across the cap's back to the plug's edge and straight into a
 // groove down the plug's side; the wire goes into the hole beside the plug.
-// The cap is also wide enough (cap_w/2 > jog + rw_w/2) that the vertical
+// The cap is also wide enough (cap_right > jog + rw_w/2) that the vertical
 // run comes down onto the cap's top edge and the jog happens inside the
 // plate, as a turn in the groove, rather than as a visible elbow beside it.
 //
@@ -94,7 +94,8 @@ slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is th
 rw_ch    = 0.8;   // chamfer on every front edge, 45 deg (mm)
 
 /* [Cap] */
-cap_w      = 42.0;  // across; wide enough that the run lands on the cap, not beside it (mm)
+cap_right  = 21.0;  // hole centre to the cap's right edge; enough that the run lands on the cap, not beside it (mm)
+cap_left   = 18.5;  // hole centre to the left edge; was 21, Ziad took 2.5 off looking at the front view (mm)
 cap_margin = 6.5;   // past the far edge of a screw hole, above and below (mm)
 cap_r      = 8.0;   // corner radius (mm)
 
@@ -114,6 +115,8 @@ eps = 0.01;
 
 upper_run = run_len - lower_run;
 cap_h     = hole_h + 2 * (screw_off + cap_margin);   // 52.0
+cap_w     = cap_left + cap_right;                     // 39.5
+cap_x     = (cap_right - cap_left) / 2;               // the cap's centre, right of the hole
 cap_t     = rw_h;
 plug_hw   = hole_w / 2;
 plug_hh   = hole_h / 2;
@@ -134,8 +137,8 @@ module rw_slot() translate([-slot_w / 2, -eps]) square([slot_w, slot_d + eps]);
 module along_y(a, b) translate([0, b, 0]) rotate([90, 0, 0]) linear_extrude(b - a) children();
 module along_x(a, b) rotate([0, 0, -90]) along_y(a, b) children();
 
-// The cap plate, front edges chamfered.
-module cap_plate() hull() {
+// The cap plate, front edges chamfered, centred cap_x right of the hole.
+module cap_plate() translate([cap_x, 0, 0]) hull() {
   linear_extrude(cap_t - rw_ch) rr(cap_w, cap_h, cap_r);
   translate([0, 0, cap_t - eps]) linear_extrude(eps) offset(delta = -rw_ch) rr(cap_w, cap_h, cap_r);
 }
@@ -193,7 +196,7 @@ module upper() difference() {
 // The fit coupon: cap and plug, groove from the cap's right edge to the plug.
 module cap_only() difference() {
   union() { cap_plate(); plug(); }
-  along_x(plug_hw - groove_d, cap_w / 2 + eps) rw_slot();
+  along_x(plug_hw - groove_d, cap_right + eps) rw_slot();
   plug_groove();
 }
 
@@ -210,6 +213,6 @@ if (show == "both") {
   translate([cap_w / 2 + rw_w + 10, -cap_h / 2, 0]) oriented() upper();
 }
 
-echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, "; plug ", hole_w, " x ", hole_h,
+echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right); plug ", hole_w, " x ", hole_h,
          " + ", plug_rib, " ribs, ", plug_depth, " deep; lower piece ",
          lower_run + lap + cap_h / 2, " tall, upper ", upper_run));
