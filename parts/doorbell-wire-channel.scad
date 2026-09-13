@@ -30,7 +30,9 @@
 // THE RACEWAY'S EDGES ARE A MILD ROUND, rw_r. It was briefly 18 wide with
 // the cap's long blend on each side, and that made it MORE conspicuous, not
 // less (Ziad, 2026-09-13); a narrow ridge with softened corners is the
-// quieter thing on a wall.
+// quieter thing on a wall. The rails are three loops: this is a cosmetic
+// cover over a wire that was bare before, not a load path, and Ziad asked
+// why the walls were so thick.
 //
 // THE CAP'S FRONT IS A LONG ROUND, to blend into the wall: a plateau over
 // the plug and the groove, then an S-curve — a half cosine, level at the
@@ -121,9 +123,9 @@ lap_clr   = 0.2;    // between tongue end and the upper's back plate (mm)
 bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as large as will reach the corner (mm)
 
 /* [Raceway] */
-rw_w     = 8.0;   // across (mm)
+rw_w     = 6.9;   // across: the groove plus a three-loop rail each side; it is a cover, not a beam (mm)
 rw_h     = 3.2;   // off the wall; also the cap's thickness at its plateau (mm)
-rw_r     = 1.9;   // round on the two front edges, the whole rail; 1.2 was the one Ziad liked and may come back to, 0.8 a touch crisp (mm)
+rw_r     = 1.2;   // round on the two front edges; the one Ziad liked, and the most a 1.35 rail can take. 0.8 was a touch crisp; 1.9 was tried on the 8 wide bar (mm)
 slot_w   = 4.2;   // the groove, for the wire's 3.8 (mm)
 slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is the skin (mm)
 
@@ -140,7 +142,7 @@ plug_depth = 14.0;  // into the hole; the old one went 8 (mm)
 plug_rib   = 0.3;   // crush ribs proud of the hole's size, per side (mm)
 rib_w      = 1.2;   // (mm)
 plug_lead  = 1.0;   // chamfer on the plug's leading edge (mm)
-plug_wall  = 1.68;  // the shell, four loops on the 0.4 nozzle (mm)
+plug_wall  = 1.35;  // the shell, three loops on the 0.4 nozzle; it only has to hold the ribs against the hole (mm)
 notch_d    = plug_depth + 1;  // the wire notch through the top-right corner: the full depth, so the wire is laid in from the side, not threaded (mm)
 
 /* [Quality] */
