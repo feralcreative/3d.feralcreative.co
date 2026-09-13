@@ -40,13 +40,13 @@
 # The name is the marker on purpose. A sidecar file or a central list is one
 # more thing to drift out of step with the tree, and neither shows up in `ls`.
 # This does: you can see what is protected while you are looking at what is
-# there. Mark old versions rather than the newest one — renaming the newest
-# breaks the stl/<name>.stl symlink that points at it, and the newest is
-# already protected by retention anyway.
+# there. Mark old versions rather than the newest one — it is already protected
+# by retention anyway.
 #
 # WHAT IS PROTECTED WITHOUT ANY MARKING
 #   - the newest N versions of each name (N = 2 unless --keep says otherwise)
-#   - whatever each stl/<name>.stl symlink points at
+#   - whatever a stl/<name>.stl symlink points at, where a build older than
+#     2026-09-12 left one (build.sh now writes a real copy there instead)
 #   - the coupon version docs/print-log.txt records as printed, because the
 #     thing you printed is the reference for everything measured off it
 #   - any slice/ directory whose STL survives the pass
@@ -78,8 +78,9 @@
 # --stale N adds the missing axis: anything regenerable that has not been
 # touched in N days goes, whatever its rank. It still honours .keep, still
 # refuses tracked files, and still spares a coupon the print log says was
-# printed. --stale 0 means everything. If a name loses every version that way,
-# its stl/<name>.stl symlink is removed too rather than left dangling.
+# printed. --stale 0 means everything. If a name loses every version that way
+# and its stl/<name>.stl is one of the old symlinks, that goes too rather than
+# being left dangling; a real copy there is untouched.
 
 set -euo pipefail
 
@@ -149,7 +150,7 @@ is_printed() {  # basename without extension
   printf '%s\n' "$PRINTED" | grep -qx -- "$1"
 }
 
-# --- symlink targets ---------------------------------------------------------
+# --- symlink targets (builds older than 2026-09-12) --------------------------
 
 LINKED=""
 for l in stl/*.stl; do

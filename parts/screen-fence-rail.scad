@@ -167,7 +167,7 @@
 // A bare build.sh run would otherwise stamp the assembly into the fence's own
 // version series and leave stl/screen-fence-rail.stl pointing at a rail with a
 // fence inside it. There is an echo at the bottom of this file to catch that.
-show = "twinassembly";  // [fence, coupon, pair, twin, twincoupon, twinfit, twinpath, twinassembly, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
+show = "twinassembly";  // [fence, coupon, pair, pairfit, twin, twincoupon, twinfit, twinpath, twinassembly, key, keyfit, keyblock, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
 
 // COUPON-COMPONENTS: fit=coupon
 // COUPON-PLATE: coupon
@@ -350,7 +350,16 @@ clip_path_slack = 0.05;
 
 // Length of one printed segment (mm). Standing up, this is the print height,
 // and it is why the part is segmented rather than one 200 mm extrusion.
-clip_seg_len = 60;
+//
+// 219.82 IS THE PART, not a variant. Ziad, 2026-09-10: "do 220mm and we'll
+// print it on its edge straight up." 219.82 rather than 220.00 because it
+// lands on a layer boundary at every layer height from 0.12 to 0.30 — a
+// 220.00 object tops out at 220.02 and Orca refuses it. It is the default
+// here so that the insert and the key build at the real length with no -D
+// and no second name: there is ONE insert and ONE key.
+//
+// ⚠️ 219.82 standing up is 4.82 past the reference's 215 mm derived-safe Z.
+clip_seg_len = 219.82;
 
 // Lead-in ramp on the underside of every tab, as a RISE PER UNIT OF RUN. 1.00
 // is the 45 deg wedge this started as; higher is a gentler wedge that cams in
@@ -398,7 +407,7 @@ clip_leg_fillet = 2.50;
 // At 2.50 the two of them reached 5.00 mm into the middle of the channel right
 // at the crossbar, which is the narrowest place the key has to pass and the
 // one place it cannot be narrowed to suit — a key thin enough to clear them is
-// 1.93 mm wide and gives back 3.39 mm of the 4.05 it is there to stop.
+// 1.93 mm wide and lets a leg retract 3.39 mm, past the 2.55 it is there to stop.
 //
 // It is the cheap one to give up. Squeezing a leg inward puts the OUTBOARD
 // face in tension and this one in compression, and PETG cracks in tension, so
@@ -412,15 +421,23 @@ clip_leg_fillet_in = 0;
 // Straight-down insertion costs one millimetre of leg squeeze for every
 // millimetre of reach past a feature's tip, so this number IS the squeeze, and
 // what caps it is the two legs meeting in the middle of the channel. At the
-// 1.05 mm leg tip they touch at 4.11 with a 0.40 mm margin, and 4.00 keeps a
-// little of that back. utils/legcheck.py prices any other value; the strain at
-// 4.00 is 0.85 %, against a 1.0 % repeated-use allowance.
+// 1.05 mm leg tip they touch at 4.11. utils/legcheck.py prices any value.
+//
+// It was 4.00 while the legs were the only thing holding the part in, and it
+// left 0.40 mm of margin before the legs met. That margin was spent the first
+// time the insert was printed in PETG instead of PLA: PETG comes out fatter
+// in XY, the PLA coupon snapped in and the PETG rails would not (2026-09-12).
+// Now that the key does the holding, the tab only has to outreach the 0.89 mm
+// a leg can still retract with the key home, and 2.50 leaves 1.61 mm under
+// the fin with the key in, 3.61 mm between the leg tips on the way in, and
+// 0.53 % strain. It also makes the human push-on and pull-off easier, which
+// is the point of putting the retention in the key.
 //
 // It was briefly 3.1813, derived to make the two barbs protrude equally from
 // the leg face. That was the wrong invariant and it cost the roll most of its
 // grip: what the design has to ration is SQUEEZE, and equal protrusion spends
 // it unequally because the two features do not reach equally far inboard.
-twin_hook = 4.00;
+twin_hook = 2.50;
 
 // Engagement of the ROLL bump, per side (mm), 0 for none.
 //
@@ -449,7 +466,7 @@ twin_bump = min(trk_hook_x - twin_bump_gap, twin_hook - 0.10);
 // easiness away from anything without thumbs.
 //
 // It is also what fills the middle of the channel. Nothing attached to the
-// legs ever could — that void is the flex space, and each leg needs 4.05 mm of
+// legs ever could — that void is the flex space, and each leg needs 2.55 mm of
 // it to get in at all.
 twin_key = true;
 
@@ -467,7 +484,7 @@ key_clr = 0.20;
 //
 //     (bore - 2 x (leg face + tip thickness) - key_w) / 2  =  0.89 mm
 //
-// against the 4.00 mm it needs to clear the fin. So the barbs stay 3.11 mm
+// against the 2.50 mm it needs to clear the fin. So the barbs stay 1.61 mm
 // under their fins with the key home, and a cat is not the thing that gets it
 // out. A thinner clip_leg_root_t would shrink that 0.89 — it opens the root
 // gap and softens a spring whose retention job the key has taken over — but it
@@ -499,10 +516,23 @@ key_lift = 1.20;
 // standing up. It lies on its side instead, on the face of the stem — every
 // part of it is then a slab of the same thickness sitting on the bed, the
 // ring and the stem included, and the pull load runs in the plane of the
-// layers rather than across them. The one thing that had to give for that is
-// the flange, which cannot stick out below the face the key lies on: it is
-// now one-sided, flush with the stem toward the front and reaching past it
-// only toward the back wall. It only ever had to be wider than the window.
+// layers rather than across them.
+//
+// THE FLANGE IS GONE — key_head_ext = 0, Ziad's call, 2026-09-11. It was a
+// lip wider than the window, and it never had a job: key_z0 puts the stem on
+// the channel floor, so the floor is what stops the key going down and the
+// flange floated key_lift clear of the cap bearing nothing. Printing it lying
+// down had already forced it one-sided, flush toward the front and reaching
+// past the stem only toward the back, and a one-sided lip is a key with a
+// wrong way round.
+//
+// WITHOUT IT THE KEY IS OMNIDIRECTIONAL. Stem, head band, and ring are all
+// key_w wide and all centred on the same plane, so the key is a constant
+// slab, mirror-symmetric across its faces and along its length: either face
+// down on the bed, either way round in the window, either end leading. There
+// is nothing left to get backwards. key_head_ext is kept as a parameter and
+// now splits evenly on both sides, so a lip can come back two-sided if one
+// is ever wanted — it cannot come back one-sided.
 //
 // Bore, radial width, and thickness (mm). The bore is measured ALONG the
 // rail, across the widest part of the head: 32 there is two fingertips side
@@ -516,11 +546,27 @@ key_ring_t  = 0;            // 0 = the stem's own width, key_w
 // Round on the ring's edges (mm). Sharp edges were the other half of the
 // complaint. Must be under half of both key_ring_w and the thickness.
 key_ring_r  = 1.50;
-// How far the ring's bottom sinks into the flange (mm), so the two overlap
-// over a real area rather than meeting on a plane. Never below the flange's
-// underside: the ring hangs past the window along the rail, and anything of
-// it under the flange lands on the crossbar.
-key_ring_sink = 1.50;
+// How far the ring's bottom sinks into the head band (mm) — the stem's top
+// face, measured down to the cat's chin.
+//
+// IT IS key_ring_w, WHICH IS THE MOST IT CAN BE. The hole is the head inset
+// by key_ring_w, so the hole's lowest point sits exactly key_ring_w above the
+// chin: sink that much and the stem's top face lands tangent to the floor of
+// the finger hole, which is as far up as the stem can go without eating the
+// grip. Everything of the ring below the hole is then stem, so the two read
+// as one piece rather than a head perched on a neck.
+//
+// It does not merge the OUTLINE. The stem is key_len - 2 x key_end_clr =
+// 39.40 along the rail and the head is cat_w() = 42.00, but at the hole's
+// floor the head is only 32.32 wide — so the cheeks still step out about
+// 3.5 mm each side above the stem's top corners. Closing that gap too would
+// need the stem 10.32 mm above the chin, which is 5.32 mm into the hole.
+// Ziad's call, 2026-09-11: keep the hole.
+//
+// Never below the band's underside — the head hangs past the window along the
+// rail, and anything of it under the band lands on the crossbar. key_head_t
+// is held equal to this for exactly that reason.
+key_ring_sink = key_ring_w;
 
 // THE CAT, AS NUMBERS. Traced off the reference silhouette and normalised to
 // a head ONE UNIT WIDE, origin at the head's centre, y up. Scale by cat_w()
@@ -548,15 +594,27 @@ cat_round = 0.040;
 // Step height for the ring's rounded edge (mm), which is built as a stack
 // rather than swept — see key_ring().
 cat_step = 0.10;
-// Flange thickness (mm) and how far it reaches past the stem toward the back
-// wall (mm). The window is key_w + 2 x key_clr = 7.33; the stem is 6.93; a
-// 4.00 one-sided lip lands 3.80 on the bridge and stops 2.25 short of the
-// back wall's inner face.
-key_head_ext = 4.00;
-key_head_t = 2.19;
+// How far the head band reaches past the stem (mm), SPLIT EVENLY between the
+// two faces. 0 is the design: no lip, nothing protruding, the key symmetric
+// across its faces. Anything above 0 is a two-sided lip and costs the key its
+// flat-slab print — the window is only key_w + 2 x key_clr = 7.33 against a
+// 6.93 stem, so there is 0.20 a side before it fouls the crossbar anyway.
+key_head_ext = 0;
+// Height of the head band: the plain stub of stem between the window and the
+// ring, which is what key_ring_sink sinks the ring into (mm). Held equal to
+// the sink, so the chin lands exactly on the band's underside and no part of
+// the ring reaches down toward the crossbar. It was 2.19 when the sink was
+// 1.50, which left the head standing on a visible neck.
+key_head_t = key_ring_sink;
 // Chamfer on the key's two bottom corners (mm), so it finds the gap rather
 // than catching a leg on the way down.
 key_lead = 1.20;
+// Round on the key's two SHOULDERS (mm) — the top corners of the stem, where
+// its 39.40 mm run along the rail meets the band's top face. They are the last
+// square corners on the handle and they sit right where a hand lands. Must not
+// exceed key_head_t, or the round reaches below the band and starts narrowing
+// the stem where it passes through the window.
+key_shoulder_r = 3.00;
 
 // SEVERAL SHORT WINDOWS, NOT ONE LONG SLOT — and this is not a detail.
 //
@@ -789,9 +847,19 @@ pair_hook = twin_hook;
 
 /* [Preview] */
 
-// Length of track and fence drawn for "track" and "assembly" (mm). Short, so
-// the section stays legible in a render.
-preview_len = 60;
+// Length of track and fence drawn for the preview and check views (mm).
+//
+// IT IS THE SEGMENT LENGTH, not a short stand-in. It used to be 60, which was
+// fine while a preview only had to show a cross-section — but the key's size
+// is DERIVED from the segment length (key_len() fits key_count() windows into
+// it), so a 60 mm preview draws a 19.40 mm key that does not exist and never
+// will. keyfit and keyblock inherit this default, so a short preview was also
+// clearing and blocking a key that was not the part.
+//
+// The cost is that previews now draw the whole 219.82 mm. That is the honest
+// picture; pass -D 'preview_len=60' for a quick legible section, knowing the
+// key in it is wrong.
+preview_len = clip_seg_len;
 
 // Thickness of the mesh drawn in the slot (mm), and how far it stands above the
 // top of the rail. Representative only — the mesh floats and is not modelled
@@ -1761,9 +1829,11 @@ module key2d() {
         polygon([[cx - k + L, key_z0], [cx + k - L, key_z0],
                  [cx + k, key_z0 + L], [cx + k, hz],
                  [cx - k, hz], [cx - k, key_z0 + L]]);
-        // Flush with the stem's front face, past it only toward the back —
-        // the front face is what the key lies on to print.
-        translate([cx - k, hz]) square([key_w + key_head_ext, key_head_t]);
+        // Centred on the stem, so key_head_ext splits evenly and the key has
+        // no front and no back. At the design value of 0 this is the stem
+        // carried straight on up to the ring.
+        translate([cx - k - key_head_ext / 2, hz])
+            square([key_w + key_head_ext, key_head_t]);
     }
 }
 
@@ -1880,6 +1950,19 @@ module key_ring() {
 // key_ring_sink into the flange, from the flange's TOP face down — two
 // shapes meeting exactly on a plane are separate shells, which is how the
 // key came off the plate as two objects once already.
+// The shoulder mask, drawn in the (along the rail, up) plane: the stem's own
+// rectangle with its two TOP corners rounded, open-ended downward so it only
+// ever touches the shoulders. Hull of two circles and a bottom bar, which is
+// how cap_outline draws the same kind of shape.
+module key_shoulder_2d(len_k, ytop, ybot) {
+    r = key_shoulder_r;
+    hull() {
+        translate([r, ytop - r])          circle(r = r);
+        translate([len_k - r, ytop - r])  circle(r = r);
+        translate([0, ybot])              square([len_k, eps]);
+    }
+}
+
 module key_solid(len_k) {
     cx   = trk_clear_w / 2;
     ztop = trk_depth + clip_fence_h;
@@ -1888,8 +1971,20 @@ module key_solid(len_k) {
     // chin: drop the flange's top face by key_ring_sink, then lift by however
     // far the chin hangs below that origin.
     yc   = hz + key_head_t - key_ring_sink - cat_head_bot * cat_w();
+    assert(key_shoulder_r <= key_head_t,
+           "key_shoulder_r reaches below the head band and narrows the stem in the window");
     union() {
-        linear_extrude(height = len_k, convexity = 10) key2d();
+        // The stem, with the shoulders taken off it. The mask is applied to
+        // the stem ALONE — the ring is unioned after, so its cheeks keep
+        // their own outline.
+        intersection() {
+            linear_extrude(height = len_k, convexity = 10) key2d();
+            translate([cx, 0, 0])
+                rotate([0, -90, 0])
+                    linear_extrude(height = trk_clear_w * 2, center = true,
+                                   convexity = 4)
+                        key_shoulder_2d(len_k, hz + key_head_t, key_z0 - 1);
+        }
         translate([cx, yc, len_k / 2]) key_ring();
     }
 }
@@ -1903,11 +1998,12 @@ module key_upright(len = clip_seg_len) {
             key_solid(key_len(len) - 2 * key_end_clr);
 }
 
-// The keys on a plate: lying on the stem's front face, the ring flat on the
-// bed. Not the insert's pose any more — the ring is not a prism along the
-// rail, and stood up it would be a 42 mm arch printed on edge. Laid down,
-// nothing on the key is thicker than the stem and nothing overhangs but the
-// ring's rounded lower edge and the 1.2 mm lead chamfer. Keys go side by side
+// The keys on a plate: lying on a stem face, the ring flat on the bed. Not
+// the insert's pose any more — the ring is not a prism along the rail, and
+// stood up it would be a 42 mm arch printed on edge. Laid down, the key is a
+// slab of one thickness end to end and nothing overhangs but the ring's
+// rounded lower edge and the 1.2 mm lead chamfer. With the flange gone it no
+// longer matters which face goes down; this picks one. Keys go side by side
 // along what was the rail, ring to ring, pair_gap apart.
 module key_plate(len = clip_seg_len) {
     cx    = trk_clear_w / 2;

@@ -278,16 +278,17 @@ stl/*
 stl/*-v[0-9][0-9]*.stl
 
 # The one case the rule above cannot see: while a series is still moving,
-# stl/<name>.stl is a SYMLINK to the newest -vNN, and -vNN is ignored. The
-# re-include catches the link by name and git happily commits it, so the repo
-# ends up carrying a pointer to a file nobody else has. finalize.sh is what
-# turns a series into a real file worth committing; until it has been run,
-# list the name here.
+# stl/<name>.stl is build.sh's copy of the newest -vNN, rewritten on every
+# build. The re-include catches it by name and git happily commits it, so the
+# repo would carry a fresh binary per draft. finalize.sh is what marks a series
+# as worth committing; until it has been run, list the name here.
 stl/screen-fence-test-rail.stl
 stl/screen-fence-clip-coupon.stl
 stl/screen-fence-twin-coupon.stl
 stl/screen-fence-fit-pair.stl
-stl/screen-fence-twin-220.stl
+stl/cat-gap-wedge.stl
+stl/cat-gap-wedge-coupon.stl
+stl/zr-monogram-stamp-2026.stl
 slice/
 _incoming
 MODELS
@@ -296,3 +297,4 @@ _PLANS
 # BOSL2 is expected at lib/BOSL2 as a git submodule.
 # If you'd rather vendor it as a plain clone instead, uncomment:
 # lib/BOSL2/
+3mf/

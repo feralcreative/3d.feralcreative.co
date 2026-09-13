@@ -135,6 +135,13 @@ def main():
     ap.add_argument("--filament", required=True)
     ap.add_argument("--set", action="append", default=[], metavar="KIND:KEY=VALUE",
                     help="override a resolved value, e.g. filament:nozzle_temperature=240")
+    ap.add_argument("--bed-type", default=None, metavar="NAME",
+                    help="plate the job is sliced for, e.g. 'Textured PEI Plate'. "
+                         "Not a preset key: it picks WHICH of the preset's "
+                         "*_plate_temp values the slicer reads, and lives in "
+                         "the project rather than in any profile, so --set "
+                         "cannot reach it and it is written into the process "
+                         "settings here instead")
     ap.add_argument("--outdir", required=True)
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
@@ -162,6 +169,14 @@ def main():
         before = apply_override(resolved[kind], key, value, kind)
         applied.append((kind, key, before, resolved[kind][key]))
 
+    # curr_bed_type is a project setting, not a profile one — no preset in the
+    # bundle or the repo carries it, and the CLI has no flag for it — but the
+    # slicer does honour it when it arrives in the loaded process settings.
+    # Without it every job is sliced for the "Cool Plate", which is not what is
+    # on the machine and is recorded as such in the G-code header and the 3mf.
+    if args.bed_type:
+        resolved["process"]["curr_bed_type"] = args.bed_type
+
     os.makedirs(args.outdir, exist_ok=True)
     written = {}
     for kind, data in resolved.items():
@@ -185,6 +200,8 @@ def main():
         for kind, key, before, after in applied:
             print("  set  %s:%-32s %s -> %s" % (kind, key, before, after),
                   file=sys.stderr)
+        if args.bed_type:
+            print("  bed  %s" % args.bed_type, file=sys.stderr)
 
     print(json.dumps(written))
 

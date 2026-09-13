@@ -5,6 +5,9 @@
 // measured off that mesh — see "How it was measured" at the bottom of this
 // header.
 //
+// FITTED TO the Roku Voice Remote Pro (RC-OS1): the pocket squeeze, the
+// front scoop, and the slot are all sized against that remote.
+//
 // THE FORM. An egg-shaped slab with its narrow end cut off, and a D-section
 // tube standing on the cut end, flush with it, leaning back 15 degrees. The
 // tube is open at the top and its floor is the slab. The top 5 mm of its
@@ -38,10 +41,10 @@
 //                   placed twice: in the front elevation, and in plan on the
 //                   slab, spun 180 so it reads from behind.
 //   cut_profile     the front cutaway, drawn in elevation rather than plan —
-//                   an opening 37 wide, floor 5 down from the rim, its bottom
-//                   corners rounded 5, which is the whole depth, so the sides
-//                   are pure quarter-rounds and it reads as a scoop rather
-//                   than a slot. Where it breaks the rim the wall is rounded
+//                   an opening 37 wide, floor 7 down from the rim, its bottom
+//                   corners rounded 5, so the sides are quarter-rounds with
+//                   2 mm of straight above them and it still reads as a scoop
+//                   rather than a slot. Where it breaks the rim the wall is rounded
 //                   2 as well, which is done on the wall's elevation rather
 //                   than the cutter's — the note on the module says why.
 //                   cut_reach bounds it in plan: the pocket swept forward,
@@ -73,8 +76,9 @@
 //   squeeze that means wall 1.48 or 1.90.
 //
 //   The front cutaway. The reference has none: its front wall runs the full
-//   30 mm up to the rim. Keep it shallow. The first attempt took the top
-//   10 mm across 43 of the 47 mm width, which opened the top of the pocket
+//   30 mm up to the rim. Keep it shallow. It was 5 deep and was lowered to
+//   7 on 2026-09-12, the mark dropping 2 with it. The first attempt took the
+//   top 10 mm across 43 of the 47 mm width, which opened the top of the pocket
 //   into a U — the remote pivoted straight out of it when the stand was
 //   lifted, because the closed rim is what stops that, not friction lower
 //   down.
@@ -153,14 +157,14 @@ slot_rim       = 0.5;    // chamfer on the slot's top rim, sides and rear (mm)
 
 /* [Front cutaway] */
 cut_side       = 5.0;    // wall left standing each side of the cutaway (mm)
-cut_depth      = 5;      // how far down from the rim the cutaway reaches (mm)
+cut_depth      = 7;      // how far down from the rim the cutaway reaches (mm)
 cut_corner_r   = 5.0;    // round on the cutaway's two bottom corners (mm)
 cut_top_r      = 2.0;    // round where the cutaway breaks the rim (mm)
 
 /* [Front mark] */
 mark           = "none"; // [none, Z, R]
 mark_h         = 14.0;   // cap height of the letter in the front elevation (mm)
-mark_z         = 21.0;   // its centre above the build plate (mm)
+mark_z         = 19.0;   // its centre above the build plate (mm)
 mark_depth     = 0.70;   // deboss depth (mm)
 mark_taper     = 70;     // deg from horizontal; 90 is a prismatic cut
 mark_steps     = 5;      // bands the taper is built from
@@ -294,7 +298,8 @@ module slot_outline(grow = 0)
 // The scoop in front elevation: sides at ±cut_half, floor at cut_z, open
 // upward. Its two bottom corners are convex on the cutter, so they come out
 // as fillets in the finished wall; with cut_corner_r at the full depth the
-// sides are pure quarter-rounds and there is no straight left between them.
+// sides would be pure quarter-rounds, and at 5 of 7 a 2 mm straight is left
+// above each.
 module cut_scoop()
     offset(r = cut_corner_r) offset(delta = -cut_corner_r)
         translate([-cut_half, cut_z]) square([2 * cut_half, big]);
