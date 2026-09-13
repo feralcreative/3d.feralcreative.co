@@ -26,6 +26,7 @@ Each stage produces an artifact that proves something the previous stage could n
 4. **Slice it** — `utils/slice.sh` → `slice/<part>/`. Proves settings. Three sub-steps:
    - `ffprofile.py` walks each `inherits` chain, merges child over parent, applies `--set` overrides, and writes flat profiles with `inherits` stripped. It searches `docs/profiles/` before the app bundle, so repo presets resolve by name without being installed.
    - Flash Studio slices headless into `plate_1.gcode`, `out.gcode.3mf`, `resolved.json`, `slice.log`.
+   - The job is copied to `3mf/<part>.3mf`, the printer-bound file with the part's name on it.
    - `gcode-probe.py` reads the G-code back: layer count, max Z, commanded temperatures, real retraction distances, and per-layer extrusion cliffs.
 
 Nothing in this loop touches the printer.
