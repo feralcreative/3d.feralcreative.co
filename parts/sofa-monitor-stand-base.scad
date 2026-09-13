@@ -21,7 +21,7 @@
 // each side, every outside edge above the feet rounded 10 mm with spherical
 // corners, the two inside bends rounded 5, and the outside edge of
 // each foot rounded foot_r, corners included — a small round, since the leg
-// is only 4.44 thick and the foot has to keep a flat to stand on. The plug
+// is only 6.66 thick and the foot has to keep a flat to stand on. The plug
 // stands on
 // the deck dead centre. The legs are what stop the stand walking sideways, so
 // they are sized to the arm plus a little air, not to the arm plus room —
@@ -38,8 +38,11 @@
 // over 160 mm and a little roughness there changes nothing. flip = false
 // draws it the way up it is used, z = 0 at the foot of the legs.
 //
-// WALLS. The legs are 4.44 mm — ten loops on the 0.4 nozzle, which the
-// profile prints as two loops a side over infill. The deck is 10 mm; it is
+// WALLS. The legs are 6.66 mm — fifteen loops on the 0.4 nozzle, which the
+// profile prints as two loops a side over infill. They were 4.44 until the
+// coupon was in hand and felt like it would break off under a hard press
+// (Ziad, 2026-09-13); the cavity did not change, the outside grew. The deck
+// is 10 mm; it is
 // horizontal, so its thickness is layers, not loops, and anything on 0.2
 // is fine. It was 8 until the outside got its 10 mm round — a quarter-round
 // has to be as deep as it is wide, and one deeper than the deck would come
@@ -67,7 +70,7 @@ base_clearance = 0.5;    // air between arm and leg, per side (mm)
 
 /* [Saddle] */
 leg_drop     = 90.0;   // legs below the deck's underside (mm)
-leg_t        = 4.44;   // leg plate, ten loops on the 0.4 nozzle (mm)
+leg_t        = 6.66;   // leg plate, fifteen loops on the 0.4 nozzle; was 4.44 and Ziad thought a hard push would snap it (mm)
 deck_t       = 10.0;   // deck, underside to the face the disc sits on; not less than round_r (mm)
 base_depth   = 95.0;   // run along the arm; what the old base had (mm)
 round_r      = 10.0;   // every outside edge above the feet, corners spherical; not more than deck_t (mm)
@@ -84,7 +87,7 @@ $fn = 64;
 // ---- derived ---------------------------------------------------------------
 
 cavity_w = arm_w + 2 * base_clearance;   // 181.0
-base_w   = cavity_w + 2 * leg_t;         // 189.88
+base_w   = cavity_w + 2 * leg_t;         // 194.32
 base_h   = leg_drop + arm_crown + deck_t; // 108.0, foot of the legs to the deck face
 // The arch: a circle through the cavity's two top corners and arm_crown
 // above their chord.
@@ -109,7 +112,7 @@ module cavity_profile(h) {
 // foot_r all the way round, corners included — a hull of four spheres over
 // four posts standing on four tori. Because the plan corners are rounder
 // than the legs are thick, each leg's front and back ends thin to an edge
-// over their last 8 mm, as any plate rounded past its own thickness must;
+// over the round's 10 mm, as any plate rounded past its own thickness must;
 // the ends do no work and the edge is vertical, so it prints as a wall. The
 // cavity cut leaves the INSIDE foot edge square, so each foot keeps a flat
 // leg_t - foot_r wide to stand on.
