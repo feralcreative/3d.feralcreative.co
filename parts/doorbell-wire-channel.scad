@@ -216,8 +216,12 @@ module diagonal_wire() {
     rotate_extrude(angle = 45 + eps) translate([bend, 0]) rw_slot();
   translate([diag_x0, diag_y0, 0]) rotate([0, 0, -135]) {
     along_x(-eps, diag_len + eps) rw_slot();
+    // From hole_r before the corner point to the corner round's centre,
+    // hole_r * sqrt(2) past it — the wall's inner face is that way, at
+    // (hole_r - plug_wall) short of the centre, and a cutter stopped at
+    // plug_wall past the corner point never reached it (the first cut).
     translate([diag_len - hole_r, -slot_w / 2, -notch_d])
-      cube([hole_r + plug_wall + 2 * eps, slot_w, notch_d + slot_d]);
+      cube([hole_r * (1 + sqrt(2)) + eps, slot_w, notch_d + slot_d]);
   }
 }
 
