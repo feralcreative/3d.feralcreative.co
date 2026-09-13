@@ -1,0 +1,234 @@
+// Desk cup holder, Starbucks — the desk-cup-holder.scad collar rebored for
+// a cup that is Ø60 at its base and Ø75 at 60 mm up.
+//
+// A copy of desk-cup-holder.scad, and meant to stay one: the only thing that
+// changed is the bore, so a diff between the two files is exactly the list of
+// things the cup forced. The bore is a cone, Ø65 at the floor and Ø80 at the
+// rim — the cup's two diameters plus 5 mm of wiggle room each (Ziad,
+// 2026-09-13) — and the outside is still Ø115 at the foot and Ø105 at the
+// rim, so the wall runs from 25 thick at the bottom to 12.5 at the top. Four
+// handle slots, 25 wide, let a mug sit with its handle out in any of four
+// directions. Everything the hand or the mug meets is rounded:
+// the rim and every edge of every slot carry the same full round, so the top
+// outline reads as one continuous rolled lip that dips into each slot and
+// comes back up.
+//
+// HOW THE ROUNDING IS DONE. The body is drawn SHRUNK by lip_r on every face —
+// bore out by lip_r, outside in by lip_r, top down by lip_r, slots widened by
+// lip_r — and then grown back by lip_r. Concave corners (the floor meeting the
+// bore) come back exactly where they were; every convex edge comes back as a
+// fillet of lip_r. That growth is a minkowski with a sphere, and the first
+// draft did it literally: one minkowski() of the whole slotted ring, which
+// OpenSCAD cannot preview and has to convex-decompose, so the file took a
+// minute to open. Minkowski distributes over union, so the same result is
+// built here from pieces that are each convex and each grown analytically:
+//
+//   - the ring between slots: rotate_extrude of the 2D-offset section, which
+//     IS that piece's minkowski, with a hull of four spheres capping each
+//     radial end face;
+//   - the wall under each slot: sixteen thin wedges following the U, each the
+//     hull of eight spheres at its corners;
+//   - the floor: rotate_extrude of its own offset section.
+//
+// Same surface, zero minkowski calls, and it previews instantly. The one
+// design consequence is that the slot flanks are radial planes rather than
+// parallel ones, because a radial cut is where the ring splits cleanly. On a
+// wall this thin the difference is 1 mm of width between the bore and the
+// outside, and the slot is dimensioned at the mid-wall of the rim.
+//
+// THE UNDERSIDE. Flat, on a 4 mm floor; the adhesive goes straight on it
+// (Ziad, 2026-09-13). A pocket for a round gel pad is still available — set
+// pad_recess_h to a depth shallower than the pad and it is cut from the
+// centre of the floor.
+//
+// ORIENTATION. Printed as drawn, floor down. The outside leans inward going
+// up, so it is a 4.8° overhang everywhere and needs nothing. The slot bottoms
+// are half-rounds, 25 across, which the slicer handles as a shallow arch.
+
+/* [Envelope] */
+
+// Bore: a cone from the floor to the rim. The cup is Ø60 at its base and Ø75
+// at 60 mm up; each gets 5 mm of room. Nothing grips it, so no compensation
+// for the polygon's inscription is applied ($fn is high enough to make it
+// moot).
+bore_bot_d = 65;   // mm, at the floor
+bore_top_d = 80;   // mm, at the rim
+
+// Outside at the foot and at the rim. The wall between is a straight cone.
+outer_bot_d = 115;   // mm
+outer_top_d = 105;   // mm
+
+// Overall height, floor to top of the lip.
+total_h = 60;     // mm
+
+// Floor under the mug. The pad pocket is cut out of this.
+floor_t = 4;      // mm
+
+/* [Handle slots] */
+
+slot_count = 4;
+// Width of each slot, measured across the mid-wall at the rim. The flanks
+// are radial, so it is ~1 mm narrower at the bore and wider outside.
+slot_w = 25;      // mm
+// How far down from the rim the slot goes, to the lowest point of its round
+// bottom. Two thirds of the height leaves a full ring at the base.
+slot_depth = 40;  // mm
+// Wedges used to follow each slot's round bottom. 16 puts the chord error
+// under 0.1 mm.
+slot_segs = 16;
+
+/* [Rounding] */
+
+// Fillet on the rim and every slot edge. Half the rim's wall gives a full
+// half-round; anything larger is clamped to that.
+lip_r_req = 3.75;   // mm
+
+/* [Underside] */
+
+// Optional pocket for a round adhesive pad; 0 leaves the underside flat.
+// If used, keep the depth less than the pad's thickness so the pad stands
+// proud.
+pad_recess_d = 60;   // mm
+pad_recess_h = 0;    // mm
+
+/* [Hidden] */
+
+$fn = 120;
+sphere_fn = 32;
+eps = 0.01;
+
+bore_br   = bore_bot_d / 2;
+bore_tr   = bore_top_d / 2;
+r_bot     = outer_bot_d / 2;
+r_top     = outer_top_d / 2;
+wall_top  = r_top - bore_tr;
+// The rim can only hold a fillet of half its wall; leave a hair so the shrunk
+// wall never collapses to a zero-width sliver.
+lip_r     = min(lip_r_req, wall_top / 2 - 0.05);
+
+// The outer wall's tilt from vertical. Shifting a tilted line inward by lip_r
+// moves its x at any given z by lip_r / cos(tilt), not by lip_r.
+tilt      = atan((r_bot - r_top) / total_h);
+inset_x   = lip_r / cos(tilt);
+
+// Radius of the outer cone at a height z (unshrunk), and shrunk.
+function outer_r(z)  = r_bot + (r_top - r_bot) * z / total_h;
+function shrunk_r(z) = outer_r(z) - inset_x;
+
+// The bore cone runs from the floor to the rim, and its own tilt sets how
+// far its shrunk copy sits from it.
+btilt     = atan((bore_tr - bore_br) / (total_h - floor_t));
+inset_b   = lip_r / cos(btilt);
+function bore_r(z) = bore_br + (bore_tr - bore_br) * (z - floor_t) / (total_h - floor_t);
+function bs(z)     = bore_r(z) + inset_b;   // shrunk bore radius
+z_top = total_h - lip_r;         // shrunk rim height
+z_flr = floor_t - lip_r;         // shrunk floor top = shrunk wall bottom
+below = lip_r + 1;               // how far the shrunk floor runs under z = 0
+
+// The slot, in the shrunk space. Its flanks are radial planes at ±slot_a
+// from the slot's centreline, chosen so that after growth the opening at the
+// rim's mid-wall radius is exactly slot_w. Its round bottom is an arc of
+// radius slot_rad in arc-length at that same radius, tangent to the flanks.
+rho_mid  = (bore_tr + r_top) / 2;
+slot_a   = asin(lip_r / rho_mid) + asin(slot_w / 2 / rho_mid);   // deg
+slot_rad = rho_mid * slot_a * PI / 180;
+slot_zc  = total_h - slot_depth - lip_r + slot_rad;   // centre of the arc
+
+// Height of the shrunk wall under the slot at angle a from its centreline.
+function slot_floor(a) =
+    let (s = rho_mid * a * PI / 180)
+    slot_zc - sqrt(max(0, slot_rad * slot_rad - s * s));
+
+// 2D section of the shrunk wall, in the (r, z) plane.
+module wall_section() {
+    polygon([
+        [bs(z_flr),       z_flr],
+        [shrunk_r(z_flr), z_flr],
+        [shrunk_r(z_top), z_top],
+        [bs(z_top),       z_top],
+    ]);
+}
+
+// 2D section of the shrunk floor, run past z = 0 so the base is trimmed
+// square instead of rounded.
+module floor_section() {
+    polygon([
+        [0,                -below],
+        [shrunk_r(-below), -below],
+        [shrunk_r(z_flr),   z_flr],
+        [0,                 z_flr],
+    ]);
+}
+
+// Grow a section by lip_r and keep it on the positive side of the axis.
+module grown(section_convexity = 4) {
+    intersection() {
+        offset(r = lip_r) children();
+        square([r_bot + 2 * lip_r, total_h + 2 * lip_r]);
+    }
+}
+
+// A point of the shrunk wall section, [r, z], swung to angle a about Z.
+function swing(p, a) = [p[0] * cos(a), p[0] * sin(a), p[1]];
+
+module ball(p) { translate(p) sphere(r = lip_r, $fn = sphere_fn); }
+
+// The wall's radial end face at angle a, grown: hull of a sphere at each
+// corner. Exactly the minkowski of that face.
+module end_cap(a) {
+    hull() {
+        ball(swing([bs(z_flr),       z_flr], a));
+        ball(swing([shrunk_r(z_flr), z_flr], a));
+        ball(swing([shrunk_r(z_top), z_top], a));
+        ball(swing([bs(z_top),       z_top], a));
+    }
+}
+
+// The wall under one slot, centred on +X: thin wedges whose tops follow the
+// arc, each grown as the hull of eight spheres.
+module slot_floor_wedges() {
+    for (i = [0 : slot_segs - 1]) {
+        a0 = -slot_a + 2 * slot_a * i / slot_segs;
+        a1 = -slot_a + 2 * slot_a * (i + 1) / slot_segs;
+        z0 = slot_floor(a0);
+        z1 = slot_floor(a1);
+        hull() {
+            for (a = [a0, a1]) {
+                ball(swing([bs(z_flr),       z_flr], a));
+                ball(swing([shrunk_r(z_flr), z_flr], a));
+            }
+            ball(swing([bs(z0),        z0], a0));
+            ball(swing([shrunk_r(z0),  z0], a0));
+            ball(swing([bs(z1),        z1], a1));
+            ball(swing([shrunk_r(z1),  z1], a1));
+        }
+    }
+}
+
+module desk_cup_holder() {
+    pitch = 360 / slot_count;
+    difference() {
+        intersection() {
+            union() {
+                rotate_extrude(convexity = 4) grown() floor_section();
+                for (k = [0 : slot_count - 1]) rotate([0, 0, k * pitch]) {
+                    // Ring between this slot and the next.
+                    rotate([0, 0, slot_a])
+                        rotate_extrude(angle = pitch - 2 * slot_a, convexity = 4)
+                            grown() wall_section();
+                    end_cap(slot_a);
+                    end_cap(-slot_a);
+                    slot_floor_wedges();
+                }
+            }
+            // Trim the below-zero extension: the base stays square.
+            translate([-r_bot - 10, -r_bot - 10, 0])
+                cube([2 * r_bot + 20, 2 * r_bot + 20, total_h + 1]);
+        }
+        if (pad_recess_h > 0)
+            translate([0, 0, -eps])
+                cylinder(d = pad_recess_d, h = pad_recess_h + eps);
+    }
+}
+
+desk_cup_holder();
