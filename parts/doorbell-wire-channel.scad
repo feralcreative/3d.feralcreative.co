@@ -32,12 +32,22 @@
 // THE CAP IS AS THICK AS THE RACEWAY. The old cap was 0.8. Here the groove
 // has to cross the cap to reach the plug, and cap and raceway have to share
 // one front face if the piece is to print face down in one go — a 0.8 flange
-// under a 3.6 raceway would print in the air. So cap_t = rw_h, and the
-// groove runs across the cap's back to the plug's edge and straight into a
-// groove down the plug's side; the wire goes into the hole beside the plug.
-// The cap is also wide enough (cap_right > jog + rw_w/2) that the vertical
-// run comes down onto the cap's top edge and the jog happens inside the
-// plate, as a turn in the groove, rather than as a visible elbow beside it.
+// under a 3.6 raceway would print in the air. So cap_t = rw_h. The cap is
+// also wide enough (cap_right > jog + rw_w/2) that the vertical run comes
+// down onto the cap's top edge and the jog happens inside the plate, as a
+// turn in the groove, rather than as a visible elbow beside it.
+//
+// THE TURN IS A DIAGONAL. The groove leaves the vertical run at 45 and heads
+// straight for the plug's nearest corner — the top right — so the wire bends
+// 45 twice instead of 90 once (Ziad, 2026-09-13: the square turn was too
+// tight). It passes through a notch in the plug's wall at that corner, on
+// the same diagonal, and is inside the plug.
+//
+// THE PLUG IS A SHELL, open to the hole: plug_wall of wall around the hole's
+// section and the cap as its front, like the old one but plug_depth deep and
+// ribbed. The wire comes through the corner notch into the hollow and down
+// into the hole from there; the notch is notch_d deep so the corner keeps
+// its last few millimetres of wall at the tip.
 //
 // TWO PIECES, because 260 does not fit a 220 bed. The lower piece is the
 // cap, the jog, and lower_run of the vertical; the upper is the rest. They
@@ -104,7 +114,8 @@ plug_depth = 14.0;  // into the hole; the old one went 8 (mm)
 plug_rib   = 0.3;   // crush ribs proud of the hole's size, per side (mm)
 rib_w      = 1.2;   // (mm)
 plug_lead  = 1.0;   // chamfer on the plug's leading edge (mm)
-groove_d   = 2.0;   // the wire groove down the plug's side, deep (mm)
+plug_wall  = 1.68;  // the shell, four loops on the 0.4 nozzle (mm)
+notch_d    = 8.0;   // the wire notch through the top-right corner, from the cap's back (mm)
 
 /* [Quality] */
 $fn = 48;
@@ -120,6 +131,10 @@ cap_x     = (cap_right - cap_left) / 2;               // the cap's centre, right
 cap_t     = rw_h;
 plug_hw   = hole_w / 2;
 plug_hh   = hole_h / 2;
+// The diagonal runs at 45 from the vertical run down to the plug's top-right
+// corner, so it leaves the run this far above the hole's centre.
+diag_y    = plug_hh + (jog - plug_hw);   // 16.5
+diag_len  = (jog - plug_hw) * sqrt(2);   // run centreline to the corner
 
 assert(slot_d > wire_t && slot_w > wire_w, "the wire does not fit the groove");
 assert(lower_run + lap + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
@@ -143,19 +158,24 @@ module cap_plate() translate([cap_x, 0, 0]) hull() {
   translate([0, 0, cap_t - eps]) linear_extrude(eps) offset(delta = -rw_ch) rr(cap_w, cap_h, cap_r);
 }
 
-// The plug, hanging below z = 0: the hole's section, ribbed, with a lead-in.
+// The plug, hanging below z = 0: a shell of the hole's section, ribbed,
+// with a lead-in, hollow to the back of the cap.
 module plug() {
-  mirror([0, 0, 1]) {
-    hull() {
-      linear_extrude(plug_depth - plug_lead) rr(hole_w, hole_h, hole_r);
-      translate([0, 0, plug_depth - eps]) linear_extrude(eps) offset(delta = -plug_lead) rr(hole_w, hole_h, hole_r);
+  mirror([0, 0, 1]) difference() {
+    union() {
+      hull() {
+        linear_extrude(plug_depth - plug_lead) rr(hole_w, hole_h, hole_r);
+        translate([0, 0, plug_depth - eps]) linear_extrude(eps) offset(delta = -plug_lead) rr(hole_w, hole_h, hole_r);
+      }
+      // Ribs: two a side on the long faces, one a side on the short, each
+      // fading to nothing over its last plug_lead so the plug still starts in.
+      for (sx = [-1, 1], y = [-plug_hh * 0.6, plug_hh * 0.6])
+        rib([sx * plug_hw, y], [sx * plug_rib, 0], [0, rib_w]);
+      for (sy = [-1, 1])
+        rib([0, sy * plug_hh], [0, sy * plug_rib], [rib_w, 0]);
     }
-    // Ribs: two a side on the long faces, one a side on the short, each
-    // fading to nothing over its last plug_lead so the plug still starts in.
-    for (sx = [-1, 1], y = [-plug_hh * 0.6, plug_hh * 0.6])
-      rib([sx * plug_hw, y], [sx * plug_rib, 0], [0, rib_w]);
-    for (sy = [-1, 1])
-      rib([0, sy * plug_hh], [0, sy * plug_rib], [rib_w, 0]);
+    translate([0, 0, -eps]) linear_extrude(plug_depth + 2 * eps)
+      rr(hole_w - 2 * plug_wall, hole_h - 2 * plug_wall, max(hole_r - plug_wall, 0.5));
   }
 }
 // A rib on a face at p, standing out by v, span s along the face; z down.
@@ -166,23 +186,27 @@ module rib(p, v, s) hull() {
     cube([max(eps, s[0]), max(eps, s[1]), eps], center = true);
 }
 
-// The plug's wire groove, down its right side, open to the cap's groove.
-module plug_groove()
-  translate([plug_hw - groove_d, -slot_w / 2, -plug_depth - eps])
-    cube([groove_d + eps, slot_w, plug_depth + slot_d + 2 * eps]);
+// The wire's way from the vertical run into the plug: a groove in the cap's
+// back from the run's centreline diagonally to the plug's top-right corner,
+// then a notch through the corner's wall on the same line, notch_d deep.
+module diagonal_wire() {
+  translate([jog, diag_y, 0]) rotate([0, 0, -135]) {
+    along_x(-slot_w / 2, diag_len + eps) rw_slot();
+    translate([diag_len - hole_r, -slot_w / 2, -notch_d])
+      cube([hole_r + plug_wall + 2 * eps, slot_w, notch_d + slot_d]);
+  }
+}
 
 module lower() difference() {
   union() {
     cap_plate();
     plug();
     translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap - lap_clr) rw_outer();
-    along_x(0, jog + rw_w / 2) rw_outer();
   }
   // The right half stops at lower_run; the left carries on as the tongue.
   translate([jog, lower_run, -eps]) cube([rw_w / 2 + eps, lap + eps, rw_h + 2 * eps]);
-  translate([jog, 0, 0]) along_y(-slot_w / 2, lower_run + eps) rw_slot();
-  along_x(plug_hw - groove_d, jog + eps) rw_slot();
-  plug_groove();
+  translate([jog, 0, 0]) along_y(diag_y, lower_run + lap + eps) rw_slot();
+  diagonal_wire();
 }
 
 // From y = 0 at the joint to upper_run at the doorbell; the left half is
@@ -193,11 +217,12 @@ module upper() difference() {
   translate([-rw_w / 2 - eps, -eps, -eps]) cube([rw_w / 2 + eps, lap + eps, rw_h + 2 * eps]);
 }
 
-// The fit coupon: cap and plug, groove from the cap's right edge to the plug.
+// The fit coupon: cap and plug, with the groove in from the cap's top edge
+// the way the run would bring it.
 module cap_only() difference() {
   union() { cap_plate(); plug(); }
-  along_x(plug_hw - groove_d, cap_right + eps) rw_slot();
-  plug_groove();
+  translate([jog, 0, 0]) along_y(diag_y, cap_h / 2 + eps) rw_slot();
+  diagonal_wire();
 }
 
 module oriented() {
