@@ -22,9 +22,13 @@
 #
 # VERSIONS. Every build stamps a version into the filename —
 # stl/<name>-v01.stl, zero padded to two digits so a listing sorts in the order
-# the versions ran — and leaves stl/<name>.stl as a symlink to the newest, so
+# the versions ran — and copies the newest to stl/<name>.stl as a real file, so
 # anything pointing at the plain name (slice.sh, the docs, a slicer window you
-# left open) still finds the current mesh. The counter is per name and lives in
+# left open) finds the current mesh. It is a COPY and not a symlink, on purpose:
+# a link is a pointer to a file nobody else has, breaks the moment its target is
+# cleaned, and is not something you can hand to anyone. The plain file is always
+# the newest build; the numbered files beside it are the drafts, and they keep
+# their numbers. The counter is per name and lives in
 # docs/stl-versions.txt, which is COMMITTED on purpose: stl/ is gitignored and
 # regenerable, so a counter kept there would reset to v1 the first time the tree
 # was cleaned, and "v7" would stop meaning anything.
@@ -35,7 +39,7 @@
 #
 # FINISHED PARTS CARRY NO VERSION. All of the above is for a part that is still
 # moving. Once it stops, `utils/finalize.sh <name>` collapses the series to a
-# single stl/<name>.stl with no stamp and no symlink, so there is nothing stale
+# single stl/<name>.stl with no stamp and no drafts, so there is nothing stale
 # sitting beside the current mesh looking equally printable. Use --no-version
 # here instead when a part is known to be done before it is built.
 #
@@ -158,13 +162,13 @@ else
   VER=""
   OUT="$OUTDIR/${BASE}.stl"
 
-  # That plain name is where the latest-version symlink lives, and OpenSCAD
-  # writes THROUGH a symlink — so an unversioned build would silently overwrite
-  # the newest stamped mesh with whatever it just rendered, leaving the ledger
-  # claiming a v9 that is really this build. Drop the link first so a real file
-  # takes its place; the next versioned build replaces it again.
+  # The plain name is a real file now, but builds before 2026-09-12 left a
+  # symlink there, and OpenSCAD writes THROUGH a symlink — an unversioned build
+  # would silently overwrite the newest stamped mesh with whatever it just
+  # rendered, leaving the ledger claiming a v9 that is really this build. Drop a
+  # leftover link first so a real file takes its place.
   if [[ -L "$OUT" ]]; then
-    echo "note: replacing the latest-version symlink at $OUT with a plain file"
+    echo "note: replacing the old latest-version symlink at $OUT with a plain file"
     rm "$OUT"
   fi
 fi
@@ -176,12 +180,14 @@ echo "rendering $SCAD -> $OUT (this may take a while)"
 echo "built $OUT ($(du -h "$OUT" | cut -f1), $FORMAT)"
 
 # The counter moves only once a mesh actually exists, so a failed render does
-# not burn a number. The symlink is relative, so stl/ can be moved or the whole
-# tree copied without it dangling.
+# not burn a number. The plain name is removed before the copy rather than
+# overwritten, because it may still be a symlink from an older build and cp
+# writes through those the same way OpenSCAD does.
 if [[ "$VERSIONED" -eq 1 ]]; then
   version_record "$BASE" "$VER"
-  ln -sfn "${BASE}-${VER_TAG}.stl" "$OUTDIR/${BASE}.stl"
-  echo "stamped ${VER_TAG} (docs/stl-versions.txt); $OUTDIR/${BASE}.stl -> ${BASE}-${VER_TAG}.stl"
+  rm -f "$OUTDIR/${BASE}.stl"
+  cp "$OUT" "$OUTDIR/${BASE}.stl"
+  echo "stamped ${VER_TAG} (docs/stl-versions.txt); copied to $OUTDIR/${BASE}.stl"
 fi
 
 if [[ "$PUSH" -eq 1 ]]; then

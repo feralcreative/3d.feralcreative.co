@@ -9,7 +9,7 @@
 # current one looks exactly as legitimate.
 #
 # So a finished piece gets one file, stl/<name>.stl, with no version in the name
-# and no symlink standing in for it. That is what this does:
+# and no drafts beside it. That is what this does:
 #
 #   utils/finalize.sh slim-can-holder-3in-explicit
 #   utils/finalize.sh slim-can-holder-3in-explicit slim-can-holder-3in-censored
@@ -18,10 +18,12 @@
 # Names are OUTPUT names, the same ones build.sh --name takes and the same ones
 # docs/stl-versions.txt is keyed on — not .scad paths.
 #
-# WHICH MESH SURVIVES. Whatever stl/<name>.stl currently resolves to, not the
-# highest number. Those are usually the same and are not always: slim-can-adapter
-# carried a v02 while both the ledger and the symlink said v01 was current, and
-# taking the highest number would have promoted a mesh nothing pointed at.
+# WHICH MESH SURVIVES. stl/<name>.stl itself — build.sh keeps it as a real copy
+# of the newest build — so this only deletes the numbered drafts beside it. Not
+# the highest number: those are usually the same and are not always, and
+# slim-can-adapter once carried a v02 while both the ledger and the plain name
+# said v01 was current. Builds before 2026-09-12 left a symlink at the plain
+# name instead of a copy; one of those is still followed and promoted.
 #
 # THE LEDGER IS LEFT ALONE. docs/stl-versions.txt keeps its count for the name.
 # Finishing a part is not a promise never to touch it again, and if it is rebuilt
@@ -34,8 +36,8 @@
 # ignores every stl/<name>-vNN.stl, so this is the step that puts a finished
 # mesh under version control and takes its scratch history back out.
 #
-# Rebuilding a finalized part reintroduces a versioned file and a symlink, which
-# is correct: it has started moving again. Run this again when it stops. To skip
+# Rebuilding a finalized part puts a numbered draft back beside it, which is
+# correct: it has started moving again. Run this again when it stops. To skip
 # that round trip entirely on a part you know is done, build it with
 # `build.sh --no-version`, which writes the plain name in the first place.
 
@@ -76,9 +78,11 @@ finalize_one() {
   local plain="${OUTDIR}/${name}.stl"
   local keep=""
 
-  # The symlink is the authority on which mesh is current. Resolve one level
-  # rather than following it all the way, because that is exactly what build.sh
-  # wrote: a relative link to a sibling.
+  # A symlink here is from a build older than 2026-09-12, when the plain name
+  # was a link to the newest draft rather than a copy of it. It is still the
+  # authority on which mesh was current. Resolve one level rather than following
+  # it all the way, because that is exactly what build.sh wrote: a relative link
+  # to a sibling.
   if [[ -L "$plain" ]]; then
     local target
     target="$(readlink "$plain")"
@@ -88,7 +92,7 @@ finalize_one() {
       return 1
     fi
   elif [[ -f "$plain" ]]; then
-    keep=""     # already a real file; the versions beside it are the strays
+    keep=""     # the newest build, as build.sh copies it; the drafts are the strays
   else
     # No plain name at all. Fall back to the highest version, and say so, since
     # this is the one case where the number is doing the choosing.
