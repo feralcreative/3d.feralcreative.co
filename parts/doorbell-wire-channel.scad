@@ -21,39 +21,43 @@
 // the screw holes. hole_w and hole_h swap if not. Also assumed: 14 mm of
 // plug can go in before it hits anything; the old one went 8.
 //
-// THE RACEWAY. A rw_w x rw_h bar with a slot down its front the wire presses
-// into: slot_w wide at the bottom for the wire's 3.8, narrowed to mouth_w at
-// the lips so it stays pressed in. The back is flat, for tape. Every front
-// edge is chamfered rw_ch at 45 — a chamfer rather than a round because the
-// front face goes on the bed (below) and a round would start at 90 degrees.
+// THE RACEWAY IS A COVER. The wire runs against the wall, in a groove down
+// the BACK of a rw_w x rw_h bar; the front is a plain chamfered face. Nothing
+// holds the wire in but the wall — the bar is laid over the wire and taped
+// down by the two rails either side of the groove. (Ziad, 2026-09-13: the
+// first draft had the slot on the front, wire showing.) Every front edge is
+// chamfered rw_ch at 45 — a chamfer rather than a round because the front
+// face goes on the bed (below) and a round would start at 90 degrees.
 //
-// THE CAP IS AS THICK AS THE RACEWAY. The old cap was 0.8. Here the raceway
+// THE CAP IS AS THICK AS THE RACEWAY. The old cap was 0.8. Here the groove
 // has to cross the cap to reach the plug, and cap and raceway have to share
 // one front face if the piece is to print face down in one go — a 0.8 flange
-// under a 3.6 raceway would print in the air. So cap_t = rw_h, and the slot
-// runs across the cap to the plug's edge, then drops through the cap into a
+// under a 3.6 raceway would print in the air. So cap_t = rw_h, and the
+// groove runs across the cap's back to the plug's edge and straight into a
 // groove down the plug's side; the wire goes into the hole beside the plug.
 // The cap is also wide enough (cap_w/2 > jog + rw_w/2) that the vertical
 // run comes down onto the cap's top edge and the jog happens inside the
-// plate, as a turn in the slot, rather than as a visible elbow beside it.
+// plate, as a turn in the groove, rather than as a visible elbow beside it.
 //
 // TWO PIECES, because 260 does not fit a 220 bed. The lower piece is the
-// jog, the cap, and lower_run of the vertical; the upper is the rest. They
-// meet in a lap: the lower's back plate carries on lap mm as a tongue with
-// no walls, and the upper's walls carry on lap mm with no back plate, so the
-// upper sits over the tongue. The tape does the holding; the lap only keeps
-// them in line. Set lower_run so the lower piece — lower_run + lap + cap_h/2
-// tall — and upper_run both stay under 205.
+// cap, the jog, and lower_run of the vertical; the upper is the rest. They
+// meet in a half-lap IN PLAN: the lower's left half carries on lap mm past
+// its right half, and the upper's left half is cut back the same, so the
+// seam steps across the width. Full height everywhere, so both pieces print
+// face down with nothing in the air — a lap in the thickness would put one
+// half of the joint 0.8 mm off the bed. The tape does the holding; the lap
+// only keeps them in line. Set lower_run so the lower piece — lower_run +
+// lap + cap_h/2 tall — and upper_run both stay under 205.
 //
 // PRINTED FACE DOWN. flip = true (the default) turns each piece over so the
-// front face, chamfers and all, is on the bed and the plug stands up off the
-// back of the cap. flip = false draws it the way it goes on the wall: x to
-// the right, y up, z out of the wall, the wall at z = 0, the hole's centre
-// at the origin.
+// front face, chamfers and all, is on the bed and the groove, rails and plug
+// are on top. flip = false draws it the way it goes on the wall: x to the
+// right, y up, z out of the wall, the wall at z = 0, the hole's centre at
+// the origin.
 //
-// COUPON. show = "cap" is the cap and plug alone, with the wire slot from
-// its edge — print that first: if the plug will not go in, drop plug_rib;
-// if it does not hold, raise it or plug_depth.
+// COUPON. show = "cap" is the cap and plug alone, with the groove from its
+// edge — print that first: if the plug will not go in, drop plug_rib; if it
+// does not hold, raise it or plug_depth.
 
 /* [Output] */
 // lower — jog, cap, plug, and the lower part of the vertical run
@@ -83,13 +87,11 @@ lap       = 10.0;   // the lap joint (mm)
 lap_clr   = 0.2;    // between tongue end and the upper's back plate (mm)
 
 /* [Raceway] */
-rw_w    = 8.0;   // across (mm)
-rw_h    = 3.6;   // off the wall; also the cap's thickness (mm)
-rw_back = 1.0;   // back plate, under the wire (mm)
-slot_w  = 4.2;   // the slot, at the wire (mm)
-mouth_w = 3.4;   // the slot, between the lips (mm)
-lip_t   = 0.6;   // the lips (mm)
-rw_ch   = 0.8;   // chamfer on every front edge, 45 deg (mm)
+rw_w     = 8.0;   // across (mm)
+rw_h     = 3.6;   // off the wall; also the cap's thickness (mm)
+slot_w   = 4.2;   // the groove, for the wire's 3.8 (mm)
+slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is the skin (mm)
+rw_ch    = 0.8;   // chamfer on every front edge, 45 deg (mm)
 
 /* [Cap] */
 cap_w      = 42.0;  // across; wide enough that the run lands on the cap, not beside it (mm)
@@ -116,8 +118,7 @@ cap_t     = rw_h;
 plug_hw   = hole_w / 2;
 plug_hh   = hole_h / 2;
 
-assert(rw_back + wire_t + lip_t < rw_h, "the wire does not fit under the lips");
-assert(mouth_w < wire_w, "the mouth is wider than the wire: nothing holds it in");
+assert(slot_d > wire_t && slot_w > wire_w, "the wire does not fit the groove");
 assert(lower_run + lap + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
@@ -126,10 +127,8 @@ module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true
 module rw_outer() polygon([
   [-rw_w / 2, 0], [rw_w / 2, 0], [rw_w / 2, rw_h - rw_ch], [rw_w / 2 - rw_ch, rw_h],
   [-rw_w / 2 + rw_ch, rw_h], [-rw_w / 2, rw_h - rw_ch]]);
-module rw_slot() polygon([
-  [-slot_w / 2, rw_back], [slot_w / 2, rw_back], [slot_w / 2, rw_h - lip_t],
-  [mouth_w / 2, rw_h - lip_t], [mouth_w / 2, rw_h + eps], [-mouth_w / 2, rw_h + eps],
-  [-mouth_w / 2, rw_h - lip_t], [-slot_w / 2, rw_h - lip_t]]);
+// The groove, open to the wall.
+module rw_slot() translate([-slot_w / 2, -eps]) square([slot_w, slot_d + eps]);
 
 // A section, run from y = a to y = b, or from x = a to x = b.
 module along_y(a, b) translate([0, b, 0]) rotate([90, 0, 0]) linear_extrude(b - a) children();
@@ -164,35 +163,38 @@ module rib(p, v, s) hull() {
     cube([max(eps, s[0]), max(eps, s[1]), eps], center = true);
 }
 
+// The plug's wire groove, down its right side, open to the cap's groove.
+module plug_groove()
+  translate([plug_hw - groove_d, -slot_w / 2, -plug_depth - eps])
+    cube([groove_d + eps, slot_w, plug_depth + slot_d + 2 * eps]);
+
 module lower() difference() {
   union() {
     cap_plate();
     plug();
-    translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run) rw_outer();
+    translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap - lap_clr) rw_outer();
     along_x(0, jog + rw_w / 2) rw_outer();
-    // The tongue: back plate only.
-    translate([jog - rw_w / 2, lower_run - eps, 0]) cube([rw_w, lap - lap_clr + eps, rw_back]);
   }
+  // The right half stops at lower_run; the left carries on as the tongue.
+  translate([jog, lower_run, -eps]) cube([rw_w / 2 + eps, lap + eps, rw_h + 2 * eps]);
   translate([jog, 0, 0]) along_y(-slot_w / 2, lower_run + eps) rw_slot();
   along_x(plug_hw - groove_d, jog + eps) rw_slot();
-  translate([plug_hw - groove_d, -slot_w / 2, -plug_depth - eps])
-    cube([groove_d + eps, slot_w, plug_depth + rw_back + 2 * eps]);
+  plug_groove();
 }
 
-// From y = 0 at the joint to upper_run at the doorbell; no back plate over
-// the first lap mm, where it sits on the lower's tongue.
+// From y = 0 at the joint to upper_run at the doorbell; the left half is
+// cut back lap mm to take the lower's tongue.
 module upper() difference() {
   along_y(0, upper_run) rw_outer();
   along_y(-eps, upper_run + eps) rw_slot();
-  translate([-rw_w / 2 - eps, -eps, -eps]) cube([rw_w + 2 * eps, lap + eps, rw_back + eps]);
+  translate([-rw_w / 2 - eps, -eps, -eps]) cube([rw_w / 2 + eps, lap + eps, rw_h + 2 * eps]);
 }
 
-// The fit coupon: cap and plug, slot from the cap's right edge to the plug.
+// The fit coupon: cap and plug, groove from the cap's right edge to the plug.
 module cap_only() difference() {
   union() { cap_plate(); plug(); }
   along_x(plug_hw - groove_d, cap_w / 2 + eps) rw_slot();
-  translate([plug_hw - groove_d, -slot_w / 2, -plug_depth - eps])
-    cube([groove_d + eps, slot_w, plug_depth + rw_back + 2 * eps]);
+  plug_groove();
 }
 
 module oriented() {
