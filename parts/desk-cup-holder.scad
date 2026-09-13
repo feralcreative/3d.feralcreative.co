@@ -32,10 +32,10 @@
 // wall this thin the difference is 1 mm of width between the bore and the
 // outside, and the slot is dimensioned at the mid-wall of the rim.
 //
-// THE UNDERSIDE. A 4 mm floor with a Ø60 × 1 pocket in it for a round
-// double-sided gel pad: the pocket locates the pad and stops it creeping, and
-// is shallower than any pad so the pad, not the floor, is what touches the
-// desk. Set pad_recess_h = 0 for a plain flat underside.
+// THE UNDERSIDE. Flat, on a 4 mm floor; the adhesive goes straight on it
+// (Ziad, 2026-09-13). A pocket for a round gel pad is still available — set
+// pad_recess_h to a depth shallower than the pad and it is cut from the
+// centre of the floor.
 //
 // ORIENTATION. Printed as drawn, floor down. The outside leans inward going
 // up, so it is a 4.8° overhang everywhere and needs nothing. The slot bottoms
@@ -78,10 +78,11 @@ lip_r_req = 3.75;   // mm
 
 /* [Underside] */
 
-// Pocket for a round adhesive pad. Depth is deliberately less than a pad's
-// thickness so the pad stands proud.
+// Optional pocket for a round adhesive pad; 0 leaves the underside flat.
+// If used, keep the depth less than the pad's thickness so the pad stands
+// proud.
 pad_recess_d = 60;   // mm
-pad_recess_h = 1.0;  // mm
+pad_recess_h = 0;    // mm
 
 /* [Hidden] */
 
