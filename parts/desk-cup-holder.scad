@@ -5,9 +5,9 @@
 // outside at the rim, so the wall runs from 12.5 thick at the bottom to 7.5 at
 // the top. Four handle slots, 25 wide, let a mug sit with its handle out in
 // any of four directions. Everything the hand or the mug meets is rounded:
-// the rim and every edge of every slot carry the same full round, so the top
-// outline reads as one continuous rolled lip that dips into each slot and
-// comes back up.
+// the rim and every edge of every slot carry the same 1.9 round, so the top
+// outline reads as one continuous lip that dips into each slot and comes
+// back up.
 //
 // HOW THE ROUNDING IS DONE. The body is drawn SHRUNK by lip_r on every face —
 // bore out by lip_r, outside in by lip_r, top down by lip_r, slots widened by
@@ -72,9 +72,11 @@ slot_segs = 16;
 
 /* [Rounding] */
 
-// Fillet on the rim and every slot edge. Half the rim's wall gives a full
-// half-round; anything larger is clamped to that.
-lip_r_req = 3.75;   // mm
+// Fillet on the rim and every slot edge. Half the rim's wall (3.75) gives a
+// full half-round; Ziad wanted it about half as round as that (2026-09-13),
+// so the rim is a 3.7 flat between two 1.9 rounds. Anything larger than half
+// the wall is clamped to that.
+lip_r_req = 1.9;    // mm
 
 /* [Underside] */
 
