@@ -27,24 +27,29 @@
 // and taped down by the two rails either side of the groove. (Ziad,
 // 2026-09-13: the first draft had the slot on the front, wire showing.)
 //
-// THE FRONT IS A LONG ROUND, to blend into the wall: a plateau just wider
-// than the groove, then an S-curve — a half cosine, level at the plateau
-// and level again at the wall — falling over bevel_w to an edge edge_t
-// thick, two layers, at the sides. No crease anywhere: a straight bevel had
-// two lines, where it left the plateau and where it met the wall, and Ziad
-// could see both (2026-09-13: "I'm trying to avoid seeing edges"). The width
-// is what makes it gradual; at 18 wide the steepest part is about 34
-// degrees. The cap wears the same bevel_w band all round, built as a loft
-// of bevel_steps slices of the same curve, and its right edge is the
-// raceway's right edge, so the run flows onto the cap without a step.
+// THE RACEWAY'S EDGES ARE A MILD ROUND, rw_r. It was briefly 18 wide with
+// the cap's long blend on each side, and that made it MORE conspicuous, not
+// less (Ziad, 2026-09-13); a narrow ridge with softened corners is the
+// quieter thing on a wall.
+//
+// THE CAP'S FRONT IS A LONG ROUND, to blend into the wall: a plateau over
+// the plug and the groove, then an S-curve — a half cosine, level at the
+// plateau and level again at the wall — falling over cap_bevel to an edge
+// cap_edge thick, two layers, all the way round. No crease anywhere: a
+// straight bevel had two lines, where it left the plateau and where it met
+// the wall, and Ziad could see both ("I'm trying to avoid seeing edges").
+// It is a loft of bevel_steps slices of that curve. The raceway lands on
+// the plateau, not the band: cap_right is derived so the run's right edge
+// clears the band, and the only place the ridge crosses the blend is where
+// it comes in over the cap's top edge.
 //
 // THE CAP IS AS THICK AS THE RACEWAY. The old cap was 0.8. Here the groove
 // has to cross the cap to reach the plug, and cap and raceway have to share
 // one front plateau if the piece is to print face down in one go — a 0.8
 // flange under a 3.2 raceway would print in the air. So cap_t = rw_h, and
-// cap_right is derived from the raceway so the run comes down onto the
-// cap's top edge flush with its right edge, and the jog happens inside the
-// plate, as a turn in the groove, rather than as a visible elbow beside it.
+// the run comes down onto the cap's top edge and the jog happens inside
+// the plate, as a turn in the groove, rather than as a visible elbow
+// beside it.
 //
 // THE TURN IS ONE LONG ARC. The groove leaves the vertical run on an arc
 // through 45 that arrives at the plug's nearest corner — the top right —
@@ -75,10 +80,10 @@
 // PRINTED FACE DOWN, WITH SUPPORT. flip = true (the default) turns each
 // piece over so the front plateau is on the bed and the groove, rails and
 // plug are on top. The plug is why: it has to stand up off the cap's back.
-// That puts the bevel underneath as a 23-degree overhang with its thin edge
-// 2.8 mm off the bed, which does not print in the air — THE SLICER MUST
-// GENERATE SUPPORT under the bevel band, and the front carries the support
-// scar. Ziad's call, 2026-09-13, over a separate glued plug sleeve or a
+// That puts the cap's blend underneath as a shallow overhang with its thin
+// edge 2.8 mm off the bed, which does not print in the air — THE SLICER
+// MUST GENERATE SUPPORT under the band, and the front carries the support
+// scar. The raceway's small round prints face down without help. Ziad's call, 2026-09-13, over a separate glued plug sleeve or a
 // steeper bevel. flip = false draws it the way it goes on the wall: x to
 // the right, y up, z out of the wall, the wall at z = 0, the hole's centre
 // at the origin.
@@ -116,18 +121,19 @@ lap_clr   = 0.2;    // between tongue end and the upper's back plate (mm)
 bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as large as will reach the corner (mm)
 
 /* [Raceway] */
-rw_w     = 18.0;  // across, edge to edge; the width is the bevel (mm)
-rw_h     = 3.2;   // off the wall, at the plateau; also the cap's thickness (mm)
+rw_w     = 8.0;   // across (mm)
+rw_h     = 3.2;   // off the wall; also the cap's thickness at its plateau (mm)
+rw_r     = 0.8;   // round on the two front edges (mm)
 slot_w   = 4.2;   // the groove, for the wire's 3.8 (mm)
 slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is the skin (mm)
-shoulder = 0.4;   // plateau past the groove, each side, before the round starts (mm)
-edge_t   = 0.4;   // the round's outer edge; two layers (mm)
-bevel_steps = 16; // slices the round is lofted from
 
 /* [Cap] */
 cap_left   = 18.5;  // hole centre to the left edge; was 21, Ziad took 2.5 off looking at the front view (mm)
 cap_margin = 6.5;   // past the far edge of a screw hole, above and below (mm)
 cap_r      = 8.0;   // corner radius (mm)
+cap_bevel  = 6.5;   // the blend, plateau to edge, all round (mm)
+cap_edge   = 0.4;   // the blend's outer edge; two layers (mm)
+bevel_steps = 16;   // slices the blend is lofted from
 
 /* [Plug] */
 plug_depth = 14.0;  // into the hole; the old one went 8 (mm)
@@ -146,9 +152,8 @@ eps = 0.01;
 
 upper_run = run_len - lower_run;
 cap_h     = hole_h + 2 * (screw_off + cap_margin);   // 52.0
-bevel_w   = (rw_w - slot_w) / 2 - shoulder;           // 6.5, the raceway's slope and the cap's band
-cap_right = jog + rw_w / 2;                           // 24.0, the raceway's own right edge
-cap_w     = cap_left + cap_right;                     // 42.5
+cap_right = jog + rw_w / 2 + cap_bevel;               // 25.5: the run lands on the plateau, clear of the blend
+cap_w     = cap_left + cap_right;                     // 44.0
 cap_x     = (cap_right - cap_left) / 2;               // the cap's centre, right of the hole
 cap_t     = rw_h;
 plug_hw   = hole_w / 2;
@@ -175,22 +180,22 @@ stray     = bend_y > cap_h / 2 ? bend - sqrt(bend * bend - pow(bend_y - cap_h / 
 assert(stray < (rw_w - slot_w) / 2 - 0.8, "the bend leaves the raceway before it reaches the cap");
 
 assert(slot_d > wire_t && slot_w > wire_w, "the wire does not fit the groove");
-assert(bevel_w > 0 && edge_t < rw_h, "no room for a bevel: widen rw_w");
-assert(cap_left > plug_hw + bevel_w && cap_h / 2 > plug_hh + bevel_w, "the cap's plateau does not clear the plug");
+assert(2 * rw_r <= rw_w - slot_w && rw_r < rw_h, "rw_r is bigger than the rails");
+assert(cap_left > plug_hw + cap_bevel && cap_h / 2 > plug_hh + cap_bevel, "the cap's plateau does not clear the plug");
 assert(lower_run + lap + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
 
-// Height of the front at t of the way from the plateau (0) to the edge (1).
-function bz(t) = edge_t + (rw_h - edge_t) * (1 + cos(180 * t)) / 2;
-plateau_hw = rw_w / 2 - bevel_w;
+// Height of the cap's front at t of the way from the plateau (0) to the
+// edge (1).
+function bz(t) = cap_edge + (cap_t - cap_edge) * (1 + cos(180 * t)) / 2;
 
-// The raceway in section, x across and y out from the wall: a plateau over
-// the groove, the S-curve each side down to an edge_t edge.
+// The raceway in section, x across and y out from the wall: a bar with its
+// two front corners rounded rw_r.
 module rw_outer() polygon(concat(
   [[-rw_w / 2, 0], [rw_w / 2, 0]],
-  [for (i = [0 : bevel_steps]) let(t = 1 - i / bevel_steps) [plateau_hw + t * bevel_w, bz(t)]],
-  [for (i = [0 : bevel_steps]) let(t = i / bevel_steps) [-(plateau_hw + t * bevel_w), bz(t)]]));
+  [for (a = [0 : 10 : 90]) [rw_w / 2 - rw_r + rw_r * cos(a), rw_h - rw_r + rw_r * sin(a)]],
+  [for (a = [90 : 10 : 180]) [-rw_w / 2 + rw_r + rw_r * cos(a), rw_h - rw_r + rw_r * sin(a)]]));
 // The groove, open to the wall.
 module rw_slot() translate([-slot_w / 2, -eps]) square([slot_w, slot_d + eps]);
 
@@ -198,13 +203,12 @@ module rw_slot() translate([-slot_w / 2, -eps]) square([slot_w, slot_d + eps]);
 module along_y(a, b) translate([0, b, 0]) rotate([90, 0, 0]) linear_extrude(b - a) children();
 module along_x(a, b) rotate([0, 0, -90]) along_y(a, b) children();
 
-// The cap plate, centred cap_x right of the hole: an edge_t edge all round,
-// rounding up over bevel_w to the plateau on the same curve as the raceway.
-// A loft: each slice is the plate inset and raised per bz, and consecutive
-// slices are hulled, so the surface between them is the same straight
-// segment the raceway's polygon has between the same two points.
+// The cap plate, centred cap_x right of the hole: a cap_edge edge all
+// round, rounding up over cap_bevel to the plateau on bz. A loft: each
+// slice is the plate inset and raised per bz, and consecutive slices are
+// hulled, so the surface between them is a straight segment.
 module cap_slice(i) let(t = 1 - i / bevel_steps)
-  linear_extrude(bz(t)) offset(delta = -(1 - t) * bevel_w) rr(cap_w, cap_h, cap_r);
+  linear_extrude(bz(t)) offset(delta = -(1 - t) * cap_bevel) rr(cap_w, cap_h, cap_r);
 module cap_plate() translate([cap_x, 0, 0])
   for (i = [0 : bevel_steps - 1]) hull() { cap_slice(i); cap_slice(i + 1); }
 
