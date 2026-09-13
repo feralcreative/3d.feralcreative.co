@@ -9,19 +9,28 @@
 // outline reads as one continuous rolled lip that dips into each slot and
 // comes back up.
 //
-// HOW THE ROUNDING IS DONE. Not a hand-drawn fillet per edge. The body is
-// drawn SHRUNK by lip_r on every face — bore out by lip_r, outside in by
-// lip_r, top down by lip_r, slots widened by lip_r — and then grown back with
-// minkowski() against a sphere of lip_r. Concave corners (the floor meeting the
+// HOW THE ROUNDING IS DONE. The body is drawn SHRUNK by lip_r on every face —
+// bore out by lip_r, outside in by lip_r, top down by lip_r, slots widened by
+// lip_r — and then grown back by lip_r. Concave corners (the floor meeting the
 // bore) come back exactly where they were; every convex edge comes back as a
-// fillet of lip_r. The base is kept square by drawing the shrunk body past
-// z = 0 and trimming after the growth. With lip_r at half the rim's wall the
-// rim is a full half-round and the slot flanks are too; lower down, where the
-// wall is thicker, the slots have a flat between two 3.5 rounds.
+// fillet of lip_r. That growth is a minkowski with a sphere, and the first
+// draft did it literally: one minkowski() of the whole slotted ring, which
+// OpenSCAD cannot preview and has to convex-decompose, so the file took a
+// minute to open. Minkowski distributes over union, so the same result is
+// built here from pieces that are each convex and each grown analytically:
 //
-// The shape is non-convex (four slots), so the minkowski is not free. It is
-// the price of a lip that is genuinely one surface, and it is paid once per
-// build, not per print.
+//   - the ring between slots: rotate_extrude of the 2D-offset section, which
+//     IS that piece's minkowski, with a hull of four spheres capping each
+//     radial end face;
+//   - the wall under each slot: sixteen thin wedges following the U, each the
+//     hull of eight spheres at its corners;
+//   - the floor: rotate_extrude of its own offset section.
+//
+// Same surface, zero minkowski calls, and it previews instantly. The one
+// design consequence is that the slot flanks are radial planes rather than
+// parallel ones, because a radial cut is where the ring splits cleanly. On a
+// wall this thin the difference is 1 mm of width between the bore and the
+// outside, and the slot is dimensioned at the mid-wall of the rim.
 //
 // THE UNDERSIDE. A 4 mm floor with a Ø60 × 1 pocket in it for a round
 // double-sided gel pad: the pocket locates the pad and stops it creeping, and
@@ -51,12 +60,15 @@ floor_t = 4;      // mm
 /* [Handle slots] */
 
 slot_count = 4;
-// Width of each slot at the mid-wall; the flanks flare out by the fillet on
-// both faces.
+// Width of each slot, measured across the mid-wall at the rim. The flanks
+// are radial, so it is ~1 mm narrower at the bore and wider outside.
 slot_w = 25;      // mm
 // How far down from the rim the slot goes, to the lowest point of its round
 // bottom. Two thirds of the height leaves a full ring at the base.
 slot_depth = 40;  // mm
+// Wedges used to follow each slot's round bottom. 16 puts the chord error
+// under 0.1 mm.
+slot_segs = 16;
 
 /* [Rounding] */
 
@@ -74,6 +86,7 @@ pad_recess_h = 1.0;  // mm
 /* [Hidden] */
 
 $fn = 120;
+sphere_fn = 32;
 eps = 0.01;
 
 bore_r    = bore_d / 2;
@@ -81,7 +94,7 @@ r_bot     = outer_bot_d / 2;
 r_top     = outer_top_d / 2;
 wall_top  = r_top - bore_r;
 // The rim can only hold a fillet of half its wall; leave a hair so the shrunk
-// wall never collapses to a zero-width sliver the minkowski would drop.
+// wall never collapses to a zero-width sliver.
 lip_r     = min(lip_r_req, wall_top / 2 - 0.05);
 
 // The outer wall's tilt from vertical. Shifting a tilted line inward by lip_r
@@ -89,56 +102,114 @@ lip_r     = min(lip_r_req, wall_top / 2 - 0.05);
 tilt      = atan((r_bot - r_top) / total_h);
 inset_x   = lip_r / cos(tilt);
 
-// Radius of the outer cone at a height z (unshrunk).
-function outer_r(z) = r_bot + (r_top - r_bot) * z / total_h;
+// Radius of the outer cone at a height z (unshrunk), and shrunk.
+function outer_r(z)  = r_bot + (r_top - r_bot) * z / total_h;
+function shrunk_r(z) = outer_r(z) - inset_x;
 
-// Section of the body with every face pulled in by lip_r. Extends below z = 0
-// by more than lip_r so the base edge is trimmed square rather than rounded.
-module shrunk_section() {
-    below = lip_r + 1;
+bs    = bore_r + lip_r;          // shrunk bore radius
+z_top = total_h - lip_r;         // shrunk rim height
+z_flr = floor_t - lip_r;         // shrunk floor top = shrunk wall bottom
+below = lip_r + 1;               // how far the shrunk floor runs under z = 0
+
+// The slot, in the shrunk space. Its flanks are radial planes at ±slot_a
+// from the slot's centreline, chosen so that after growth the opening at the
+// rim's mid-wall radius is exactly slot_w. Its round bottom is an arc of
+// radius slot_rad in arc-length at that same radius, tangent to the flanks.
+rho_mid  = (bore_r + r_top) / 2;
+slot_a   = asin(lip_r / rho_mid) + asin(slot_w / 2 / rho_mid);   // deg
+slot_rad = rho_mid * slot_a * PI / 180;
+slot_zc  = total_h - slot_depth - lip_r + slot_rad;   // centre of the arc
+
+// Height of the shrunk wall under the slot at angle a from its centreline.
+function slot_floor(a) =
+    let (s = rho_mid * a * PI / 180)
+    slot_zc - sqrt(max(0, slot_rad * slot_rad - s * s));
+
+// 2D section of the shrunk wall, in the (r, z) plane.
+module wall_section() {
     polygon([
-        [0,                              -below],
-        [outer_r(-below) - inset_x,      -below],
-        [outer_r(total_h - lip_r) - inset_x, total_h - lip_r],
-        [bore_r + lip_r,                 total_h - lip_r],
-        [bore_r + lip_r,                 floor_t - lip_r],
-        [0,                              floor_t - lip_r],
+        [bs,              z_flr],
+        [shrunk_r(z_flr), z_flr],
+        [shrunk_r(z_top), z_top],
+        [bs,              z_top],
     ]);
 }
 
-// One slot cutter, widened by lip_r all round, running radially along +X
-// through both faces. Hull of a round bottom and a box out the top.
-module slot_cutter() {
-    rad   = slot_w / 2 + lip_r;
-    zc    = total_h - slot_depth + slot_w / 2;   // centre of the round bottom
-    reach = r_bot + 5;
-    hull() {
-        translate([0, 0, zc]) rotate([0, 90, 0])
-            cylinder(r = rad, h = reach, $fn = 64);
-        translate([0, -rad, zc]) cube([reach, 2 * rad, total_h]);
+// 2D section of the shrunk floor, run past z = 0 so the base is trimmed
+// square instead of rounded.
+module floor_section() {
+    polygon([
+        [0,                -below],
+        [shrunk_r(-below), -below],
+        [shrunk_r(z_flr),   z_flr],
+        [0,                 z_flr],
+    ]);
+}
+
+// Grow a section by lip_r and keep it on the positive side of the axis.
+module grown(section_convexity = 4) {
+    intersection() {
+        offset(r = lip_r) children();
+        square([r_bot + 2 * lip_r, total_h + 2 * lip_r]);
     }
 }
 
-module shrunk_body() {
-    difference() {
-        rotate_extrude() shrunk_section();
-        for (i = [0 : slot_count - 1])
-            rotate([0, 0, i * 360 / slot_count]) slot_cutter();
+// A point of the shrunk wall section, [r, z], swung to angle a about Z.
+function swing(p, a) = [p[0] * cos(a), p[0] * sin(a), p[1]];
+
+module ball(p) { translate(p) sphere(r = lip_r, $fn = sphere_fn); }
+
+// The wall's radial end face at angle a, grown: hull of a sphere at each
+// corner. Exactly the minkowski of that face.
+module end_cap(a) {
+    hull() {
+        ball(swing([bs,              z_flr], a));
+        ball(swing([shrunk_r(z_flr), z_flr], a));
+        ball(swing([shrunk_r(z_top), z_top], a));
+        ball(swing([bs,              z_top], a));
+    }
+}
+
+// The wall under one slot, centred on +X: thin wedges whose tops follow the
+// arc, each grown as the hull of eight spheres.
+module slot_floor_wedges() {
+    for (i = [0 : slot_segs - 1]) {
+        a0 = -slot_a + 2 * slot_a * i / slot_segs;
+        a1 = -slot_a + 2 * slot_a * (i + 1) / slot_segs;
+        z0 = slot_floor(a0);
+        z1 = slot_floor(a1);
+        hull() {
+            for (a = [a0, a1]) {
+                ball(swing([bs,              z_flr], a));
+                ball(swing([shrunk_r(z_flr), z_flr], a));
+            }
+            ball(swing([bs,            z0], a0));
+            ball(swing([shrunk_r(z0),  z0], a0));
+            ball(swing([bs,            z1], a1));
+            ball(swing([shrunk_r(z1),  z1], a1));
+        }
     }
 }
 
 module desk_cup_holder() {
+    pitch = 360 / slot_count;
     difference() {
-        // render() so the preview draws the evaluated mesh with enough
-        // convexity for the bore; without it OpenCSG loses the far wall.
-        render(convexity = 10) intersection() {
-            minkowski() {
-                shrunk_body();
-                sphere(r = lip_r, $fn = 32);
+        intersection() {
+            union() {
+                rotate_extrude(convexity = 4) grown() floor_section();
+                for (k = [0 : slot_count - 1]) rotate([0, 0, k * pitch]) {
+                    // Ring between this slot and the next.
+                    rotate([0, 0, slot_a])
+                        rotate_extrude(angle = pitch - 2 * slot_a, convexity = 4)
+                            grown() wall_section();
+                    end_cap(slot_a);
+                    end_cap(-slot_a);
+                    slot_floor_wedges();
+                }
             }
             // Trim the below-zero extension: the base stays square.
-            translate([0, 0, total_h / 2 + eps])
-                cube([outer_bot_d + 20, outer_bot_d + 20, total_h + 2 * eps], center = true);
+            translate([-r_bot - 10, -r_bot - 10, 0])
+                cube([2 * r_bot + 20, 2 * r_bot + 20, total_h + 1]);
         }
         if (pad_recess_h > 0)
             translate([0, 0, -eps])
