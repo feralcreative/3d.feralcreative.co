@@ -43,9 +43,9 @@
 // Set flute_count or flute_depth to 0 for a plain barrel.
 //
 // THE SIGNS. Two of them, 180 degrees apart: a bounded flat plaque milled into
-// the barrel, not a flat side. Each is exactly the three-line block plus 3 mm
-// of padding all round — 40.00 wide by about 31.4 tall — and nothing more, so
-// the barrel above and below it is still round and still fluted.
+// the barrel, not a flat side. Each is exactly the artwork plus 3 mm of padding
+// all round — 40.00 wide by about 53.8 tall — and nothing more, so the barrel
+// above and below it is still round and still fluted.
 //
 // WHY THE PLAQUE IS 5.67 DEEP, AND WHY IT HAS A BEVEL. Those two numbers are
 // not choices, they are the barrel's radius. A 40.00 mm chord on a Ø76.20
@@ -56,36 +56,31 @@
 // would droop. Relieving it at 45 degrees fixes that, and a 45-degree relief
 // across 5.67 mm of depth costs exactly 5.67 mm of height. So the plaque reads
 // as a flat panel with a bevelled frame above and below, and the frame is that
-// tall because the printer says so. Widen the type and all three numbers grow
-// together; text_w is the one knob.
+// tall because the printer says so. Widen the artwork and all three numbers
+// grow together; art_w is the one knob.
 //
 // The left and right edges need no such treatment: the flat simply runs out
 // where its plane meets the barrel, which is why the plaque has straight sides
 // and gabled ends rather than four square corners.
 //
-// THE WORDING. Three lines, debossed 0.70 deep, justified flush left AND flush
-// right — and justified by SIZE, not by tracking, so every line is the same
-// typeface at its own scale rather than the same scale spaced out. The widest
-// line sets the smallest type: RED BULL is 23% wider than ZAMIL’S at a common
-// size, so it lands at 81% of its size. `wording` switches the second line
-// between the explicit and the censored build.
+// WHAT IS ON THE PLAQUES. The middle finger, standing out of the flat, on both
+// of them (Ziad, 2026-09-14: take the words off and put the finger on instead).
+// It was three lines of debossed type until then — ZAMIL'S / FUCKING / RED BULL,
+// justified by size off a table of measured ink boxes. All of that is gone: the
+// justification machinery, the ink table, the censored variant and the
+// textmetrics note with it. git log has them if they are ever wanted back.
 //
-// ⚠️ The two builds are NOT dimensionally identical. F@#KING is wider than
-// FUCKING, so it justifies to a smaller size and a shorter line, and since the
-// plaque is the block plus a fixed 3 mm the censored plaque comes out 0.45 mm
-// shorter. The padding is what is held constant, not the plaque.
+// The artwork comes from middle-finger-emboss.scad, which is where the mesh,
+// the angles it is stood at and the 20 mm it is sliced to are all decided. This
+// file gives it a width and a relief depth and nothing else.
 //
-// HOW THE JUSTIFICATION IS DONE. OpenSCAD cannot measure a string at render
-// time unless it is run with --enable=textmetrics, an experimental flag that
-// utils/render.sh and utils/build.sh do not pass and should not have to. So the
-// ink boxes are MEASURED ONCE and recorded in ink() below, exactly the way the
-// stubby records its section fits. Re-measure with:
-//
-//     openscad --enable=textmetrics -o /dev/null --export-format asciistl f.scad
-//
-// where f.scad echoes textmetrics(s, size = 100, font = text_font) for each
-// string. Any string not in the table fails an assert rather than going quietly
-// unjustified.
+// ⚠️ THE RELIEF IS SQUASHED, and it has to be. At 34 mm wide a true-scale
+// relief would stand 7.46 mm off the plaque floor, and the floor is only 5.67
+// below the barrel — so at full scale the fist would break the 3 inch envelope
+// this whole part exists to hold. art_relief is 4.00, which is 54% of scale
+// depth and leaves 1.67 mm between the knuckles and the barrel's own surface.
+// It is still a relief; reliefs are squashed. Raising art_w makes the plaque
+// deeper and buys headroom if a taller one is wanted.
 //
 // THE FIT — INHERITED, NOT CONFIRMED. The bore is drawn generous and six
 // rounded ribs take the slack back up. bore_comp and rib_h are carried over
@@ -121,6 +116,13 @@
 //
 // COUPON-COMPONENTS: fit=coupon
 // COUPON-PLATE: coupon
+
+// The artwork. middle-finger-emboss.scad owns the mesh, the angles it is stood
+// at and the depth it is sliced to; this file only asks for it at a width and
+// a relief depth. standalone = false is what stops its own hand appearing at
+// this part's origin — see the note on it over there.
+include <middle-finger-emboss.scad>
+standalone = false;
 
 /* [Output] */
 
@@ -252,69 +254,42 @@ flute_clear = 0.50;
 // Cut in, never stood off, so the 3 inch maximum is untouched.
 sign_count = 2;
 // Clear space around the type, on all four sides (mm). This IS the plaque —
-// its width is text_w + 2 x this, its height is the block + 2 x this, and it
+// its width is art_w + 2 x this, its height is the artwork + 2 x this, and it
 // is no bigger than that in either direction.
 sign_pad = 3.00;
 
-/* [Panel text] */
+/* [Panel art] */
 
-// Width of the type, and with it the whole plaque (mm). Everything downstream
-// is a consequence: the plaque is 6.00 wider, the flat is that much below the
-// barrel surface (5.67 at 34.00), and the bevel that makes the flat printable
-// is exactly as tall as the flat is deep. Raise it for bigger lettering and a
-// deeper, more heavily framed plaque; drop it for the reverse.
-text_w = 34.00;
+// Width of the artwork, and with it the whole plaque (mm). Everything
+// downstream is a consequence: the plaque is 6.00 wider, the flat is that much
+// below the barrel surface (5.67 at 34.00), and the bevel that makes the flat
+// printable is exactly as tall as the flat is deep. The height follows too —
+// the artwork has a fixed aspect and the plaque is sized to it.
+art_w = 34.00;
 
-// Which build. The two are identical but for the second line.
-wording = "explicit";   // [explicit, censored]
-
-// Heavy and condensed on purpose. Condensed buys type size — justification
-// pins the width, so a narrower face is a taller line — and Black gives a
-// 1.9 mm stem at these sizes, which is four passes of a 0.4 nozzle.
-// Alternatives measured on this machine: "Impact", "Arial Black",
-// "Futura:style=Condensed ExtraBold", "DIN Condensed:style=Bold".
-// ⚠️ Changing this invalidates every number in ink(). Re-measure.
-text_font = "Helvetica Neue:style=Condensed Black";
-// Gap between lines (mm). The only free vertical dimension — the line heights
-// themselves are consequences of the justification.
-line_gap = 2.00;
-// Height of the centre of the three-line block above the base (mm). A little
-// over half, because the eye reads a block on a cylinder as low when it is
-// geometrically centred.
-text_z = 55.0;
-// How deep the letters are cut (mm).
-deboss_d = 0.70;
-
-// Wall angle of the cut, from horizontal — the same treatment as the chalk
-// holder's wordmark, and for the same reason.
+// Height of the centre of the artwork above the base (mm).
 //
-// The plaque is a vertical wall and the part prints upright, so a prismatic cut
-// leaves a horizontal roof over the top edge of every stroke: the wall has to
-// reach back in by the full depth with nothing under it. At 0.40 that is a
-// ledge you get away with. At 0.70 it is marginal, and a slicer's answer to
-// marginal is support material inside the lettering, which then has to be
-// picked out of a 0.70 mm deep letter.
-//
-// Sloping every face removes the roof entirely. The cost is stroke width: the
-// cut narrows as it deepens, so the deepest section is the artwork eroded by
-// depth / tan(angle). 90 is prismatic — no taper. 45 is the classic
-// self-supporting chamfer and costs 1.00 mm per mm of depth. 70 is still 20
-// degrees off vertical, well inside what prints unsupported, and costs 0.36.
-// Measured off the built mesh: the floor of the cut comes out 0.408 narrower
-// than the opening, so each edge loses 0.204. Against stems of roughly 1.7 to
-// 2.1 mm at these sizes that leaves about 1.3 at the narrowest — three passes
-// of a 0.4 nozzle, and the opening is still full width where it is read.
-deboss_taper = 70;   // (deg from horizontal)
+// 55 with the old three-line block, which was 31.4 tall. The artwork is 47.8,
+// so the plaque with its bevels is now 65.2 of a 100 mm barrel and there is
+// only 34.8 of slack in the whole height — the freedom the old number had is
+// gone. 46 is what is left after both ends are respected: the bevel has to
+// clear the base round below (13.4 against 5.0) and the plaque has to stay out
+// of the fit coupon above, which takes the top 18 mm, so nothing may reach
+// past 81. At 46 the top bevel ends at 78.6.
+art_z = 46.0;
 
-// The taper is a stack of prismatic bands, not a true draft, because
-// linear_extrude cannot loft between two offsets of a 2D shape. What each band
-// leaves is a horizontal ledge as deep as the band, so 5 over 0.70 gives 0.14 mm
-// ledges — below one layer, and invisible.
+// How far the relief stands proud of the plaque's floor (mm).
 //
-// Unlike the chalk holder this is a flat cut and not a cylindrical wrap, so the
-// bands are cheap and there is no faceting mismatch to overlap away. eps is
-// enough here.
-deboss_steps = 5;
+// ⚠️ It must stay under sign_sag, the 5.67 the flat is sunk below the barrel,
+// or the artwork pokes out past the 3 inch maximum that is the whole point of
+// this part. There is an assert on it.
+//
+// It is also not the scale depth. At art_w wide a true-scale relief would
+// stand art_w * 20 / 91.17 = 7.46 proud, so finger_mark squashes the depth to
+// this instead of scaling it with the width. Squashing depth is what a relief
+// is; the alternative here is not a deeper relief, it is a part that is no
+// longer 3 inches across.
+art_relief = 4.00;
 
 /* [Grip ribs] */
 
@@ -427,37 +402,17 @@ flute_a   = (pow(flute_off, 2) + pow(out_r, 2) - pow(flute_cut_r, 2))
             / (2 * flute_off);
 flute_hw  = sqrt(pow(out_r, 2) - pow(flute_a, 2));
 
-// Ink boxes, measured once at size = 100 in text_font. [position, size], both
-// in the units text() itself uses, so a line set at size S has ink S/100 times
-// these. position is the bottom-left of the ink relative to the pen, which is
-// why it is needed as well as the size: it is what centres a line on the panel
-// by its INK rather than by its advance width, and flush edges are the whole
-// point here.
-function ink(s) =
-    s == "ZAMIL’S"  ? [[2.752, -1.536], [441.856, 102.656]] :
-    s == "FUCKING"  ? [[6.080, -1.536], [480.918, 102.656]] :
-    s == "F@#KING"  ? [[6.080, -1.536], [512.446, 102.656]] :
-    s == "RED BULL" ? [[6.080, -1.536], [543.978, 100.672]] :
-    undef;
-
-lines    = ["ZAMIL’S", wording == "censored" ? "F@#KING" : "FUCKING", "RED BULL"];
-
-// Justify by size: each line is scaled until its ink is exactly text_w wide.
-// Its height is then a consequence, not a choice.
-sizes    = [for (l = lines) text_w * 100 / ink(l)[1][0]];
-heights  = [for (i = [0 : len(lines) - 1]) ink(lines[i])[1][1] * sizes[i] / 100];
-function hsum(v, i) = i <= 0 ? 0 : v[i - 1] + hsum(v, i - 1);
-block_h  = hsum(heights, len(heights)) + (len(lines) - 1) * line_gap;
-// Bottom of line i's ink, measured from the bottom of the block. Line 0 is top.
-function ink_z(i) = block_h - hsum(heights, i + 1) - i * line_gap;
+// The artwork's height follows its width: it is a fixed relief and the plaque
+// is sized to it rather than the other way round.
+art_h = art_w * art_h_mm / art_w_mm;
 
 // The plaque, which is the block plus sign_pad on all four sides and nothing
 // else. Its width fixes its depth: flat_r is where a chord sign_w long sits on
 // a circle of out_r, and sign_sag is how far below the surface that is. The
 // bevel that makes the top of it printable runs at 45 degrees, so it is
 // sign_sag tall as well — the frame and the depth are the same number.
-sign_w   = text_w + 2 * sign_pad;
-sign_h   = block_h + 2 * sign_pad;
+sign_w   = art_w + 2 * sign_pad;
+sign_h   = art_h + 2 * sign_pad;
 // Set against the INRADIUS of the barrel polygon, not the circle it is drawn
 // in. An inscribed 97-gon runs 0.02 mm inside its circle, and taking the chord
 // off the circle would have handed back a flat 39.92 wide where 40.00 was
@@ -466,8 +421,8 @@ sign_h   = block_h + 2 * sign_pad;
 // is never short.
 flat_r   = sqrt(pow(out_r * cos(180 / nseg), 2) - pow(sign_w / 2, 2));
 sign_sag = out_r - flat_r;
-sign_z0  = text_z - sign_h / 2;
-sign_z1  = text_z + sign_h / 2;
+sign_z0  = art_z - sign_h / 2;
+sign_z1  = art_z + sign_h / 2;
 sign_t   = flat_r - r_bore;                  // solid wall left behind a plaque
 // Half the angle the plaque subtends, for the do-they-collide assert.
 sign_ang = asin((sign_w / 2) / out_r);
@@ -524,15 +479,15 @@ assert(base_round == 0 || base_round < total_h / 4,
 assert(base_round == 0 || base_foot_r > drain_d / 2 + 8,
        "the base round has eaten the floor out to the drain: reduce base_round");
 assert(sign_count == 0 || sign_w < outer_d,
-       "a plaque has to be cut IN: text_w + 2 x sign_pad must be under outer_d");
-assert(sign_count == 0 || sign_t - deboss_d >= 2.10,
-       "too little wall left behind the plaque: reduce text_w");
+       "a plaque has to be cut IN: art_w + 2 x sign_pad must be under outer_d");
+assert(sign_count == 0 || sign_t >= 2.10,
+       "too little wall left behind the plaque: reduce art_w");
 assert(sign_count < 2 || sign_ang * sign_count < 180 - 8,
-       "the plaques have run into each other: reduce text_w or sign_count");
+       "the plaques have run into each other: reduce art_w or sign_count");
 assert(sign_count < 2 || sign_back_ang * sign_count < 180 - 8,
        "the backing wedges have met: the cavity between the plaques is gone");
-assert(sign_count == 0 || len([for (l = lines) if (is_undef(ink(l))) l]) == 0,
-       "a line has no measured ink box: re-measure it into ink() (see header)");
+assert(sign_count == 0 || art_relief < sign_sag,
+       "the artwork stands out past the barrel: reduce art_relief or raise art_w");
 assert(sign_count == 0
        || (sign_z0 - sign_sag > base_top_z && sign_z1 + sign_sag < total_h - top_cham),
        "the plaque and its bevels have run off the end of the barrel");
@@ -650,51 +605,20 @@ module sign_backing() {
                     polygon(wedge);
 }
 
-// The three-line block as 2D, centred on the origin. Each line is placed by its
-// measured ink box, not by halign/valign — halign centres on the advance width,
-// which includes the right side bearing and would leave the flush right edge
-// short by a fraction of a stem.
-module wordmark() {
-    for (i = [0 : len(lines) - 1]) {
-        m = ink(lines[i]);
-        k = sizes[i] / 100;
-        translate([-(m[0][0] + m[1][0] / 2) * k,
-                   ink_z(i) - m[0][1] * k - block_h / 2])
-            // No $fn here on purpose — the file's $fa/$fs govern, so a bowl
-            // on a 9 mm cap and one on a 7 mm cap get the same chord error
-            // instead of the same segment count.
-            text(lines[i], size = sizes[i], font = text_font,
-                 halign = "left", valign = "baseline");
-    }
-}
-
-// Extruded outward through the panel face. rotate([90, 0, 90]) sends the 2D x
-// axis to +Y and the 2D y axis to +Z, which is exactly how the text reads to
-// someone standing at +X — no mirroring needed, and getting that backwards is
-// the classic way to emboss a part in reverse.
+// The finger, standing off each plaque's floor. rotate([0, 0, -90]) turns the
+// relief so its flat face lands on the plaque's plane and it stands outward:
+// the artwork is built facing +Y and the plaque faces +X. It reads the right
+// way round doing that — a viewer at +X has +Y on their right, a viewer at +Y
+// has -X on theirs, and the turn carries one onto the other.
 //
-// The stack runs from the plaque surface inward, band 0 outermost. Erosion is
-// taken from each band's OUTER face, so band 0 is the artwork at full size and
-// the letters read their true width from outside — eroding by the inner figure
-// instead would thin the visible outline and bury the widest part of the cut
-// where nobody can see it. It also means the flush left and right edges are
-// still exactly text_w apart at the surface, which is where they are measured.
-module text_cutters() {
-    steps = deboss_taper >= 90 ? 1 : max(1, deboss_steps);
-    band  = deboss_d / steps;
+// Sunk eps into the floor so the union has something to bite on rather than
+// two coincident planes.
+module finger_marks() {
     for (i = [0 : sign_count - 1])
         rotate([0, 0, i * 360 / sign_count])
-            for (k = [0 : steps - 1]) {
-                erode = deboss_taper >= 90 ? 0
-                                           : (band * k) / tan(deboss_taper);
-                translate([flat_r - band * (k + 1), 0, text_z])
-                    rotate([90, 0, 90])
-                        // Every band reaches eps outward into its neighbour —
-                        // band 0 out past the plaque surface, the rest into the
-                        // band above — so no two bands meet on a shared plane.
-                        linear_extrude(height = band + eps)
-                            offset(delta = -erode) wordmark();
-            }
+            translate([flat_r - eps, 0, art_z])
+                rotate([0, 0, -90])
+                    finger_mark(art_w, art_relief);
 }
 
 module ribs() {
@@ -715,7 +639,7 @@ module ribs() {
             }
 }
 
-module slim_can_holder() {
+module holder_body() {
     // The ribs are unioned in BEFORE the cavity is cut, not after. Each rib is
     // a 3.90 mm arc and only 0.30 mm of it is wanted, so left to itself a rib
     // reaches 36.70 mm out — 5.40 mm into a cavity that is only 4.40 wide, so
@@ -737,7 +661,15 @@ module slim_can_holder() {
         }
         if (flute_count > 0 && flute_depth > 0) flutes();
         if (sign_count > 0) sign_pockets();
-        if (sign_count > 0 && deboss_d > 0) text_cutters();
+    }
+}
+
+module slim_can_holder() {
+    union() {
+        holder_body();
+        // The artwork goes on AFTER the plaque is cut, not before: it stands
+        // out of the floor the pocket leaves, so it has to survive that cut.
+        if (sign_count > 0 && art_relief > 0) finger_marks();
     }
 }
 
@@ -749,13 +681,12 @@ echo(str("outside ", outer_d, "  bore ", bore_d,
          PI * outer_d / flute_count, " pitch  (",
          len(kept_flutes), " of ", flute_count,
          " kept; the rest would have bitten a plaque)"));
-echo(str("wording=", wording, "  plaque ", sign_w, " x ", sign_h,
+echo(str("plaque ", sign_w, " x ", sign_h,
          "  deep ", sign_sag, " (= bevel height)  wall behind ", sign_t,
          "  z ", sign_z0, "..", sign_z1,
          "  overall with bevels ", sign_h + 2 * sign_sag));
-for (i = [0 : len(lines) - 1])
-    echo(str("  line ", i, "  \"", lines[i], "\"  size ", sizes[i],
-             "  cap ", heights[i]));
+echo(str("artwork ", art_w, " x ", art_h, " standing ", art_relief,
+         " proud, against ", sign_sag, " of room"));
 
 // The fit coupon: the top coupon_h of the finished part, dropped onto the bed
 // the same way up as the part itself. Taking it off the real thing rather than

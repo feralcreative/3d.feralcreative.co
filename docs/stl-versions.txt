@@ -16,7 +16,7 @@ hobbs-chalk-holder-coupon 5
 large-door-stop 2
 large-door-stop-coupon 2
 large-door-stop-coupon-profile 1
-middle-finger-emboss 13
+middle-finger-emboss 14
 patio-leg-foot 3
 patio-leg-spacer-base 8
 patio-leg-spacer-coupon 1
@@ -41,7 +41,7 @@ screen-fence-test-rail 4
 screen-fence-twin-coupon 1
 slim-can-adapter 1
 slim-can-holder-3in 2
-slim-can-holder-3in-12oz 2
+slim-can-holder-3in-12oz 4
 slim-can-holder-3in-12oz-coupon 2
 slim-can-holder-3in-censored 5
 slim-can-holder-3in-coupon 1

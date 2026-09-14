@@ -119,6 +119,10 @@
 /* [Output] */
 flip = true;   // printed orientation, flat face on the bed; false shows it standing as mounted
 
+// False when another part includes this file for finger_mark() and wants the
+// modules without the hand turning up at its origin. Nothing else uses it.
+standalone = true;
+
 /* [Mesh] */
 mesh_file  = "../_incoming/MiddleFingerToScale.stl";
 mesh_scale = 25.4;   // the mesh is in inches
@@ -131,6 +135,19 @@ bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the me
 
 /* [Hidden] */
 big = 400;
+
+// The relief's own size, measured off the built mesh: what it comes out
+// wide and tall, and where the middle of that is. A part that puts this on
+// one of its faces needs them to place and scale it, and OpenSCAD cannot
+// measure an import.
+//
+// ⚠️ Tied to tilt, spin and relief_depth exactly as back_y is. Change any of
+// them and re-measure these too, or finger_mark() places the artwork off
+// centre and scales it wrong.
+art_w_mm  = 91.17;    // across
+art_h_mm  = 128.16;   // up
+art_cx_mm = -19.94;   // the middle of that, across
+art_cz_mm = 80.36;    // and up
 // The back of the whole hand after the turn: the minimum y of the mesh,
 // measured off it at tilt 57. Tied to tilt — see above.
 back_y = -109.36;
@@ -149,9 +166,18 @@ module emboss() {
   }
 }
 
+// The relief as artwork for another part: centred on the origin across and
+// up, its flat face on y = 0, scaled to w wide, and its depth squashed to d
+// rather than scaled with it. Squashing is the point — at full scale a
+// relief w wide stands w * relief_depth / art_w_mm proud, which on anything
+// small is far more than the face it is sitting in can give back.
+module finger_mark(w, d)
+  scale([w / art_w_mm, d / relief_depth, w / art_w_mm])
+    translate([-art_cx_mm, 0, -art_cz_mm]) emboss();
+
 module oriented() {
   if (flip) rotate([90, 0, 0]) children();   // face (y = 0) to the bed, relief up
   else children();
 }
 
-oriented() emboss();
+if (standalone) oriented() emboss();
