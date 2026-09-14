@@ -58,14 +58,22 @@
 // seen from the wrong side. There is no `bite` any more: a bite is a cut
 // into the display surface and there is no reason to want one.
 //
-// HOW THICK, so nothing floats. The finger has to be inside the slab or it
-// has air behind it where it rises off the fist. Measured at tilt 57, from
-// the knuckle surface inward, the finger is wholly inside 23.2 mm — it lies
-// close to the same plane the fist's knuckles do, which is what the tilt is
-// fitted for. relief_depth 25 covers it with a little to spare, and leaves
-// the fist as a 25 mm slab of knuckles. Below 23 the fingertip starts to
-// hollow out behind; above about 60 the knuckle roll is no longer cut at all
-// and you are back to most of a fist.
+// HOW THICK: FAR ENOUGH IN THAT THE FINGER IS CUT, not merely enclosed.
+// Enclosing it is not enough — at 25 the finger sat wholly inside the slab
+// and had 1.8 mm of air behind it, so it would have been bridging over the
+// mounting surface rather than sitting on it (Ziad, 2026-09-14: cut more
+// until there is no gap between the back of the finger and the surface).
+//
+// Measured at tilt 57, the finger's back runs from 19.9 to 23.2 in from the
+// knuckle surface over its length — nearest at about z 117, furthest at the
+// tip. The face has to be at or inside the NEAREST of those, so 19.0: the
+// finger then has a land the whole way up, 0.9 wide at the shallowest and
+// 4.2 at the tip, and it keeps 11 to 17 mm of its own depth. Anything above
+// 19.9 leaves the finger floating somewhere along its length; much below and
+// you are slicing the finger for nothing.
+//
+// The same number is the fist's thickness, because it is one plane: the fist
+// comes out a 19 mm slab of knuckles.
 //
 // The bottom is squared off at bottom_z, in the stood-up frame; it sits
 // below the mesh by default, so nothing is cut off the bottom either.
@@ -83,7 +91,7 @@ mesh_scale = 25.4;   // the mesh is in inches
 tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
 
 /* [Cut] */
-relief_depth = 25;    // the slab's thickness, measured in from the knuckle surface. 23.2 is where the finger stops having air behind it, at tilt 57 (mm)
+relief_depth = 19.0;  // the slab's thickness, measured in from the knuckle surface. The finger's back is nearest at 19.9, so this is the deepest the face can sit and still touch it everywhere, at tilt 57 (mm)
 bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the mesh, which bottoms out at -17.9, so nothing is cut off the bottom at all (mm)
 
 /* [Hidden] */
