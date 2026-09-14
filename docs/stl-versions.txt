@@ -4,8 +4,8 @@ cat-gap-wedge-coupon 5
 deck-door-stop 4
 deck-door-stop-coupon 3
 deck-door-stop-truss 5
-desk-cup-holder 7
-desk-cup-holder-starbucks 8
+desk-cup-holder 8
+desk-cup-holder-starbucks 9
 door-stop-base 2
 door-stop-fin 2
 door-stop-post 2

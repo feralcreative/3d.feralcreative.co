@@ -46,10 +46,10 @@
 // outside, and the slot is dimensioned at the mid-wall of the rim.
 //
 // THE UNDERSIDE. Flat, on a 4 mm floor, with four shallow pockets — 26
-// across by 13 in, 0.5 deep — at north, east, south and west, for the adhesive
+// across by 13 in, 0.6 deep — at north, east, south and west, for the adhesive
 // strips (Ziad, 2026-09-13). Each sits as far out as it can with pad_edge of
 // floor left outside it, so the grip is at the rim of the footprint where it
-// resists tipping. They are locating pockets, not sockets: half a millimetre
+// resists tipping. They are locating pockets, not sockets: three layers
 // keeps a strip from wandering while it is pressed on and leaves it standing
 // proud. A pocket for a round gel pad in the centre is still available — set
 // pad_recess_h to a depth shallower than the pad.
@@ -114,7 +114,7 @@ pad_recess_h = 0;    // mm
 // Ziad halved the radial run (2026-09-13).
 pad_w     = 26;    // mm, across (tangential)
 pad_len   = 13;    // mm, from the outside in (radial)
-pad_sq_h  = 0.5;   // mm, deep; 0 for none
+pad_sq_h  = 0.6;   // mm, deep, three 0.2 layers for a 1 mm strip; 0.5 is not a layer count (Ziad). 0 for none
 pad_edge  = 5;     // mm of floor left between a pocket and the outside; 2 risked a crack at the edge (Ziad)
 
 /* [Hidden] */
