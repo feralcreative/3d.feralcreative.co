@@ -10,9 +10,9 @@ door-stop-base 2
 door-stop-fin 2
 door-stop-post 2
 door-stop-spinner 2
-doorbell-wire-channel 34
-doorbell-wire-channel-cap 22
-doorbell-wire-channel-upper 29
+doorbell-wire-channel 43
+doorbell-wire-channel-cap 27
+doorbell-wire-channel-upper 33
 hobbs-chalk-holder-coupon 5
 large-door-stop 2
 large-door-stop-coupon 2

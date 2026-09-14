@@ -98,7 +98,7 @@
 // lower keeping the front lap_face of it and the upper the back tenon_t
 // along with its two rails. Both halves are the full 6.9 across and they
 // glue face to face over the whole of it. Set lower_run so the lower piece
-// — lower_run + lap_len + cap_h/2 tall — and upper_run both stay under 205.
+// — lower_run + lap_len + cap_down tall — and upper_run both stay under 205.
 //
 // The wire channel runs through unchanged: over the lap its floor is the
 // upper's own half of the face, at the same slot_d as everywhere else, and
@@ -195,7 +195,7 @@ key_w     = 5.0;    // the tenon across (mm)
 key_len   = 4.0;    // the tenon along the run (mm)
 key_r     = 1.0;    // its corners in plan, so a printed corner cannot hold it off its seat (mm)
 key_clr   = 0.15;   // the mortise over the tenon, all round (mm)
-bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as large as will reach the corner (mm)
+bend_r    = 22.0;   // centreline radius of the bend out of the run; 0 = as large as will reach the corner, 23.9. Held at 22 since the cap's top came in to 21: any bigger and the arc has wandered more than 0.55 off the run's centreline by the time it crosses that edge, and the assert below catches it (mm)
 
 /* [Raceway] */
 rw_w     = 6.9;   // across: the groove plus a three-loop rail each side; it is a cover, not a beam (mm)
@@ -205,9 +205,13 @@ slot_w   = 4.2;   // the groove, for the wire's 3.8 (mm)
 slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is the skin (mm)
 
 /* [Cap] */
-cap_left   = 18.5;  // hole centre to the left edge; was 21, Ziad took 2.5 off looking at the front view (mm)
-cap_right  = 21.5;  // hole centre to the right edge; the run's edge at jog + rw_w/2 has to land on the flat, inside the round (mm)
-cap_margin = 6.5;   // past the far edge of a screw hole, above and below (mm)
+// The four edges, each from the hole's centre. Ziad trimmed three of them
+// on 2026-09-14, reading the front view: 5 off the left, 5 off the top, and
+// the right edge in flush with the channel instead of 3 proud of it.
+cap_left   = 13.5;            // was 18.5, and 21 before that (mm)
+cap_right  = jog + rw_w / 2 + 0.02;  // flush with the channel's right face, bar two hundredths so the two are not exactly coplanar — coplanar faces are what the mesh trips over; was 21.5 (mm)
+cap_up     = 21.0;            // was 26 = hole_h/2 + screw_off + 6.5 of margin; this leaves 1.5 past the upper screw hole (mm)
+cap_down   = 26.0;            // hole_h/2 + screw_off + 6.5 of margin (mm)
 cap_r      = 8.0;   // corner radius, in plan (mm)
 cap_round_in = 3.0; // the edge round, in from the edge (mm)
 cap_round_up = 2.4; // the edge round, up from the wall; what is left below it is a vertical edge (mm)
@@ -225,6 +229,7 @@ ramp_angle = 40;    // the floor's slope as it comes up; shallower is gentler on
 
 /* [Quality] */
 $fn = 48;
+blend_steps = 12;  // slices in the blend where the bar grows out of the cap
 
 eps = 0.01;
 
@@ -235,9 +240,21 @@ rail_w    = (rw_w - slot_w) / 2;     // 1.35, one rail
 split_z   = rw_h - lap_face;         // 2.66, where the lap splits the face
 tenon_t   = split_z - slot_d;        // 0.66, the tenon's own thickness
 key_y     = (lap_len - key_len) / 2; // the tenon's start, from the joint line
-cap_h     = hole_h + 2 * (screw_off + cap_margin);   // 52.0
-cap_w     = cap_left + cap_right;                     // 39.5
+cap_h     = cap_up + cap_down;                        // 47.0
+cap_w     = cap_left + cap_right;                     // 31.95
 cap_x     = (cap_right - cap_left) / 2;               // the cap's centre, right of the hole
+cap_y     = (cap_up - cap_down) / 2;                  // and below it, now the top is cut
+// Where the raceway's bar starts, up the cap. Below the cap's top edge the
+// cap IS the cover — it is the same rw_h thick and shares the front plateau
+// — so the bar down there was a ridge for nothing, and it took the cap's
+// rounded right edge with it: flush with the channel, the bar's own square
+// side replaces that round wherever the bar exists, and it used to run down
+// to -rw_w/2, stopping the round well before it reached the chute (Ziad,
+// 2026-09-14). One short of where the cap's top-right corner starts to
+// curve, so the bar's end face still lands on the straight part of the edge
+// and nothing jinks out past the plan outline.
+bar_start = cap_up - cap_r - 1;                       // 12.0
+blend_len = 8.0;                                      // and it takes this far to grow to full section
 cap_t     = rw_h;
 plug_hw   = hole_w / 2;
 plug_hh   = hole_h / 2;
@@ -259,7 +276,7 @@ diag_len  = (diag_x0 - plug_hw) * sqrt(2);        // 0 at bend_max
 // Where the arc starts above the cap's top edge, it has to stay inside the
 // raceway's rails; this is how far it has strayed from the centreline by
 // the time it reaches the cap.
-stray     = bend_y > cap_h / 2 ? bend - sqrt(bend * bend - pow(bend_y - cap_h / 2, 2)) : 0;
+stray     = bend_y > cap_up ? bend - sqrt(bend * bend - pow(bend_y - cap_up, 2)) : 0;
 // The chute, measured along the diagonal from the plug's corner point. The
 // hole's rounded corner crosses that line edge_u in; the channel's floor
 // leaves the groove there and climbs the whole ramp_drop — out of the
@@ -268,8 +285,17 @@ edge_u    = hole_r * (sqrt(2) - 1);
 ramp_drop = slot_d + ramp_depth;
 ramp_run  = ramp_drop / tan(ramp_angle);
 ramp_end  = edge_u + ramp_run;
-ramp_x1   = diag_x0 - (diag_len + ramp_end) / sqrt(2);   // where it lets go, in plan
-ramp_y1   = diag_y0 - (diag_len + ramp_end) / sqrt(2);
+// The floor has to run out THROUGH the underside of its own stock and not
+// exactly at the far corner of it, or the wedge tapers to a knife edge on
+// the very line where three surfaces already meet, and the mesh comes back
+// with four facets to an edge. So the stock runs fill_tail past where the
+// floor reaches depth, and the cut carries on down the same slope past that.
+fill_tail = 2.0;
+fill_end  = ramp_end + fill_tail;
+ramp_far  = fill_end + 1;
+ramp_farz = slot_d - (ramp_far - edge_u) * tan(ramp_angle);
+ramp_x1   = diag_x0 - (diag_len + fill_end) / sqrt(2);   // the chute's far end, in plan
+ramp_y1   = diag_y0 - (diag_len + fill_end) / sqrt(2);
 assert(stray < (rw_w - slot_w) / 2 - 0.8, "the bend leaves the raceway before it reaches the cap");
 
 assert(slot_d > wire_t && slot_w > wire_w, "the wire does not fit the groove");
@@ -280,21 +306,77 @@ assert(slot_d / tan(ramp_angle) > slot_w / 2,
        "the floor reaches the wall's plane before the channel is clear of the hole's edge: shallower ramp_angle");
 assert(2 * rw_r <= rw_w - slot_w && rw_r < rw_h, "rw_r is bigger than the rails");
 assert(cap_round_up < cap_t, "cap_round_up is the whole thickness: no edge left");
-assert(cap_right >= jog + rw_w / 2 + cap_round_in, "the run's edge lands on the cap's round: widen cap_right");
-assert(cap_left > plug_hw + cap_round_in && cap_h / 2 > plug_hh + cap_round_in, "the cap's flat does not clear the plug");
-assert(lower_run + lap_len + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
+assert(cap_right >= jog + rw_w / 2, "the cap's right edge is inside the channel's");
+assert(bar_start < cap_up - cap_r && bar_start > plug_hh,
+       "the bar starts on the cap's plan corner, or down over the plug");
+assert(bar_start + blend_len <= cap_up, "the bar is still growing when it leaves the cap");
+assert(cap_left > plug_hw + cap_round_in && cap_right > plug_hw + cap_round_in
+       && cap_up > plug_hh + cap_round_in && cap_down > plug_hh + cap_round_in,
+       "the cap's flat does not clear the plug on one of its four sides");
+assert(cap_up >= hole_h / 2 + screw_off && cap_down >= hole_h / 2 + screw_off,
+       "the cap no longer reaches a screw hole");
+assert(lower_run + lap_len + cap_down <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
 assert(rw_h - slot_d >= 0.8 && lap_len > 4 * lap_clr, "the lap's tongue is too thin, or too short to glue");
 assert(lap_face >= 0.5 && tenon_t >= 0.5, "the lap splits the face too thin on one side");
 assert(key_y > key_clr + 1.0 && rw_w - key_w - 2 * key_clr >= 1.6, "the mortise leaves too little face around the tenon");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
 
-// The raceway in section, x across and y out from the wall: a bar with its
-// two front corners rounded rw_r.
-module rw_outer() polygon(concat(
+// The raceway in section, x across and y out from the wall: a bar whose two
+// front edges are a quarter ellipse rin in by rup up. At rw_r, rw_r that is
+// a plain round, which is what the run wears; the blend out of the cap
+// sweeps it from the cap's own ellipse to that. Keep the 10 degree step:
+// lap_face is chosen to miss the vertex it puts at z = 2.6.
+function rw_pts(rin, rup) = concat(
   [[-rw_w / 2, 0], [rw_w / 2, 0]],
-  [for (a = [0 : 10 : 90]) [rw_w / 2 - rw_r + rw_r * cos(a), rw_h - rw_r + rw_r * sin(a)]],
-  [for (a = [90 : 10 : 180]) [-rw_w / 2 + rw_r + rw_r * cos(a), rw_h - rw_r + rw_r * sin(a)]]));
+  [for (a = [0 : 10 : 90]) [rw_w / 2 - rin * (1 - cos(a)), rw_h - rup + rup * sin(a)]],
+  [for (a = [90 : 10 : 180]) [-rw_w / 2 + rin * (1 + cos(a)), rw_h - rup + rup * sin(a)]]);
+module rw_edge(rin, rup) polygon(rw_pts(rin, rup));
+module rw_outer() rw_edge(rw_r, rw_r);
+
+// Where the bar grows out of the cap. Butting the two edge treatments
+// against each other left a 1.8 mm step in the front plateau, the cap's
+// ellipse 3.0 in and the bar's round only 1.2 (Ziad, 2026-09-14: make a
+// smoother transition from one arc to the other). So the section is swept
+// from one to the other over blend_len on a cosine, which is flat at both
+// ends and leaves no crease where the blend meets either. It starts 0.15
+// rounder than the cap's own edge so the first slice is strictly inside the
+// plate rather than coincident with its surface.
+function blend_t(i)  = (1 - cos(180 * i / blend_steps)) / 2;
+function blend_in(i) = cap_round_in + 0.15 + (rw_r - cap_round_in - 0.15) * blend_t(i);
+function blend_up(i) = cap_round_up + 0.15 + (rw_r - cap_round_up - 0.15) * blend_t(i);
+//
+// One polyhedron and not a chain of hulls: chained hulls share a slice, so
+// consecutive ones meet on identical cross-sections and the mesh came back
+// with 40-odd edges carrying four facets. Skinned by hand there are no
+// internal faces at all.
+// The station list runs one past the blend, at the run's own profile, so the
+// whole bar from the cap to the lap is this one solid. Handing the last of
+// it to a separate along_y() put two prisms with the same outer rectangle
+// over the top of each other, and every one of their four sides was then a
+// coplanar pair.
+function blend_y(j) = j <= blend_steps ? bar_start + blend_len * j / blend_steps
+                                       : lower_run + lap_len;
+function blend_rin(j) = j <= blend_steps ? blend_in(j) : rw_r;
+function blend_rup(j) = j <= blend_steps ? blend_up(j) : rw_r;
+module lower_bar() {
+  n   = blend_steps + 1;
+  pts = [for (j = [0 : n]) rw_pts(blend_rin(j), blend_rup(j))];
+  np  = len(pts[0]);
+  polyhedron(
+    points = [for (j = [0 : n], k = [0 : np - 1])
+                [pts[j][k][0], blend_y(j), pts[j][k][1]]],
+    faces = concat(
+      // ends first, then the skin. OpenSCAD wants every face clockwise seen
+      // from outside, which is the reverse of the profile's own order at the
+      // near end and the same as it at the far one.
+      [[for (k = [np - 1 : -1 : 0]) k]],
+      [[for (k = [0 : np - 1]) n * np + k]],
+      [for (j = [0 : n - 1], k = [0 : np - 1])
+         let (k2 = (k + 1) % np)
+         [j * np + k, j * np + k2, (j + 1) * np + k2, (j + 1) * np + k]]),
+    convexity = 6);
+}
 // The groove, open to the wall.
 module rw_slot() translate([-slot_w / 2, -eps]) square([slot_w, slot_d + eps]);
 
@@ -302,10 +384,10 @@ module rw_slot() translate([-slot_w / 2, -eps]) square([slot_w, slot_d + eps]);
 module along_y(a, b) translate([0, b, 0]) rotate([90, 0, 0]) linear_extrude(b - a) children();
 module along_x(a, b) rotate([0, 0, -90]) along_y(a, b) children();
 
-// The cap plate, centred cap_x right of the hole, its front edge a quarter
+// The cap plate, centred cap_x right of the hole and cap_y above it, its front edge a quarter
 // ellipse all round: a hull of slices, each the plate inset and raised
 // along the curve. Plate and round are both convex, so one hull is exact.
-module cap_plate() translate([cap_x, 0, 0]) hull()
+module cap_plate() translate([cap_x, cap_y, 0]) hull()
   for (a = [0 : 7.5 : 90])
     linear_extrude(cap_t - cap_round_up + cap_round_up * sin(a))
       offset(delta = -cap_round_in * (1 - cos(a))) rr(cap_w, cap_h, cap_r);
@@ -339,7 +421,7 @@ module entry_fill() intersection() {
   translate([0, 0, -ramp_depth]) linear_extrude(ramp_depth) rr(hole_w, hole_h, hole_r);
   translate([diag_x0, diag_y0, 0]) rotate([0, 0, -135])
     translate([diag_len, -(slot_w / 2 + plug_wall), -ramp_depth - eps])
-      cube([ramp_end, slot_w + 2 * plug_wall, ramp_depth + 2 * eps]);
+      cube([fill_end, slot_w + 2 * plug_wall, ramp_depth + 2 * eps]);
 }
 
 // A rib on a face at p, standing out by v, span s along the face; z down.
@@ -375,8 +457,8 @@ module diagonal_wire() {
     translate([0, slot_w / 2, 0]) rotate([90, 0, 0]) linear_extrude(slot_w)
       polygon([[diag_len - hole_r - eps, slot_d],
                [diag_len + edge_u,       slot_d],
-               [diag_len + ramp_end,     -ramp_depth],
-               [diag_len + ramp_end,     -plug_depth - 1],
+               [diag_len + ramp_far,     ramp_farz],
+               [diag_len + ramp_far,     -plug_depth - 1],
                [diag_len - hole_r - eps, -plug_depth - 1]]);
   }
 }
@@ -397,7 +479,7 @@ module lower() {
       cap_plate();
       plug();
       entry_fill();
-      translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap_len) rw_outer();
+      translate([jog, 0, 0]) lower_bar();
     }
     // Past lower_run the lower keeps only the front lap_face of the face,
     // full width and rounds and all; the upper carries the rest of it.
@@ -426,7 +508,7 @@ module upper() difference() {
 // the way the run would bring it.
 module cap_only() difference() {
   union() { cap_plate(); plug(); entry_fill(); }
-  translate([jog, 0, 0]) along_y(min(bend_y, cap_h / 2) - eps, cap_h / 2 + eps) rw_slot();
+  translate([jog, 0, 0]) along_y(min(bend_y, cap_up) - eps, cap_up + eps) rw_slot();
   diagonal_wire();
 }
 
@@ -458,9 +540,9 @@ if (show == "both") {
              lower_run + lap_len - upper_run, 0]) oriented() upper();
 }
 
-echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right); plug ", hole_w, " x ", hole_h,
+echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right, ", cap_up, " up, ", cap_down, " down); plug ", hole_w, " x ", hole_h,
          " + ", plug_rib, " ribs, ", plug_depth, " deep; lower piece ",
-         lower_run + lap_len + cap_h / 2, " tall, upper ", upper_run,
+         lower_run + lap_len + cap_down, " tall, upper ", upper_run,
          "; lap ", lap_len, " long, the face split ", lap_face, " to the lower and ",
          tenon_t, " to the upper, tenon ", key_w, " x ", key_len, " x ", tenon_t,
          ", ", (rw_w - key_w) / 2 - key_clr, " of face each side of its mortise"));
