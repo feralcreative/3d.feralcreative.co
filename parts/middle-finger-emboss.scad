@@ -41,9 +41,23 @@
 // ends up standing about 9 mm off the face: the finger tips away from the
 // wall as it rises, which is what a finger does.
 //
-// ⚠️ back_y IS MEASURED AT THIS TILT. Change tilt and it is wrong, and
-// nothing will tell you: the cut simply lands somewhere else on the hand.
-// Re-measure it as the minimum y of the mesh above bottom_z after the turn.
+// AND A LITTLE ROLL, about the hand's own axis, before the tilt. The fist
+// does not face square on to the knuckle plane, so turning it a few degrees
+// brings more of it inside the slab (Ziad, 2026-09-14: rotate it a couple of
+// degrees to expose more of the fist). Counting mesh points that fall within
+// a 20 mm slab, against roll:
+//
+//   roll     -6     -4     -2      0     +2     +4     +6     +8
+//   in slab  52220  52164  52085  52331  53355  53684  53687  53754
+//
+// It is worth about 1300 points, a couple of percent, and it is all had by
+// +4 — past that the count is flat and the hand is just turned. 3 is inside
+// that and does not disturb where the finger lands: the contact bands come
+// out at the same heights as at 0.
+//
+// ⚠️ back_y IS MEASURED AT THIS TILT AND THIS ROLL. Change either and it is
+// wrong, and nothing will tell you: the cut simply lands somewhere else on
+// the hand. Re-measure it as the minimum y of the mesh after the turns.
 //
 // THE CUT IS ON THE PALM SIDE, and nothing at all comes off the knuckles.
 // The knuckle side is what you look at; the palm side is what goes against
@@ -99,6 +113,7 @@ flip = true;   // printed orientation, flat face on the bed; false shows it stan
 mesh_file  = "../_incoming/MiddleFingerToScale.stl";
 mesh_scale = 25.4;   // the mesh is in inches
 tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
+roll       = 3;      // deg about the hand's own axis, before the tilt: turns the fist toward you. back_y is measured at THIS too
 
 /* [Cut] */
 relief_depth = 20.0;  // the slab's thickness, measured in from the knuckle surface. Lands the finger top and bottom and leaves a small gap between; see the profile above. 18.7 touches even the tip, 23.2 and the finger floats entirely (mm)
@@ -108,9 +123,10 @@ bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the me
 big = 400;
 // The back of the whole hand after the turn: the minimum y of the mesh,
 // measured off it at tilt 57. Tied to tilt — see above.
-back_y = -113.27;
+back_y = -113.49;
 
-module stood_up() rotate([tilt, 0, 0]) scale(mesh_scale) import(mesh_file, convexity = 10);
+module stood_up() rotate([tilt, 0, 0]) rotate([0, 0, roll])
+  scale(mesh_scale) import(mesh_file, convexity = 10);
 
 // Standing, as mounted: the flat face on y = 0, the knuckles standing out
 // toward +y, the finger up.
