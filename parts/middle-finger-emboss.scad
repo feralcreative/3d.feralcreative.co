@@ -45,14 +45,33 @@
 // nothing will tell you: the cut simply lands somewhere else on the hand.
 // Re-measure it as the minimum y of the mesh above bottom_z after the turn.
 //
-// THE CUT. Everything behind y = back_y + bite goes, so the finger keeps a
-// flat land bite deep along its back — that is what ties it to the face;
-// with bite = 0 the finger would touch the face along a line and could be
-// snapped off it. Everything further out than relief_depth from the face
-// goes too, or the whole fist would stand 100 mm proud: the finger is 18 mm
-// deep, the knuckle ridge starts about 40 mm out, so relief_depth is the
-// dial between "finger on a plate" and "fist". The bottom is squared off at
-// bottom_z, in the stood-up frame, so the wrist's slanted end is gone.
+// THE CUT. One plane, and only at the back. Everything behind
+// y = back_y + bite goes, so the finger keeps a
+// flat land along its back — that is what ties it to the face; with bite = 0
+// the finger would touch the face along a line and could be snapped off it.
+//
+// bite HAS TO REACH THE FINGERTIP. back_y is the back of the fist, and the
+// finger tips away from the wall as it rises, so its back climbs away from
+// that plane — 1.5 mm up at the knuckles, 3.0 by mid-finger, 10.5 at the
+// tip. At the 2.0 it used to be, the top 25 mm of the finger never touched
+// the face at all: it stood off it and the land ran out (Ziad, 2026-09-14:
+// cut more of the back until there is no gap between the finger and the
+// back). 10.5 is where that last gap closes and 11.0 gives the tip an
+// actual land instead of a tangent point.
+//
+// It costs finger. The cut is the same plane all the way down, so closing a
+// 10.5 gap at the tip takes 9 mm off the back of the finger at its base,
+// and the finger ends up standing about 8 mm proud along its whole length
+// rather than 17 in the middle and nothing at the top. That is the trade:
+// an even half-round finger that is attached everywhere, against a rounder
+// one that lets go a third of the way up. Everything further out than relief_depth from the face
+// ⚠️ THE FRONT IS NOT CUT. relief_depth used to cap it at 30 from the face,
+// which sliced the knuckles off flat — and because the cap is measured from
+// the face, every millimetre of extra bite took another millimetre off the
+// front as well. Ziad, 2026-09-14: wrong side, the front is untouched, all
+// we are doing is trimming the back so it sits flat on something. So
+// relief_depth is 0, which means no cap, and the fist stands its full ~90 mm
+// off the face. Set it to a number again only if you want it back as a slab.
 //
 // THERE IS NO BOTTOM CUT any more. bottom_z sat at 60, just above the
 // knuckles, so the relief was the finger and a sliver with no hand to speak
@@ -75,8 +94,8 @@ mesh_scale = 25.4;   // the mesh is in inches
 tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
 
 /* [Cut] */
-bite         = 2.0;   // mm the face cuts into the finger's back, so it is joined along a land (mm)
-relief_depth = 30;    // from the face; the finger is 18 deep, the knuckle roll runs 40-60 out and is cut flat here (mm)
+bite         = 11.0;  // how far the face cuts in past back_y. 10.5 is where the last gap under the fingertip closes; 11.0 gives the tip a land rather than a tangent point (mm)
+relief_depth = 0;     // 0 = no front cap at all, the whole fist stands off the face. Set it to cut the front back to a slab that many mm thick (mm)
 bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the mesh, which bottoms out at -17.9, so nothing is cut off the bottom at all (mm)
 
 /* [Hidden] */
@@ -92,7 +111,8 @@ module stood_up() rotate([tilt, 0, 0]) scale(mesh_scale) import(mesh_file, conve
 module emboss() {
   translate([0, -(back_y + bite), 0]) intersection() {
     stood_up();
-    translate([-big / 2, back_y + bite, bottom_z]) cube([big, relief_depth, big]);
+    translate([-big / 2, back_y + bite, bottom_z])
+      cube([big, relief_depth > 0 ? relief_depth : big, big]);
   }
 }
 
