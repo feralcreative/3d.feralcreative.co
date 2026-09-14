@@ -113,7 +113,7 @@ pad_recess_h = 0;    // mm
 // out as pad_edge allows.
 pad_sq    = 26;    // mm, square
 pad_sq_h  = 0.5;   // mm, deep; 0 for none
-pad_edge  = 2;     // mm of floor left between a pocket and the outside
+pad_edge  = 5;     // mm of floor left between a pocket and the outside; 2 risked a crack at the edge (Ziad)
 
 /* [Hidden] */
 
