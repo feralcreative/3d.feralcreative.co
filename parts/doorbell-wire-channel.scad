@@ -55,16 +55,40 @@
 // heading diagonally into it; by default the arc is as big as will still
 // reach the corner (about 24 mm radius), so there is no straight and no
 // kink anywhere (Ziad, 2026-09-13: the square turn was too tight, then the
-// sharp 45 was rounded, then "as gradually as possible"). It passes through
-// a notch in the plug's wall at that corner, on the same diagonal, and is
-// inside the plug.
+// sharp 45 was rounded, then "as gradually as possible").
+//
+// AND IT GOES IN ON A CHUTE, not over a cliff. It was a notch through the
+// plug's corner at full depth: the wire ran flat along the wall and then
+// had to turn square down the bore at the hole's very edge (Ziad,
+// 2026-09-14: smooth out that step, take the channel farther into the hole
+// than the very edge and bring the floor up gradually).
+//
+// So the channel carries on past the edge and its FLOOR CLIMBS at
+// ramp_angle: it leaves the groove where the hole starts, reaches the
+// wall's plane a little inside it, and keeps going until it stands
+// ramp_depth proud, ramp_run in all. Proud of the wall is only possible
+// over the hole, which is the point — the floor is the underside of a
+// wedge hanging off the cap's back into the bore, and it presses the wire
+// down and in over ramp_run instead of letting it kink at the edge. Off
+// the end of the wedge the wire is ramp_depth into the hole already and
+// carries on down the hollow on its own.
+//
+// Two walls plug_wall thick run down either side of the wedge, hanging the
+// same ramp_depth, so the whole thing is a chute and the wire cannot wander
+// out of it sideways. It stays open downward — into the bore — for its
+// whole length, so the wire is still laid into it from the side rather than
+// threaded through anything.
+//
+// The floor must not reach the wall's plane until the channel is clear of
+// the hole's edge, or the wire is pinched between the ramp and the wall
+// instead of being let into the hole. That is what the ramp_angle assert
+// is checking.
 //
 // THE PLUG IS A SHELL, open to the hole: plug_wall of wall around the hole's
 // section and the cap as its front, like the old one but plug_depth deep and
-// ribbed. The wire comes through the corner notch into the hollow and down
-// into the hole from there. The notch runs the whole depth, splitting the
-// corner open to the tip, so the wire is laid into it from the side rather
-// than threaded through a hole (Ziad, 2026-09-13).
+// ribbed. The chute's floor and the two walls beside it fill the top
+// ramp_depth of that hollow along the diagonal; everything else is empty,
+// and the wire drops into it off the end of the chute.
 //
 // TWO PIECES, because 255 does not fit a 220 bed. The lower piece is the
 // cap, the jog, and lower_run of the vertical; the upper is the rest. They
@@ -199,7 +223,10 @@ plug_rib   = 0.3;   // crush ribs proud of the hole's size, per side (mm)
 rib_w      = 1.2;   // (mm)
 plug_lead  = 1.0;   // chamfer on the plug's leading edge (mm)
 plug_wall  = 1.35;  // the shell, three loops on the 0.4 nozzle; it only has to hold the ribs against the hole (mm)
-notch_d    = plug_depth + 1;  // the wire notch through the top-right corner: the full depth, so the wire is laid in from the side, not threaded (mm)
+
+/* [The wire's way into the hole] */
+ramp_depth = 5.0;   // how far the channel's floor ends up proud of the wall, inside the hole (mm)
+ramp_angle = 40;    // the floor's slope as it comes up; shallower is gentler on the wire, and costs run (deg)
 
 /* [Quality] */
 $fn = 48;
@@ -238,9 +265,24 @@ diag_len  = (diag_x0 - plug_hw) * sqrt(2);        // 0 at bend_max
 // raceway's rails; this is how far it has strayed from the centreline by
 // the time it reaches the cap.
 stray     = bend_y > cap_h / 2 ? bend - sqrt(bend * bend - pow(bend_y - cap_h / 2, 2)) : 0;
+// The chute, measured along the diagonal from the plug's corner point. The
+// hole's rounded corner crosses that line edge_u in; the channel's floor
+// leaves the groove there and climbs the whole ramp_drop — out of the
+// groove, through the wall's plane and on into the hole — by ramp_end.
+edge_u    = hole_r * (sqrt(2) - 1);
+ramp_drop = slot_d + ramp_depth;
+ramp_run  = ramp_drop / tan(ramp_angle);
+ramp_end  = edge_u + ramp_run;
+ramp_x1   = diag_x0 - (diag_len + ramp_end) / sqrt(2);   // where it lets go, in plan
+ramp_y1   = diag_y0 - (diag_len + ramp_end) / sqrt(2);
 assert(stray < (rw_w - slot_w) / 2 - 0.8, "the bend leaves the raceway before it reaches the cap");
 
 assert(slot_d > wire_t && slot_w > wire_w, "the wire does not fit the groove");
+assert(ramp_depth < plug_depth - 2 && ramp_angle > 10 && ramp_angle < 80, "the chute is deeper than the plug, or its slope is silly");
+assert(abs(ramp_x1) + slot_w / 2 < plug_hw - plug_wall && abs(ramp_y1) + slot_w / 2 < plug_hh - plug_wall,
+       "the chute runs out through the far side of the plug: less ramp_depth, or steepen ramp_angle");
+assert(slot_d / tan(ramp_angle) > slot_w / 2,
+       "the floor reaches the wall's plane before the channel is clear of the hole's edge: shallower ramp_angle");
 assert(2 * rw_r <= rw_w - slot_w && rw_r < rw_h, "rw_r is bigger than the rails");
 assert(cap_round_up < cap_t, "cap_round_up is the whole thickness: no edge left");
 assert(cap_right >= jog + rw_w / 2 + cap_round_in, "the run's edge lands on the cap's round: widen cap_right");
@@ -293,6 +335,18 @@ module plug() {
       rr(hole_w - 2 * plug_wall, hole_h - 2 * plug_wall, max(hole_r - plug_wall, 0.5));
   }
 }
+// The stock the chute's floor and its two side walls are carved out of: a
+// bar down the diagonal standing ramp_depth proud of the cap's back, into
+// the hole. Clipped to the plug's own footprint, because material anywhere
+// outside it would hold the cap off the wall. diagonal_wire() then takes
+// everything below the ramp away and what is left is the floor.
+module entry_fill() intersection() {
+  translate([0, 0, -ramp_depth]) linear_extrude(ramp_depth) rr(hole_w, hole_h, hole_r);
+  translate([diag_x0, diag_y0, 0]) rotate([0, 0, -135])
+    translate([diag_len, -(slot_w / 2 + plug_wall), -ramp_depth - eps])
+      cube([ramp_end, slot_w + 2 * plug_wall, ramp_depth + 2 * eps]);
+}
+
 // A rib on a face at p, standing out by v, span s along the face; z down.
 module rib(p, v, s) hull() {
   translate([p[0] + v[0] / 2, p[1] + v[1] / 2, (plug_depth - plug_lead) / 2])
@@ -303,20 +357,32 @@ module rib(p, v, s) hull() {
 
 // The wire's way from the vertical run into the plug: a 45 arc of radius
 // bend out of the run, a straight groove on the diagonal to the plug's
-// top-right corner (none at all at bend_max), then a notch through the
-// corner's wall on the same line, notch_d deep. The arc's centre is bend
-// left of the run, level with where the run's groove ends.
+// top-right corner (none at all at bend_max), and then a CHUTE. The arc's
+// centre is bend left of the run, level with where the run's groove ends.
+//
+// The chute is the channel carried on past the hole's edge with its floor
+// falling away at ramp_angle: flush with the wall where the hole starts,
+// ramp_depth down by ramp_end, and open to the plug's hollow from there on.
+// Before it the wire ran along the wall and then had to turn square down
+// the bore at the hole's edge (Ziad, 2026-09-14: smooth out that step, take
+// the channel farther in than the very edge and bring the floor up
+// gradually). It is still open to the wall for its whole length, so the
+// wire is laid into it from the side and not threaded through anything.
 module diagonal_wire() {
   translate([jog - bend, bend_y, 0]) rotate([0, 0, -45])
     rotate_extrude(angle = 45 + eps) translate([bend, 0]) rw_slot();
   translate([diag_x0, diag_y0, 0]) rotate([0, 0, -135]) {
     along_x(-eps, diag_len + eps) rw_slot();
-    // From hole_r before the corner point to the corner round's centre,
-    // hole_r * sqrt(2) past it — the wall's inner face is that way, at
-    // (hole_r - plug_wall) short of the centre, and a cutter stopped at
-    // plug_wall past the corner point never reached it (the first cut).
-    translate([diag_len - hole_r, -slot_w / 2, -notch_d])
-      cube([hole_r * (1 + sqrt(2)) + eps, slot_w, notch_d + slot_d]);
+    // The chute, in section, everything under the wire: the groove's floor
+    // as far as the hole's edge, then the ramp climbing out of the cap and
+    // on into the hole, and the whole plug's depth below it so the corner
+    // is open and the wire drops off the ramp's end into the hollow.
+    translate([0, slot_w / 2, 0]) rotate([90, 0, 0]) linear_extrude(slot_w)
+      polygon([[diag_len - hole_r - eps, slot_d],
+               [diag_len + edge_u,       slot_d],
+               [diag_len + ramp_end,     -ramp_depth],
+               [diag_len + ramp_end,     -plug_depth - 1],
+               [diag_len - hole_r - eps, -plug_depth - 1]]);
   }
 }
 
@@ -335,6 +401,7 @@ module lower() {
     union() {
       cap_plate();
       plug();
+      entry_fill();
       translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap_len) rw_outer();
     }
     // Past lower_run everything below the groove's floor goes: what is left
@@ -362,7 +429,7 @@ module upper() difference() {
 // The fit coupon: cap and plug, with the groove in from the cap's top edge
 // the way the run would bring it.
 module cap_only() difference() {
-  union() { cap_plate(); plug(); }
+  union() { cap_plate(); plug(); entry_fill(); }
   translate([jog, 0, 0]) along_y(min(bend_y, cap_h / 2) - eps, cap_h / 2 + eps) rw_slot();
   diagonal_wire();
 }
