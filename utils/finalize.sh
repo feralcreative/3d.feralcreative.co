@@ -15,6 +15,9 @@
 #   utils/finalize.sh slim-can-holder-3in-explicit slim-can-holder-3in-censored
 #   utils/finalize.sh --all          # every series in stl/
 #
+#   utils/finalize.sh --shitcan doorbell-wire-channel-upper   # say what would go
+#   utils/finalize.sh --shitcan --apply doorbell-wire-channel-upper
+#
 # Names are OUTPUT names, the same ones build.sh --name takes and the same ones
 # docs/stl-versions.txt is keyed on — not .scad paths.
 #
@@ -45,17 +48,83 @@
 # correct: it has started moving again. Run this again when it stops. To skip
 # that round trip entirely on a part you know is done, build it with
 # `build.sh --no-version`, which writes the plain name in the first place.
+#
+# --shitcan: THE OTHER END OF A PART'S LIFE
+# -----------------------------------------
+# Finalizing says "this one is done, keep exactly one of it". --shitcan says
+# the opposite: this output is not wanted at all any more, take every trace of
+# it away. An abandoned variant — the wire channel's upper and cap once the
+# design stopped needing them as separate outputs — otherwise leaves meshes,
+# renders, a sliced job and a line in the ledger lying around looking current.
+#
+# For each name it removes:
+#
+#   stl/<name>.stl and every stl/<name>-vNN.stl and stl/<name>-*coupon*.stl
+#   renders/<name>-*.png
+#   slice/<name>/ and 3mf/<name>.3mf
+#   the <name> line in docs/stl-versions.txt
+#
+# DRY RUN IS THE DEFAULT, like clean.sh: it lists and stops, and --apply is the
+# only thing that removes anything. Unlike clean.sh it will delete files git
+# tracks, because a finished stl/<name>.stl is committed and that is precisely
+# the file being thrown out; it says which ones those are, and leaves the
+# deletion staged for you to commit.
+#
+# THE LEDGER LINE GOES, where finalizing leaves it. There is no history left to
+# collide with once the meshes are gone, and a name in docs/stl-versions.txt
+# with nothing behind it is just a puzzle for later.
+#
+# WHAT IT WILL NOT TOUCH. parts/<name>.scad — the source is never generated
+# output and one .scad usually feeds several output names, so deleting a
+# variant must not take the part with it; it names the file if one exists and
+# leaves it to you. MODELS/ likewise: that is a symlink into the printer site's
+# NAS and removing something from it is a change to a live site, so it says
+# what it found there and stops.
+#
+# ⚠️ THE RENDER GLOB IS A PREFIX, renders/<name>-*.png, because ad-hoc renders
+# are named freely and there is no list of them to match against. So shitcanning
+# a base name also sweeps up renders belonging to names that extend it —
+# doorbell-wire-channel takes doorbell-wire-channel-upper-zplus.png with it.
+# That is what the dry run is for: read the list before you pass --apply.
+#
+# --shitcan takes explicit names only. There is no --shitcan --all, on purpose.
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTDIR="${OUTDIR:-${REPO_ROOT}/stl}"
 
-if [[ $# -lt 1 ]]; then
+usage() {
   echo "usage: $0 <name> [<name>...]" >&2
   echo "       $0 --all" >&2
+  echo "       $0 --shitcan [--apply] <name> [<name>...]" >&2
   echo >&2
   echo "  <name> is an output name (build.sh --name), not a .scad path." >&2
+  exit 64
+}
+
+SHITCAN=0
+APPLY=0
+ARGS=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --shitcan)  SHITCAN=1; shift ;;
+    --apply|-y) APPLY=1; shift ;;
+    --all)      ARGS[${#ARGS[@]}]="--all"; shift ;;
+    -h|--help)  usage ;;
+    -*)         echo "error: unknown option: $1" >&2; usage ;;
+    *)          ARGS[${#ARGS[@]}]="$1"; shift ;;
+  esac
+done
+set -- ${ARGS[@]+"${ARGS[@]}"}
+
+[[ $# -ge 1 ]] || usage
+if [[ "$APPLY" -eq 1 && "$SHITCAN" -eq 0 ]]; then
+  echo "error: --apply only means anything with --shitcan; finalizing has no dry run" >&2
+  exit 64
+fi
+if [[ "$SHITCAN" -eq 1 && "$1" == "--all" ]]; then
+  echo "error: --shitcan takes names, never --all" >&2
   exit 64
 fi
 
@@ -151,6 +220,83 @@ finalize_one() {
     "$( [[ "$removed" -gt 0 ]] && echo ", $removed older version(s) removed" )" \
     "$( [[ "$coupons" -gt 0 ]] && echo ", $coupons coupon file(s) removed" )"
 }
+
+LEDGER="${REPO_ROOT}/docs/stl-versions.txt"
+
+# Everything generated that carries one output name. Lists it, and removes it
+# only when --apply says so. Returns 1 if the name turned up nothing at all,
+# which usually means it was spelled wrong.
+shitcan_one() {
+  local name="$1"
+  local found=0
+  local paths=()
+  local p
+
+  for p in "${OUTDIR}/${name}.stl" "${REPO_ROOT}/3mf/${name}.3mf" "${REPO_ROOT}/3mf/${name}.keep.3mf"; do
+    [[ -e "$p" ]] && paths[${#paths[@]}]="$p"
+  done
+  while IFS= read -r p; do
+    [[ -n "$p" ]] && paths[${#paths[@]}]="$p"
+  done < <(find "$OUTDIR" -maxdepth 1 \( -name "${name}-v[0-9][0-9]*.stl" -o -name "${name}-*coupon*.stl" \) 2>/dev/null | sort)
+  if [[ -d "${REPO_ROOT}/renders" ]]; then
+    while IFS= read -r p; do
+      [[ -n "$p" ]] && paths[${#paths[@]}]="$p"
+    done < <(find "${REPO_ROOT}/renders" -maxdepth 1 -name "${name}-*.png" 2>/dev/null | sort)
+  fi
+  for p in "${REPO_ROOT}/slice/${name}" "${REPO_ROOT}/slice/${name}.keep"; do
+    [[ -d "$p" ]] && paths[${#paths[@]}]="$p"
+  done
+
+  printf '  %s\n' "$name"
+  if [[ "${#paths[@]}" -gt 0 ]]; then
+    found=1
+    for p in "${paths[@]}"; do
+      local mark=""
+      git -C "$REPO_ROOT" ls-files --error-unmatch "$p" >/dev/null 2>&1 && mark="   [git tracked]"
+      printf '      %s%s\n' "${p#$REPO_ROOT/}" "$mark"
+      [[ "$APPLY" -eq 1 ]] && rm -rf "$p"
+    done
+  fi
+
+  if [[ -f "$LEDGER" ]] && grep -q -- "^${name} " "$LEDGER"; then
+    found=1
+    printf '      docs/stl-versions.txt — the %s line\n' "$name"
+    if [[ "$APPLY" -eq 1 ]]; then
+      local tmp
+      tmp="$(mktemp)"
+      grep -v -- "^${name} " "$LEDGER" > "$tmp" || true
+      mv "$tmp" "$LEDGER"
+    fi
+  fi
+
+  # Named, never touched: the source, and the live site's mirror.
+  [[ -f "${REPO_ROOT}/parts/${name}.scad" ]] \
+    && printf '      note: parts/%s.scad exists and is left alone — delete it yourself if the part is going too\n' "$name"
+  [[ -e "${REPO_ROOT}/MODELS/${name}.stl" ]] \
+    && printf '      note: MODELS/%s.stl is on the printer site NAS and is left alone — that is a live site\n' "$name"
+
+  if [[ "$found" -eq 0 ]]; then
+    printf '      nothing found under this name\n' >&2
+    return 1
+  fi
+  return 0
+}
+
+if [[ "$SHITCAN" -eq 1 ]]; then
+  echo "== shitcanning, in ${REPO_ROOT}"
+  failed=0
+  for n in "${NAMES[@]}"; do
+    shitcan_one "$n" || failed=$((failed + 1))
+  done
+  echo
+  if [[ "$APPLY" -eq 0 ]]; then
+    echo "dry run. Re-run with --apply to remove it."
+  else
+    echo "gone. Whatever git tracked is now a staged deletion — commit it."
+  fi
+  [[ "$failed" -eq 0 ]] || exit 1
+  exit 0
+fi
 
 echo "== finalizing in $OUTDIR"
 failed=0
