@@ -80,9 +80,25 @@
 // tight, and one on the wall side at the lower's shoulder, held lap_clr
 // open so the first can close. Ziad, 2026-09-14: the dovetail this replaces
 // was far too fragile — 0.8 mm socket walls around a flaring pin — and the
-// joint is glued and not load bearing, so flat surfaces to glue are all it
-// needs. Set lower_run so the lower piece — lower_run + lap_len + cap_h/2
-// tall — and upper_run both stay under 205.
+// joint is glued and not load bearing. Set lower_run so the lower piece —
+// lower_run + lap_len + cap_h/2 tall — and upper_run both stay under 205.
+//
+// AND THE LAP IS KEYED, so it does not just butt: halfway along it the
+// tongue carries a block on each rail line, key_len x key_h, and the
+// upper's rails have a pocket key_clr looser for it to drop into. The
+// pockets' end walls are what locks the joint along the run — pull on it
+// and the keys have to shear, not just the glue. They are the full width of
+// a rail and the pocket is a notch clean through it, so there is no thin
+// wall anywhere in the joint: the key is a solid 1.35 x 5 x 1.0 block and
+// what is left under its pocket is 0.9 of rail, two loops and a bit. Their
+// outer faces finish flush with the bar, so what shows on the wall side is
+// an inlaid block, not a gap. Ziad, 2026-09-14: the two faces meeting was
+// not enough, one bit should embed in the other.
+//
+// Sideways it is still the flush outer faces that line the two up — a key
+// narrow enough to leave a wall beside it in a 1.35 rail would be back to
+// the flimsiness this replaces — but sideways is the easy direction to hold
+// while the glue grabs, and the wall and the tape hold it after.
 //
 // THE TWO PIECES PRINT THE OPPOSITE WAY UP, and that is what makes the lap
 // work: each piece's half of the joint has to be the half on the bed, or it
@@ -139,6 +155,10 @@ jog       = 15.0;   // the run's centreline is this far right of the hole (mm)
 lower_run = 120.0;  // of run_len, on the lower piece; the rest is the upper (mm)
 lap_len   = 12.0;   // the lap, along the run: the lower's skin under the upper's rails (mm)
 lap_clr   = 0.15;   // the upper's rails stop this short of the lower's shoulder (mm)
+key_len   = 5.0;    // the block on each rail line that locks the lap, along the run (mm)
+key_h     = 1.0;    // how far it stands off the tongue, of the rail's 2.0 (mm)
+key_clr   = 0.15;   // the pocket over the key, each end (mm)
+key_sink  = 0.1;    // the pocket is this much deeper than the key is tall, so the lap's faces close and not the key's top (mm)
 bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as large as will reach the corner (mm)
 
 /* [Raceway] */
@@ -172,6 +192,10 @@ eps = 0.01;
 // ---- derived ---------------------------------------------------------------
 
 upper_run = run_len - lower_run;
+rail_w    = (rw_w - slot_w) / 2;     // 1.35, one rail
+rail_x    = (rw_w + slot_w) / 4;     // 2.775, a rail's centreline
+key_d     = key_h + key_sink;        // the pocket
+key_y     = (lap_len - key_len) / 2; // the key's start, from the joint line
 cap_h     = hole_h + 2 * (screw_off + cap_margin);   // 52.0
 cap_w     = cap_left + cap_right;                     // 39.5
 cap_x     = (cap_right - cap_left) / 2;               // the cap's centre, right of the hole
@@ -206,6 +230,7 @@ assert(cap_right >= jog + rw_w / 2 + cap_round_in, "the run's edge lands on the 
 assert(cap_left > plug_hw + cap_round_in && cap_h / 2 > plug_hh + cap_round_in, "the cap's flat does not clear the plug");
 assert(lower_run + lap_len + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
 assert(rw_h - slot_d >= 0.8 && lap_len > 2 * lap_clr, "the lap's tongue is too thin, or too short to glue");
+assert(key_y > key_clr + 1.0 && slot_d - key_d >= 0.8, "the key leaves no rail either side of its pocket, or none under it");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
 
@@ -277,18 +302,32 @@ module diagonal_wire() {
   }
 }
 
-module lower() difference() {
-  union() {
-    cap_plate();
-    plug();
-    translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap_len) rw_outer();
+// The lap's keys, on both rail lines: a block from y0, key_len long and h
+// off the tongue, grown g at each end. The key is drawn exactly a rail wide
+// so it finishes flush with the bar; the pocket is drawn with a fat o on
+// each side and up over the lap's face, into space that is void there
+// anyway, because a cut that stops flush with a face leaves a sliver of a
+// facet and the mesh comes back a genus out.
+module lap_keys(y0, g, h, o, up) for (sx = [-1, 1])
+  translate([sx * rail_x - rail_w / 2 - o, y0 - g, slot_d - h])
+    cube([rail_w + 2 * o, key_len + 2 * g, h + up]);
+
+module lower() {
+  difference() {
+    union() {
+      cap_plate();
+      plug();
+      translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap_len) rw_outer();
+    }
+    // Past lower_run everything below the groove's floor goes: what is left
+    // is the front skin, full width, the tongue the upper's rails sit on.
+    translate([jog - rw_w / 2 - eps, lower_run, -eps])
+      cube([rw_w + 2 * eps, lap_len + 1, slot_d + eps]);
+    translate([jog, 0, 0]) along_y(bend_y - eps, lower_run + eps) rw_slot();
+    diagonal_wire();
   }
-  // Past lower_run everything below the groove's floor goes: what is left is
-  // the front skin, full width, the tongue the upper's rails sit on.
-  translate([jog - rw_w / 2 - eps, lower_run, -eps])
-    cube([rw_w + 2 * eps, lap_len + 1, slot_d + eps]);
-  translate([jog, 0, 0]) along_y(bend_y - eps, lower_run + eps) rw_slot();
-  diagonal_wire();
+  // Then the keys go back on, outside the cut that took the rails away.
+  translate([jog, 0, 0]) lap_keys(lower_run + key_y, 0, key_h, 0, eps);
 }
 
 // From y = 0 at the joint to upper_run at the doorbell. Its first lap_len is
@@ -299,6 +338,12 @@ module upper() difference() {
   along_y(lap_clr - eps, upper_run + eps) rw_slot();
   translate([-rw_w / 2 - eps, -eps, slot_d])
     cube([rw_w + 2 * eps, lap_len + eps, rw_h - slot_d + eps]);
+  // And eps down into the groove, so that cut and the groove's are one
+  // region. Left exactly back to back they leave a zero-thickness face
+  // across the channel and the mesh comes back a genus out.
+  translate([-slot_w / 2, -eps, slot_d - eps])
+    cube([slot_w, lap_len + eps, 2 * eps]);
+  lap_keys(key_y, key_clr, key_d, 0.5, rw_h);
 }
 
 // The fit coupon: cap and plug, with the groove in from the cap's top edge
@@ -327,5 +372,6 @@ if (show == "both") {
 echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right); plug ", hole_w, " x ", hole_h,
          " + ", plug_rib, " ribs, ", plug_depth, " deep; lower piece ",
          lower_run + lap_len + cap_h / 2, " tall, upper ", upper_run,
-         "; lap ", lap_len, " x ", rw_h - slot_d, " tongue under 2 x ",
-         (rw_w - slot_w) / 2, " of rail"));
+         "; lap ", lap_len, " x ", rw_h - slot_d, " tongue under 2 x ", rail_w,
+         " of rail, keyed 2 x ", rail_w, " x ", key_len, " x ", key_h,
+         " into pockets ", key_d, " deep, ", slot_d - key_d, " of rail left under them"));
