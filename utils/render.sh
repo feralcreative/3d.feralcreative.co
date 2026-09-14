@@ -52,9 +52,17 @@ fi
 # Verified on OpenSCAD 2026.06.12 with a deliberately asymmetric rig — a
 # pillar on +X, a block on +Y, a ball on +Z:
 #
-#   zplus    camera on +Z, looking down;  +x right, +y up
-#   yminus   camera on -Y;                +x right, +z up
-#   xplus    camera on +X;                +y right, +z up
+#   zplus    camera on +Z;  +x right, +y up
+#   zminus   camera on -Z;  +x LEFT,  +y up
+#   yminus   camera on -Y;  +x right, +z up
+#   yplus    camera on +Y;  +x LEFT,  +z up
+#   xplus    camera on +X;  +y right, +z up
+#   xminus   camera on -X;  +y LEFT,  +z up
+#
+# All six faces, because three is half a part: whichever three you pick,
+# some part's own front is one of the other three. This one's was (Ziad,
+# 2026-09-14, twice). Each opposite pair is a turn about the vertical, so
+# the second of each pair reads as the mirror of the first.
 #
 # Do not re-verify with a rotationally symmetric part: its views come out
 # pixel-identical whether the flags work or not.
@@ -64,9 +72,12 @@ fi
 # perspective purely because it looks better as an overview.
 VIEWS=(
   "iso:55,0,25:p"
-  "yminus:90,0,0:o"
-  "xplus:90,0,90:o"
   "zplus:0,0,0:o"
+  "zminus:0,180,0:o"
+  "yminus:90,0,0:o"
+  "yplus:90,0,180:o"
+  "xplus:90,0,90:o"
+  "xminus:90,0,-90:o"
 )
 
 find_openscad() {
