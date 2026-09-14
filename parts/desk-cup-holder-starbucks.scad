@@ -51,8 +51,8 @@
 // wall this thin the difference is 1 mm of width between the bore and the
 // outside, and the slot is dimensioned at the mid-wall of the rim.
 //
-// THE UNDERSIDE. Flat, on a 4 mm floor, with four shallow square pockets —
-// 26 x 26, 0.5 deep — at north, east, south and west, for the adhesive
+// THE UNDERSIDE. Flat, on a 4 mm floor, with four shallow pockets — 26
+// across by 13 in, 0.5 deep — at north, east, south and west, for the adhesive
 // strips (Ziad, 2026-09-13). Each sits as far out as it can with pad_edge of
 // floor left outside it, so the grip is at the rim of the footprint where it
 // resists tipping. They are locating pockets, not sockets: half a millimetre
@@ -120,9 +120,11 @@ lip_r_req = 1.9;    // mm
 pad_recess_d = 60;   // mm
 pad_recess_h = 0;    // mm
 
-// Four square pockets for adhesive strips, one on each axis, centred as far
-// out as pad_edge allows.
-pad_sq    = 26;    // mm, square
+// Four pockets for adhesive strips, one on each axis, as far out as pad_edge
+// allows: pad_w across, pad_len from the outside in. They were 26 square;
+// Ziad halved the radial run (2026-09-13).
+pad_w     = 26;    // mm, across (tangential)
+pad_len   = 13;    // mm, from the outside in (radial)
 pad_sq_h  = 0.5;   // mm, deep; 0 for none
 pad_edge  = 5;     // mm of floor left between a pocket and the outside; 2 risked a crack at the edge (Ziad)
 
@@ -272,9 +274,9 @@ module desk_cup_holder() {
                 cylinder(d = pad_recess_d, h = pad_recess_h + eps);
         if (pad_sq_h > 0)
             for (a = [0 : 90 : 270]) rotate([0, 0, a])
-                translate([r_bot - pad_edge - pad_sq / 2, 0, -eps])
+                translate([r_bot - pad_edge - pad_len / 2, 0, -eps])
                     linear_extrude(pad_sq_h + eps)
-                        square(pad_sq, center = true);
+                        square([pad_len, pad_w], center = true);
     }
 }
 
