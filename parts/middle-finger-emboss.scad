@@ -45,41 +45,30 @@
 // nothing will tell you: the cut simply lands somewhere else on the hand.
 // Re-measure it as the minimum y of the mesh above bottom_z after the turn.
 //
-// THE CUT. One plane, and only at the back. Everything behind
-// y = back_y + bite goes, so the finger keeps a
-// flat land along its back — that is what ties it to the face; with bite = 0
-// the finger would touch the face along a line and could be snapped off it.
+// THE CUT IS ON THE PALM SIDE, and nothing at all comes off the knuckles.
+// The knuckle side is what you look at; the palm side is what goes against
+// the object. So the piece is the slab of the hand from its knuckle surface
+// inward, relief_depth thick, and the flat face is the far end of that slab
+// — the cut through the palm, the curled fingers and the thumb.
 //
-// bite HAS TO REACH THE FINGERTIP. back_y is the back of the fist, and the
-// finger tips away from the wall as it rises, so its back climbs away from
-// that plane — 1.5 mm up at the knuckles, 3.0 by mid-finger, 10.5 at the
-// tip. At the 2.0 it used to be, the top 25 mm of the finger never touched
-// the face at all: it stood off it and the land ran out (Ziad, 2026-09-14:
-// cut more of the back until there is no gap between the finger and the
-// back). 10.5 is where that last gap closes and 11.0 gives the tip an
-// actual land instead of a tangent point.
+// It was the other way round until 2026-09-14, cutting a flat on the KNUCKLE
+// side and capping the palm side too. That flattened the very thing the
+// piece is for (Ziad: you are cutting the front and only the front), and the
+// face it left was the knuckles rather than the palm, so it read as a hand
+// seen from the wrong side. There is no `bite` any more: a bite is a cut
+// into the display surface and there is no reason to want one.
 //
-// It costs finger. The cut is the same plane all the way down, so closing a
-// 10.5 gap at the tip takes 9 mm off the back of the finger at its base,
-// and the finger ends up standing about 8 mm proud along its whole length
-// rather than 17 in the middle and nothing at the top. That is the trade:
-// an even half-round finger that is attached everywhere, against a rounder
-// one that lets go a third of the way up. Everything further out than relief_depth from the face
-// ⚠️ THE FRONT IS NOT CUT. relief_depth used to cap it at 30 from the face,
-// which sliced the knuckles off flat — and because the cap is measured from
-// the face, every millimetre of extra bite took another millimetre off the
-// front as well. Ziad, 2026-09-14: wrong side, the front is untouched, all
-// we are doing is trimming the back so it sits flat on something. So
-// relief_depth is 0, which means no cap, and the fist stands its full ~90 mm
-// off the face. Set it to a number again only if you want it back as a slab.
+// HOW THICK, so nothing floats. The finger has to be inside the slab or it
+// has air behind it where it rises off the fist. Measured at tilt 57, from
+// the knuckle surface inward, the finger is wholly inside 23.2 mm — it lies
+// close to the same plane the fist's knuckles do, which is what the tilt is
+// fitted for. relief_depth 25 covers it with a little to spare, and leaves
+// the fist as a 25 mm slab of knuckles. Below 23 the fingertip starts to
+// hollow out behind; above about 60 the knuckle roll is no longer cut at all
+// and you are back to most of a fist.
 //
-// THERE IS NO BOTTOM CUT any more. bottom_z sat at 60, just above the
-// knuckles, so the relief was the finger and a sliver with no hand to speak
-// of; then at 55 for the knuckles. Ziad, 2026-09-14: the entire fist, cut
-// only the back. So bottom_z now sits below the mesh and takes nothing, and
-// the wrist's slanted end is part of the piece — it tapers off the face over
-// the last 20 mm or so, which is the wrist going away from the wall. Raise
-// bottom_z above -17.9 to square it off again.
+// The bottom is squared off at bottom_z, in the stood-up frame; it sits
+// below the mesh by default, so nothing is cut off the bottom either.
 //
 // PRINTED FACE DOWN: the flat cut is the bed, the finger and knuckles stand
 // up off it, and their rounded fronts are the top of the print. flip = false
@@ -94,8 +83,7 @@ mesh_scale = 25.4;   // the mesh is in inches
 tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
 
 /* [Cut] */
-bite         = 11.0;  // how far the face cuts in past back_y. 10.5 is where the last gap under the fingertip closes; 11.0 gives the tip a land rather than a tangent point (mm)
-relief_depth = 0;     // 0 = no front cap at all, the whole fist stands off the face. Set it to cut the front back to a slab that many mm thick (mm)
+relief_depth = 25;    // the slab's thickness, measured in from the knuckle surface. 23.2 is where the finger stops having air behind it, at tilt 57 (mm)
 bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the mesh, which bottoms out at -17.9, so nothing is cut off the bottom at all (mm)
 
 /* [Hidden] */
@@ -106,13 +94,14 @@ back_y = -113.27;
 
 module stood_up() rotate([tilt, 0, 0]) scale(mesh_scale) import(mesh_file, convexity = 10);
 
-// Standing, as mounted: the flat face on y = 0, the relief standing out
+// Standing, as mounted: the flat face on y = 0, the knuckles standing out
 // toward +y, the finger up.
 module emboss() {
-  translate([0, -(back_y + bite), 0]) intersection() {
+  // The slab, from the knuckle surface inward; then the flat face to y = 0,
+  // and turned to look at the knuckles rather than the cut.
+  rotate([0, 0, 180]) translate([0, -(back_y + relief_depth), 0]) intersection() {
     stood_up();
-    translate([-big / 2, back_y + bite, bottom_z])
-      cube([big, relief_depth > 0 ? relief_depth : big, big]);
+    translate([-big / 2, back_y - 1, bottom_z]) cube([big, relief_depth + 1, big]);
   }
 }
 
