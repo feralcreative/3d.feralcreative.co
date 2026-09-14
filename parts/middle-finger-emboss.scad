@@ -20,18 +20,26 @@
 // actually matters, because the face is one plane and everything above
 // bottom_z has to lie near it.
 //
-// Measured off the mesh, over everything above z = 55, the back strays from
-// its own flattest plane by:
+// The tilt is fitted to whatever is being kept, and what is kept is now the
+// whole fist (Ziad, 2026-09-14: the entire fist, and cut only the back).
+// With all of it in, the measure that matters is how much of its height
+// actually lands on the face — where the back comes within bite of the
+// plane — because that is what holds it on:
 //
-//   tilt      58    60    62    64    65    66    67    68    70    72
-//   spread  11.5   7.9   7.7   5.5   5.0   4.6   7.1   5.0   5.4   5.7
+//   tilt        54    55    56    57    58    60    62    64    66    68
+//   land 2mm  62.5  70.0  77.5  82.5  75.0  57.5  55.0  47.5  30.0  40.0
+//   land 4mm  80.0  90.0 100.0 102.5 102.5 100.0  82.5  72.5  70.0  60.0
 //
-// So there is no angle that lays the whole thing flat: the finger's back and
-// the fist's back are a few degrees apart, and every tilt trades one against
-// the other. 66° is the flattest of them, and it also puts the worst of the
-// lift-off at the FINGERTIP, where a rounded tip standing a few mm off the
-// face reads as the tip curling. At 68° the worst of it was at the bottom
-// edge instead, where it reads as the hand not sitting down properly.
+// 57° is the best of them and it is not close: 82.5 mm of the height gets a
+// land, against 30 at the 66° this replaced and 40 at the 68° before that.
+// Both of those were fitted to the FINGER — 68° to its centreline, 66° to
+// the finger plus the knuckles — which is the right fit when the finger is
+// most of what you keep and the wrong one once the fist is.
+//
+// The finger's back and the fist's back are a few degrees apart, so no angle
+// lays all of it flat. At 57° the leftover goes into the fingertip, which
+// ends up standing about 9 mm off the face: the finger tips away from the
+// wall as it rises, which is what a finger does.
 //
 // ⚠️ back_y IS MEASURED AT THIS TILT. Change tilt and it is wrong, and
 // nothing will tell you: the cut simply lands somewhere else on the hand.
@@ -46,18 +54,13 @@
 // dial between "finger on a plate" and "fist". The bottom is squared off at
 // bottom_z, in the stood-up frame, so the wrist's slanted end is gone.
 //
-// bottom_z IS WHAT DECIDES HOW MUCH HAND YOU GET, and it was set at 60,
-// which is just above the knuckles — the finger with a sliver under it, and
-// no hand to speak of (Ziad, 2026-09-14). It is the bottom cut that was
-// hiding the hand, not the angle. What it costs, at tilt 66, measured:
-//
-//   bottom_z    65    60    55    50    45    40
-//   hand wide 72.3  86.9  95.3  96.6  96.2  94.9
-//   worst lift 4.0   4.0   4.6   5.9   6.9   7.7
-//
-// 55 is the knuckles across their full width for almost nothing: the hand's
-// back leaves the face by 4.6 mm at worst against 4.0 at 60. Below that the
-// fist stops getting wider and only the lift-off grows.
+// THERE IS NO BOTTOM CUT any more. bottom_z sat at 60, just above the
+// knuckles, so the relief was the finger and a sliver with no hand to speak
+// of; then at 55 for the knuckles. Ziad, 2026-09-14: the entire fist, cut
+// only the back. So bottom_z now sits below the mesh and takes nothing, and
+// the wrist's slanted end is part of the piece — it tapers off the face over
+// the last 20 mm or so, which is the wrist going away from the wall. Raise
+// bottom_z above -17.9 to square it off again.
 //
 // PRINTED FACE DOWN: the flat cut is the bed, the finger and knuckles stand
 // up off it, and their rounded fronts are the top of the print. flip = false
@@ -69,18 +72,18 @@ flip = true;   // printed orientation, flat face on the bed; false shows it stan
 /* [Mesh] */
 mesh_file  = "../_incoming/MiddleFingerToScale.stl";
 mesh_scale = 25.4;   // the mesh is in inches
-tilt       = 66;     // deg about X to stand the finger up; back_y is measured at THIS angle
+tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
 
 /* [Cut] */
 bite         = 2.0;   // mm the face cuts into the finger's back, so it is joined along a land (mm)
 relief_depth = 30;    // from the face; the finger is 18 deep, the knuckle roll runs 40-60 out and is cut flat here (mm)
-bottom_z     = 55;    // squared-off bottom, in the stood-up frame: the knuckles at their full width, and the hand's back still within 4.6 of the face (mm)
+bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the mesh, which bottoms out at -17.9, so nothing is cut off the bottom at all (mm)
 
 /* [Hidden] */
 big = 400;
-// The back of the finger and hand after the turn: the minimum y of the mesh
-// above bottom_z, measured off it at tilt 66. Tied to tilt — see above.
-back_y = -127.89;
+// The back of the whole hand after the turn: the minimum y of the mesh,
+// measured off it at tilt 57. Tied to tilt — see above.
+back_y = -113.27;
 
 module stood_up() rotate([tilt, 0, 0]) scale(mesh_scale) import(mesh_file, convexity = 10);
 
