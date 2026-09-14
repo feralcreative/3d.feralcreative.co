@@ -92,49 +92,64 @@
 //
 // TWO PIECES, because 255 does not fit a 220 bed. The lower piece is the
 // cap, the jog, and lower_run of the vertical; the upper is the rest. They
-// meet in a LAP IN PLAN, lap_len long: past lower_run the lower keeps the
-// channel's floor and nothing else — a tongue slot_w wide and rw_h - slot_d
-// thick — and the upper's first lap_len is its two rails with the socket
-// cut clean through between them. Set lower_run so the lower piece —
-// lower_run + lap_len + cap_h/2 tall — and upper_run both stay under 205.
+// meet in a LAP THROUGH THE FACE, lap_len long, ONE BEHIND THE OTHER: the
+// face — what is left in front of the groove, rw_h - slot_d = 1.2, ten
+// layers at the 0.12 this gets sliced at — splits down its thickness, the
+// lower keeping the front lap_face of it and the upper the back tenon_t
+// along with its two rails. Both halves are the full 6.9 across and they
+// glue face to face over the whole of it. Set lower_run so the lower piece
+// — lower_run + lap_len + cap_h/2 tall — and upper_run both stay under 205.
 //
-// The channel runs through unbroken: the tongue IS its floor over the lap,
-// at the same slot_d as everywhere else, and the upper's rails are its
-// walls. The socket is lap_clr wider than the tongue and lap_clr longer at
-// the root, which leaves sock_rail of rail each side of it, and the tip
-// butts tight because that is the seam that shows across the face.
+// The wire channel runs through unchanged: over the lap its floor is the
+// upper's own half of the face, at the same slot_d as everywhere else, and
+// its walls are the upper's rails.
 //
-// ⚠️ IN PLAN, NOT THROUGH THE THICKNESS, and that is the whole reason both
-// pieces can print face down. A lap through the thickness gives one piece
-// the front of the face and the other the back, and only the front half
-// lands on the bed — sliced face down, the back half hangs 0.54 mm in the
-// air for the whole lap_len and comes out as bridge. In plan both pieces
-// are full depth right down to the bed in their own half of the footprint,
-// and nothing anywhere on either piece is unsupported.
+// Two seams show. The front one, where the lower's tongue ends and the
+// upper's face takes over, is butted tight. The other is on the wall side
+// at the lower's shoulder, held lap_clr open so the first one can close.
 //
-// What it costs is the lock. A joint split in plan can only be keyed by
-// widening the tongue into the rails, and there is not enough rail to do
-// it: 1.35 has to cover both the key's ear and the wall beside it, so one
-// of the two comes out at 0.4 to 0.8 — which is exactly the 0.8 mm socket
-// wall Ziad threw the dovetail out for on 2026-09-14. So the tongue is
-// straight. It locates the joint in every direction but one: across, up and
-// down, and along the run in compression, where the shoulders butt. Pulling
-// the two apart is the glue's job alone, over the tongue's two long faces
-// and the two shoulders.
+// AND THE LAP IS TENONED, so the two lock rather than just butt (Ziad,
+// 2026-09-14: one bit should embed in the other). Halfway along it the
+// lower's tongue carries a pad key_w x key_len, key_r round in plan,
+// standing tenon_t off its back — exactly filling the upper's half of the
+// face — and the upper has the matching mortise through that half, key_clr
+// looser all round. It is caught on all four sides: pull the joint along
+// the run or push it across and the tenon has to shear, not just the glue.
+//
+// Nothing in it is thin. The tenon is a 5 x 4 x 0.66 pad on a 0.54 tongue;
+// what is left of the upper's face beside the mortise is 0.8 wide, and that
+// sits on top of a rail for its whole length rather than standing free.
+//
+// ⚠️ lap_face is 0.54 and not the 0.6 that would split the face evenly,
+// for two reasons either of which would do it on its own. The lower's
+// tongue lies flat on the bed, so its thickness is a layer count, and 0.54
+// is the 0.3 first layer plus two of 0.12. And 0.6 puts the split plane at
+// z = 2.6, which is exactly a vertex of the faceted front round — the round
+// is centred at z = slot_d with r = rw_r and steps 10°, so a = 30 lands on
+// 2.0 + 0.6 — and a cut through a profile vertex came back with four edges
+// shared by four facets each. Move lap_face and check the mesh, not just
+// the render.
 //
 // BOTH PIECES PRINT FACE DOWN, front face on the bed. flip = true (the
-// default) lays each one out that way. There is no bridge anywhere on
-// either piece and the slicer asks for no support: the channel opens
-// upward, the tongue and the rails both sit on the plate, and the front
-// rounds and the cap's ellipse are the only overhangs — those step out
-// about 0.5 mm over the first layer and 0.1 after that, which PETG carries.
-// If the cap's edge comes out ragged, slice that one with support.
+// default) lays each one out that way. That keeps the wire channel opening
+// upward on both, which is the whole point: printed the other way up, back
+// down, the upper bridges the entire 133 mm of the channel in one layer and
+// the sag lands on the 0.3 mm the wire has spare in the groove.
 //
-// Getting here took an argument that should have been a slice (2026-09-14).
-// Back down, with the lap through the thickness, the upper bridges the
-// whole 133 mm of the wire channel in one layer and the sag lands on the
-// 0.3 mm the wire has spare in the groove. Face down it bridges nothing.
-// Slice it before claiming otherwise.
+// ⚠️ THE UPPER'S HALF OF THE LAP NEEDS SUPPORT. Its back half of the face
+// starts lap_face off the bed and hangs there for the whole lap_len — the
+// price of a lap one behind the other rather than side by side, and Ziad's
+// call, 2026-09-14, over a joint split in plan. Sliced with support on, it
+// is a 10 x 18 pad two layers tall, 0.04 g, tucked under that one tab with
+// a 0.15 gap over it; nothing else on the plate asks for any. Slice it with
+// supports enabled or that tab prints as a 12 mm cantilever, and its
+// underside is the glue face.
+//
+// Otherwise nothing is unsupported: the front rounds and the cap's ellipse
+// step out about 0.5 mm over the first layer and 0.1 after that, which PETG
+// carries. If the cap's edge comes out ragged, slice that one with support
+// too — and slice it before claiming how any of this prints (2026-09-14:
+// three turns were spent arguing that from memory and all of it was wrong).
 //
 // flip = false draws both the way they go on the wall: x to the right, y
 // up, z out of the wall, the wall at z = 0, the hole's centre at the
@@ -174,7 +189,12 @@ run_len   = 255.0;  // doorbell to the jog's centreline; was 260, Ziad measured 
 jog       = 15.0;   // the run's centreline is this far right of the hole (mm)
 lower_run = 120.0;  // of run_len, on the lower piece; the rest is the upper (mm)
 lap_len   = 12.0;   // the lap, along the run (mm)
-lap_clr   = 0.15;   // the socket over the tongue, sideways and at the root; the tip butts (mm)
+lap_clr   = 0.15;   // the upper's rails stop this short of the lower's shoulder (mm)
+lap_face  = 0.54;   // of the face's 1.2, what the lower keeps over the lap; the upper carries the rest. Three layers on the bed at 0.3 + 2 x 0.12, and it misses the facet vertex that sits exactly at 0.6 (mm)
+key_w     = 5.0;    // the tenon across (mm)
+key_len   = 4.0;    // the tenon along the run (mm)
+key_r     = 1.0;    // its corners in plan, so a printed corner cannot hold it off its seat (mm)
+key_clr   = 0.15;   // the mortise over the tenon, all round (mm)
 bend_r    = 0;      // centreline radius of the bend out of the run; 0 = as large as will reach the corner (mm)
 
 /* [Raceway] */
@@ -212,7 +232,9 @@ eps = 0.01;
 
 upper_run = run_len - lower_run;
 rail_w    = (rw_w - slot_w) / 2;     // 1.35, one rail
-sock_rail = rail_w - lap_clr;        // 1.20, what is left of a rail beside the socket
+split_z   = rw_h - lap_face;         // 2.66, where the lap splits the face
+tenon_t   = split_z - slot_d;        // 0.66, the tenon's own thickness
+key_y     = (lap_len - key_len) / 2; // the tenon's start, from the joint line
 cap_h     = hole_h + 2 * (screw_off + cap_margin);   // 52.0
 cap_w     = cap_left + cap_right;                     // 39.5
 cap_x     = (cap_right - cap_left) / 2;               // the cap's centre, right of the hole
@@ -262,7 +284,8 @@ assert(cap_right >= jog + rw_w / 2 + cap_round_in, "the run's edge lands on the 
 assert(cap_left > plug_hw + cap_round_in && cap_h / 2 > plug_hh + cap_round_in, "the cap's flat does not clear the plug");
 assert(lower_run + lap_len + cap_h / 2 <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
 assert(rw_h - slot_d >= 0.8 && lap_len > 4 * lap_clr, "the lap's tongue is too thin, or too short to glue");
-assert(sock_rail >= 0.8, "the socket leaves less than two loops of rail beside it");
+assert(lap_face >= 0.5 && tenon_t >= 0.5, "the lap splits the face too thin on one side");
+assert(key_y > key_clr + 1.0 && rw_w - key_w - 2 * key_clr >= 1.6, "the mortise leaves too little face around the tenon");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
 
@@ -358,42 +381,45 @@ module diagonal_wire() {
   }
 }
 
-// The tongue in plan, from the joint line at y = 0: the channel's own width,
-// so the channel's floor carries through the lap unbroken. g grows it
-// sideways, tail past its tip. The socket takes g = lap_clr and tail = 0,
-// so the tip butts tight — that is the seam that shows across the face. The
-// lower cuts round it with g = -eps, so the tongue's sides and the groove's
-// walls overlap instead of meeting in a zero-thickness face, and tail = 1
-// so the tongue's tip is the bar's own end rather than a cut.
-module lap_plan(g, tail) translate([-slot_w / 2 - g, -1])
-  square([slot_w + 2 * g, 1 + lap_len + tail]);
+// The tenon in the middle of the lap: a pad key_w x key_len standing off the
+// back of the lower's half of the face and filling the upper's half, its
+// corners rounded key_r. g grows it all round for the mortise; o takes it o
+// past the face's two planes at both ends, into space that is void either
+// way — a cut left flush with a face leaves a zero-thickness facet behind
+// and the mesh comes back a genus out.
+module lap_tenon(y0, g, o)
+  translate([0, y0 + key_len / 2, slot_d - o])
+    linear_extrude(tenon_t + 2 * o) offset(delta = g) rr(key_w, key_len, key_r);
 
-module lower() difference() {
-  union() {
-    cap_plate();
-    plug();
-    entry_fill();
-    translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap_len) rw_outer();
+module lower() {
+  difference() {
+    union() {
+      cap_plate();
+      plug();
+      entry_fill();
+      translate([jog, 0, 0]) along_y(-rw_w / 2, lower_run + lap_len) rw_outer();
+    }
+    // Past lower_run the lower keeps only the front lap_face of the face,
+    // full width and rounds and all; the upper carries the rest of it.
+    translate([jog - rw_w / 2 - 1, lower_run, -1])
+      cube([rw_w + 2, lap_len + 1, split_z + 1]);
+    translate([jog, 0, 0]) along_y(bend_y - eps, lower_run + eps) rw_slot();
+    diagonal_wire();
   }
-  // Past lower_run everything outside the tongue goes, the whole depth of
-  // the bar: the rails there are the upper's, and what is left of the lower
-  // is the channel's floor and nothing else.
-  translate([jog, lower_run, -1]) linear_extrude(rw_h + 2) difference() {
-    translate([-rw_w / 2 - 1, 0]) square([rw_w + 2, lap_len + 2]);
-    lap_plan(-eps, 1);
-  }
-  translate([jog, 0, 0]) along_y(bend_y - eps, lower_run + lap_len + eps) rw_slot();
-  diagonal_wire();
+  // Then the tenon goes back on, outside the cut that took the rest away.
+  translate([jog, 0, 0]) lap_tenon(lower_run + key_y, 0, eps);
 }
 
-// From y = 0 at the joint to upper_run at the doorbell. Its first lap_len is
-// the two rails with the socket cut clean through between them; the rails
-// start lap_clr short so the tongue's tip can butt the socket's end face
-// without the two shoulders fighting over the same millimetre.
+// From y = 0 at the joint to upper_run at the doorbell. Over the first
+// lap_len it keeps the back tenon_t of the face and both rails, and that
+// half of the face is the tab that hangs: it starts lap_face off the plate
+// and needs support under it.
 module upper() difference() {
   along_y(lap_clr, upper_run) rw_outer();
   along_y(lap_clr - eps, upper_run + eps) rw_slot();
-  translate([0, 0, -1]) linear_extrude(rw_h + 2) lap_plan(lap_clr, 0);
+  translate([-rw_w / 2 - 1, -eps, split_z])
+    cube([rw_w + 2, lap_len + eps, rw_h - split_z + 1]);
+  lap_tenon(key_y, key_clr, eps);
 }
 
 // The fit coupon: cap and plug, with the groove in from the cap's top edge
@@ -427,5 +453,6 @@ if (show == "both") {
 echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right); plug ", hole_w, " x ", hole_h,
          " + ", plug_rib, " ribs, ", plug_depth, " deep; lower piece ",
          lower_run + lap_len + cap_h / 2, " tall, upper ", upper_run,
-         "; lap ", lap_len, " long, tongue ", slot_w, " x ", rw_h - slot_d,
-         " in a socket ", lap_clr, " looser, ", sock_rail, " of rail each side of it"));
+         "; lap ", lap_len, " long, the face split ", lap_face, " to the lower and ",
+         tenon_t, " to the upper, tenon ", key_w, " x ", key_len, " x ", tenon_t,
+         ", ", (rw_w - key_w) / 2 - key_clr, " of face each side of its mortise"));
