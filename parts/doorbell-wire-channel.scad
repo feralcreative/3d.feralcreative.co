@@ -173,11 +173,16 @@
 // lower — jog, cap, plug, and the lower part of the vertical run
 // upper — the rest of the vertical run
 // cap   — cap and plug alone, the fit coupon
-// both  — lower and upper laid side by side, to look at
+// both  — the print plate: both pieces, each the way up it prints, the
+//         upper plate_gap off the cap's edge and inside the lower's length
 show = "both";  // [lower, upper, cap, both]
 
 // Printed orientation, front face on the bed. false draws it as it mounts.
 flip = true;
+
+// Between the two pieces on the "both" plate. They are one object to the
+// slicer, so the only thing this has to clear is a brim, if one is used.
+plate_gap = 3.0;
 
 /* [Wire — measured] */
 wire_t = 1.7;    // wire, thick (mm)
@@ -446,7 +451,12 @@ if (show == "upper") upper();
 if (show == "cap")   oriented() cap_only();
 if (show == "both") {
   oriented() lower();
-  translate([cap_w / 2 + rw_w + 10, -cap_h / 2, 0]) upper();
+  // Alongside the cap's right edge, plate_gap off it, and hung from the
+  // cap's top so the upper sits inside the lower's own length: the head
+  // crosses plate_gap between the two and the plate is no longer than the
+  // lower piece. It used to sit 12 away and 135 further up the bed, which
+  // put the plate 241 long — over the 220 the machine has.
+  translate([cap_x + cap_w / 2 + plate_gap + rw_w / 2, cap_h / 2 - upper_run, 0]) upper();
 }
 
 echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right); plug ", hole_w, " x ", hole_h,
