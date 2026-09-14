@@ -50,10 +50,12 @@
 //   roll     -6     -4     -2      0     +2     +4     +6     +8
 //   in slab  52220  52164  52085  52331  53355  53684  53687  53754
 //
-// It is worth about 1300 points, a couple of percent, and it is all had by
-// +4 — past that the count is flat and the hand is just turned. 3 is inside
-// that and does not disturb where the finger lands: the contact bands come
-// out at the same heights as at 0.
+// It is worth about 1400 points, a couple of percent, and the count is flat
+// past +4 — beyond that the roll is buying a turn of the hand rather than
+// more fist in the slab, which is a look and not a measurement. It sat at 3,
+// then Ziad asked for another 5 (2026-09-14), so 8. The finger is no worse
+// for it: the contact bands come out at the same heights as at 0, with one
+// more low down.
 //
 // ⚠️ back_y IS MEASURED AT THIS TILT AND THIS ROLL. Change either and it is
 // wrong, and nothing will tell you: the cut simply lands somewhere else on
@@ -113,7 +115,7 @@ flip = true;   // printed orientation, flat face on the bed; false shows it stan
 mesh_file  = "../_incoming/MiddleFingerToScale.stl";
 mesh_scale = 25.4;   // the mesh is in inches
 tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
-roll       = 3;      // deg about the hand's own axis, before the tilt: turns the fist toward you. back_y is measured at THIS too
+roll       = 8;      // deg about the hand's own axis, before the tilt: turns the fist toward you. back_y is measured at THIS too
 
 /* [Cut] */
 relief_depth = 20.0;  // the slab's thickness, measured in from the knuckle surface. Lands the finger top and bottom and leaves a small gap between; see the profile above. 18.7 touches even the tip, 23.2 and the finger floats entirely (mm)
@@ -123,7 +125,7 @@ bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the me
 big = 400;
 // The back of the whole hand after the turn: the minimum y of the mesh,
 // measured off it at tilt 57. Tied to tilt — see above.
-back_y = -113.49;
+back_y = -113.89;
 
 module stood_up() rotate([tilt, 0, 0]) rotate([0, 0, roll])
   scale(mesh_scale) import(mesh_file, convexity = 10);
