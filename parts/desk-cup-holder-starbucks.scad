@@ -5,16 +5,22 @@
 // changed are the bore and the outside that follows it, so a diff between the
 // two files is exactly the list of things the cup forced. The bore is a cone,
 // Ø65 at the floor and Ø80 at the rim — the cup's two diameters plus 5 mm of
-// wiggle room each. The outside keeps the sibling's rim wall, 7.5, so it is
-// Ø95 at the rim, and the sibling's 10 mm of taper on top of that, so it is
-// Ø105 at the foot — a 20 mm wall down there, against the bore's 12.5.
+// wiggle room each. The outside is at the rules' limits: wall_min at the rim,
+// so Ø90 there, and taper_min wider at the foot, Ø94, where the wall is 14.5
+// — the bore's 7.5 of radial flare plus the rim wall plus half the taper,
+// just under wall_max. It was Ø105 / Ø95 with a 20 mm foot wall before the
+// wall rule, and Ø89 / Ø95 — wider at the top — before the taper rule.
 //
-// THE OUTSIDE IS ALWAYS WIDER AT THE FOOT, whatever the bore does. That is
-// the whole point of these collars: they add width to the bottom of a cup so
-// it is harder to knock over, and an outside that followed this cup's bore
-// would have been Ø89 at the foot and Ø95 at the rim — the first draft, and
-// exactly backwards (Ziad, 2026-09-13). The rule holds for every variation
-// of this part, and the assert below enforces it.
+// RULES FOR EVERY VARIANT OF THIS PART (Ziad, 2026-09-13), asserted below:
+//   1. the outside tapers OUT going down — wider at the foot than the rim by
+//      at least taper_min on the diameter — whatever the bore does. The
+//      collar exists to add width to the bottom of a cup so it is harder to
+//      knock over; the Starbucks copy once followed its bore the other way.
+//   2. the wall is never thinner than wall_min nor thicker than wall_max,
+//      measured at the rim and at the foot (it is a straight cone between).
+//      Thick walls cost print time, not plastic. On a cup whose bore widens
+//      going up the foot wall has to carry the bore's radial taper plus half
+//      the outside's, so wall_max is what caps how much the bore may flare.
 //
 // Four handle slots, 25 wide, let a mug sit with its handle out in any of
 // four directions. Everything the hand or the mug meets is rounded:
@@ -64,12 +70,10 @@
 bore_bot_d = 65;   // mm, at the floor
 bore_top_d = 80;   // mm, at the rim
 
-// Outside at the foot and at the rim: the rim is the bore plus the sibling's
-// 7.5 wall; the foot is the rim plus the sibling's 10 mm of taper, so the
-// collar is wider at the bottom no matter what the bore does. The wall
-// between is a straight cone.
-outer_bot_d = 105;   // mm
-outer_top_d = 95;    // mm
+// Outside at the foot and at the rim: the rim is the bore plus wall_min, the
+// foot is the rim plus taper_min. The wall between is a straight cone.
+outer_bot_d = 94;    // mm
+outer_top_d = 90;    // mm
 
 // Overall height, floor to top of the lip.
 total_h = 60;     // mm
@@ -90,12 +94,18 @@ slot_depth = 40;  // mm
 // under 0.1 mm.
 slot_segs = 16;
 
+/* [Rules] */
+
+wall_min  = 5;     // mm, thinnest the wall may be anywhere
+wall_max  = 15;    // mm, thickest
+taper_min = 4;     // mm, how much wider the foot must be than the rim, on the diameter
+
 /* [Rounding] */
 
-// Fillet on the rim and every slot edge. Half the rim's wall (3.75) gives a
-// full half-round; Ziad wanted it about half as round as that (2026-09-13),
-// so the rim is a 3.7 flat between two 1.9 rounds. Anything larger than half
-// the wall is clamped to that.
+// Fillet on the rim and every slot edge. Half the rim's wall (2.5) would give
+// a full half-round; Ziad wanted the sibling's 1.9 (2026-09-13), so the rim
+// is a 1.2 flat between two 1.9 rounds. Anything larger than half the wall is
+// clamped to that.
 lip_r_req = 1.9;    // mm
 
 /* [Underside] */
@@ -112,8 +122,12 @@ $fn = 120;
 sphere_fn = 32;
 eps = 0.01;
 
-assert(outer_bot_d > outer_top_d,
-       "the outside must be wider at the foot than the rim: the collar exists to widen the cup's base");
+assert(outer_bot_d - outer_top_d >= taper_min,
+       "rule 1: the outside must be at least taper_min wider at the foot than the rim");
+assert((outer_top_d - bore_top_d) / 2 >= wall_min && (outer_bot_d - bore_bot_d) / 2 >= wall_min,
+       "rule 2: a wall is thinner than wall_min");
+assert((outer_top_d - bore_top_d) / 2 <= wall_max && (outer_bot_d - bore_bot_d) / 2 <= wall_max,
+       "rule 2: a wall is thicker than wall_max");
 
 bore_br   = bore_bot_d / 2;
 bore_tr   = bore_top_d / 2;

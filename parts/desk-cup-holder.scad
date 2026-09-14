@@ -3,11 +3,20 @@
 //
 // Three fixed numbers from Ziad: a Ø90 bore, Ø115 outside at the foot, Ø105
 // outside at the rim, so the wall runs from 12.5 thick at the bottom to 7.5 at
-// the top. THE OUTSIDE IS ALWAYS WIDER AT THE FOOT, in this and every
-// variation of it, whatever the bore does — the collar exists to add width to
-// the bottom of a cup so it is harder to knock over (Ziad, 2026-09-13, after
-// the Starbucks copy came out the other way round). The assert below holds
-// the rule. Four handle slots, 25 wide, let a mug sit with its handle out in
+// the top.
+//
+// RULES FOR EVERY VARIANT OF THIS PART (Ziad, 2026-09-13), asserted below:
+//   1. the outside tapers OUT going down — wider at the foot than the rim by
+//      at least taper_min on the diameter — whatever the bore does. The
+//      collar exists to add width to the bottom of a cup so it is harder to
+//      knock over; the Starbucks copy once followed its bore the other way.
+//   2. the wall is never thinner than wall_min nor thicker than wall_max,
+//      measured at the rim and at the foot (it is a straight cone between).
+//      Thick walls cost print time, not plastic. On a cup whose bore widens
+//      going up the foot wall has to carry the bore's radial taper plus half
+//      the outside's, so wall_max is what caps how much the bore may flare.
+//
+// Four handle slots, 25 wide, let a mug sit with its handle out in
 // any of four directions. Everything the hand or the mug meets is rounded:
 // the rim and every edge of every slot carry the same 1.9 round, so the top
 // outline reads as one continuous lip that dips into each slot and comes
@@ -74,6 +83,12 @@ slot_depth = 40;  // mm
 // under 0.1 mm.
 slot_segs = 16;
 
+/* [Rules] */
+
+wall_min  = 5;     // mm, thinnest the wall may be anywhere
+wall_max  = 15;    // mm, thickest
+taper_min = 4;     // mm, how much wider the foot must be than the rim, on the diameter
+
 /* [Rounding] */
 
 // Fillet on the rim and every slot edge. Half the rim's wall (3.75) gives a
@@ -96,8 +111,12 @@ $fn = 120;
 sphere_fn = 32;
 eps = 0.01;
 
-assert(outer_bot_d > outer_top_d,
-       "the outside must be wider at the foot than the rim: the collar exists to widen the cup's base");
+assert(outer_bot_d - outer_top_d >= taper_min,
+       "rule 1: the outside must be at least taper_min wider at the foot than the rim");
+assert((outer_top_d - bore_d) / 2 >= wall_min && (outer_bot_d - bore_d) / 2 >= wall_min,
+       "rule 2: a wall is thinner than wall_min");
+assert((outer_top_d - bore_d) / 2 <= wall_max && (outer_bot_d - bore_d) / 2 <= wall_max,
+       "rule 2: a wall is thicker than wall_max");
 
 bore_r    = bore_d / 2;
 r_bot     = outer_bot_d / 2;
