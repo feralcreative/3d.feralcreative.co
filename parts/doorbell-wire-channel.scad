@@ -430,10 +430,15 @@ module cap_only() difference() {
   diagonal_wire();
 }
 
-// Face down for printing. The upper piece never uses it: it prints back
-// down, which is how it is already drawn, so it is the same either way.
+// Face down for printing, turned over about the LONG axis and not the short
+// one. Either turn puts the face on the bed; about X it also stands the run
+// on its head, so every render of the plate came out upside down, cap at the
+// top and the run going away from the doorbell (Ziad, 2026-09-14). About Y
+// the run still goes up the picture the way it goes up the wall, and what
+// swaps instead is left for right — which is what turning a thing over to
+// look at its back does anyway.
 module oriented() {
-  if (flip) translate([0, 0, rw_h]) rotate([180, 0, 0]) children();
+  if (flip) translate([0, 0, rw_h]) rotate([0, 180, 0]) children();
   else children();
 }
 
@@ -442,12 +447,15 @@ if (show == "upper") oriented() upper();
 if (show == "cap")   oriented() cap_only();
 if (show == "both") {
   oriented() lower();
-  // Alongside the cap's right edge, plate_gap off it, and hung from the
-  // cap's top so the upper sits inside the lower's own length: the head
+  // Alongside the cap, plate_gap off its far edge, and hung from the top of
+  // the run so the upper sits inside the lower's own length: the head
   // crosses plate_gap between the two and the plate is no longer than the
   // lower piece. It used to sit 12 away and 135 further up the bed, which
-  // put the plate 241 long — over the 220 the machine has.
-  translate([cap_x + cap_w / 2 + plate_gap + rw_w / 2, cap_h / 2, 0]) oriented() upper();
+  // put the plate 241 long — over the 220 the machine has. The cap's edge
+  // is at -cap_x + cap_w/2 and not +cap_x, because oriented() has turned
+  // the lower over about Y and swapped its left for its right.
+  translate([-cap_x + cap_w / 2 + plate_gap + rw_w / 2,
+             lower_run + lap_len - upper_run, 0]) oriented() upper();
 }
 
 echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right); plug ", hole_w, " x ", hole_h,
