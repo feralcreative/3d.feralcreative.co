@@ -41,14 +41,32 @@ fi
 
 # view name : rot_x,rot_y,rot_z : projection
 #
+# Named for where the CAMERA sits, in the part's own axes, and never for a
+# side of the part. They were iso/front/right/top until 2026-09-14, which are
+# OpenSCAD's camera names: on a part whose own front is its +Z face, that
+# made "front" the end of it and "top" its back. Two vocabularies over one
+# set of filenames, and a whole session of renders got read the wrong way
+# round. Which side is which is the part file's business; all this script
+# says is which way it is looking.
+#
+# Verified on OpenSCAD 2026.06.12 with a deliberately asymmetric rig — a
+# pillar on +X, a block on +Y, a ball on +Z:
+#
+#   zplus    camera on +Z, looking down;  +x right, +y up
+#   yminus   camera on -Y;                +x right, +z up
+#   xplus    camera on +X;                +y right, +z up
+#
+# Do not re-verify with a rotationally symmetric part: its views come out
+# pixel-identical whether the flags work or not.
+#
 # Orthographic on the three elevations so they read as true drawings — no
 # perspective taper, so edges that should line up visibly line up. Iso stays
 # perspective purely because it looks better as an overview.
 VIEWS=(
   "iso:55,0,25:p"
-  "front:90,0,0:o"
-  "right:90,0,90:o"
-  "top:0,0,0:o"
+  "yminus:90,0,0:o"
+  "xplus:90,0,90:o"
+  "zplus:0,0,0:o"
 )
 
 find_openscad() {
