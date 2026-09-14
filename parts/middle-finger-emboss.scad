@@ -58,22 +58,32 @@
 // seen from the wrong side. There is no `bite` any more: a bite is a cut
 // into the display surface and there is no reason to want one.
 //
-// HOW THICK: FAR ENOUGH IN THAT THE FINGER IS CUT, not merely enclosed.
-// Enclosing it is not enough — at 25 the finger sat wholly inside the slab
-// and had 1.8 mm of air behind it, so it would have been bridging over the
-// mounting surface rather than sitting on it (Ziad, 2026-09-14: cut more
-// until there is no gap between the back of the finger and the surface).
+// HOW THICK: FAR ENOUGH THAT THE FINGER IS CUT, not merely enclosed. At 25
+// the finger sat wholly inside the slab with 1.8 mm of air behind it, so it
+// would have bridged over the mounting surface instead of sitting on it.
 //
-// Measured at tilt 57, the finger's back runs from 19.9 to 23.2 in from the
-// knuckle surface over its length — nearest at about z 117, furthest at the
-// tip. The face has to be at or inside the NEAREST of those, so 19.0: the
-// finger then has a land the whole way up, 0.9 wide at the shallowest and
-// 4.2 at the tip, and it keeps 11 to 17 mm of its own depth. Anything above
-// 19.9 leaves the finger floating somewhere along its length; much below and
-// you are slicing the finger for nothing.
+// The finger's back is not parallel to the face — measured at tilt 57, in
+// 2 mm bands, its distance in from the knuckle surface is:
 //
-// The same number is the fist's thickness, because it is one plane: the fist
-// comes out a 19 mm slab of knuckles.
+//   z    143  141  139  137  135  133  131  129  127  125  123
+//   in  18.7 20.2 21.9 22.6 23.1 23.2 23.1 22.7 22.3 21.6 20.9
+//   z    121  119  117  115  113  111  109  107  105  103  101   99   97   95
+//   in  20.3 20.1 19.7 19.6 19.8 20.3 20.5 20.6 20.5 20.4 20.3 20.1 19.8 19.8
+//
+// It bulges to 23.2 in the upper third, sits around 20 through the lower two
+// thirds, and the rounded end of the tip falls back to 18.7.
+//
+// 19.0 touches everywhere but the last 2 mm of the tip, and costs 4 mm off
+// the finger's back where it bulges. 20.0 is what it is at, because Ziad
+// asked for a little less and said a gap behind the finger is fine as long
+// as it is attached top and bottom (2026-09-14): at 20.0 it lands from z 123
+// to 139 at the top and from z 99 to 113 lower down, the fist carries it
+// below that, and what is left is a 1.4 mm gap over the last 4 mm of the tip
+// and a couple of 0.3 mm dips in between.
+//
+// The ceiling is 23.2: above that the whole finger floats. The floor is
+// 18.7: below that nothing is gained and the finger is being sliced for
+// nothing. The same number is the fist's thickness, because it is one plane.
 //
 // The bottom is squared off at bottom_z, in the stood-up frame; it sits
 // below the mesh by default, so nothing is cut off the bottom either.
@@ -91,7 +101,7 @@ mesh_scale = 25.4;   // the mesh is in inches
 tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
 
 /* [Cut] */
-relief_depth = 19.0;  // the slab's thickness, measured in from the knuckle surface. The finger's back is nearest at 19.9, so this is the deepest the face can sit and still touch it everywhere, at tilt 57 (mm)
+relief_depth = 20.0;  // the slab's thickness, measured in from the knuckle surface. Lands the finger top and bottom and leaves a small gap between; see the profile above. 18.7 touches even the tip, 23.2 and the finger floats entirely (mm)
 bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the mesh, which bottoms out at -17.9, so nothing is cut off the bottom at all (mm)
 
 /* [Hidden] */
