@@ -35,7 +35,7 @@ screen-fence-insert 3
 screen-fence-key 8
 screen-fence-rail 1
 screen-fence-rail-coupon 4
-screen-fence-rail-keyslot-coupon 1
+screen-fence-rail-keyslot-coupon 2
 screen-fence-rail-loose 2
 screen-fence-rigid 1
 screen-fence-test-rail 4

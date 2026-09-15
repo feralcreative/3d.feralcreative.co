@@ -317,7 +317,22 @@ clip_out_clr = 0.10;
 // part will not seat; too much and the part can lift by that much before the
 // barb bears. Half a millimetre of lift on a fence costs nothing. A no-go
 // costs a print.
-clip_tab_clr = 0.50;
+//
+// 0.05 SINCE 2026-09-15, down from 0.50, on the printed 60 mm key-slot coupon:
+// Ziad found the bottom barbs "just shy of reaching the tabs" and asked for
+// half a millimetre more reach. That is exactly this number — 0.50 of it was
+// lift before the barb bears — so it closes rather than the hook growing,
+// which already has 1.61 mm of margin past the squeeze and is not what was
+// short. It is not taken to zero: coplanar with the fin's underside is a seat
+// that cannot be printed and it makes the fit intersections answer in
+// zero-volume slivers instead of pass/fail.
+//
+// This is the measured part beating the discredited drawing, which is the
+// right way round, but the no-go the paragraph above warns about is now real
+// rather than theoretical. twinpath and pairfit were re-run; see the plan file
+// for the round. If a printed insert will not seat, this is the number to put
+// back, and 0.20 is the halfway house.
+clip_tab_clr = 0.05;
 // Inner leg and outer prong thickness (mm). Upright, EVERY dimension of this
 // section is a wall width, so these are line counts, not round numbers: 1.74
 // is four lines and 2.19 is five, at 0.42 outer and 0.45 inner. A leg at 1.60
