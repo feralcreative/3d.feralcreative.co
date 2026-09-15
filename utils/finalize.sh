@@ -33,6 +33,23 @@
 # is deleted with the drafts (Ziad, 2026-09-13). Only untracked files: a
 # coupon that has somehow been committed is left where it is and named.
 #
+# AND SO DO THE RENDERS (Ziad, 2026-09-15). They are previews of a mesh that
+# is no longer moving, gitignored and one `render.sh` away, and a finished
+# part leaving 7 stale PNGs behind is the same clutter the versioned STLs
+# were.
+#
+# THE RENDER MATCH IS NARROWER THAN --shitcan's, deliberately. render.sh
+# names its output after the .scad's basename and a view — <base>-zplus.png —
+# and output names extend each other: renders/ holds deck-door-stop-*.png
+# beside deck-door-stop-truss-*.png, and desk-cup-holder-*.png beside
+# desk-cup-holder-starbucks-*.png. A prefix glob on the shorter name would
+# take the longer part's renders with it, and finalizing has no dry run to
+# catch that. So this takes renders/<name>-<one segment>.png only: a view
+# name carries no dash, so anything with a second dash after <name>- belongs
+# to a longer output name and is left alone. --shitcan keeps the broad prefix
+# glob, because there the whole point is to sweep, and it lists before it
+# removes.
+#
 # THE LEDGER IS LEFT ALONE. docs/stl-versions.txt keeps its count for the name.
 # Finishing a part is not a promise never to touch it again, and if it is rebuilt
 # the next build should be v07 rather than a v01 that collides with the history.
@@ -147,6 +164,26 @@ else
   NAMES=("$@")
 fi
 
+# renders/<name>-<one segment>.png, untracked only. Echoes the count so the
+# caller can report it; see the header for why the match is not a prefix glob.
+sweep_renders() {
+  local name="$1"
+  local n=0 f tail
+  [[ -d "${REPO_ROOT}/renders" ]] || { echo 0; return 0; }
+  for f in "${REPO_ROOT}/renders/${name}-"*.png; do
+    [[ -e "$f" ]] || continue
+    tail="${f##*/${name}-}"
+    [[ "$tail" == *-* ]] && continue
+    if git -C "$REPO_ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
+      printf '  %-40s note: %s is tracked, left alone\n' "" "$(basename "$f")" >&2
+      continue
+    fi
+    rm -f "$f"
+    n=$((n + 1))
+  done
+  echo "$n"
+}
+
 finalize_one() {
   local name="$1"
   local plain="${OUTDIR}/${name}.stl"
@@ -183,7 +220,11 @@ finalize_one() {
     < <(find "$OUTDIR" -maxdepth 1 -name "${name}-v[0-9][0-9]*.stl" | sort)
 
   if [[ "${#versions[@]}" -eq 0 && -z "$keep" ]]; then
-    printf '  %-40s already final\n' "$name"
+    # Still sweep: a part can be final and have renders of it lying around.
+    local only_renders
+    only_renders="$(sweep_renders "$name")"
+    printf '  %-40s already final%s\n' "$name" \
+      "$( [[ "$only_renders" -gt 0 ]] && echo ", $only_renders render(s) removed" )"
     return 0
   fi
 
@@ -214,11 +255,15 @@ finalize_one() {
     coupons=$((coupons + 1))
   done < <(find "$OUTDIR" -maxdepth 1 -name "${name}-*coupon*.stl")
 
+  local rendered
+  rendered="$(sweep_renders "$name")"
+
   local kept_tag="already a plain file"
   [[ -n "$keep" ]] && kept_tag="was $(basename "$keep")"
-  printf '  %-40s final (%s)%s%s\n' "$name" "$kept_tag" \
+  printf '  %-40s final (%s)%s%s%s\n' "$name" "$kept_tag" \
     "$( [[ "$removed" -gt 0 ]] && echo ", $removed older version(s) removed" )" \
-    "$( [[ "$coupons" -gt 0 ]] && echo ", $coupons coupon file(s) removed" )"
+    "$( [[ "$coupons" -gt 0 ]] && echo ", $coupons coupon file(s) removed" )" \
+    "$( [[ "$rendered" -gt 0 ]] && echo ", $rendered render(s) removed" )"
 }
 
 LEDGER="${REPO_ROOT}/docs/stl-versions.txt"
@@ -306,4 +351,5 @@ done
 
 echo
 echo "docs/stl-versions.txt is unchanged — a rebuild resumes at the next number."
+echo "Renders are gone with the drafts — utils/render.sh remakes them."
 [[ "$failed" -eq 0 ]] || exit 1
