@@ -725,15 +725,22 @@ clip_cap_clr = 0;
 // up 0.5 would have left a gap under it and given away part of that datum;
 // thickening it raises the top face by the same amount and keeps the bearing.
 //
-// 2.64 and not 2.69, because upright every dimension of this section is a
-// wall width: 2.19 is two outer lines at 0.42 plus three inner at 0.45, and
-// 2.64 is the next whole line up. 2.69 is 5.9 lines and prints with a gap.
+// 3.54 SINCE THE SAME DAY, up from 2.64: "raise the clip cap floor another
+// millimetre". 3.54 and not 3.64, for the reason below.
+//
+// Upright, every dimension of this section is a wall width: n lines is
+// 0.84 + 0.45 x (n - 2), at 0.42 outer and 0.45 inner. 2.19 is five lines,
+// 2.64 is six, 3.54 is eight. At this size the block is wide enough to carry
+// infill rather than being solid perimeters — two perimeters a side take
+// 1.74, so 3.54 leaves exactly four 0.45 lines down the middle where 3.64
+// leaves 4.2 and a sliver. Less binding than it was at 2.19, where the
+// remainder was a single line, but still the cleaner number.
 //
 // Costs nothing the spring cares about. The leg is held off this block by
 // clip_relief, which is HORIZONTAL and unchanged, and the leg flexes inboard
 // rather than down, so the slot losing 0.45 mm of height changes no travel.
 // The free length is still measured from the crossbar to the barb.
-clip_cap_floor = 2.64;
+clip_cap_floor = 3.54;
 // ...and the slot left between that floor and the leg it passes (mm).
 //
 // THE FLOOR MUST NOT TOUCH THE LEG. It attaches to the skirt only. Joining the
