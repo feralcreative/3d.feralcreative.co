@@ -12,7 +12,7 @@
 // rim (measured off the mesh 2026-09-13). Ziad: the plug is the right size
 // but does not go in far enough to stay put, and the flange does not reach
 // the old doorbell's screw holes, which sit about 10 mm outside the hole
-// above and below it. So the plug here is solid, plug_depth deep, with
+// above and below it. The plug here is a shell, plug_depth deep, with
 // crush ribs a little proud of the hole's size, and the cap is cap_w x cap_h
 // — tall enough to cover a screw hole at 19/2 + 10 from the centre with
 // cap_margin to spare.
@@ -30,9 +30,8 @@
 // THE RACEWAY'S EDGES ARE A MILD ROUND, rw_r. It was briefly 18 wide with
 // the cap's long blend on each side, and that made it MORE conspicuous, not
 // less (Ziad, 2026-09-13); a narrow ridge with softened corners is the
-// quieter thing on a wall. The rails are three loops: this is a cosmetic
-// cover over a wire that was bare before, not a load path, and Ziad asked
-// why the walls were so thick.
+// quieter thing on a wall. After printing, Ziad found the cover too
+// delicate; the face and rails are now thicker (2026-09-15).
 //
 // THE CAP'S EDGE IS A QUARTER ELLIPSE, cap_round_in deep by cap_round_up
 // tall, over a short vertical edge. It had a 6.5 mm half-cosine blend down
@@ -45,7 +44,7 @@
 // THE CAP IS AS THICK AS THE RACEWAY. The old cap was 0.8. Here the groove
 // has to cross the cap to reach the plug, and cap and raceway have to share
 // one front plateau if the piece is to print face down in one go — a 0.8
-// flange under a 3.2 raceway would print in the air. So cap_t = rw_h, and
+// flange under a taller raceway would print in the air. So cap_t = rw_h, and
 // the run comes down onto the cap's top edge and the jog happens inside
 // the plate, as a turn in the groove, rather than as a visible elbow
 // beside it.
@@ -90,66 +89,37 @@
 // ramp_depth of that hollow along the diagonal; everything else is empty,
 // and the wire drops into it off the end of the chute.
 //
-// TWO PIECES, because 255 does not fit a 220 bed. The lower piece is the
-// cap, the jog, and lower_run of the vertical; the upper is the rest. They
-// meet in a LAP THROUGH THE FACE, lap_len long, ONE BEHIND THE OTHER: the
-// face — what is left in front of the groove, rw_h - slot_d = 1.2, ten
-// layers at the 0.12 this gets sliced at — splits down its thickness, the
-// lower keeping the front lap_face of it and the upper the back tenon_t
-// along with its two rails. Both halves are the full 6.9 across and they
-// glue face to face over the whole of it. Set lower_run so the lower piece
-// — lower_run + lap_len + cap_down tall — and upper_run both stay under 205.
+// TWO PIECES, WITH A THREE-SIDED LAP. The lower keeps the front face and
+// an outer cheek on each side; the upper nests inside that U, keeping the
+// inner half of each rail and the back half of the face. Glue the broad
+// face AND both long side faces. The 0.15 side clearance is for glue and
+// fit; the face seats directly. A rounded key still locates the joint.
 //
-// The wire channel runs through unchanged: over the lap its floor is the
-// upper's own half of the face, at the same slot_d as everywhere else, and
-// its walls are the upper's rails.
+// The whole rail is 2.73 thick; over the lap each piece keeps 1.29, with
+// 0.15 between them. The face is 2.28 thick and splits into two 1.14
+// sections. The wire groove stays 4.2 x 2.0 through the assembled joint.
+// Assemble from the open back of the lower's U before fitting to the wall.
 //
-// Two seams show. The front one, where the lower's tongue ends and the
-// upper's face takes over, is butted tight. The other is on the wall side
-// at the lower's shoulder, held lap_clr open so the first one can close.
+// The joint starts at the first whole millimetre past the wire's bend,
+// 5 mm above the cap. The upper is 229 mm long, so both pieces print face
+// down on a 45-degree plate layout inside the 205 mm safe bed square.
+// The upper's lap still hangs above the bed and needs local support.
 //
-// AND THE LAP IS TENONED, so the two lock rather than just butt (Ziad,
-// 2026-09-14: one bit should embed in the other). Halfway along it the
-// lower's tongue carries a pad key_w x key_len, key_r round in plan,
-// standing tenon_t off its back — exactly filling the upper's half of the
-// face — and the upper has the matching mortise through that half, key_clr
-// looser all round. It is caught on all four sides: pull the joint along
-// the run or push it across and the tenon has to shear, not just the glue.
+// A stronger glued joint carries the run into the cap; holding the complete
+// cover against the wall still depends on its mounting, not this joint.
 //
-// Nothing in it is thin. The tenon is a 5 x 4 x 0.66 pad on a 0.54 tongue;
-// what is left of the upper's face beside the mortise is 0.8 wide, and that
-// sits on top of a rail for its whole length rather than standing free.
+// EXCEPT AT THE TOP, WHERE THE DOORBELL ITSELF NOW HOLDS IT. Two strips
+// tab_t thick — two 0.20 layers, the height this prints at — carry on
+// tab_len past the upper's doorbell end and slide between the wall and
+// the doorbell's own mounting plate, so its screws trap the top of the
+// cover (Ziad, 2026-09-15).
 //
-// ⚠️ lap_face is 0.54 and not the 0.6 that would split the face evenly,
-// for two reasons either of which would do it on its own. The lower's
-// tongue lies flat on the bed, so its thickness is a layer count, and 0.54
-// is the 0.3 first layer plus two of 0.12. And 0.6 puts the split plane at
-// z = 2.6, which is exactly a vertex of the faceted front round — the round
-// is centred at z = slot_d with r = rw_r and steps 10°, so a = 30 lands on
-// 2.0 + 0.6 — and a cut through a profile vertex came back with four edges
-// shared by four facets each. Move lap_face and check the mesh, not just
-// the render.
-//
-// BOTH PIECES PRINT FACE DOWN, front face on the bed. flip = true (the
-// default) lays each one out that way. That keeps the wire channel opening
-// upward on both, which is the whole point: printed the other way up, back
-// down, the upper bridges the entire 133 mm of the channel in one layer and
-// the sag lands on the 0.3 mm the wire has spare in the groove.
-//
-// ⚠️ THE UPPER'S HALF OF THE LAP NEEDS SUPPORT. Its back half of the face
-// starts lap_face off the bed and hangs there for the whole lap_len — the
-// price of a lap one behind the other rather than side by side, and Ziad's
-// call, 2026-09-14, over a joint split in plan. Sliced with support on, it
-// is a 10 x 18 pad two layers tall, 0.04 g, tucked under that one tab with
-// a 0.15 gap over it; nothing else on the plate asks for any. Slice it with
-// supports enabled or that tab prints as a 12 mm cantilever, and its
-// underside is the glue face.
-//
-// Otherwise nothing is unsupported: the front rounds and the cap's ellipse
-// step out about 0.5 mm over the first layer and 0.1 after that, which PETG
-// carries. If the cap's edge comes out ragged, slice that one with support
-// too — and slice it before claiming how any of this prints (2026-09-14:
-// three turns were spent arguing that from memory and all of it was wrong).
+// They are the rails' own footprint AT THE WALL'S PLANE, z = 0 to tab_t,
+// and they have to be: behind the mount means between the mount and the
+// wall, and anything at the front plateau instead would sit rw_h off the
+// wall and reach behind nothing. Printing face down, the wall's plane is
+// the TOP of the print, so the strips are a two-layer cantilever off the
+// end and want the same local support the upper's lap already needs.
 //
 // flip = false draws both the way they go on the wall: x to the right, y
 // up, z out of the wall, the wall at z = 0, the hole's centre at the
@@ -164,7 +134,7 @@
 // upper — the rest of the vertical run
 // cap   — cap and plug alone, the fit coupon
 // both  — the print plate: both pieces, each the way up it prints, the
-//         upper plate_gap off the cap's edge and inside the lower's length
+//         upper plate_gap off the cap's edge, both diagonal on the bed
 show = "both";  // [lower, upper, cap, both]
 
 // Printed orientation, front face on the bed. false draws it as it mounts.
@@ -173,6 +143,8 @@ flip = true;
 // Between the two pieces on the "both" plate. They are one object to the
 // slicer, so the only thing this has to clear is a brim, if one is used.
 plate_gap = 3.0;
+plate_angle = 45;  // diagonal layout so the joint can sit next to the cap (deg)
+bed_safe = 205;    // safe square from the printer design reference (mm)
 
 /* [Wire — measured] */
 wire_t = 1.7;    // wire, thick (mm)
@@ -187,20 +159,31 @@ screw_off = 10.0;  // old screw holes, from the hole's edge, above and below (mm
 /* [Run] */
 run_len   = 255.0;  // doorbell to the jog's centreline; was 260, Ziad measured the upper piece at 135 (mm)
 jog       = 15.0;   // the run's centreline is this far right of the hole (mm)
-lower_run = 120.0;  // of run_len, on the lower piece; the rest is the upper (mm)
-lap_len   = 12.0;   // the lap, along the run (mm)
-lap_clr   = 0.15;   // the upper's rails stop this short of the lower's shoulder (mm)
-lap_face  = 0.54;   // of the face's 1.2, what the lower keeps over the lap; the upper carries the rest. Three layers on the bed at 0.3 + 2 x 0.12, and it misses the facet vertex that sits exactly at 0.6 (mm)
-key_w     = 5.0;    // the tenon across (mm)
-key_len   = 4.0;    // the tenon along the run (mm)
+lower_run = 0;      // 0 = immediately after the bend; positive overrides joint position (mm)
+lap_len   = 16.0;   // the lap, along the run (mm)
+lap_clr   = 0.15;   // clearance at the rear shoulder (mm)
+side_clr  = 0.15;   // glue clearance between the overlapping rail halves (mm)
+side_wall = 1.29;   // lower outer cheek, three extrusion paths (mm)
+lap_face  = 1.14;   // lower face: 0.30 first layer + seven 0.12 layers (mm)
+key_w     = 4.8;    // tenon width, leaves 0.84 beside its mortise (mm)
+key_len   = 6.0;    // tenon length (mm)
 key_r     = 1.0;    // its corners in plan, so a printed corner cannot hold it off its seat (mm)
 key_clr   = 0.15;   // the mortise over the tenon, all round (mm)
-bend_r    = 22.0;   // centreline radius of the bend out of the run; 0 = as large as will reach the corner, 23.9. Held at 22 since the cap's top came in to 21: any bigger and the arc has wandered more than 0.55 off the run's centreline by the time it crosses that edge, and the assert below catches it (mm)
+bend_r    = 22.0;   // retain the fitted bend; 0 = largest radius that reaches the hole's corner (mm)
+
+/* [Doorbell mount tabs] */
+// Off the upper's doorbell end only, at the wall plane. Thin on purpose:
+// the strips shim under the doorbell's mounting plate and must not hold it
+// off the wall.
+tab_len = 30.0;   // how far they stick out past the end of the run; long on
+                  // purpose, Ziad will cut them back to whatever the mount
+                  // actually covers (2026-09-15) (mm)
+tab_t   = 0.40;   // two layers at the 0.20 height this part prints at (mm)
 
 /* [Raceway] */
-rw_w     = 6.9;   // across: the groove plus a three-loop rail each side; it is a cover, not a beam (mm)
-rw_h     = 3.2;   // off the wall; also the cap's thickness at its plateau (mm)
-rw_r     = 1.2;   // round on the two front edges; the one Ziad liked, and the most a 1.35 rail can take. 0.8 was a touch crisp; 1.9 was tried on the 8 wide bar (mm)
+rw_w     = 9.66;  // 4.2 groove + two 2.73 rails, each 1.29 + 0.15 + 1.29 at the lap (mm)
+rw_h     = 4.28;  // 2.0 groove + 2.28 face; cap shares this plateau (mm)
+rw_r     = 1.2;   // retain the mild round on the two front edges (mm)
 slot_w   = 4.2;   // the groove, for the wire's 3.8 (mm)
 slot_d   = 2.0;   // the groove, for the wire's 1.7; what is left in front is the skin (mm)
 
@@ -235,13 +218,15 @@ eps = 0.01;
 
 // ---- derived ---------------------------------------------------------------
 
-upper_run = run_len - lower_run;
-rail_w    = (rw_w - slot_w) / 2;     // 1.35, one rail
-split_z   = rw_h - lap_face;         // 2.66, where the lap splits the face
-tenon_t   = split_z - slot_d;        // 0.66, the tenon's own thickness
+socket_w  = rw_w - 2 * side_wall;
+tongue_w  = socket_w - 2 * side_clr;
+tongue_rail = (tongue_w - slot_w) / 2;
+rail_w    = (rw_w - slot_w) / 2;     // one complete rail
+split_z   = rw_h - lap_face;         // where the lap splits the face
+tenon_t   = split_z - slot_d;        // upper face and key thickness
 key_y     = (lap_len - key_len) / 2; // the tenon's start, from the joint line
 cap_h     = cap_up + cap_down;                        // 47.0
-cap_w     = cap_left + cap_right;                     // 31.95
+cap_w     = cap_left + cap_right;                     // 33.35
 cap_x     = (cap_right - cap_left) / 2;               // the cap's centre, right of the hole
 cap_y     = (cap_up - cap_down) / 2;                  // and below it, now the top is cut
 // Where the raceway's bar starts, up the cap. Below the cap's top edge the
@@ -270,6 +255,8 @@ diag_y    = plug_hh + (jog - plug_hw);            // 16.5
 bend_max  = (jog - plug_hw) / (1 - sqrt(2) / 2);  // 23.90
 bend      = bend_r > 0 ? min(bend_r, bend_max) : bend_max;
 bend_y    = diag_y + bend * (sqrt(2) - 1);        // 26.40 at bend_max
+joint_y   = lower_run > 0 ? lower_run : ceil(bend_y + eps);
+upper_run = run_len - joint_y;
 diag_x0   = jog - bend * (1 - sqrt(2) / 2);       // 8.00 at bend_max
 diag_y0   = bend_y - bend * sqrt(2) / 2;          // 9.50 at bend_max
 diag_len  = (diag_x0 - plug_hw) * sqrt(2);        // 0 at bend_max
@@ -315,18 +302,41 @@ assert(cap_left > plug_hw + cap_round_in && cap_right > plug_hw + cap_round_in
        "the cap's flat does not clear the plug on one of its four sides");
 assert(cap_up >= hole_h / 2 + screw_off && cap_down >= hole_h / 2 + screw_off,
        "the cap no longer reaches a screw hole");
-assert(lower_run + lap_len + cap_down <= 205 && upper_run <= 205, "a piece is longer than the safe bed");
+// The rotated plate's footprint, from the two pieces' OWN plan rectangles
+// rather than from one rectangle drawn round the pair. The crude version
+// was a 41 x 259 box, which at 45 needs 212 mm and fails the bed check —
+// but the plate is not a box: it is a 259 mm bar with a 33 mm cap sitting
+// beside one end of it, and rotating each piece's four corners puts the
+// real need at 194 x 190. That difference is what let the mount tabs grow
+// to 30 mm (2026-09-15). Each rectangle is the piece as print_plate lays
+// it down, flip and offset included.
+plate_lo  = flip ? [-cap_right, -cap_down, cap_left, joint_y + lap_len]
+                 : [-cap_left, -cap_down, cap_right, joint_y + lap_len];
+plate_updx = (flip ? 1 : -1) * (cap_left + plate_gap + rw_w / 2);
+plate_updy = joint_y + lap_len - upper_run;
+plate_up  = [plate_updx - rw_w / 2, plate_updy + lap_clr,
+             plate_updx + rw_w / 2, plate_updy + upper_run + tab_len];
+plate_pts = [for (r = [plate_lo, plate_up],
+                  c = [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]])
+               [c[0] * cos(plate_angle) - c[1] * sin(plate_angle),
+                c[0] * sin(plate_angle) + c[1] * cos(plate_angle)]];
+plate_x = max([for (p = plate_pts) p[0]]) - min([for (p = plate_pts) p[0]]);
+plate_y = max([for (p = plate_pts) p[1]]) - min([for (p = plate_pts) p[1]]);
+assert(plate_x <= bed_safe && plate_y <= bed_safe, "the rotated layout exceeds the safe bed");
+assert(joint_y > bend_y && joint_y + lap_len < run_len, "the joint cuts into the bend or past the run");
+assert(side_wall >= 1.29 && tongue_rail >= 1.29 - eps && side_clr > 0,
+       "the side lap leaves a rail half too thin");
 assert(rw_h - slot_d >= 0.8 && lap_len > 4 * lap_clr, "the lap's tongue is too thin, or too short to glue");
-assert(lap_face >= 0.5 && tenon_t >= 0.5, "the lap splits the face too thin on one side");
-assert(key_y > key_clr + 1.0 && rw_w - key_w - 2 * key_clr >= 1.6, "the mortise leaves too little face around the tenon");
+assert(lap_face >= 1.0 && tenon_t >= 1.0, "the lap splits the face too thin on one side");
+assert(key_y > key_clr + 1.0 && tongue_w - key_w - 2 * key_clr >= 1.68 - eps, "the mortise leaves too little face around the tenon");
+assert(tab_t > 0 && tab_t < slot_d && tab_len > 0, "the mount tabs are thicker than the groove's floor, or have no length");
 
 module rr(w, h, r) offset(r = r) offset(delta = -r) square([w, h], center = true);
 
 // The raceway in section, x across and y out from the wall: a bar whose two
 // front edges are a quarter ellipse rin in by rup up. At rw_r, rw_r that is
 // a plain round, which is what the run wears; the blend out of the cap
-// sweeps it from the cap's own ellipse to that. Keep the 10 degree step:
-// lap_face is chosen to miss the vertex it puts at z = 2.6.
+// sweeps it from the cap's own ellipse to that.
 function rw_pts(rin, rup) = concat(
   [[-rw_w / 2, 0], [rw_w / 2, 0]],
   [for (a = [0 : 10 : 90]) [rw_w / 2 - rin * (1 - cos(a)), rw_h - rup + rup * sin(a)]],
@@ -356,7 +366,7 @@ function blend_up(i) = cap_round_up + 0.15 + (rw_r - cap_round_up - 0.15) * blen
 // over the top of each other, and every one of their four sides was then a
 // coplanar pair.
 function blend_y(j) = j <= blend_steps ? bar_start + blend_len * j / blend_steps
-                                       : lower_run + lap_len;
+                                       : joint_y + lap_len;
 function blend_rin(j) = j <= blend_steps ? blend_in(j) : rw_r;
 function blend_rup(j) = j <= blend_steps ? blend_up(j) : rw_r;
 module lower_bar() {
@@ -446,8 +456,10 @@ module rib(p, v, s) hull() {
 // gradually). It is still open to the wall for its whole length, so the
 // wire is laid into it from the side and not threaded through anything.
 module diagonal_wire() {
+  // End exactly at the tangent. The straight cutter already overlaps in Y;
+  // overshooting the angle makes a sub-micron crescent that collapses in STL.
   translate([jog - bend, bend_y, 0]) rotate([0, 0, -45])
-    rotate_extrude(angle = 45 + eps) translate([bend, 0]) rw_slot();
+    rotate_extrude(angle = 45) translate([bend, 0]) rw_slot();
   translate([diag_x0, diag_y0, 0]) rotate([0, 0, -135]) {
     along_x(-eps, diag_len + eps) rw_slot();
     // The chute, in section, everything under the wire: the groove's floor
@@ -481,27 +493,40 @@ module lower() {
       entry_fill();
       translate([jog, 0, 0]) lower_bar();
     }
-    // Past lower_run the lower keeps only the front lap_face of the face,
-    // full width and rounds and all; the upper carries the rest of it.
-    translate([jog - rw_w / 2 - 1, lower_run, -1])
-      cube([rw_w + 2, lap_len + 1, split_z + 1]);
-    translate([jog, 0, 0]) along_y(bend_y - eps, lower_run + eps) rw_slot();
+    // Open socket: leave the front face AND both outer cheeks to glue.
+    translate([jog - socket_w / 2, joint_y, -eps])
+      cube([socket_w, lap_len + eps, split_z + eps]);
+    translate([jog, 0, 0]) along_y(bend_y - eps, joint_y + eps) rw_slot();
     diagonal_wire();
   }
   // Then the tenon goes back on, outside the cut that took the rest away.
-  translate([jog, 0, 0]) lap_tenon(lower_run + key_y, 0, eps);
+  translate([jog, 0, 0]) lap_tenon(joint_y + key_y, 0, eps);
 }
 
-// From y = 0 at the joint to upper_run at the doorbell. Over the first
-// lap_len it keeps the back tenon_t of the face and both rails, and that
-// half of the face is the tab that hangs: it starts lap_face off the plate
-// and needs support under it.
-module upper() difference() {
-  along_y(lap_clr, upper_run) rw_outer();
-  along_y(lap_clr - eps, upper_run + eps) rw_slot();
-  translate([-rw_w / 2 - 1, -eps, split_z])
-    cube([rw_w + 2, lap_len + eps, rw_h - split_z + 1]);
-  lap_tenon(key_y, key_clr, eps);
+// The two mounting strips, off the far end of the upper: each rail's own
+// plan footprint, tab_t deep from the wall's plane, carried tab_len past
+// the end of the run so it can go behind the doorbell's mount. They lap
+// eps back into the end face so the union is a solid overlap and not two
+// solids touching on a plane.
+module upper_tabs() for (sx = [-1, 1])
+  translate([sx * (slot_w + rail_w) / 2, upper_run + (tab_len - eps) / 2, tab_t / 2])
+    cube([rail_w, tab_len + eps, tab_t], center = true);
+
+// From y = 0 at the joint to upper_run at the doorbell, plus the two mount
+// strips past that. The tongue has the inner half of both rails as well as
+// the back half of the face.
+module upper() {
+  difference() {
+    along_y(lap_clr, upper_run) rw_outer();
+    along_y(lap_clr - eps, upper_run + eps) rw_slot();
+    translate([-rw_w / 2 - eps, -eps, split_z])
+      cube([rw_w + 2 * eps, lap_len + eps, lap_face + eps]);
+    for (sx = [-1, 1])
+      translate([sx > 0 ? tongue_w / 2 : -rw_w / 2 - eps, -eps, -eps])
+        cube([(rw_w - tongue_w) / 2 + eps, lap_len + eps, rw_h + 2 * eps]);
+    lap_tenon(key_y, key_clr, eps);
+  }
+  upper_tabs();
 }
 
 // The fit coupon: cap and plug, with the groove in from the cap's top edge
@@ -524,25 +549,24 @@ module oriented() {
   else children();
 }
 
-if (show == "lower") oriented() lower();
-if (show == "upper") oriented() upper();
-if (show == "cap")   oriented() cap_only();
-if (show == "both") {
+module print_plate() rotate([0, 0, plate_angle]) {
   oriented() lower();
-  // Alongside the cap, plate_gap off its far edge, and hung from the top of
-  // the run so the upper sits inside the lower's own length: the head
-  // crosses plate_gap between the two and the plate is no longer than the
-  // lower piece. It used to sit 12 away and 135 further up the bed, which
-  // put the plate 241 long — over the 220 the machine has. The cap's edge
-  // is at -cap_x + cap_w/2 and not +cap_x, because oriented() has turned
-  // the lower over about Y and swapped its left for its right.
-  translate([-cap_x + cap_w / 2 + plate_gap + rw_w / 2,
-             lower_run + lap_len - upper_run, 0]) oriented() upper();
+  // Match the top ends, with a clear gap beside the cap in either view.
+  translate([flip ? cap_left + plate_gap + rw_w / 2
+                  : -cap_left - plate_gap - rw_w / 2,
+             joint_y + lap_len - upper_run, 0]) oriented() upper();
 }
 
-echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t, " (", cap_left, " left of the hole, ", cap_right, " right, ", cap_up, " up, ", cap_down, " down); plug ", hole_w, " x ", hole_h,
-         " + ", plug_rib, " ribs, ", plug_depth, " deep; lower piece ",
-         lower_run + lap_len + cap_down, " tall, upper ", upper_run,
-         "; lap ", lap_len, " long, the face split ", lap_face, " to the lower and ",
-         tenon_t, " to the upper, tenon ", key_w, " x ", key_len, " x ", tenon_t,
-         ", ", (rw_w - key_w) / 2 - key_clr, " of face each side of its mortise"));
+if (show == "lower") oriented() lower();
+if (show == "upper") rotate([0, 0, plate_angle]) oriented() upper();
+if (show == "cap")   oriented() cap_only();
+if (show == "both")  print_plate();
+
+echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t,
+         "; channel ", rw_w, " x ", rw_h, "; groove ", slot_w, " x ", slot_d,
+         "; joint starts ", joint_y - cap_up, " above cap, overlap ", lap_len,
+         "; lower length ", joint_y + lap_len + cap_down, "; upper length ", upper_run,
+         "; face halves ", lap_face, " / ", tenon_t,
+         "; side halves ", side_wall, " / ", tongue_rail, ", glue gap ", side_clr,
+         "; mount tabs ", rail_w, " x ", tab_len, " x ", tab_t,
+         "; rotated plate ", plate_x, " x ", plate_y));
