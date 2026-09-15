@@ -714,7 +714,26 @@ twin_cap = true;
 clip_cap_clr = 0;
 // Close the bottom of the two side slots, so the cap reads as a closed box
 // rather than an open frame. Thickness of that floor (mm).
-clip_cap_floor = 2.19;
+//
+// 2.64 SINCE 2026-09-15, up from 2.19: Ziad pointed at these two blocks in a
+// slicer section — "the springy shoulders" — and asked for half a millimetre
+// more, alongside the barb change of the same round.
+//
+// It GROWS UPWARD, into the side slot, because the bottom face cannot move.
+// That face is at cz0, flush with the rail's top, and together with the skirt
+// wall beside it it IS the down-stop the part seats on. Translating the block
+// up 0.5 would have left a gap under it and given away part of that datum;
+// thickening it raises the top face by the same amount and keeps the bearing.
+//
+// 2.64 and not 2.69, because upright every dimension of this section is a
+// wall width: 2.19 is two outer lines at 0.42 plus three inner at 0.45, and
+// 2.64 is the next whole line up. 2.69 is 5.9 lines and prints with a gap.
+//
+// Costs nothing the spring cares about. The leg is held off this block by
+// clip_relief, which is HORIZONTAL and unchanged, and the leg flexes inboard
+// rather than down, so the slot losing 0.45 mm of height changes no travel.
+// The free length is still measured from the crossbar to the barb.
+clip_cap_floor = 2.64;
 // ...and the slot left between that floor and the leg it passes (mm).
 //
 // THE FLOOR MUST NOT TOUCH THE LEG. It attaches to the skirt only. Joining the
