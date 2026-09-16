@@ -711,7 +711,24 @@ function key_gap(len)   = (len - key_count(len) * key_len(len))
 // on how thick the fin is.
 twin_cap = true;
 // Air between the skirt's bottom and the top of the rail (mm). Zero: it bears.
-clip_cap_clr = 0;
+//
+// 1.0 SINCE 2026-09-16: "shorten the skirt wall by 1mm, moving the side-slot
+// floor up accordingly" (Ziad, reading the colour key). This is that change
+// and the whole of it — cz0 feeds the skirt wall polygon, the side-slot floor
+// polygon and cap_outline's bottom edge, so all three rise together and the
+// floor keeps its clip_cap_floor thickness. The legs and both barbs do NOT
+// move: they hang from zbar and stand off the channel floor, neither of which
+// reads this.
+//
+// ⚠️ IT GIVES UP THE DOWN-STOP, which the skirt paragraph above calls the
+// better datum by some distance. With 1.0 mm of air the skirt no longer lands
+// on the rail's top face, so nothing sets the seated height from above; the
+// part can sink until the barbs' own bottoms reach the channel floor, which
+// is clip_tab_floor = 0.30 mm of play, and the barb tops end up that much
+// further below the fins than clip_tab_clr says. The fit checks cannot see
+// this — they test the nominal pose, and more clearance only makes them
+// pass harder. Raised with Ziad rather than designed around.
+clip_cap_clr = 1.0;
 // Close the bottom of the two side slots, so the cap reads as a closed box
 // rather than an open frame. Thickness of that floor (mm).
 //
