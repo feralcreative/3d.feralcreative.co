@@ -17,6 +17,7 @@ large-door-stop 2
 large-door-stop-coupon 2
 large-door-stop-coupon-profile 1
 middle-finger-emboss 14
+middle-finger-wrist-emboss 1
 patio-leg-foot 3
 patio-leg-spacer-base 8
 patio-leg-spacer-coupon 1
