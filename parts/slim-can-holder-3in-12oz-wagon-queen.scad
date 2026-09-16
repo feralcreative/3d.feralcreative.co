@@ -368,7 +368,33 @@ art_swell = 0.19;
 // The script is deliberately NOT rounded. Its thins are already down to 0.846
 // after the swell, so the same erode would leave them 0.146 and the round
 // would be fighting the swell for the same millimetre.
-crest_round = 0.35;
+crest_round = 0;
+
+// Radius of the round bevel where the RAISED artwork rises off the plaque
+// (mm), crest and lettering separately. 0 leaves a square 90-degree edge.
+//
+// This is the one that stops the relief feeling sharp under a hand: without it
+// the artwork's side walls meet its top face in a hard corner all the way
+// round. It is rolled as a stack of slabs, each inset along a quarter circle —
+// the same construction logos/marks.scad uses for the cat ring's roundover.
+//
+// ⚠️ EACH IS BOUNDED BY ITS OWN THINNEST STROKE, not by art_relief. The
+// topmost slab is the artwork eroded by the full radius, so a feature narrower
+// than twice the bevel comes to a knife edge and then vanishes off the top.
+// That is why there are two numbers and not one:
+//
+//     crest bars   1.38 mm wide  ->  0.35 leaves 0.68 at the top, 0.50 leaves 0.38
+//     script thins 0.846 wide    ->  0.25 leaves 0.346 at the top
+//
+// A single radius would have had to obey the script and left the crown
+// under-rounded at 0.25, which is the opposite of the ask. There is an assert
+// on each, keeping the top of the narrowest stroke over 0.20.
+art_bevel_crest = 0.35;
+art_bevel_word  = 0.25;
+
+// Slab height in the roll (mm). Half a layer at 0.20, so the slicer sees a
+// curve rather than a staircase — the same reasoning as cat_step.
+bevel_step = 0.10;
 
 // How far the relief stands proud of the plaque's floor, or sinks into it (mm).
 //
@@ -608,6 +634,20 @@ assert(sign_count == 0 || crest_round <= 0
            art_w * crest_thin_frac - 2 * crest_round,
            " mm during its erode and they would be severed: keep it under ",
            (art_w * crest_thin_frac - 0.20) / 2));
+assert(sign_count == 0 || art_bevel_crest <= 0
+       || (art_w * crest_thin_frac - 2 * art_bevel_crest >= 0.20
+           && art_bevel_crest < art_relief),
+       str("art_bevel_crest takes the crown's bars to ",
+           art_w * crest_thin_frac - 2 * art_bevel_crest,
+           " mm at the top: keep it under ",
+           (art_w * crest_thin_frac - 0.20) / 2));
+assert(sign_count == 0 || art_bevel_word <= 0
+       || (art_w * script_thin_frac + 2 * art_swell - 2 * art_bevel_word >= 0.20
+           && art_bevel_word < art_relief),
+       str("art_bevel_word takes the script's thins to ",
+           art_w * script_thin_frac + 2 * art_swell - 2 * art_bevel_word,
+           " mm at the top: keep it under ",
+           (art_w * script_thin_frac + 2 * art_swell - 0.20) / 2));
 assert(sign_count == 0 || art_swell < art_w * counter_budget_frac,
        str("art_swell has closed the lettering's counters: keep it under ",
            art_w * counter_budget_frac));
@@ -751,13 +791,41 @@ module sign_backing() {
 // than offset(delta = ): it is what the swell budget was measured with, and a
 // rounded swell is kinder to a script's terminals than a mitred one, which
 // would spike them.
-module logo_art() {
+module crest_shape() {
     if (crest_round > 0)
         offset(r = -crest_round) offset(r = 2 * crest_round)
             offset(r = -crest_round) wagon_queen_crest(art_w);
     else
         wagon_queen_crest(art_w);
-    offset(r = art_swell) wagon_queen_word(art_w);
+}
+
+module word_shape() offset(r = art_swell) wagon_queen_word(art_w);
+
+module logo_art() { crest_shape(); word_shape(); }
+
+// A 2D shape extruded h tall with its TOP edge rolled over by r: a
+// full-section core, then slabs inset by r x (1 - cos a) reaching r x sin a
+// above it, sampled at equal angles along the quarter circle.
+//
+// ONLY THE TOP IS ROLLED. cat_slab rolls both faces because the ring floats;
+// this sits on the plaque, and rolling the bottom too would undercut it and
+// leave a gap at the floor instead of a join.
+//
+// EVERY SLAB STARTS FROM THE MIDDLE OF THE CORE, not from its top face, and
+// that is not tidiness — it is the trap cat_slab records. Slabs stacked
+// exactly face to face touch over zero volume and the union comes back as a
+// pile of separate shells; marks.scad saw a plain disc built that way report
+// genus -7. Starting at core/2 buries every join in solid material.
+module rolled_relief(h, r) {
+    n    = max(3, ceil(r / bevel_step));
+    core = h - r;
+    linear_extrude(height = core) children();
+    for (i = [1 : n]) {
+        z = core + r * sin(90 * i / n);
+        d = r * (1 - cos(90 * i / n));
+        translate([0, 0, core / 2])
+            linear_extrude(height = z - core / 2) offset(r = -d) children();
+    }
 }
 
 module logo_marks() {
@@ -766,8 +834,17 @@ module logo_marks() {
         rotate([0, 0, i * 360 / sign_count])
             translate([x0, 0, art_z])
                 rotate([0, 90, 0]) rotate([0, 0, 90])
-                    linear_extrude(height = art_relief + eps)
-                        logo_art();
+                    if (art_mode == "deboss")
+                        // A square cutter. Rolling it would fillet the
+                        // recess's FLOOR, not its rim, which is not the same
+                        // favour — the rim is what a hand touches.
+                        linear_extrude(height = art_relief + eps) logo_art();
+                    else {
+                        rolled_relief(art_relief + eps, art_bevel_crest)
+                            crest_shape();
+                        rolled_relief(art_relief + eps, art_bevel_word)
+                            word_shape();
+                    }
 }
 
 module ribs() {
@@ -839,8 +916,11 @@ echo(str("plaque ", sign_w, " x ", sign_h,
          "  overall with bevels ", sign_h + 2 * sign_sag));
 echo(str("lockup ", art_w, " x ", art_h, " ", art_mode, "ed ", art_relief,
          ", against ", sign_sag, " of room"));
-echo(str("crest rounded ", crest_round, "; bars pinch to ",
-         art_w * crest_thin_frac - 2 * crest_round, " mid-round"));
+echo(str("bevel: crest ", art_bevel_crest, " -> bars ",
+         art_w * crest_thin_frac - 2 * art_bevel_crest, " at the top; word ",
+         art_bevel_word, " -> thins ",
+         art_w * script_thin_frac + 2 * art_swell - 2 * art_bevel_word,
+         " at the top; outline round ", crest_round));
 echo(str("thinnest: crest bar ", art_w * crest_thin_frac,
          ", script thin ", art_w * script_thin_frac, " swelled to ",
          art_w * script_thin_frac + 2 * art_swell,
