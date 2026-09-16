@@ -45,7 +45,7 @@ slim-can-adapter 1
 slim-can-holder-3in 2
 slim-can-holder-3in-12oz 4
 slim-can-holder-3in-12oz-coupon 2
-slim-can-holder-3in-12oz-wagon-queen 2
+slim-can-holder-3in-12oz-wagon-queen 3
 slim-can-holder-3in-12oz-wagon-queen-coupon 2
 slim-can-holder-3in-censored 5
 slim-can-holder-3in-coupon 1

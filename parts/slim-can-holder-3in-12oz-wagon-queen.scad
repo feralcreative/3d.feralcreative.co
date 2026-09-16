@@ -345,6 +345,31 @@ art_mode = "emboss";   // [emboss, deboss]
 // expect a dotted script.
 art_swell = 0.19;
 
+// Radius the CREST's outline is rounded to (mm). 0 leaves it as drawn.
+//
+// The crown is geometric where the script is not: the bars and the rule end in
+// square corners and the three points meet in sharp Vs, and next to a script
+// whose terminals are all round that is what reads as sharp (Ziad,
+// 2026-09-16). This softens the silhouette without redrawing the mark.
+//
+// It is the erode-dilate-erode that logos/marks.scad uses on the cat's face —
+// offset(-k) offset(+2k) offset(-k) — because it rounds CONVEX and CONCAVE
+// corners alike, where a plain closing or opening only gets one kind. The
+// valleys between the crown's points are concave and they need it as much as
+// the bar ends do. Net offset is zero, so stroke widths on the flats are
+// untouched.
+//
+// ⚠️ THE FIRST ERODE IS WHAT BOUNDS IT. It cuts 2 x this off the narrowest
+// feature, and if that reaches zero the feature is gone for good — dilating
+// afterwards cannot bring back something that was severed. The bars are
+// art_w x crest_thin_frac = 1.38 mm here, so this has to stay well under
+// 0.69; 0.35 leaves them 0.68 through the pinch. There is an assert.
+//
+// The script is deliberately NOT rounded. Its thins are already down to 0.846
+// after the swell, so the same erode would leave them 0.146 and the round
+// would be fighting the swell for the same millimetre.
+crest_round = 0.35;
+
 // How far the relief stands proud of the plaque's floor, or sinks into it (mm).
 //
 // ⚠️ Embossed it must stay under sign_sag, the 3.10 the flat is sunk below the
@@ -577,6 +602,12 @@ assert(sign_count == 0 || art_w * script_thin_frac + 2 * art_swell >= 0.84,
            art_w * script_thin_frac + 2 * art_swell,
            " mm wide, under two 0.42 lines: raise art_swell to at least ",
            (0.84 - art_w * script_thin_frac) / 2));
+assert(sign_count == 0 || crest_round <= 0
+       || art_w * crest_thin_frac - 2 * crest_round >= 0.20,
+       str("crest_round pinches the crown's bars to ",
+           art_w * crest_thin_frac - 2 * crest_round,
+           " mm during its erode and they would be severed: keep it under ",
+           (art_w * crest_thin_frac - 0.20) / 2));
 assert(sign_count == 0 || art_swell < art_w * counter_budget_frac,
        str("art_swell has closed the lettering's counters: keep it under ",
            art_w * counter_budget_frac));
@@ -721,7 +752,11 @@ module sign_backing() {
 // rounded swell is kinder to a script's terminals than a mitred one, which
 // would spike them.
 module logo_art() {
-    wagon_queen_crest(art_w);
+    if (crest_round > 0)
+        offset(r = -crest_round) offset(r = 2 * crest_round)
+            offset(r = -crest_round) wagon_queen_crest(art_w);
+    else
+        wagon_queen_crest(art_w);
     offset(r = art_swell) wagon_queen_word(art_w);
 }
 
@@ -804,6 +839,8 @@ echo(str("plaque ", sign_w, " x ", sign_h,
          "  overall with bevels ", sign_h + 2 * sign_sag));
 echo(str("lockup ", art_w, " x ", art_h, " ", art_mode, "ed ", art_relief,
          ", against ", sign_sag, " of room"));
+echo(str("crest rounded ", crest_round, "; bars pinch to ",
+         art_w * crest_thin_frac - 2 * crest_round, " mid-round"));
 echo(str("thinnest: crest bar ", art_w * crest_thin_frac,
          ", script thin ", art_w * script_thin_frac, " swelled to ",
          art_w * script_thin_frac + 2 * art_swell,
