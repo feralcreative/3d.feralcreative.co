@@ -3,8 +3,8 @@
 // A copy of slim-can-holder-3in-12oz.scad with different artwork on it, and it
 // is meant to stay a copy. Everything that differs from that file differs
 // because the artwork changed — four plaques instead of two, sized to the
-// crest's 1 : 1.5505 instead of the finger's, and the crest in place of the
-// finger. The can, the bore, the ribs, the cavity, the webs, the flutes, the
+// lockup's 1 : 2.1607 instead of the finger's, and the Wagon Queen lockup in
+// place of the finger. The can, the bore, the ribs, the cavity, the webs, the flutes, the
 // floor and the fit coupon are untouched, so a diff between the two is exactly
 // the list of things the logo forced.
 //
@@ -49,7 +49,7 @@
 //
 // THE SIGNS. FOUR of them, at the cardinal directions: a bounded flat plaque
 // milled into the barrel, not a flat side. Each is exactly the artwork plus
-// 3 mm of padding all round — 30.00 wide by 43.2 tall — and nothing more, so
+// 3 mm of padding all round — 30.00 wide by 57.9 tall — and nothing more, so
 // the barrel above and below it is still round and still fluted.
 //
 // WHY THE PLAQUE IS 5.67 DEEP, AND WHY IT HAS A BEVEL. Those two numbers are
@@ -72,21 +72,45 @@
 // times. art_mode picks emboss or deboss; it is embossed by default, the way
 // the sibling's finger is.
 //
-// ⚠️ THE CREST, NOT THE FULL LOCKUP, and that is not a preference — the full
-// lockup cannot go on this barrel at all. Measured, by eroding the artwork
-// until its thinnest stroke pinches off:
+// THE WHOLE LOCKUP, CREST AND LETTERING, and the lettering only works because
+// it is SWELLED. Measured, by eroding the artwork until its thinnest stroke
+// pinches off:
 //
 //     lockup script   thinnest stroke  1.94% of the mark's width
 //     crest bars      thinnest stroke  7.09% of the crest's width
 //
-// For the script to hold 0.84 mm — two lines at 0.42 — it needs art_w >= 43.3,
-// which puts sign_w at 49.3. A 49.3 mm chord on this barrel's inradius sits at
-// flat_r 29.03, and the bore is at 29.215: the plaque floor would be INSIDE
-// the bore. So the lockup is impossible here at a legible size at any
-// sign_count, not merely at four. The crest needs only art_w >= 11.9 for the
-// same stroke and is drawn at 24, where its bars come out 1.70 mm wide.
+// At art_w 24 that puts the script's thins at 0.47 mm, which is one extrusion
+// line and change — it would print as a broken dotted line. Making the
+// artwork bigger is not the way out: for the script to reach 0.84 unswelled it
+// needs art_w >= 43.3, which puts sign_w at 49.3, and a 49.3 mm chord on this
+// barrel's inradius sits at flat_r 29.03 against a bore at 29.215 — the plaque
+// floor would be inside the bore. That is a radius problem on a fixed 3 inch
+// diameter and no amount of height or padding fixes it.
 //
-// Use wagon_queen() on something with a flat face and no 38 mm radius to fight.
+// So the script is swelled instead, which is what marks.scad's note on
+// zr_monogram prescribes for exactly this: let the thins gain and let the
+// thicks carry the extra. art_swell 0.185 takes the thins 0.47 -> 0.84 while
+// the heavy strokes grow by the same absolute amount, which at reading
+// distance is the same drawing a little heavier.
+//
+// The budget on that is the COUNTERS, not the strokes: swelling closes the
+// holes in the a, the g, the o, the e's and the Q by twice itself, and the
+// first of the eight shuts at 0.354 mm. 0.19 spends 54% of that, measured by
+// swelling the lettering and watching the genus hold at 5 | 2 | 1.
+//
+// ⚠️ An earlier round of this part left the lettering OFF and called it
+// impossible. That was wrong, and wrong in a specific way worth recording: it
+// reasoned only about scaling the artwork up and never about swelling it,
+// despite the library documenting the technique. The geometry that ruled out
+// art_w 43.3 is real; the conclusion drawn from it was not.
+//
+// THE CREST IS NOT SWELLED. It does not need it — registered to the lockup's
+// box it is 19.5 mm wide at art_w 24 and its bars come out 1.38 mm — and
+// swelling it would close its own gaps for nothing. The two halves come from
+// wagon_queen_crest() and wagon_queen_word(), which are both registered to
+// the LOCKUP's bounding box rather than their own, so they land on the plaque
+// in the same relationship they have in the artwork. That shared registration
+// is the whole reason marks.scad splits them.
 //
 // THE RELIEF IS NOT SQUASHED HERE. The sibling's finger is a 3D mesh whose
 // true-scale depth would break the 3 inch envelope, so it is squashed to 54%.
@@ -292,13 +316,13 @@ art_w = 24.00;
 
 // Height of the centre of the artwork above the base (mm).
 //
-// 46 is carried over from the sibling and it has room to spare here, because
-// the crest's plaque is 49.4 tall with its bevels against the finger's 65.2.
-// The two ends that bound it: the lower bevel must clear the base round
-// (21.3 against 5.0) and the upper must stay out of the fit coupon, which
-// takes the top 18 mm, so nothing may reach past 82. At 46 the top bevel ends
-// at 70.7. Anything from 30 to 57 is legal; 46 keeps the pair looking alike.
-art_z = 46.0;
+// The lockup's plaque is 64.1 tall with its bevels — close to the finger's
+// 65.2 — so the slack is back to a few millimetres at each end. The two that
+// bound it: the lower bevel must clear the base round (11.97 against 5.0) and
+// the upper must stay out of the fit coupon, which takes the top 18 mm, so
+// nothing may reach past 82. At 44 the top bevel ends at 76.03. Legal range is
+// 37.1 to 50.0; 44 centres what is left.
+art_z = 44.0;
 
 // Emboss the crest out of the plaque floor, or deboss it into it.
 //
@@ -307,6 +331,19 @@ art_z = 46.0;
 // matters for a through-cut, which this is not, but it is why the crest is
 // also the half that COULD be cut through a thin wall on some other part.
 art_mode = "emboss";   // [emboss, deboss]
+
+// How much to swell the LETTERING before placing it (mm, per side).
+//
+// The script's thins are 1.94% of the lockup's width, so at art_w 24 they are
+// 0.47 mm — under two 0.42 lines, and it would print broken. This is the knob
+// that fixes that without growing the plaque, which cannot grow. 0.185 takes
+// them to 0.84.
+//
+// ⚠️ It is bounded from ABOVE by the counters, not by the strokes. Swelling
+// closes the eight holes in the lettering by twice itself and the first shuts
+// at 0.354 mm; there is an assert. Set to 0 to see the artwork as drawn, and
+// expect a dotted script.
+art_swell = 0.19;
 
 // How far the relief stands proud of the plaque's floor, or sinks into it (mm).
 //
@@ -438,11 +475,16 @@ flute_hw  = sqrt(pow(out_r, 2) - pow(flute_a, 2));
 // from marks.scad and answers for the crest's OWN bounding box, which is the
 // one wagon_queen_crest_alone is registered to — see the warning over the
 // height functions there before reaching for a different one.
-art_h = wagon_queen_crest_height(art_w);
-// The crest's thinnest feature, as a fraction of its width. Measured by
-// eroding the artwork until a bar pinches off: it survives offset(r = -21) at
-// a native 606.804 wide and breaks by -22.
-crest_thin_frac = 2 * 21.5 / 606.804;
+art_h = wagon_queen_height(art_w);
+// Thinnest features and the swell budget, all as fractions of the LOCKUP's
+// width, measured by eroding or swelling the artwork until the mesh changes:
+//
+//   script thins     survives offset(r = -7.0) of a native 746.806, breaks -7.5
+//   crest bars       survives -21 of the crest's own native 606.804, breaks -22
+//   counter closure  all eight holes hold at +11, the first shuts by +12
+script_thin_frac  = 2 * 7.25 / 746.806;                  // 1.94%
+crest_thin_frac   = (2 * 21.5 / 606.804) * (606.804 / 746.806);  // 5.76%
+counter_budget_frac = 11.0 / 746.806;                    // 1.47%
 
 // The plaque, which is the block plus sign_pad on all four sides and nothing
 // else. Its width fixes its depth: flat_r is where a chord sign_w long sits on
@@ -530,6 +572,14 @@ assert(sign_count == 0 || art_w * crest_thin_frac >= 0.84,
        str("the crest's bars come out ", art_w * crest_thin_frac,
            " mm wide, under two 0.42 lines: raise art_w to at least ",
            0.84 / crest_thin_frac));
+assert(sign_count == 0 || art_w * script_thin_frac + 2 * art_swell >= 0.84,
+       str("the lettering's thin strokes come out ",
+           art_w * script_thin_frac + 2 * art_swell,
+           " mm wide, under two 0.42 lines: raise art_swell to at least ",
+           (0.84 - art_w * script_thin_frac) / 2));
+assert(sign_count == 0 || art_swell < art_w * counter_budget_frac,
+       str("art_swell has closed the lettering's counters: keep it under ",
+           art_w * counter_budget_frac));
 assert(art_mode == "emboss" || art_mode == "deboss",
        "art_mode is emboss or deboss");
 assert(sign_count == 0
@@ -665,6 +715,16 @@ module sign_backing() {
 // something to bite on rather than two coincident planes. Debossed, it starts
 // eps OUTSIDE it for the same reason, and runs inward instead; the turns are
 // identical either way, so the artwork cannot silently mirror between modes.
+// Crest as drawn, lettering swelled, both on the LOCKUP's registration so they
+// sit in the same relationship they have in the artwork. offset(r = ) rather
+// than offset(delta = ): it is what the swell budget was measured with, and a
+// rounded swell is kinder to a script's terminals than a mitred one, which
+// would spike them.
+module logo_art() {
+    wagon_queen_crest(art_w);
+    offset(r = art_swell) wagon_queen_word(art_w);
+}
+
 module logo_marks() {
     x0 = art_mode == "deboss" ? flat_r + eps - art_relief : flat_r - eps;
     for (i = [0 : sign_count - 1])
@@ -672,7 +732,7 @@ module logo_marks() {
             translate([x0, 0, art_z])
                 rotate([0, 90, 0]) rotate([0, 0, 90])
                     linear_extrude(height = art_relief + eps)
-                        wagon_queen_crest_alone(art_w);
+                        logo_art();
 }
 
 module ribs() {
@@ -742,9 +802,13 @@ echo(str("plaque ", sign_w, " x ", sign_h,
          "  deep ", sign_sag, " (= bevel height)  wall behind ", sign_t,
          "  z ", sign_z0, "..", sign_z1,
          "  overall with bevels ", sign_h + 2 * sign_sag));
-echo(str("crest ", art_w, " x ", art_h, " ", art_mode, "ed ", art_relief,
-         ", against ", sign_sag, " of room; thinnest bar ",
-         art_w * crest_thin_frac, " (floor 0.84)"));
+echo(str("lockup ", art_w, " x ", art_h, " ", art_mode, "ed ", art_relief,
+         ", against ", sign_sag, " of room"));
+echo(str("thinnest: crest bar ", art_w * crest_thin_frac,
+         ", script thin ", art_w * script_thin_frac, " swelled to ",
+         art_w * script_thin_frac + 2 * art_swell,
+         " (floor 0.84); swell ", art_swell, " of a ",
+         art_w * counter_budget_frac, " counter budget"));
 
 // The fit coupon: the top coupon_h of the finished part, dropped onto the bed
 // the same way up as the part itself. Taking it off the real thing rather than
