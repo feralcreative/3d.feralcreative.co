@@ -461,10 +461,19 @@ web_t = 1.35;
 /* [Fit coupon] */
 
 // The top of the part, cut off and stood on the bed, so a real can can be
-// pushed into it before committing to a five-hour print. It is a genuine slice
-// of the barrel — inner shell, cavity, webs, outer shell, flutes — because that
-// structure is what decides whether the bore comes out round and on size, and a
-// bare tube would not answer the same question.
+// pushed into it before committing to a six-hour print.
+//
+// IT IS FOR THE INSIDE DIAMETER AND NOTHING ELSE (Ziad, 2026-09-16). What the
+// outside of the coupon looks like is of no consequence — it is not a
+// presentation piece and nobody is judging its plaques.
+//
+// It is still a genuine slice of the barrel rather than a bare tube, and that
+// is not about appearance: the inner shell, cavity, webs and outer shell are
+// what decide whether the bore comes out round and on size, so a bare tube
+// would not answer the same question. Including a plaque is if anything BETTER
+// than avoiding one, because a plaque replaces 4.40 mm of cavity with 5.79 mm
+// of solid wall behind the bore, and that asymmetry is exactly the kind of
+// thing that pulls a bore out of round.
 //
 // ⚠️ PRINT THIS ONE FIRST. On the 250 ml part the coupon confirmed a bore that
 // had already been reasoned out. Here it is also the only thing that will tell
@@ -473,19 +482,27 @@ web_t = 1.35;
 // Height (mm). The budget from the top down: 2.00 of mouth chamfer, 1.00 of
 // clearance, 8.00 of rib ramp and then full-proud rib.
 //
-// 16.50 SINCE 2026-09-16, down from 18.00, because centring the plaque raised
-// what the coupon has to clear. The coupon gave way rather than the plaque: it
-// is a test piece and the plaque is the deliverable, and the budget had slack.
-// It leaves 5.50 mm of full-proud rib against the 7.00 it had, as easy to feel.
+// That budget says 7.00 mm of full-proud rib and the mesh says 6.11: the
+// coupon_relief cone eats the first 0.90 mm of the bore, so the rib is at full
+// height from z 0.90 to 7.01. Still plenty to feel, and the 7.00 in the
+// inherited comment was never measured. The tightest point across the bore
+// measures 57.80, which is bore_d less twice rib_h exactly.
 //
-// ⚠️ IT IS THE BACKING WEDGE THAT BOUNDS THIS, NOT THE BEVEL, and that took a
-// round to notice. Centring put the upper bevel at 82.03, so 17.50 looked
-// right — but sign_backing runs 1.0 mm past the bevel, to 83.03, and a coupon
-// starting at 82.50 swallowed half a millimetre of it. The symptom was the
-// coupon's genus going 1 -> -3: the wedge tops subdivide the cavity inside the
-// coupon into sealed pockets. The old assert only looked at the plaque, so it
-// passed. It checks sign_back_z1 now and names the number to beat.
-coupon_h = 16.50;
+// It went 18.00 -> 17.50 -> 16.50 and back on 2026-09-16, chasing a constraint
+// that does not exist. Centring the plaque put its bevel at 82.03 and its
+// backing wedge at 83.03, and the coupon was shortened twice to stay clear of
+// both — on the assumption that the coupon had to be a plain barrel section.
+// It does not: the outside is of no consequence, so the coupon is free to
+// contain as much plaque as the height happens to catch. 18.00 restored.
+//
+// What that episode DID leave behind is worth keeping: sign_back_z1, a name
+// for the fact that a plaque reaches 1.0 mm further up the barrel than its
+// bevel does, because sign_backing runs long at both ends. The echo below
+// reports whether the coupon catches any of it, so it is legible in the log
+// rather than a surprise in the mesh — a coupon that contains wedge tops
+// reports a negative genus, since they subdivide its cavity into sealed
+// pockets. That is now information, not an error.
+coupon_h = 18.00;
 
 // Relief on the bore at the cut face (mm), at 45 degrees, taking the rib tips
 // with it. The real part's bore never touches the bed — the floor does — so
@@ -999,12 +1016,18 @@ echo(str("thinnest: crest bar ", art_w * crest_thin_frac,
 module fit_coupon() {
     z0 = total_h - coupon_h;
     c  = coupon_relief + rib_h;          // 45 degrees, clearing the rib tips
-    assert(sign_count == 0 || z0 > sign_back_z1,
-           str("coupon_h reaches into the plaque's backing wedge at z ",
-               sign_back_z1, " — keep coupon_h under ", total_h - sign_back_z1,
-               ". The wedge tops would subdivide the coupon's cavity into ",
-               "sealed pockets, so it is no longer the plain barrel section ",
-               "it claims to be; the tell is a negative genus"));
+    // NOT an assert. The coupon is for the bore, so catching part of a plaque
+    // is a fact about it rather than a fault in it. Said out loud because it
+    // changes what the geometry summary looks like: wedge tops inside the
+    // coupon subdivide its cavity into sealed pockets and the genus goes
+    // negative, and that is easier to read here than to work out later.
+    if (sign_count > 0 && z0 <= sign_back_z1)
+        echo(str("coupon note: it catches the plaque — bevel top ",
+                 sign_z1 + sign_sag, ", backing wedge top ", sign_back_z1,
+                 ", coupon floor ", z0,
+                 ". Expect extra sealed voids and a negative genus. Harmless; ",
+                 "coupon_h under ", total_h - sign_back_z1,
+                 " would avoid it if a plain section is ever wanted"));
     difference() {
         translate([0, 0, -z0])
             intersection() {
