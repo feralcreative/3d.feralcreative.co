@@ -44,8 +44,8 @@ screen-fence-test-rail 4
 screen-fence-twin-coupon 1
 slim-can-adapter 1
 slim-can-holder-3in 2
-slim-can-holder-3in-12oz 6
-slim-can-holder-3in-12oz-coupon 4
+slim-can-holder-3in-12oz 9
+slim-can-holder-3in-12oz-coupon 7
 slim-can-holder-3in-12oz-wagon-queen 7
 slim-can-holder-3in-12oz-wagon-queen-coupon 6
 slim-can-holder-3in-censored 5

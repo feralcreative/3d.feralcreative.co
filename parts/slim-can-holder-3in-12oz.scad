@@ -42,22 +42,46 @@
 // cylinder, and every one of them is a vertical cut that costs no support.
 // Set flute_count or flute_depth to 0 for a plain barrel.
 //
-// THE SIGNS. Two of them, 180 degrees apart: a bounded flat plaque milled into
-// the barrel, not a flat side. Each is exactly the artwork plus 3 mm of padding
-// all round — 40.00 wide by about 53.8 tall — and nothing more, so the barrel
-// above and below it is still round and still fluted.
+// THE SIGNS. Four of them, at the cardinal points (Ziad, 2026-09-16): a
+// bounded flat plaque milled into the barrel, not a flat side. Each is the artwork plus 3 mm of padding at the
+// sides and the top — 33.50 wide by 65.50 tall — and nothing more, so the
+// barrel above and below it is still round and still fluted. There is no
+// padding at the bottom, because the wrist runs off that edge.
 //
-// WHY THE PLAQUE IS 5.67 DEEP, AND WHY IT HAS A BEVEL. Those two numbers are
-// not choices, they are the barrel's radius. A 40.00 mm chord on a Ø76.20
-// circle has a sagitta of 5.67 mm, so a flat that wide is 5.67 mm below the
+// WHY THE PLAQUE IS 3.90 DEEP, AND WHY IT HAS A BEVEL. Those two numbers are
+// not choices, they are the barrel's radius. A 33.50 mm chord on a Ø76.20
+// circle has a sagitta of 3.90 mm, so a flat that wide is 3.90 mm below the
 // surface at its centre whatever else is done — and the plaque's ceiling is
-// then a 5.67 mm shelf hanging over open air with nothing under its outer
+// then a 3.90 mm shelf hanging over open air with nothing under its outer
 // edge, which is not a bridge (two anchors) but a cantilever (one), and it
 // would droop. Relieving it at 45 degrees fixes that, and a 45-degree relief
-// across 5.67 mm of depth costs exactly 5.67 mm of height. So the plaque reads
+// across 3.90 mm of depth costs exactly 3.90 mm of height. So the plaque reads
 // as a flat panel with a bevelled frame above and below, and the frame is that
 // tall because the printer says so. Widen the artwork and all three numbers
 // grow together; art_w is the one knob.
+//
+// ⚠️ FOUR OF THEM COSTS THE CAVITY, and that is the real price of the pair
+// Ziad added. Each plaque's floor sits inside the annular cavity, so each one
+// needs a solid wedge behind it, and sign_back_ang makes that wedge 69.1 wide
+// — four of those leave only 20.9 degrees of cavity between them. Over the
+// plaque's 75 mm of height the dead air goes from 138 degrees' worth to 276,
+// which is about 27 cm3 of air turned into PETG.
+//
+// ⚠️ The wedge angle is the conservative one inherited from the 250 ml part,
+// where it was sized at the cavity's INNER radius after a torus-shaped pocket
+// got through a box-shaped block. Measured against this plaque it is roughly
+// twice what the geometry needs — the pocket only reaches the cavity between
+// radius 34.20 and 35.70, which subtends 16.5 degrees, not 34.55 — so most of
+// that 27 cm3 is recoverable. It has not been touched, because the number that
+// is too big is the one that fixed a real bug, and this was not the round to
+// re-derive it in.
+//
+// ⚠️ WHICH IS WHY art_w CAME DOWN FROM 34.00, and it is a trade, not a tidy-up.
+// A wider plaque is a deeper plaque, and a deeper plaque is a taller one once
+// its two bevels are counted — so widening the artwork costs height twice over
+// while the hand needs height once. At 34.00 the whole hand cannot be shown on
+// this barrel at any art_z; at 27.50 it can, with 1.85 mm to spare at each end.
+// The bill is a smaller hand and a shallower relief.
 //
 // The left and right edges need no such treatment: the flat simply runs out
 // where its plane meets the barrel, which is why the plaque has straight sides
@@ -81,7 +105,15 @@
 // own width where the old fist was 1.41, so at art_w it stands 81.65 tall
 // against a plaque that cannot clear 62.61 on a 100 mm barrel — the top bevel
 // has to stay under the fit coupon and the bottom one has to clear the base
-// round. 60.50 of it shows, which is every millimetre there is to give.
+// round.
+//
+// ⚠️ SO THE WIDTH GAVE WAY INSTEAD (Ziad, 2026-09-16: the very bottom of the
+// hand should butt up against the bottom). Cropping was the first answer and
+// it is the wrong one — at 34.00 wide, a quarter of the hand had to go. At
+// 27.50 the whole relief fits, and all that is cut is the 8.05 mm at its very
+// bottom where the forearm was squared off flat, which is not anatomy: it is
+// the cut the other file made to stand the hand on a bed. The visible bottom
+// of the hand is the plaque's bottom edge.
 // So the plaque is NOT sized to the artwork any more, the way it was when the
 // artwork was a fist and fitted: art_h is chosen, the hand hangs from its
 // fingertip, and the forearm runs off the bottom edge.
@@ -95,11 +127,11 @@
 // The cut plane is dropped eps below the sill so the union has an overlap to
 // bite on rather than two coincident faces.
 //
-// ⚠️ THE RELIEF IS SQUASHED, and it has to be. At 34 mm wide a true-scale
-// relief would stand 8.71 mm off the plaque floor, and the floor is only 5.69
+// ⚠️ THE RELIEF IS SQUASHED, and it has to be. At 27.5 mm wide a true-scale
+// relief would stand 7.05 mm off the plaque floor, and the floor is only 3.90
 // below the barrel — so at full scale the hand would break the 3 inch envelope
-// this whole part exists to hold. art_relief is 4.00, which is 46% of scale
-// depth and leaves 1.69 mm between the knuckles and the barrel's own surface.
+// this whole part exists to hold. art_relief is 2.90, which is 41% of scale
+// depth and leaves 1.00 mm between the knuckles and the barrel's own surface.
 // It is still a relief; reliefs are squashed. Raising art_w makes the plaque
 // deeper and buys headroom if a taller one is wanted.
 //
@@ -272,8 +304,10 @@ flute_clear = 0.50;
 /* [Signs] */
 
 // Bounded flat plaques milled into the barrel, one per sign, evenly spaced.
-// Cut in, never stood off, so the 3 inch maximum is untouched.
-sign_count = 2;
+// Cut in, never stood off, so the 3 inch maximum is untouched. Four of them
+// is the cardinal points; see the two warnings in the header for what the
+// second pair costs in cavity.
+sign_count = 4;
 // Clear space around the artwork (mm). This IS the plaque — its width is
 // art_w + 2 x this, and it is no bigger than that. Its height is art_h + ONE
 // of these, not two: there is padding above the fingertip and none below,
@@ -285,10 +319,17 @@ sign_pad = 3.00;
 
 // Width of the artwork, and with it the whole plaque (mm). Everything
 // downstream is a consequence: the plaque is 6.00 wider, the flat is that much
-// below the barrel surface (5.69 at 34.00), and the bevel that makes the flat
+// below the barrel surface (3.90 at 27.50), and the bevel that makes the flat
 // printable is exactly as tall as the flat is deep. The height does NOT follow
 // — see art_h.
-art_w = 34.00;
+//
+// 27.50 IS SET BY THE HEIGHT, NOT BY TASTE. It is the widest the artwork can be
+// and still show the whole hand: every millimetre of width adds 2.40 mm of
+// hand and about 0.25 mm of bevel at each end, and the barrel has 77.00 mm
+// between the top of the base round and the bottom of the fit coupon. 34.00
+// was the old fist's width and it does not fit this hand; 28.00 fits with 1.1
+// of margin; 27.50 fits with 1.85, which is where it sits.
+art_w = 27.50;
 
 // How much of the hand shows, from the plaque's bottom edge up to the
 // fingertip (mm). The whole relief is 81.65 tall at this width and there is
@@ -296,31 +337,36 @@ art_w = 34.00;
 // from its fingertip and whatever falls below the plaque's bottom edge is cut
 // off on the sill's own 45-degree plane.
 //
-// AS LITTLE AS POSSIBLE COMES OFF (Ziad, 2026-09-16: only cut off the wrist
-// what you have to), so this is not a composition choice — it is the ceiling
-// less a millimetre at each end. The ceiling is 62.61, where the lower bevel
-// reaches the top of the base round and the upper one reaches the fit coupon's
-// cut face at the same moment. 60.50 backs off both by 1.06 and nothing else
-// is available: every millimetre past it has to come from total_h, base_round
-// or coupon_h, and all three are deliberate numbers belonging to something
-// else.
+// NOTHING OF THE HAND COMES OFF ANY MORE. The whole relief is 66.05 tall at
+// this width and 62.50 of it shows; the 3.55 mm difference is not a crop of
+// the drawing but of the squared-off end the other file cut to stand the hand
+// on a bed — 8.05 mm of the relief's own 149.94, all of it below the wrist.
 //
-// That crops the relief 40.5 mm up, in the narrowing forearm — 26% of the hand
-// goes, and what goes is the slimmest part of the wrist plus the stump below
-// it. Over 81.65 there is no crop left to make at all, which an assert says.
-art_h = 60.50;
+// It has to be cut, and it has to be cut by more than art_relief: a flat end
+// left standing at the plaque's bottom edge would hang art_relief proud over
+// the sill as a ledge. Cutting deeper than that hands the whole end to the
+// 45-degree taper instead. There is an assert on it; the slack here is 0.65.
+art_h = 62.50;
 
 // Height of the centre of the artwork above the base (mm).
 //
-// 55 with the old three-line block, which was 31.4 tall, and 46 with the old
-// fist. The taller hand leaves no freedom at all: the plaque with its bevels is
-// 74.89 of a 100 mm barrel, so 25.11 is all the slack there is and both ends
-// are hard up against something. 42.0 is the only value that splits it evenly —
-// the bottom bevel starts at 6.06 against a base round that reaches 5.00, and
-// the top one ends at 80.94 against a fit coupon that takes everything over
-// 82.00. 1.06 mm of clearance at each end. Move art_z either way and one of
-// those two becomes the assert that fires.
-art_z = 42.0;
+// 48.5 PUTS THE PLAQUE IN THE MIDDLE OF THE BARREL (Ziad, 2026-09-16: centre
+// the plaques vertically), and it is derived, not fitted: total_h / 2 less
+// half the padding, because the padding is all at the top. That lands the flat
+// at 17.25..82.75, whose centre is 50.00, and the bevels at 13.35..86.65,
+// whose centre is also 50.00 — the two coincide because the bevels are the
+// same height at both ends, so there is only one way to centre this and no
+// choice to make between the plaque and its frame.
+//
+// It is NOT the middle of the artwork. The hand's own centre sits at 48.5,
+// 1.5 low, and that is correct: the plaque is what you see and the padding
+// above the fingertip is part of it, so centring the drawing would push the
+// frame high by the same 1.5.
+//
+// Re-derive it if total_h or sign_pad move. 55 with the old three-line block,
+// 46 with the old fist, and 42.0 while the plaque was still being crammed in
+// between the base round and the fit coupon.
+art_z = total_h / 2 - sign_pad / 2;
 
 // How far the relief stands proud of the plaque's floor (mm).
 //
@@ -329,11 +375,30 @@ art_z = 42.0;
 // this part. There is an assert on it.
 //
 // It is also not the scale depth. At art_w wide a true-scale relief would
-// stand art_w * 16 / 62.43 = 8.71 proud, so finger_mark squashes the depth to
+// stand art_w * 16 / 62.43 = 7.05 proud, so finger_mark squashes the depth to
 // this instead of scaling it with the width. Squashing depth is what a relief
 // is; the alternative here is not a deeper relief, it is a part that is no
 // longer 3 inches across.
-art_relief = 4.00;
+art_relief = 2.90;
+
+// How far the relief is sunk INTO the plaque's floor before it is unioned on
+// (mm), so the two solids overlap instead of sharing a plane. It comes off the
+// proud height: the hand stands art_relief - this, 2.80, off the floor.
+//
+// ⚠️ IT IS NOT eps, AND IT MATTERS. At eps = 0.01 the cut plane through the
+// relief lands where the hand's own surface leaves its flat back tangentially,
+// so the footprint pinches to a point at the widest part of the fist and CGAL
+// answers with five zero-area triangles there — 4 pinch points on this part,
+// 16 once there were four plaques, each an edge with 4, 6 or 10 faces on it
+// instead of 2. OpenSCAD still calls the result manifold and a slicer would
+// not care, but the mesh stops being a clean 2-manifold and that is a poor
+// thing to hand anyone.
+//
+// 0.10 puts the cut far enough in that the footprint is a closed curve with
+// room to spare, and the whole part comes back with every edge on exactly two
+// triangles. Measured both ways, not reasoned: 16 bad edges at 0.01, none at
+// 0.10.
+art_sink = 0.10;
 
 /* [Grip ribs] */
 
@@ -390,10 +455,17 @@ web_t = 1.35;
 //
 // Height (mm). The budget from the top down: 2.00 of mouth chamfer, 1.00 of
 // clearance, 8.00 of rib ramp and then full-proud rib. 18.00 leaves 7 mm of
-// rib at full height, which is plenty to feel, and clears the top of the
-// plaque's upper bevel at z 80.94 by 1.06 — the tightest thing in the file's
-// whole height budget, and shortening this is one of the three ways to show
-// more wrist.
+// rib at full height, which is plenty to feel.
+//
+// ⚠️ IT NO LONGER CLEARS THE PLAQUE, and it cannot. Centring the plaque put
+// its upper bevel at 86.65, so a coupon that misses it has to be under 13.35
+// and would leave about 1 mm of full-proud rib. The coupon is for the inside
+// diameter and the outside is of no consequence (Ziad, 2026-09-16, settling
+// the same question on the wagon queen sibling), so 18.00 stays and the
+// coupon catches the top of a plaque. What that costs is a few sealed voids
+// off the backing wedge and a negative genus on the coupon; what it buys is
+// 7 mm of rib to push a can against. An echo in fit_coupon says so on every
+// build.
 coupon_h = 18.00;
 
 // Relief on the bore at the cut face (mm), at 45 degrees, taking the rib tips
@@ -532,14 +604,23 @@ assert(sign_count == 0 || sign_w < outer_d,
        "a plaque has to be cut IN: art_w + 2 x sign_pad must be under outer_d");
 assert(sign_count == 0 || sign_t >= 2.10,
        "too little wall left behind the plaque: reduce art_w");
-assert(sign_count < 2 || sign_ang * sign_count < 180 - 8,
+// Both of these are gaps between NEIGHBOURS, so they are written against the
+// spacing rather than against 180. They were sign_ang * sign_count < 172 until
+// sign_count went to 4, which is the same test at 2 plaques and a much weaker
+// one at 4 — at 4 it would have allowed a 43-degree half-angle and a 4-degree
+// gap while claiming to enforce 8.
+assert(sign_count < 2 || 2 * sign_ang <= 360 / sign_count - 8,
        "the plaques have run into each other: reduce art_w or sign_count");
-assert(sign_count < 2 || sign_back_ang * sign_count < 180 - 8,
+assert(sign_count < 2 || 2 * sign_back_ang <= 360 / sign_count - 8,
        "the backing wedges have met: the cavity between the plaques is gone");
+assert(sign_count == 0 || art_sink < art_relief,
+       "art_sink has swallowed the relief: the artwork is buried in the plaque floor");
 assert(sign_count == 0 || art_relief < sign_sag,
        "the artwork stands out past the barrel: reduce art_relief or raise art_w");
 assert(sign_count == 0 || art_h < art_full_h,
        "art_h is taller than the whole hand: there is no wrist left to cut, and the relief would float clear of the plaque's bottom edge");
+assert(sign_count == 0 || art_full_h - art_h >= art_relief,
+       "the cut at the bottom is shallower than the relief, so the relief's own squared end survives and hangs proud over the sill as a ledge: lower art_h by at least art_relief, or lower art_relief");
 assert(sign_count == 0
        || (sign_z0 - sign_sag > base_top_z && sign_z1 + sign_sag < total_h - top_cham),
        "the plaque and its bevels have run off the end of the barrel");
@@ -701,13 +782,14 @@ module plaque_envelope() {
 // below the plaque's top — and then clipped. Centring it would crop the tip as
 // well, and the tip is the point of the gesture.
 //
-// Sunk eps into the floor so the union has something to bite on rather than
-// two coincident planes.
+// Sunk art_sink into the floor so the union has something to bite on rather
+// than two coincident planes — and sunk that far rather than eps for a reason
+// the parameter's own note gives.
 module finger_marks() {
     for (i = [0 : sign_count - 1])
         rotate([0, 0, i * 360 / sign_count])
             intersection() {
-                translate([flat_r - eps, 0,
+                translate([flat_r - art_sink, 0,
                            sign_z1 - sign_pad - art_full_h / 2])
                     rotate([0, 0, -90])
                         finger_mark(art_w, art_relief);
@@ -779,7 +861,7 @@ echo(str("plaque ", sign_w, " x ", sign_h,
          "  deep ", sign_sag, " (= bevel height)  wall behind ", sign_t,
          "  z ", sign_z0, "..", sign_z1,
          "  overall with bevels ", sign_h + 2 * sign_sag));
-echo(str("artwork ", art_w, " x ", art_h, " standing ", art_relief,
+echo(str("artwork ", art_w, " x ", art_h, " standing ", art_relief - art_sink,
          " proud, against ", sign_sag, " of room",
          "  (cropped from ", art_full_h, ", so ", art_full_h - art_h,
          " of forearm runs off the bottom edge at 45 degrees)"));
@@ -791,9 +873,17 @@ echo(str("artwork ", art_w, " x ", art_h, " standing ", art_relief,
 module fit_coupon() {
     z0 = total_h - coupon_h;
     c  = coupon_relief + rib_h;          // 45 degrees, clearing the rib tips
-    assert(sign_count == 0 || z0 > sign_z1 + sign_sag,
-           str("coupon_h reaches into the plaque at z ", sign_z1 + sign_sag,
-               " — shorten it, or the coupon is not a plain barrel section"));
+    // Catching the plaque is a fact about the coupon, not a fault in it — see
+    // the warning on coupon_h. This was an assert until the plaques were
+    // centred, at which point there was no coupon_h that both clears them and
+    // leaves any rib to feel.
+    if (sign_count > 0 && z0 <= sign_z1 + sign_sag)
+        echo(str("coupon note: it catches a plaque — bevel top ",
+                 sign_z1 + sign_sag, ", coupon floor ", z0,
+                 ". Expect sealed voids off the backing wedge and a negative",
+                 " genus, both harmless. coupon_h under ",
+                 total_h - (sign_z1 + sign_sag),
+                 " would miss it, at about 1 mm of full-proud rib"));
     difference() {
         translate([0, 0, -z0])
             intersection() {
