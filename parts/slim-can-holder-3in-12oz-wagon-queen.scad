@@ -316,13 +316,20 @@ art_w = 24.00;
 
 // Height of the centre of the artwork above the base (mm).
 //
-// The lockup's plaque is 64.1 tall with its bevels — close to the finger's
-// 65.2 — so the slack is back to a few millimetres at each end. The two that
-// bound it: the lower bevel must clear the base round (11.97 against 5.0) and
-// the upper must stay out of the fit coupon, which takes the top 18 mm, so
-// nothing may reach past 82. At 44 the top bevel ends at 76.03. Legal range is
-// 37.1 to 50.0; 44 centres what is left.
-art_z = 44.0;
+// CENTRED ON THE BARREL (Ziad, 2026-09-16), and written as the formula rather
+// than as 50 so it stays centred if total_h ever moves — the header floats
+// total_h = 116 as a one-line change.
+//
+// Everything on the plaque is symmetric about this number: the artwork is
+// centred in the plaque, the plaque is centred on the artwork, and both bevels
+// are the same height. So centring the artwork centres the plaque and the
+// frame with it, and there is nothing else to decide.
+//
+// ⚠️ THE FIT COUPON HAD TO MOVE FOR THIS, by 0.03 mm's worth of collision.
+// The plaque with its bevels is 64.05 tall, so centred it spans 17.97 to
+// 82.03 — and coupon_h 18.00 claimed everything from 82.00 up. See coupon_h.
+// The lower end has room to spare: 17.97 against a base round of 5.00.
+art_z = total_h / 2;
 
 // Emboss the crest out of the plaque floor, or deboss it into it.
 //
@@ -464,10 +471,21 @@ web_t = 1.35;
 // you whether Ø57.40 is the can you actually have.
 //
 // Height (mm). The budget from the top down: 2.00 of mouth chamfer, 1.00 of
-// clearance, 8.00 of rib ramp and then full-proud rib. 18.00 leaves 7 mm of
-// rib at full height, which is plenty to feel, and clears the top of the
-// plaque's upper bevel at z 76.42 by 5.58.
-coupon_h = 18.00;
+// clearance, 8.00 of rib ramp and then full-proud rib.
+//
+// 16.50 SINCE 2026-09-16, down from 18.00, because centring the plaque raised
+// what the coupon has to clear. The coupon gave way rather than the plaque: it
+// is a test piece and the plaque is the deliverable, and the budget had slack.
+// It leaves 5.50 mm of full-proud rib against the 7.00 it had, as easy to feel.
+//
+// ⚠️ IT IS THE BACKING WEDGE THAT BOUNDS THIS, NOT THE BEVEL, and that took a
+// round to notice. Centring put the upper bevel at 82.03, so 17.50 looked
+// right — but sign_backing runs 1.0 mm past the bevel, to 83.03, and a coupon
+// starting at 82.50 swallowed half a millimetre of it. The symptom was the
+// coupon's genus going 1 -> -3: the wedge tops subdivide the cavity inside the
+// coupon into sealed pockets. The old assert only looked at the plaque, so it
+// passed. It checks sign_back_z1 now and names the number to beat.
+coupon_h = 16.50;
 
 // Relief on the bore at the cut face (mm), at 45 degrees, taking the rib tips
 // with it. The real part's bore never touches the bed — the floor does — so
@@ -555,6 +573,12 @@ sign_sag = out_r - flat_r;
 sign_z0  = art_z - sign_h / 2;
 sign_z1  = art_z + sign_h / 2;
 sign_t   = flat_r - r_bore;                  // solid wall left behind a plaque
+// The top of the BACKING WEDGE, which reaches 1.0 mm past the plaque's upper
+// bevel — see sign_backing, which starts 1.0 below the lower bevel and runs
+// 2.0 longer than the pair. This, not the bevel, is the highest thing a plaque
+// puts into the barrel, and it is what the fit coupon has to clear to be the
+// plain barrel section it claims to be.
+sign_back_z1 = sign_z1 + sign_sag + 1.0;
 // Half the angle the plaque subtends, for the do-they-collide assert.
 sign_ang = asin((sign_w / 2) / out_r);
 // Half-angle of the wedge that backs it, taken at the cavity's inner radius
@@ -975,9 +999,12 @@ echo(str("thinnest: crest bar ", art_w * crest_thin_frac,
 module fit_coupon() {
     z0 = total_h - coupon_h;
     c  = coupon_relief + rib_h;          // 45 degrees, clearing the rib tips
-    assert(sign_count == 0 || z0 > sign_z1 + sign_sag,
-           str("coupon_h reaches into the plaque at z ", sign_z1 + sign_sag,
-               " — shorten it, or the coupon is not a plain barrel section"));
+    assert(sign_count == 0 || z0 > sign_back_z1,
+           str("coupon_h reaches into the plaque's backing wedge at z ",
+               sign_back_z1, " — keep coupon_h under ", total_h - sign_back_z1,
+               ". The wedge tops would subdivide the coupon's cavity into ",
+               "sealed pockets, so it is no longer the plain barrel section ",
+               "it claims to be; the tell is a negative genus"));
     difference() {
         translate([0, 0, -z0])
             intersection() {
