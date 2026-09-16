@@ -579,6 +579,28 @@ function flute_bite(t, clear) =
     : let (h = sqrt(pow(flute_cut_r, 2) - pow(d, 2)))
       cy - h < sign_w / 2 + clear && cy + h > -(sign_w / 2 + clear);
 
+// How close flute i's cutter gets to the axis ACROSS THE RAISED ARTWORK, in
+// the plaque's own frame. The cutter is a circle of flute_cut_r centred
+// flute_off out at angle t, so along the plaque's centreline it reaches
+// inward to flute_off - flute_cut_r, and that is its closest approach. Only
+// flutes whose cutter actually passes over the artwork's y-span count.
+//
+// THIS IS A DIFFERENT QUESTION FROM flute_bite, which asks about the plaque's
+// FLOOR. The floor is sign_sag below the surface and the flutes only cut
+// flute_depth, so a flute can clear the floor by millimetres and still be on a
+// collision course with artwork standing art_relief proud of it. Nothing
+// checked that until the artifact below sent someone looking.
+function flute_reach_over_art(t) =
+    let (cx = flute_off * cos(t), cy = flute_off * sin(t))
+    abs(cy) - flute_cut_r > art_w / 2 ? 1e9        // misses the artwork entirely
+    : flute_off - flute_cut_r;
+
+function flute_art_gap() = sign_count == 0 || flute_count == 0 || flute_depth <= 0
+    ? 1e9
+    : min([for (i = kept_flutes, j = [0 : sign_count - 1])
+             flute_reach_over_art(i * 360 / flute_count - j * 360 / sign_count)])
+      - (flat_r + art_relief);
+
 // True if flute i bites any of the plaques.
 function flute_bites(i) = sign_count == 0 ? false :
     len([for (j = [0 : sign_count - 1])
@@ -619,6 +641,23 @@ assert(sign_count < 2 || sign_back_ang * sign_count < 180 - 8,
        "the backing wedges have met: the cavity between the plaques is gone");
 assert(sign_count == 0 || art_relief < sign_sag,
        "the artwork stands out past the barrel: reduce art_relief or raise art_w");
+// ⚠️ A FLUTE IS CENTRED ON EVERY PLAQUE here — 24 flutes at 15 degrees, four
+// plaques at 90 — and its cutter reaches inward to flute_off - flute_cut_r =
+// 37.30 while the artwork's top face is at flat_r + art_relief = 37.00. That
+// is 0.30 mm of air, and it is the whole reason the flute shows up as a
+// full-height vertical bar over the plaque in OpenSCAD's OpenCSG preview at
+// some angles: an unsubtracted cutter sitting 0.30 proud of the artwork draws
+// IN FRONT of it. The exported mesh is unaffected and always was.
+//
+// The margin is real though, and nothing was checking it: raise art_relief
+// past 2.30 and the flute would genuinely mill a groove down the middle of
+// the crown, with no warning from flute_bite, which only ever looked at the
+// plaque's floor.
+assert(flute_art_gap() >= 0.20,
+       str("a flute cutter passes ", flute_art_gap(),
+           " mm from the raised artwork and will mill a groove down the ",
+           "middle of it: reduce art_relief or flute_depth, or move the ",
+           "plaques off the flute pitch"));
 assert(sign_count == 0 || art_w * crest_thin_frac >= 0.84,
        str("the crest's bars come out ", art_w * crest_thin_frac,
            " mm wide, under two 0.42 lines: raise art_w to at least ",
@@ -921,6 +960,8 @@ echo(str("bevel: crest ", art_bevel_crest, " -> bars ",
          art_bevel_word, " -> thins ",
          art_w * script_thin_frac + 2 * art_swell - 2 * art_bevel_word,
          " at the top; outline round ", crest_round));
+echo(str("flute cutter clears the raised artwork by ", flute_art_gap(),
+         " mm (floor 0.20)"));
 echo(str("thinnest: crest bar ", art_w * crest_thin_frac,
          ", script thin ", art_w * script_thin_frac, " swelled to ",
          art_w * script_thin_frac + 2 * art_swell,
