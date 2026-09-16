@@ -57,8 +57,23 @@ FERAL_BOX      = [[  0.000, 0.000], [292.453, 342.019]];
 VMC_BOX        = [[  0.000, 3.845], [352.777, 256.928]];
 ZR_BOX         = [[  0.000, 0.000], [333.309, 270.705]];
 ZR_MONO_BOX    = [[  0.000, 0.000], [181.150, 123.472]];
+// The Wagon Queen lockup: crest over lettering, in one file. All three boxes
+// are measured off the same import, so the two halves share the lockup's
+// registration exactly the way the Hobbs pair do.
+WAGON_QUEEN_BOX       = [[  0.000,   0.349], [746.806, 1613.609]];
+WAGON_QUEEN_CREST_BOX = [[ 86.405, 673.100], [606.804,  940.858]];
+WAGON_QUEEN_WORD_BOX  = [[  0.000,   0.349], [746.806,  569.034]];
 
 // What a mark stands to when it is placed `width` across.
+//
+// ⚠️ EACH ONE ANSWERS FOR ITS OWN BOX, which is not always the module of the
+// same name. hobbs_word_height and wagon_queen_crest_height describe the
+// `_alone` variants, because those are the ones registered to that box; the
+// half-marks registered to a lockup's box come out smaller. Measured at
+// width 40: wagon_queen_crest_height says 62.02, wagon_queen_crest_alone
+// delivers exactly that, and wagon_queen_crest delivers 32.50 x 50.39 because
+// it is still holding the lettering's place. wagon_queen_word is the harmless
+// case — its box is the full lockup width, so both readings agree at 30.48.
 function mark_height(box, width)   = width * box[1][1] / box[1][0];
 function hobbs_mark_height(width)  = mark_height(HOBBS_BOX, width);
 function hobbs_word_height(width)  = mark_height(HOBBS_WORD_BOX, width);
@@ -66,6 +81,9 @@ function feral_logo_height(width)  = mark_height(FERAL_BOX, width);
 function vmc_rocker_height(width)  = mark_height(VMC_BOX, width);
 function zr_mark_height(width)     = mark_height(ZR_BOX, width);
 function zr_monogram_height(width) = mark_height(ZR_MONO_BOX, width);
+function wagon_queen_height(width)       = mark_height(WAGON_QUEEN_BOX, width);
+function wagon_queen_crest_height(width) = mark_height(WAGON_QUEEN_CREST_BOX, width);
+function wagon_queen_word_height(width)  = mark_height(WAGON_QUEEN_WORD_BOX, width);
 
 // Scale to width, centre on the origin.
 module place_mark(box, width) {
@@ -127,4 +145,72 @@ module zr_mark(width = 30, $fn = 0) {
 // distance is the same drawing. parts/deck-door-stop.scad does exactly that.
 module zr_monogram(width = 30, $fn = 0) {
     place_mark(ZR_MONO_BOX, width) import("monogram-zr.svg");
+}
+
+// THE WAGON QUEEN LOCKUP — a three-balled crown over five bars and a rule,
+// with "Wagon Queen" in script beneath it. Crown, bars and rule together are
+// what the modules below call the crest. Tall: 2.16 times its own width, so
+// `width` buys a lot less than it does on the other marks here. Ask for 40 and
+// you get 86.4 mm of height.
+//
+// ONE FILE, SPLIT WITH A HALF-PLANE. The crest and the lettering are separate
+// halves of one SVG rather than two files, because the artwork leaves a 103.7 mm
+// band of empty space between the rule and the top of the W. Clipping there
+// keeps one source of truth — a second file would be the same drawing twice and
+// free to drift out of registration, which is the trap the Hobbs pair are
+// carefully arranged to avoid rather than one to repeat.
+//
+// WHAT CAN BE CUT THROUGH: the crest, and only the crest. Extruded it comes out
+// as SEVEN disjoint solids — the crown, the five bars, the rule — and every one
+// of them is genus 0, so it has no counters at all and a through-cut leaves
+// holes and nothing loose. That puts it with the ZR marks and the Hobbs figure.
+//
+// The lettering is the opposite and it is not close: three shells carrying
+// EIGHT counters between them (genus 5, 2 and 1 — the a, the g's two, the o,
+// the n's, the Q, and both e's). A through-cut drops all eight on the floor.
+// Deboss it or raise it. The same goes for the full lockup, which is just the
+// two halves together.
+//
+// Measured, not assumed: the boxes above and the counter counts come from
+// extruding each half and reading the mesh back.
+WAGON_QUEEN_SPLIT = 621.25;   // the empty band, in imported millimetres
+
+// Either half of the lockup, clipped out of the one import. The band it cuts
+// through is 103.7 mm of nothing, from 569.4 to 673.1, so this line has about
+// 45 mm of slack in each direction — moving it anywhere inside the band gives
+// a bit-identical result, which is what makes a hardcoded number safe here.
+// Remeasure it along with the boxes if the SVG is ever replaced.
+module wagon_queen_half(upper) intersection() {
+    import("logo-wagon-queen.svg");
+    translate([-1000, upper ? WAGON_QUEEN_SPLIT : WAGON_QUEEN_SPLIT - 3000])
+        square([3000, 3000]);
+}
+
+// The whole lockup. Counters: deboss or raise, never cut through.
+module wagon_queen(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_BOX, width) import("logo-wagon-queen.svg");
+}
+
+// The two halves ON THE LOCKUP'S registration, so they can be mixed on one
+// part — crest cut through a wall and lettering debossed below it, say — and
+// still line up the way they do in the artwork.
+module wagon_queen_crest(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_BOX, width) wagon_queen_half(true);
+}
+
+module wagon_queen_word(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_BOX, width) wagon_queen_half(false);
+}
+
+// The crest USED ON ITS OWN, registered to its own box, so `width` is the
+// width of the crest rather than of the lockup it was cut from. Ask
+// wagon_queen_crest for a 40 mm mark and you get 32.5 mm of crest, because it
+// is still holding the lettering's place below it.
+//
+// There is deliberately no wagon_queen_word_alone. The lettering already runs
+// the full width of the lockup — both boxes are 746.806 across — so registered
+// and alone would differ only in where the origin sits, and wagon_queen_word
+// is already the answer.
+module wagon_queen_crest_alone(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_CREST_BOX, width) wagon_queen_half(true);
 }
