@@ -37,6 +37,7 @@ screen-fence-rail 1
 screen-fence-rail-coupon 4
 screen-fence-rail-keyslot-coupon 5
 screen-fence-rail-loose 2
+screen-fence-rail-nokey-coupon 1
 screen-fence-rigid 1
 screen-fence-test-rail 4
 screen-fence-twin-coupon 1
