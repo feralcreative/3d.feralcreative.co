@@ -65,3 +65,5 @@ zr-mark-plaque 1
 zr-monogram-stamp-2026 5
 fish-koozie-12oz 1
 fish-koozie-12oz-coupon 1
+delonghi-heater-stand 5
+delonghi-heater-stand-coupon 7
