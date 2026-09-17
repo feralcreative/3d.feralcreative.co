@@ -63,7 +63,7 @@
 // toward the back by 5 mm, apex at the middle". v07 bowed the whole front
 // into the V as a fixed-ended arc; v08 bowed it outward. Neither was printed:
 // each was caught in a labelled render. What he meant was the tip moving,
-// with the bend centred on the middle. Anything that bends here gets a
+// with the bend centered on the middle. Anything that bends here gets a
 // labelled render with the old line overlaid before a build.
 //
 // The block is a trapezoid, wide at the floor and narrower at the mouth,
@@ -103,7 +103,7 @@
 // front flank to the front's top, back along it to cool_depth forward of the
 // heater's back panel, up that line to the back's top, out along it, down the
 // back flank. The run leans with the panel, parallel to it, because the back
-// leans. Both its ends are inside the V, so in the centre piece and
+// leans. Both its ends are inside the V, so in the center piece and
 // everywhere the V is cut the whole stretch is taken away again and each wall
 // simply ends at its own top; the one place it shows is the 5 mm plate
 // closing each end, where the section is solid. There the step gets step_r of
@@ -115,18 +115,18 @@
 // THREE SECTIONS, because the heater's edge is 500 long (casters off — they
 // come off when it lies on its side) and the bed probes 210. Ziad's plan,
 // 2026-09-16: an end piece with a 5 mm wall closing the left end of the V,
-// the same at the right, a centre between them, and the three joined by
+// the same at the right, a center between them, and the three joined by
 // dovetails printed on the sections themselves — no loose keys, no rails.
 // He picked three equal sections over two long ends and a stub, so the two
 // ends are one design and its mirror, and every piece is 170.67 long: the
 // 500 mm edge, 1 mm of end clearance each side, and the two walls, over
 // three. The V is continuous across the joints.
 //
-// THE JOINT. The centre carries two dovetail tabs on each end face, one in
+// THE JOINT. The center carries two dovetail tabs on each end face, one in
 // each shoulder beside the V; the end pieces carry the matching sockets on
 // their inner faces. The tabs stand on the floor, tab_h tall, and a socket
 // is a slot open at the UNDERSIDE of its piece, roofed at 45 degrees, so the
-// end piece is lifted over the centre's tab and lowered on. Once it is down
+// end piece is lifted over the center's tab and lowered on. Once it is down
 // the tab fills the slot, nothing shows, and the joint is locked in both
 // horizontal directions by the dovetail; the only way apart is straight up.
 // The tabs sit low on the face because that is where the shoulders are
@@ -139,7 +139,7 @@
 // snug-sliding figure for a 0.4 nozzle plus 0.05; the joint coupon is there
 // to check it before three big pieces are printed on trust.
 //
-// The centre prints at 194.67 — its nominal length plus a tab each end —
+// The center prints at 194.67 — its nominal length plus a tab each end —
 // which is inside the probed bed. Nothing here needs the diagonal.
 //
 // THE PROFILE is the SVG's one path as an absolute cubic Bezier path, made
@@ -154,7 +154,7 @@
 //
 //     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="end-left"'  --name delonghi-heater-stand-end-left
 //     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="end-right"' --name delonghi-heater-stand-end-right
-//     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="centre"'    --name delonghi-heater-stand-centre
+//     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="center"'    --name delonghi-heater-stand-center
 //     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="coupon"'    --name delonghi-heater-stand-coupon
 //     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="joint-coupon"' --name delonghi-heater-stand-joint-coupon
 //
@@ -179,7 +179,7 @@ include <../lib/BOSL2/rounding.scad>
 
 /* [Build] */
 
-show = "stand";     // [stand, end-left, end-right, centre, coupon, joint-coupon]
+show = "stand";     // [stand, end-left, end-right, center, coupon, joint-coupon]
 
 /* [Fit] */
 
@@ -204,7 +204,7 @@ tab_len   = 12;     // how far a tab stands out of its face (mm)
 tab_neck  = 14;     // tab width at the face (mm)
 tab_head  = 20;     // tab width at its tip (mm); (head - neck) / 2 over tab_len is the dovetail angle, 14 degrees here
 tab_h     = 40;     // tab height off the floor (mm); keep it below where the back shoulder narrows
-tab_x     = 43;     // tab centres, either side of the V (mm). See the header for the room there
+tab_x     = 43;     // tab centers, either side of the V (mm). See the header for the room there
 tab_clear = 0.25;   // socket bigger than tab, all round (mm); snug sliding is 0.20 on this machine, the joint coupon is for this
 tab_foot  = 0.5;    // 45-degree chamfer on the tab's bottom edges, against elephant foot (mm)
 tab_roof  = 10;     // rise of the socket's roof above the tab, a pyramid so nothing bridges (mm)
@@ -346,8 +346,8 @@ front_reentry = max([for (p = front_pts) if (p[1] <= front_lip_y) p[0]]) - wall_
 
 // ---- derived ---------------------------------------------------------------
 
-x_off   = -HEATER_W / 2;             // centres the trace on x = 0
-mid_x   = -x_off;                    // the block's centreline, in the trace's frame. The V's floor flat straddles it, so it is inside the V at every height above the floor — which is what lets a lip's chamfer close on it
+x_off   = -HEATER_W / 2;             // centers the trace on x = 0
+mid_x   = -x_off;                    // the block's centerline, in the trace's frame. The V's floor flat straddles it, so it is inside the V at every height above the floor — which is what lets a lip's chamfer close on it
 block_h = floor_t + HEATER_H;        // where the trace stops, and where the block's one top used to be
 front_h = block_h - front_down;      // the front wall's top (mm)
 back_h  = block_h + back_up;         // the back wall's top (mm)
@@ -370,14 +370,14 @@ function cool_face(y) = x_off + left_x(y - floor_t) + cool_depth;
 
 
 stand_len   = heater_len + 2 * end_clear + 2 * end_wall;   // wall to wall, outside (mm)
-section_len = stand_len / sections;                        // each piece, nominal — the centre prints longer by its tabs
+section_len = stand_len / sections;                        // each piece, nominal — the center prints longer by its tabs
 assert(section_len + 2 * tab_len <= 210,
-       str("the centre prints ", section_len + 2 * tab_len, " long, past the bed's probed 210"));
+       str("the center prints ", section_len + 2 * tab_len, " long, past the bed's probed 210"));
 assert(tab_h + tab_clear + tab_roof < min(front_h, back_h) - 10, "socket roof is up in the mouth");
 
 // ---- 2D, in the section: x across, y up --------------------------------------
 
-// The traced edge, centred on x = 0, sitting on y = floor_t.
+// The traced edge, centered on x = 0, sitting on y = floor_t.
 module heater_trace() {
     translate([x_off, floor_t]) polygon(heater_pts);
 }
@@ -399,7 +399,7 @@ module heater_section() {
 // A 45-degree lead-in on one lip of the mouth, in the trace's frame: side is
 // +1 for the front, -1 for the back, and y_top is that wall's own top. It
 // runs from the wall's face — the clearance already added — out to the
-// block's centreline, well inside the V, so it unions into the V's void with
+// block's centerline, well inside the V, so it unions into the V's void with
 // nothing hanging off the far side.
 module lip(side, y_top) {
     polygon([
@@ -427,8 +427,8 @@ module v_cut() {
 // The block's outline. It was a symmetric trapezoid until the two walls got
 // their own tops; now the path is written out, counter-clockwise from the
 // front's foot: up the front flank, in along the front's top to the
-// centreline, up the centreline to the back's top, out along that, and down
-// the back flank. Both centreline points are inside the V, so that whole
+// centerline, up the centerline to the back's top, out along that, and down
+// the back flank. Both centerline points are inside the V, so that whole
 // stretch is cut away again by v_cut() and the two tops never meet.
 raw_outline = [
     [ half_w(0),          0      ],   // the front's foot, chamfered
@@ -471,7 +471,7 @@ module upright(len) {
     rotate([90, 0, 0]) linear_extrude(len, center = true, convexity = 4) children();
 }
 
-// A piece's body: the block, len long, centred on y = 0, with the V cut
+// A piece's body: the block, len long, centered on y = 0, with the V cut
 // from y0 to y1 (so an end piece can leave its wall) and the bottom edge of
 // each end face chamfered like the long edges are — a butt joint with an
 // elephant foot on both faces stands the pieces apart.
@@ -526,8 +526,8 @@ module sockets_on(yf, dir, h = tab_h)
 
 // ---- the pieces ------------------------------------------------------------
 
-// The centre: V right through, tabs out of both ends.
-module centre_piece()
+// The center: V right through, tabs out of both ends.
+module center_piece()
     union() {
         body(section_len);
         tabs_on( section_len / 2,  1);
@@ -547,7 +547,7 @@ module end_piece_right() mirror([0, 1, 0]) end_piece_left();
 // The stand, assembled: for looking at, not printing.
 module stand() {
     translate([0, -section_len, 0]) end_piece_left();
-    centre_piece();
+    center_piece();
     translate([0,  section_len, 0]) end_piece_right();
 }
 
@@ -607,11 +607,11 @@ echo(str("front wall tops at ", front_h, " (", front_down, " off the flat edge),
          half_w(back_h)  + (x_off + wall_x(-1, back_h  - floor_t) - clearance)));
 
 echo(str("stand ", stand_len, " long wall to wall, ", sections, " pieces of ", section_len,
-         "; the centre prints ", section_len + 2 * tab_len, " with its tabs"));
+         "; the center prints ", section_len + 2 * tab_len, " with its tabs"));
 
 if      (show == "coupon")       coupon();
 else if (show == "joint-coupon") joint_coupon();
 else if (show == "end-left")     end_piece_left();
 else if (show == "end-right")    end_piece_right();
-else if (show == "centre")       centre_piece();
+else if (show == "center")       center_piece();
 else                             stand();

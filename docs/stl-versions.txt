@@ -5,7 +5,7 @@ deck-door-stop 4
 deck-door-stop-coupon 3
 deck-door-stop-truss 5
 delonghi-heater-stand 10
-delonghi-heater-stand-centre 4
+delonghi-heater-stand-center 5
 delonghi-heater-stand-coupon 15
 delonghi-heater-stand-end-left 4
 delonghi-heater-stand-end-right 4
