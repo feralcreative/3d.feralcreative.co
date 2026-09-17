@@ -87,20 +87,30 @@
 // assumption about the heater's panel and not a measurement — it is what the
 // coupon is for.
 //
-// THE STEP IS ONLY ON THE END PLATES, and it is swept out. Between the two
-// tops the outline runs along the block's centreline, which is inside the V
-// at every one of those heights — so in the centre piece, and everywhere the
-// V is cut, that stretch is taken away again and each wall simply ends at its
-// own top. The one place it survives is the 5 mm plate closing each end,
-// where the section is solid: there the two tops met at a square notch.
-// Ziad drew a line over it on 2026-09-17, and plate_swoop() is that line — a
-// cubic leaving the back's top face level and landing on the front's flank
-// tangent to it, so the plate reads as one curve from the back's top round to
-// the flank instead of a step. It is unioned on over the wall's own 5 mm and
-// nowhere else, because carried through the block it would ramp the front
-// wall's top back up toward the back — undoing front_down, which is the thing
-// it was asked to do. Nothing overhangs: every layer of the swoop is smaller
-// than the one under it.
+// ⚠️ NOTHING OF THE STAND MAY STAND AGAINST THE HEATER PAST cool_depth ABOVE
+// THE RAIL. The traced edge is the heater's bottom rail and it is cool; above
+// where the trace stops, only the rear cool_depth of the heater's thickness is
+// the cool back panel, and forward of that is the mesh screen with the hot
+// plate behind it. Anything of the stand up there and forward of that line
+// cooks. This is why the block's top was level with the rail in the first
+// place, and it is what killed the swoop: Ziad had me sweep the end plates'
+// step into a curve running from the back's top forward to the front's flank,
+// which put 5 mm of PETG above the rail across the heater's full thickness,
+// about a millimetre off the end of the mesh (his catch, 2026-09-17, before
+// anything was printed).
+//
+// SO THE OUTLINE'S INNER RUN IS THAT LINE, and the step stands on it: up the
+// front flank to the front's top, back along it to cool_depth forward of the
+// heater's back panel, up that line to the back's top, out along it, down the
+// back flank. The run leans with the panel, parallel to it, because the back
+// leans. Both its ends are inside the V, so in the centre piece and
+// everywhere the V is cut the whole stretch is taken away again and each wall
+// simply ends at its own top; the one place it shows is the 5 mm plate
+// closing each end, where the section is solid. There the step gets step_r of
+// radius at its head and step_fillet in its throat — Ziad's feet are down
+// there and a cut edge is a thing to kick. A radius is all the room there is
+// for: the fall is 45 with 24 of run behind the line before the back wall's
+// own top face, so a sweeping curve is not on offer any more.
 //
 // THREE SECTIONS, because the heater's edge is 500 long (casters off — they
 // come off when it lies on its side) and the bed probes 210. Ziad's plan,
@@ -174,6 +184,7 @@ show = "stand";     // [stand, end-left, end-right, centre, coupon, joint-coupon
 /* [Fit] */
 
 clearance = 0.5;    // gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
+cool_depth = 23;    // how far the heater's cool back panel reaches forward of its own back face (mm). Above the rail, nothing of the stand may stand against the heater past this: it is the mesh screen and the hot plate from there forward. Ziad, 2026-09-17
 back_floor_in = 1.25; // how far the back comes in at the floor, nothing at the flat edge — the traced back rotated about the mouth (mm). 1.25 is the 1.5-2 of air Ziad saw on the v13 coupon, less the clearance that is meant to be in there
 front_tip_in = 8;   // how far left (toward the back) the front's tip moves, on an arc that starts at the knee (mm). 5 off the v06 coupon, then "a few mm more" off v09; 0 is the trace as traced
 front_knee   = 0.30; // where the bend starts, as a fraction of the front's length up from the floor corner. Was 0.5; Ziad moved it to 0.3 after v09
@@ -206,7 +217,8 @@ front_down = 15;    // how far the front wall's top stops below the trace's flat
 back_up    = 30;    // how far the back wall's top stands above the trace's flat edge (mm). Ziad, 2026-09-17
 floor_t  = 6;       // under the V's floor (mm)
 top_r    = 6;       // rounding on the top corners (mm)
-plate_swoop_k = 0.55; // how full the end plate's swoop is: the fraction of the run and the drop that its end tangents carry. 0 is a straight diagonal from one top to the other, 1 a nearly square shoulder
+step_r      = 16;   // radius at the head of the step, where the back's top face falls away to the front's (mm). What is left of the swoop once the cut is honoured
+step_fillet = 6;    // radius in the throat of that fall, where it lands on the front's top face (mm)
 foot_chamfer = 0.5; // chamfer on the bottom edges, against elephant foot (mm)
 
 /* [Coupon] */
@@ -340,24 +352,22 @@ block_h = floor_t + HEATER_H;        // where the trace stops, and where the blo
 front_h = block_h - front_down;      // the front wall's top (mm)
 back_h  = block_h + back_up;         // the back wall's top (mm)
 assert(back_h > front_h + 2 * top_r, "the two wall tops are too close to round: give the outline back a single top");
+assert(back_h - front_h > step_r + step_fillet, "step_r and step_fillet do not both fit in the fall");
+assert(cool_face(back_h) - step_r > -half_w(back_h) + top_r + 2,
+       "the step's round reaches the back's top corner: drop step_r");
 
 // The flanks' lean, taken from base_w and top_w at the height they were
 // measured at, so both walls keep the taper the block always had.
 taper = (base_w - top_w) / 2 / block_h;          // x in, per mm of rise
 function half_w(y) = base_w / 2 - taper * y;     // the block's half width at height y
 
-// The end plate's swoop, as a cubic from the notch's top corner to the
-// front's top outer corner: out of the first along the back's top face, into
-// the second along the front's flank, so both ends blend and only the middle
-// is curve. Ziad's line, 2026-09-17.
-plate_run  = half_w(front_h);                    // centreline to the front's top corner (mm)
-plate_bez  = [
-    [0,          back_h ],
-    [plate_swoop_k * plate_run, back_h ],
-    [plate_run - plate_swoop_k * (back_h - front_h) * taper,
-                 front_h + plate_swoop_k * (back_h - front_h)],
-    [plate_run,  front_h],
-];
+// The line the stand may not pass, cool_depth forward of the heater's back
+// panel and parallel to it — the panel leans out as it rises, by as much as
+// the back was leaned in, so the line leans with it. Below the rail it is an
+// extrapolation and answers for nothing: there is no hot plate down there,
+// and all that matters is that it stays inside the V.
+function cool_face(y) = x_off + left_x(y - floor_t) + cool_depth;
+
 
 stand_len   = heater_len + 2 * end_clear + 2 * end_wall;   // wall to wall, outside (mm)
 section_len = stand_len / sections;                        // each piece, nominal — the centre prints longer by its tabs
@@ -421,12 +431,12 @@ module v_cut() {
 // the back flank. Both centreline points are inside the V, so that whole
 // stretch is cut away again by v_cut() and the two tops never meet.
 raw_outline = [
-    [ half_w(0),       0      ],   // the front's foot, chamfered
-    [ half_w(front_h), front_h],   // the front's top, outside, rounded
-    [ 0,               front_h],
-    [ 0,               back_h ],
-    [-half_w(back_h),  back_h ],   // the back's top, outside, rounded
-    [-half_w(0),       0      ],   // the back's foot, chamfered
+    [ half_w(0),          0      ],   // the front's foot, chamfered
+    [ half_w(front_h),    front_h],   // the front's top, outside, rounded
+    [ cool_face(front_h), front_h],   // the step's throat, filleted
+    [ cool_face(back_h),  back_h ],   // the step's head, rounded
+    [-half_w(back_h),     back_h ],   // the back's top, outside, rounded
+    [-half_w(0),          0      ],   // the back's foot, chamfered
 ];
 
 // Corner i of path, cut off square at d along each of its two edges. The feet
@@ -440,36 +450,12 @@ block_path = round_corners(
     concat(chamfered(raw_outline, 0, foot_chamfer),
            select(raw_outline, 1, 4),
            chamfered(raw_outline, 5, foot_chamfer)),
-    radius = [0, 0, top_r, 0, 0, top_r, 0, 0]);
+    radius = [0, 0, top_r, step_fillet, step_r, top_r, 0, 0]);
 
 module block_outline() {
     polygon(block_path);
 }
 
-// The block's silhouette carried up to the taller wall's top on both sides.
-// Nothing but a clip: it is what keeps anything added between the two tops
-// from standing out past the flanks.
-module block_envelope() {
-    polygon([[ half_w(0), 0], [ half_w(back_h), back_h],
-             [-half_w(back_h), back_h], [-half_w(0), 0]]);
-}
-
-// The notch in the end plate's top, filled: everything under the swoop and
-// down past the front wall's top face, clipped to the flanks. It reaches
-// 2 * top_r below that face to bury the rounding on the front's top corner,
-// which on the plate has no top face left to round into — stopping at the
-// face itself leaves the round biting a nick out of the flank just under the
-// swoop, since a round on a leaning corner reaches further along its edges
-// than its radius. Everything else it covers is solid plate already. Going
-// out to base_w on the right is nothing but slop for the clip to take off.
-module plate_swoop() {
-    y0 = front_h - 2 * top_r;
-    intersection() {
-        polygon(concat(bezier_curve(plate_bez, 48),
-                       [[base_w, front_h], [base_w, y0], [0, y0]]));
-        block_envelope();
-    }
-}
 
 module section() {
     difference() {
@@ -552,11 +538,7 @@ module centre_piece()
 // face. The right end is this, mirrored.
 module end_piece_left()
     difference() {
-        union() {
-            body(section_len, -1 + 2 * end_wall / section_len, 1);
-            translate([0, (end_wall - section_len) / 2, 0])
-                upright(end_wall) plate_swoop();
-        }
+        body(section_len, -1 + 2 * end_wall / section_len, 1);
         sockets_on(section_len / 2, 1);
     }
 
@@ -613,6 +595,11 @@ echo(str("back leaned in ", back_floor_in, " at the floor, ",
          HEATER_BEZ[18][0] - HEATER_BEZ[15][0], " wide (was ",
          HEATER_TRACE[18][0] - HEATER_TRACE[15][0], "), back's tangent at the mouth ",
          atan(-left_dxdy), " deg off plumb"));
+
+echo(str("nothing above the rail past x ", cool_face(block_h), " (", cool_depth,
+         " forward of the back panel): the step stands there, ", back_h - front_h,
+         " tall, with ", cool_face(back_h) - step_r + half_w(back_h),
+         " of the back's top face left flat in front of its round"));
 
 echo(str("front wall tops at ", front_h, " (", front_down, " off the flat edge), back at ", back_h,
          " (", back_up, " on): wall left at the top, front ",
