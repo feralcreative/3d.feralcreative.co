@@ -17,20 +17,33 @@
 // vertical mouth would bind on it. A short chamfer widens the mouth further
 // so the heater finds its way in.
 //
-// THE FRONT IS BENT, and that is the one correction the coupon made. Held
+// THE FRONT IS BENT IN, and that is the one correction the coupon made. Held
 // against the heater, the first coupon (v06, 2026-09-16) was right everywhere
 // but along the front: the trace has that side as one long, nearly straight
-// slope, and the heater's front is really an arc that bulges OUTWARD — away
-// from the back — by 5 mm at mid-height. So the front wall is bowed out by
-// front_bow: a circular arc through the trace's two ends, apex at the
-// midpoint, and the V is that much wider in the middle. The back, the floor
-// and the corners are as traced. The mouth's tangent on that side is taken
-// off the bent curve, so the chamfer starts where the wall actually is.
+// slope, and on the heater the upper half of it curls in toward the back.
+// So the front is left as traced up to its midpoint, and from there bent
+// toward the back on a circular arc, tangent at the knee, so that the tip —
+// where the front meets the flat edge — lands front_tip_in to the left of
+// where the trace had it. Ziad's words: the 50% point is the apex, the tip 5
+// mm farther in. The shift is horizontal, so the tip stays on the flat edge.
+// The back, the floor and the corners are as traced. The mouth's tangent on
+// the front is taken off the bent curve, which now leans INWARD about 9
+// degrees at the tip, so the short run above the trace narrows rather than
+// opens — that is what the arc says the heater does, and the block stops at
+// the trace anyway; only the chamfer sees it.
 //
-// ⚠️ THE DIRECTION WAS GOT WRONG ONCE. Ziad said "bend the front toward the
-// back"; the first attempt (v07 coupon, never printed) moved the wall INTO
-// the V, and he saw it in the render and said so. The belly goes outward.
-// Anything that bends here gets a labelled render before a build.
+// ⚠️ THE MOUTH IS NOW NARROWER THAN THE V JUST BELOW IT, on the front, by the
+// amount the echo reports (1.07 mm at front_tip_in = 5). The heater has
+// the same shape, so it is not a rigid drop-in from directly above: it goes
+// in with a lean, or slides in along the edge. The clearance and the chamfer
+// cover a re-entry this small; if front_tip_in grows, watch that number.
+//
+// ⚠️ THIS WAS GOT WRONG TWICE, both times from the words "bend the front
+// toward the back by 5 mm, apex at the middle". v07 bowed the whole front
+// into the V as a fixed-ended arc; v08 bowed it outward. Neither was printed:
+// each was caught in a labelled render. What he meant was the tip moving,
+// with the bend centred on the middle. Anything that bends here gets a
+// labelled render with the old line overlaid before a build.
 //
 // The block is a trapezoid, wide at the floor and narrower at the mouth,
 // because the heater on edge is the best part of a metre tall and the V is
@@ -75,7 +88,7 @@ show = "stand";     // [stand, coupon]
 /* [Fit] */
 
 clearance = 0.5;    // gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
-front_bow = 5;      // the front bowed OUTWARD, away from the back: sagitta of the arc, apex at half height, zero at both ends (mm). Off the v06 coupon; 0 is the trace as traced
+front_tip_in = 5;   // how far left (toward the back) the front's tip moves, on an arc that starts at the front's midpoint (mm). Off the v06 coupon; 0 is the trace as traced
 lead_in   = 2;      // 45-degree chamfer on both lips of the mouth (mm)
 
 /* [Block] */
@@ -96,7 +109,6 @@ coupon_band   = 6;  // material kept around the V; the floor under it is floor_t
 
 $fn = 64;
 eps = 0.01;
-big = 500;
 
 // The traced edge, "_incoming/Asset 1.svg", as an absolute cubic bezpath in
 // mm: point, control, control, point, ... Origin is the SVG's left edge and
@@ -119,38 +131,49 @@ HEATER_W = 62.912;  // the trace's width at the flat edge (mm)
 HEATER_H = 80;      // the trace's height, narrow flat to flat edge (mm)
 
 // The front is the last cubic, from the floor corner's exit at index 21 to
-// the top. It is sampled and bent: each point moved perpendicular to the
-// chord, outward — away from the back, +X — by the height of a circular arc
-// of sagitta front_bow over that chord: nothing at either end, front_bow at
-// the middle.
+// the tip. It is sampled and bent: below the midpoint of its chord nothing
+// moves; above it, each point moves left — straight along -x, so the tip
+// stays on the flat edge — by the rise of a circular arc that is tangent to
+// the chord at the midpoint and front_tip_in off it at the tip.
 FRONT_I   = 21;
 front_bez = select(HEATER_BEZ, FRONT_I, FRONT_I + 3);
 front_A   = front_bez[0];
 front_B   = front_bez[3];
 front_L   = norm(front_B - front_A);                 // the chord (mm)
 front_u   = (front_B - front_A) / front_L;           // along it, upward
-front_n   = [front_u.y, -front_u.x];                 // across it, outward: away from the back
-front_R   = front_bow > 0 ? (front_L * front_L / 4 + front_bow * front_bow) / (2 * front_bow) : 0;
-function front_bowed(p) =
-    front_bow <= 0 ? p
-    : let (s = (p - front_A) * front_u - front_L / 2)   // distance from the chord's midpoint
-      p + front_n * (sqrt(front_R * front_R - s * s) - (front_R - front_bow));
-front_pts = [for (p = bezier_curve(front_bez, 48)) front_bowed(p)];
+front_R   = front_tip_in > 0
+          ? (front_L * front_L / 4 + front_tip_in * front_tip_in) / (2 * front_tip_in)
+          : 0;
+function front_bent(p) =
+    let (s = (p - front_A) * front_u - front_L / 2)   // distance past the midpoint, along the chord
+    front_tip_in <= 0 || s <= 0 ? p
+    : p - [front_R - sqrt(front_R * front_R - s * s), 0];
+front_pts = [for (p = bezier_curve(front_bez, 48)) front_bent(p)];
+front_tip = last(front_pts);                         // where the front now meets the flat edge
 
-// The whole outline as points: the trace up to where the front begins, then
-// the bent front. The front's first point is the trace's last, so it is
-// dropped rather than doubled.
-heater_pts = concat(bezpath_curve(select(HEATER_BEZ, 0, FRONT_I), splinesteps = 24),
+// The whole outline as points, starting at the flat edge's far end and going
+// round: down the back, along the floor, up the bent front to the tip. The
+// flat edge itself is the polygon's closing side, tip back to [0, 80], so it
+// runs to wherever the tip has moved to. The front's first point is the
+// trace's last, so it is dropped rather than doubled.
+heater_pts = concat(bezpath_curve(select(HEATER_BEZ, 3, FRONT_I), splinesteps = 24),
                     list_tail(front_pts, 1));
 
 // Where each side is heading as it leaves the trace, x per mm of y. The left
-// is vertical; the right is opening out — less so once bowed, since the arc
-// comes back in to meet the chord at the top. The mouth follows these.
+// is vertical; the right leans in once bent — the arc turns the tip's tangent
+// about 14 degrees toward the back. The mouth follows these, and the run
+// above the trace is kept short (ext) because an inward lean carried far
+// enough would cross the back and fold the polygon.
 left_dxdy  = (HEATER_BEZ[3][0] - HEATER_BEZ[4][0]) / (HEATER_BEZ[3][1] - HEATER_BEZ[4][1]);
-right_dxdy = (last(front_pts)[0] - front_pts[len(front_pts) - 2][0])
-           / (last(front_pts)[1] - front_pts[len(front_pts) - 2][1]);
-function left_x(y)  = 0        + left_dxdy  * (y - HEATER_H);   // in the trace's own frame
-function right_x(y) = HEATER_W + right_dxdy * (y - HEATER_H);
+right_dxdy = (front_tip[0] - front_pts[len(front_pts) - 2][0])
+           / (front_tip[1] - front_pts[len(front_pts) - 2][1]);
+function left_x(y)  = 0            + left_dxdy  * (y - HEATER_H);   // in the trace's own frame
+function right_x(y) = front_tip[0] + right_dxdy * (y - HEATER_H);
+ext = 30;   // how far the heater is carried on above the trace (mm); past the block top is all that matters
+
+// How much narrower the mouth is than the widest point of the V below it,
+// on the front (mm). Zero when the tip is the widest point, as traced.
+front_reentry = max([for (p = front_pts) p[0]]) - front_tip[0];
 
 // ---- derived ---------------------------------------------------------------
 
@@ -170,10 +193,10 @@ module heater_section() {
     union() {
         heater_trace();
         translate([x_off, floor_t]) polygon([
-            [left_x(HEATER_H),  HEATER_H - eps],
-            [right_x(HEATER_H), HEATER_H - eps],
-            [right_x(big),      big],
-            [left_x(big),       big],
+            [left_x(HEATER_H),        HEATER_H - eps],
+            [right_x(HEATER_H),       HEATER_H - eps],
+            [right_x(HEATER_H + ext), HEATER_H + ext],
+            [left_x(HEATER_H + ext),  HEATER_H + ext],
         ]);
     }
 }
@@ -227,6 +250,11 @@ module coupon() {
         v_cut();
     }
 }
+
+echo(str("front tip ", front_tip_in, " in: tip at x ", front_tip[0] + x_off,
+         " (was ", HEATER_W + x_off, "), mouth ", front_tip[0], " wide at the trace, ",
+         "tangent at the tip ", atan(right_dxdy), " deg from vertical (negative leans in), ",
+         "mouth narrower than the V below it by ", front_reentry));
 
 if (show == "coupon") coupon();
 else stand();
