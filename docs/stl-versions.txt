@@ -63,3 +63,5 @@ tpu-door-stop-deck 1
 zr-cube 3
 zr-mark-plaque 1
 zr-monogram-stamp-2026 5
+fish-koozie-12oz 1
+fish-koozie-12oz-coupon 1
