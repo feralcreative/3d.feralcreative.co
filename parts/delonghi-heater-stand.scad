@@ -22,23 +22,23 @@
 // but along the front: the trace has that side as one long, nearly straight
 // slope, and on the heater the upper half of it curls in toward the back.
 // So the front is left as traced up to a knee, front_knee of the way up,
-// and from there bent toward the back on a circular arc, tangent at the
-// knee, so that the tip — where the front meets the flat edge — lands
-// front_tip_in to the left of where the trace had it. Ziad's words, over two
-// coupons: the apex at the middle and the tip 5 mm in (v09), then a few mm
-// more with the apex about 30% up from the bottom. The shift is horizontal,
-// so the tip stays on the flat edge.
-// The back, the floor and the corners are as traced. The mouth's tangent on
-// the front is taken off the bent curve, which now leans INWARD about 11
-// degrees at the tip, so the short run above the trace narrows rather than
-// opens — that is what the arc says the heater does, and the block stops at
-// the trace anyway; only the chamfer sees it.
+// and from there bent toward the back so that the tip — where the front
+// meets the flat edge — lands front_tip_in to the left of where the trace
+// had it, standing at front_tip_lean from vertical when it gets there. The
+// shift is horizontal, so the tip stays on the flat edge. Ziad's words, over
+// three coupons: the apex at the middle and the tip 5 mm in (v09); a few mm
+// more with the apex about 30% up (v10); then the tip was right but the wall
+// stood 1-2 mm off the heater around the apex, and the tip should be
+// basically vertical (this). That last one is why the bend is a cubic and
+// not an arc — see the note on front_d below. The back, the floor and the
+// corners are as traced. The mouth's tangent on the front is the tip's
+// lean, and the block stops at the trace anyway; only the chamfer sees it.
 //
-// ⚠️ THE MOUTH IS NOW NARROWER THAN THE V JUST BELOW IT, on the front, by the
-// amount the echo reports (1.73 mm at 8 in from a 30% knee). The heater has
-// the same shape, so it is not a rigid drop-in from directly above: it goes
-// in with a lean, or slides in along the edge. The clearance and the chamfer
-// cover a re-entry this small; if front_tip_in grows, watch that number.
+// ⚠️ THE MOUTH MAY BE NARROWER THAN THE V JUST BELOW IT, on the front, by the
+// amount the echo reports as front_reentry. The heater has the same shape,
+// so when that is not zero it is not a rigid drop-in from directly above: it
+// goes in with a lean, or slides in along the edge. The clearance and the
+// chamfer cover a small one; if it grows, watch that number.
 //
 // ⚠️ THIS WAS GOT WRONG TWICE, both times from the words "bend the front
 // toward the back by 5 mm, apex at the middle". v07 bowed the whole front
@@ -92,6 +92,7 @@ show = "stand";     // [stand, coupon]
 clearance = 0.5;    // gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
 front_tip_in = 8;   // how far left (toward the back) the front's tip moves, on an arc that starts at the knee (mm). 5 off the v06 coupon, then "a few mm more" off v09; 0 is the trace as traced
 front_knee   = 0.30; // where the bend starts, as a fraction of the front's length up from the floor corner. Was 0.5; Ziad moved it to 0.3 after v09
+front_tip_lean = 0;  // the wall's angle from vertical at the tip (deg); positive opens outward like the trace's own 4, negative leans in. Plumb, off the v10 coupon
 lead_in   = 2;      // 45-degree chamfer on both lips of the mouth (mm)
 
 /* [Block] */
@@ -135,26 +136,45 @@ HEATER_H = 80;      // the trace's height, narrow flat to flat edge (mm)
 
 // The front is the last cubic, from the floor corner's exit at index 21 to
 // the tip. It is sampled and bent: below the knee — front_knee of the way
-// up its chord — nothing moves; above it, each point moves left — straight
-// along -x, so the tip stays on the flat edge — by the rise of a circular
-// arc that is tangent to the chord at the knee and front_tip_in off it at
-// the tip.
-FRONT_I   = 21;
-front_bez = select(HEATER_BEZ, FRONT_I, FRONT_I + 3);
-front_A   = front_bez[0];
-front_B   = front_bez[3];
-front_L   = norm(front_B - front_A);                 // the chord (mm)
-front_u   = (front_B - front_A) / front_L;           // along it, upward
-front_arm = (1 - front_knee) * front_L;              // the chord above the knee (mm)
-front_R   = front_tip_in > 0
-          ? (front_arm * front_arm + front_tip_in * front_tip_in) / (2 * front_tip_in)
-          : 0;
+// up its chord — nothing moves; above it, each point moves left, straight
+// along -x so the tip stays on the flat edge, by a displacement d(s) that
+// grows from the knee: zero and flat there, so the wall leaves the trace
+// without a kink, front_tip_in at the tip, and with the slope at the tip
+// that leaves the wall standing at front_tip_lean from vertical. Four
+// conditions, so d is the cubic a s^2 + b s^3 — not an arc any more: an arc
+// has one curvature and cannot meet a tangent at both ends, which is exactly
+// what v10 showed (the wall stood 1-2 mm off the heater around the apex
+// while the tip was right). The traced tangent at the tip, m0, is what the
+// displacement's slope has to cancel to leave the tip plumb.
+FRONT_I    = 21;
+front_bez  = select(HEATER_BEZ, FRONT_I, FRONT_I + 3);
+front_A    = front_bez[0];
+front_B    = front_bez[3];
+front_L    = norm(front_B - front_A);                // the chord (mm)
+front_u    = (front_B - front_A) / front_L;          // along it, upward
+front_base = bezier_curve(front_bez, 48);            // the front as traced
+front_m0   = (last(front_base)[0] - front_base[len(front_base) - 2][0])
+           / (last(front_base)[1] - front_base[len(front_base) - 2][1]);   // traced tangent at the tip, x per y
+front_arm  = (1 - front_knee) * front_L;             // the chord above the knee (mm)
+// Slope the displacement needs at the tip, per mm along the chord, to turn
+// the traced tangent m0 into tan(front_tip_lean). dl/dy along the traced
+// curve near the tip is u.x * m0 + u.y.
+front_k    = (front_m0 - tan(front_tip_lean)) / (front_u[0] * front_m0 + front_u[1]);
+front_b    = (front_k * front_arm - 2 * front_tip_in) / pow(front_arm, 3);
+front_a    = (front_k - 3 * front_b * front_arm * front_arm) / (2 * front_arm);
+function front_d(s) = s <= 0 ? 0 : front_a * s * s + front_b * s * s * s;
 function front_bent(p) =
     let (s = (p - front_A) * front_u - front_knee * front_L)   // distance past the knee, along the chord
-    front_tip_in <= 0 || s <= 0 ? p
-    : p - [front_R - sqrt(front_R * front_R - s * s), 0];
-front_pts = [for (p = bezier_curve(front_bez, 48)) front_bent(p)];
+    p - [front_d(s), 0];
+front_pts = [for (p = front_base) front_bent(p)];
 front_tip = last(front_pts);                         // where the front now meets the flat edge
+
+// The cubic must not overshoot: if the lean asked for at the tip needs the
+// wall to come in past front_tip_in and back out, the knobs disagree.
+front_d_max = max([for (p = front_base) front_d((p - front_A) * front_u - front_knee * front_L)]);
+assert(front_d_max <= front_tip_in + 0.05,
+       str("the front would come in ", front_d_max, " and back out to ", front_tip_in,
+           " at the tip: ease front_tip_lean, or move front_knee down"));
 
 // The whole outline as points, starting at the flat edge's far end and going
 // round: down the back, along the floor, up the bent front to the tip. The
@@ -165,13 +185,12 @@ heater_pts = concat(bezpath_curve(select(HEATER_BEZ, 3, FRONT_I), splinesteps = 
                     list_tail(front_pts, 1));
 
 // Where each side is heading as it leaves the trace, x per mm of y. The left
-// is vertical; the right leans in once bent — the arc turns the tip's tangent
-// about 16 degrees toward the back. The mouth follows these, and the run
-// above the trace is kept short (ext) because an inward lean carried far
-// enough would cross the back and fold the polygon.
+// is vertical; the right stands at front_tip_lean, which the bend was built
+// to deliver, so it is taken from the knob rather than re-measured. The run
+// above the trace is kept short (ext) because a lean carried far enough
+// would cross the back and fold the polygon.
 left_dxdy  = (HEATER_BEZ[3][0] - HEATER_BEZ[4][0]) / (HEATER_BEZ[3][1] - HEATER_BEZ[4][1]);
-right_dxdy = (front_tip[0] - front_pts[len(front_pts) - 2][0])
-           / (front_tip[1] - front_pts[len(front_pts) - 2][1]);
+right_dxdy = tan(front_tip_lean);
 function left_x(y)  = 0            + left_dxdy  * (y - HEATER_H);   // in the trace's own frame
 function right_x(y) = front_tip[0] + right_dxdy * (y - HEATER_H);
 ext = 30;   // how far the heater is carried on above the trace (mm); past the block top is all that matters
@@ -256,9 +275,9 @@ module coupon() {
     }
 }
 
-echo(str("front tip ", front_tip_in, " in: tip at x ", front_tip[0] + x_off,
+echo(str("front tip ", front_tip_in, " in, ", front_tip_lean, " deg at the tip, knee at ", front_knee * 100, "%: tip at x ", front_tip[0] + x_off,
          " (was ", HEATER_W + x_off, "), mouth ", front_tip[0], " wide at the trace, ",
-         "tangent at the tip ", atan(right_dxdy), " deg from vertical (negative leans in), ",
+         "wall in by ", front_d(front_arm / 2), " halfway up the bend, ",
          "mouth narrower than the V below it by ", front_reentry));
 
 if (show == "coupon") coupon();
