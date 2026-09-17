@@ -106,7 +106,7 @@ foot_chamfer = 0.5; // chamfer on the bottom edges, against elephant foot (mm)
 
 /* [Coupon] */
 
-coupon_length = 10; // the slice's thickness, along the heater's edge (mm)
+coupon_length = 3;  // the slice's thickness, along the heater's edge (mm). 10 until v11; 3 prints in a third of the time and reads the same
 coupon_band   = 6;  // material kept around the V; the floor under it is floor_t regardless (mm)
 
 /* [Hidden] */
