@@ -1,0 +1,15 @@
+{
+    "enable_support": "0",
+    "from": "User",
+    "inherits": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle",
+    "name": "0.20mm @Flashforge AD5M Pro 0.4 Nozzle - Quick Structural",
+    "print_extruder_id": [
+        "1"
+    ],
+    "print_extruder_variant": [
+        "Direct Drive Standard"
+    ],
+    "print_settings_id": "0.20mm @Flashforge AD5M Pro 0.4 Nozzle - Quick Structural",
+    "sparse_infill_density": "10%",
+    "version": "2.1.1.0"
+}
