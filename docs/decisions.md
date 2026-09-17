@@ -26,7 +26,7 @@ A scanned STL is often several closed shells in one file—a head with the eyes 
 
 ## A derivative of an ND-licensed model stays private
 
-The fish koozie is CC BY-NC-ND. Reboring it for a different can is a derivative, which the licence permits for private use and forbids sharing. The `.scad` is committed—it carries numbers and no mesh—and the source mesh stays in `_incoming/`, uncommitted. The built STL is not committed either, even though the repo is private and `stl/*.stl` normally is: it is an 8 MB derivative that rebuilds in a second, and a copy on GitHub is a copy on someone else's server. It does not go to Printables, the NAS viewer, or `--push`. Decided 2026-09-16.
+The fish koozie is CC BY-NC-ND. Reboring it for a different can is a derivative, which the licence permits for private use and forbids sharing. The `.scad` is committed—it carries numbers and no mesh—and the source mesh stays in `_incoming/`, uncommitted. The built STL is committed like any other plain `stl/*.stl`, because the repo is private; it does not go to Printables, the NAS viewer, or `--push`, and the repo must not go public while it is in the history. Decided 2026-09-16.
 
 ## Big parts are sectioned with dovetails printed on the sections
 
