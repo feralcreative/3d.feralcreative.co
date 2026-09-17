@@ -34,6 +34,25 @@
 // corners are as traced. The mouth's tangent on the front is the tip's
 // lean, and the block stops at the trace anyway; only the chamfer sees it.
 //
+// THE BACK IS LEANED IN, and that is the second correction a coupon made.
+// Held against the heater, the v13 coupon was right everywhere but low on the
+// back, where Ziad saw 1.5 to 2 mm of air. Half a millimetre of that is the
+// clearance and is meant to be there, so the trace is out by about 1.25 at
+// the floor and by nothing at the flat edge, where the fit is right — which
+// is one small angular error in an eyeballed trace, not a local bulge. So the
+// back is rotated about the mouth: every traced point from the flat edge down
+// to the floor flat's left end moves toward the front by back_floor_in times
+// its depth over the full 80, about 0.9 degrees. Being a rotation, it carries
+// the corner and the left end of the 15 mm flat with it, which is the part
+// worth understanding: it says the heater's tip flat is really 13.7 wide and
+// the trace put its left edge 1.3 too far back, so the heater keeps the seat
+// it already has — tip on the floor, front in contact, which three coupons
+// went into getting right — and only the air behind it closes. If instead
+// that flat really is 15 wide, the heater will ride about 2 mm higher and the
+// front's tuned curve will slide out of register with it; that shows up as
+// fresh air along the front, and the answer then is to lean the back without
+// moving the corner.
+//
 // ⚠️ THE MOUTH MAY BE NARROWER THAN THE V JUST BELOW IT, on the front, by the
 // amount the echo reports as front_reentry. The heater has the same shape,
 // so when that is not zero it is not a rigid drop-in from directly above: it
@@ -155,6 +174,7 @@ show = "stand";     // [stand, end-left, end-right, centre, coupon, joint-coupon
 /* [Fit] */
 
 clearance = 0.5;    // gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
+back_floor_in = 1.25; // how far the back comes in at the floor, nothing at the flat edge — the traced back rotated about the mouth (mm). 1.25 is the 1.5-2 of air Ziad saw on the v13 coupon, less the clearance that is meant to be in there
 front_tip_in = 8;   // how far left (toward the back) the front's tip moves, on an arc that starts at the knee (mm). 5 off the v06 coupon, then "a few mm more" off v09; 0 is the trace as traced
 front_knee   = 0.30; // where the bend starts, as a fraction of the front's length up from the floor corner. Was 0.5; Ziad moved it to 0.3 after v09
 front_tip_lean = 0;  // the wall's angle from vertical at the tip (deg); positive opens outward like the trace's own 4, negative leans in. Plumb, off the v10 coupon
@@ -205,7 +225,7 @@ eps = 0.01;
 // y = 80 and the narrow flat at y = 0. If the trace is ever redone:
 //
 //     utils/svg2bez.py "_incoming/Asset 1.svg" --height 80
-HEATER_BEZ = [
+HEATER_TRACE = [
     [62.912, 80.000],
     [41.941, 80.000], [20.971, 80.000], [ 0.000, 80.000],   // the flat edge where the trace stops
     [ 0.000, 58.397], [ 7.994, 40.757], [ 9.088, 37.472],   // one side: straight, then curling in
@@ -218,6 +238,19 @@ HEATER_BEZ = [
 ];
 HEATER_W = 62.912;  // the trace's width at the flat edge (mm)
 HEATER_H = 80;      // the trace's height, narrow flat to flat edge (mm)
+
+// The trace with the back leaned in: a shear, +x by back_floor_in at the
+// floor and nothing at the flat edge, over the back, its corner, and the left
+// end of the floor flat. The front's corner and the front itself are left
+// where they are, so the flat narrows from the back rather than sliding. See
+// the header for why a rotation is the right correction and what it assumes.
+BACK_LAST = 15;     // last index the lean touches — the floor flat's left end
+HEATER_BEZ = [
+    for (i = [0 : len(HEATER_TRACE) - 1])
+        i <= BACK_LAST
+            ? HEATER_TRACE[i] + [back_floor_in * (HEATER_H - HEATER_TRACE[i][1]) / HEATER_H, 0]
+            : HEATER_TRACE[i]
+];
 
 // The front is the last cubic, from the floor corner's exit at index 21 to
 // the tip. It is sampled and bent: below the knee — front_knee of the way
@@ -574,6 +607,12 @@ echo(str("front tip ", front_tip_in, " in, ", front_tip_lean, " deg at the tip, 
          " (was ", HEATER_W + x_off, "), mouth ", front_tip[0], " wide at the trace, ",
          "wall in by ", front_d(front_arm / 2), " halfway up the bend, ",
          "mouth narrower than the V below it by ", front_reentry));
+
+echo(str("back leaned in ", back_floor_in, " at the floor, ",
+         atan(back_floor_in / HEATER_H), " deg: floor flat now ",
+         HEATER_BEZ[18][0] - HEATER_BEZ[15][0], " wide (was ",
+         HEATER_TRACE[18][0] - HEATER_TRACE[15][0], "), back's tangent at the mouth ",
+         atan(-left_dxdy), " deg off plumb"));
 
 echo(str("front wall tops at ", front_h, " (", front_down, " off the flat edge), back at ", back_h,
          " (", back_up, " on): wall left at the top, front ",
