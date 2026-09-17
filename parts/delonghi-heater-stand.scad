@@ -53,6 +53,21 @@
 // without printing a slab. Printed as drawn, floor down, the V opening up,
 // nothing overhangs — every face either stands or leans back.
 //
+// TWO TOPS, one per wall. The block's top was flat and level with the trace's
+// flat edge until 2026-09-17, when Ziad took front_down off the front and put
+// back_up on the back. The V is between the two walls, so there was never one
+// top edge to tilt: each wall keeps the same tapering flank and gets its own
+// horizontal top, and each lip of the mouth gets its own lead-in chamfer at
+// that top rather than the pair sharing one. Three things follow. The back
+// wall thins as it rises, because the flank leans in while the V's back is
+// plumb — the echo reports the thickness at both tops. The front's lip drops
+// to where the traced wall is still opening outward, which takes
+// front_reentry to zero: the mouth is the widest part of the V again and the
+// heater drops straight in from above. And the added back is drawn plumb, on
+// the trace's own end tangent, so the whole of it above the flat edge is an
+// assumption about the heater's panel and not a measurement — it is what the
+// coupon is for.
+//
 // THREE SECTIONS, because the heater's edge is 500 long (casters off — they
 // come off when it lies on its side) and the bed probes 210. Ziad's plan,
 // 2026-09-16: an end piece with a 5 mm wall closing the left end of the V,
@@ -116,6 +131,7 @@
 
 include <../lib/BOSL2/std.scad>
 include <../lib/BOSL2/beziers.scad>
+include <../lib/BOSL2/rounding.scad>
 
 /* [Build] */
 
@@ -150,14 +166,16 @@ tab_roof  = 10;     // rise of the socket's roof above the tab, a pyramid so not
 /* [Block] */
 
 base_w   = 150;     // across the floor — this is the stability across the heater (mm)
-top_w    = 100;     // across the top, either side of the 63 mm mouth (mm)
+top_w    = 100;     // across the block at the trace's flat edge, either side of the 63 mm mouth (mm); with base_w this is the flanks' lean, which both walls keep above and below it
+front_down = 15;    // how far the front wall's top stops below the trace's flat edge (mm). Ziad, 2026-09-17
+back_up    = 30;    // how far the back wall's top stands above the trace's flat edge (mm). Ziad, 2026-09-17
 floor_t  = 6;       // under the V's floor (mm)
 top_r    = 6;       // rounding on the top corners (mm)
 foot_chamfer = 0.5; // chamfer on the bottom edges, against elephant foot (mm)
 
 /* [Coupon] */
 
-coupon_length = 3;  // the slice's thickness, along the heater's edge (mm). 10 until v11; 3 prints in a third of the time and reads the same
+coupon_length = 5;  // the slice's thickness, along the heater's edge (mm). 10 until v11, then 3; 5 asked for on 2026-09-17, the wall tops being 45 apart now and the back one tall and thin
 coupon_band   = 6;  // material kept around the V; the floor under it is floor_t regardless (mm)
 
 /* [Hidden] */
@@ -244,22 +262,46 @@ left_dxdy  = (HEATER_BEZ[3][0] - HEATER_BEZ[4][0]) / (HEATER_BEZ[3][1] - HEATER_
 right_dxdy = tan(front_tip_lean);
 function left_x(y)  = 0            + left_dxdy  * (y - HEATER_H);   // in the trace's own frame
 function right_x(y) = front_tip[0] + right_dxdy * (y - HEATER_H);
-ext = 30;   // how far the heater is carried on above the trace (mm); past the block top is all that matters
+ext = back_up + lead_in + 5;   // how far the heater is carried on above the trace (mm); past the back wall's top, chamfer and all, is what matters
 
-// How much narrower the mouth is than the widest point of the V below it,
-// on the front (mm). Zero when the tip is the widest point, as traced.
-front_reentry = max([for (p = front_pts) p[0]]) - front_tip[0];
+// Where a wall of the V stands at a height y in the trace's own frame: side
+// is +1 for the front, -1 for the back. Below the flat edge it is the traced
+// wall — the bent front, or the back as traced — and both sides rise
+// monotonically in y, so lookup() interpolates the sampled points. Above it,
+// each side carries on along the end tangent it left on.
+front_xy = [for (p = front_pts) [p[1], p[0]]];
+back_xy  = [for (p = reverse(bezpath_curve(select(HEATER_BEZ, 3, 12), splinesteps = 24))) [p[1], p[0]]];
+function wall_x(side, y) =
+    y >= HEATER_H ? (side > 0 ? right_x(y) : left_x(y))
+                  : lookup(y, side > 0 ? front_xy : back_xy);
+
+// How much narrower the mouth is than the widest point of the V below it, on
+// the front (mm). Measured at the front's own lip, which since 2026-09-17 is
+// front_down below the trace's flat edge; zero when the lip is the widest
+// point, as it was on the trace's tip and is again once the front is cut down
+// to where the wall is still opening out.
+front_lip_y   = HEATER_H - front_down;
+front_reentry = max([for (p = front_pts) if (p[1] <= front_lip_y) p[0]]) - wall_x(1, front_lip_y);
 
 // ---- derived ---------------------------------------------------------------
 
 x_off   = -HEATER_W / 2;             // centres the trace on x = 0
-block_h = floor_t + HEATER_H;        // the mouth is exactly where the trace stops
+mid_x   = -x_off;                    // the block's centreline, in the trace's frame. The V's floor flat straddles it, so it is inside the V at every height above the floor — which is what lets a lip's chamfer close on it
+block_h = floor_t + HEATER_H;        // where the trace stops, and where the block's one top used to be
+front_h = block_h - front_down;      // the front wall's top (mm)
+back_h  = block_h + back_up;         // the back wall's top (mm)
+assert(back_h > front_h + 2 * top_r, "the two wall tops are too close to round: give the outline back a single top");
+
+// The flanks' lean, taken from base_w and top_w at the height they were
+// measured at, so both walls keep the taper the block always had.
+taper = (base_w - top_w) / 2 / block_h;          // x in, per mm of rise
+function half_w(y) = base_w / 2 - taper * y;     // the block's half width at height y
 
 stand_len   = heater_len + 2 * end_clear + 2 * end_wall;   // wall to wall, outside (mm)
 section_len = stand_len / sections;                        // each piece, nominal — the centre prints longer by its tabs
 assert(section_len + 2 * tab_len <= 210,
        str("the centre prints ", section_len + 2 * tab_len, " long, past the bed's probed 210"));
-assert(tab_h + tab_clear + tab_roof < block_h - 10, "socket roof is up in the mouth");
+assert(tab_h + tab_clear + tab_roof < min(front_h, back_h) - 10, "socket roof is up in the mouth");
 
 // ---- 2D, in the section: x across, y up --------------------------------------
 
@@ -282,27 +324,64 @@ module heater_section() {
     }
 }
 
-// The V: the heater grown by the clearance, with the mouth chamfered.
+// A 45-degree lead-in on one lip of the mouth, in the trace's frame: side is
+// +1 for the front, -1 for the back, and y_top is that wall's own top. It
+// runs from the wall's face — the clearance already added — out to the
+// block's centreline, well inside the V, so it unions into the V's void with
+// nothing hanging off the far side.
+module lip(side, y_top) {
+    polygon([
+        [mid_x,                                                        y_top - lead_in],
+        [wall_x(side, y_top - lead_in) + side * clearance,             y_top - lead_in],
+        [wall_x(side, y_top)           + side * (clearance + lead_in), y_top + eps],
+        [mid_x,                                                        y_top + eps],
+    ]);
+}
+
+// The V: the heater grown by the clearance, with a lead-in on each lip at its
+// own wall's top. The tops are front_down + back_up apart, so one chamfer
+// across the pair would hang in mid-air on the front and sit half-way up the
+// back.
 module v_cut() {
-    y0 = HEATER_H - lead_in;         // where the chamfer starts, in the trace's frame
     union() {
         offset(r = clearance) heater_section();
-        translate([x_off, floor_t]) polygon([
-            [left_x(y0)       - clearance,           y0],
-            [right_x(y0)      + clearance,           y0],
-            [right_x(HEATER_H) + clearance + lead_in, HEATER_H + eps],
-            [left_x(HEATER_H)  - clearance - lead_in, HEATER_H + eps],
-        ]);
+        translate([x_off, floor_t]) {
+            lip( 1, HEATER_H - front_down);
+            lip(-1, HEATER_H + back_up);
+        }
     }
 }
 
-// The block's outline: a trapezoid on the floor, top corners rounded, bottom
-// corners chamfered. BOSL2's corner order is [X+Y+, X-Y+, X-Y-, X+Y-].
+// The block's outline. It was a symmetric trapezoid until the two walls got
+// their own tops; now the path is written out, counter-clockwise from the
+// front's foot: up the front flank, in along the front's top to the
+// centreline, up the centreline to the back's top, out along that, and down
+// the back flank. Both centreline points are inside the V, so that whole
+// stretch is cut away again by v_cut() and the two tops never meet.
+raw_outline = [
+    [ half_w(0),       0      ],   // the front's foot, chamfered
+    [ half_w(front_h), front_h],   // the front's top, outside, rounded
+    [ 0,               front_h],
+    [ 0,               back_h ],
+    [-half_w(back_h),  back_h ],   // the back's top, outside, rounded
+    [-half_w(0),       0      ],   // the back's foot, chamfered
+];
+
+// Corner i of path, cut off square at d along each of its two edges. The feet
+// want a chamfer and the tops a radius, and round_corners() does one method
+// per call, so the feet are done here and the tops are left to it.
+function chamfered(path, i, d) =
+    let (p = path[i], a = select(path, i - 1), b = select(path, i + 1))
+    [p + d * unit(a - p), p + d * unit(b - p)];
+
+block_path = round_corners(
+    concat(chamfered(raw_outline, 0, foot_chamfer),
+           select(raw_outline, 1, 4),
+           chamfered(raw_outline, 5, foot_chamfer)),
+    radius = [0, 0, top_r, 0, 0, top_r, 0, 0]);
+
 module block_outline() {
-    trapezoid(h = block_h, w1 = base_w, w2 = top_w,
-              rounding = [top_r, top_r, 0, 0],
-              chamfer  = [0, 0, foot_chamfer, foot_chamfer],
-              anchor = FRONT);
+    polygon(block_path);
 }
 
 module section() {
@@ -437,6 +516,11 @@ echo(str("front tip ", front_tip_in, " in, ", front_tip_lean, " deg at the tip, 
          " (was ", HEATER_W + x_off, "), mouth ", front_tip[0], " wide at the trace, ",
          "wall in by ", front_d(front_arm / 2), " halfway up the bend, ",
          "mouth narrower than the V below it by ", front_reentry));
+
+echo(str("front wall tops at ", front_h, " (", front_down, " off the flat edge), back at ", back_h,
+         " (", back_up, " on): wall left at the top, front ",
+         half_w(front_h) - (x_off + wall_x( 1, front_h - floor_t) + clearance), ", back ",
+         half_w(back_h)  + (x_off + wall_x(-1, back_h  - floor_t) - clearance)));
 
 echo(str("stand ", stand_len, " long wall to wall, ", sections, " pieces of ", section_len,
          "; the centre prints ", section_len + 2 * tab_len, " with its tabs"));
