@@ -19,13 +19,18 @@
 //
 // THE FRONT IS BENT, and that is the one correction the coupon made. Held
 // against the heater, the first coupon (v06, 2026-09-16) was right everywhere
-// but along the front, which stood off the heater in the middle: the trace
-// has that side as one long, nearly straight slope, and the heater's front is
-// really an arc. So the front is bent toward the back by front_bow — a
-// circular arc through the trace's two ends, with its apex at the midpoint,
-// which is exactly the shape Ziad described. The back, the floor and the
-// corners are as traced. The mouth's tangent on that side is taken off the
-// bent curve, so the chamfer starts where the wall actually is.
+// but along the front: the trace has that side as one long, nearly straight
+// slope, and the heater's front is really an arc that bulges OUTWARD — away
+// from the back — by 5 mm at mid-height. So the front wall is bowed out by
+// front_bow: a circular arc through the trace's two ends, apex at the
+// midpoint, and the V is that much wider in the middle. The back, the floor
+// and the corners are as traced. The mouth's tangent on that side is taken
+// off the bent curve, so the chamfer starts where the wall actually is.
+//
+// ⚠️ THE DIRECTION WAS GOT WRONG ONCE. Ziad said "bend the front toward the
+// back"; the first attempt (v07 coupon, never printed) moved the wall INTO
+// the V, and he saw it in the render and said so. The belly goes outward.
+// Anything that bends here gets a labelled render before a build.
 //
 // The block is a trapezoid, wide at the floor and narrower at the mouth,
 // because the heater on edge is the best part of a metre tall and the V is
@@ -70,7 +75,7 @@ show = "stand";     // [stand, coupon]
 /* [Fit] */
 
 clearance = 0.5;    // gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
-front_bow = 5;      // the front bent toward the back: sagitta of the arc, apex at half height, zero at both ends (mm). Off the v06 coupon; 0 is the trace as traced
+front_bow = 5;      // the front bowed OUTWARD, away from the back: sagitta of the arc, apex at half height, zero at both ends (mm). Off the v06 coupon; 0 is the trace as traced
 lead_in   = 2;      // 45-degree chamfer on both lips of the mouth (mm)
 
 /* [Block] */
@@ -115,15 +120,16 @@ HEATER_H = 80;      // the trace's height, narrow flat to flat edge (mm)
 
 // The front is the last cubic, from the floor corner's exit at index 21 to
 // the top. It is sampled and bent: each point moved perpendicular to the
-// chord, toward the back, by the height of a circular arc of sagitta
-// front_bow over that chord — nothing at either end, front_bow at the middle.
+// chord, outward — away from the back, +X — by the height of a circular arc
+// of sagitta front_bow over that chord: nothing at either end, front_bow at
+// the middle.
 FRONT_I   = 21;
 front_bez = select(HEATER_BEZ, FRONT_I, FRONT_I + 3);
 front_A   = front_bez[0];
 front_B   = front_bez[3];
 front_L   = norm(front_B - front_A);                 // the chord (mm)
 front_u   = (front_B - front_A) / front_L;           // along it, upward
-front_n   = [-front_u.y, front_u.x];                 // across it, toward the back
+front_n   = [front_u.y, -front_u.x];                 // across it, outward: away from the back
 front_R   = front_bow > 0 ? (front_L * front_L / 4 + front_bow * front_bow) / (2 * front_bow) : 0;
 function front_bowed(p) =
     front_bow <= 0 ? p
@@ -138,8 +144,8 @@ heater_pts = concat(bezpath_curve(select(HEATER_BEZ, 0, FRONT_I), splinesteps = 
                     list_tail(front_pts, 1));
 
 // Where each side is heading as it leaves the trace, x per mm of y. The left
-// is vertical; the right is still opening out — more so once bent, since an
-// arc leaves its chord at an angle. The mouth follows these.
+// is vertical; the right is opening out — less so once bowed, since the arc
+// comes back in to meet the chord at the top. The mouth follows these.
 left_dxdy  = (HEATER_BEZ[3][0] - HEATER_BEZ[4][0]) / (HEATER_BEZ[3][1] - HEATER_BEZ[4][1]);
 right_dxdy = (last(front_pts)[0] - front_pts[len(front_pts) - 2][0])
            / (last(front_pts)[1] - front_pts[len(front_pts) - 2][1]);
