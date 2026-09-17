@@ -68,6 +68,21 @@
 // assumption about the heater's panel and not a measurement — it is what the
 // coupon is for.
 //
+// THE STEP IS ONLY ON THE END PLATES, and it is swept out. Between the two
+// tops the outline runs along the block's centreline, which is inside the V
+// at every one of those heights — so in the centre piece, and everywhere the
+// V is cut, that stretch is taken away again and each wall simply ends at its
+// own top. The one place it survives is the 5 mm plate closing each end,
+// where the section is solid: there the two tops met at a square notch.
+// Ziad drew a line over it on 2026-09-17, and plate_swoop() is that line — a
+// cubic leaving the back's top face level and landing on the front's flank
+// tangent to it, so the plate reads as one curve from the back's top round to
+// the flank instead of a step. It is unioned on over the wall's own 5 mm and
+// nowhere else, because carried through the block it would ramp the front
+// wall's top back up toward the back — undoing front_down, which is the thing
+// it was asked to do. Nothing overhangs: every layer of the swoop is smaller
+// than the one under it.
+//
 // THREE SECTIONS, because the heater's edge is 500 long (casters off — they
 // come off when it lies on its side) and the bed probes 210. Ziad's plan,
 // 2026-09-16: an end piece with a 5 mm wall closing the left end of the V,
@@ -171,6 +186,7 @@ front_down = 15;    // how far the front wall's top stops below the trace's flat
 back_up    = 30;    // how far the back wall's top stands above the trace's flat edge (mm). Ziad, 2026-09-17
 floor_t  = 6;       // under the V's floor (mm)
 top_r    = 6;       // rounding on the top corners (mm)
+plate_swoop_k = 0.55; // how full the end plate's swoop is: the fraction of the run and the drop that its end tangents carry. 0 is a straight diagonal from one top to the other, 1 a nearly square shoulder
 foot_chamfer = 0.5; // chamfer on the bottom edges, against elephant foot (mm)
 
 /* [Coupon] */
@@ -297,6 +313,19 @@ assert(back_h > front_h + 2 * top_r, "the two wall tops are too close to round: 
 taper = (base_w - top_w) / 2 / block_h;          // x in, per mm of rise
 function half_w(y) = base_w / 2 - taper * y;     // the block's half width at height y
 
+// The end plate's swoop, as a cubic from the notch's top corner to the
+// front's top outer corner: out of the first along the back's top face, into
+// the second along the front's flank, so both ends blend and only the middle
+// is curve. Ziad's line, 2026-09-17.
+plate_run  = half_w(front_h);                    // centreline to the front's top corner (mm)
+plate_bez  = [
+    [0,          back_h ],
+    [plate_swoop_k * plate_run, back_h ],
+    [plate_run - plate_swoop_k * (back_h - front_h) * taper,
+                 front_h + plate_swoop_k * (back_h - front_h)],
+    [plate_run,  front_h],
+];
+
 stand_len   = heater_len + 2 * end_clear + 2 * end_wall;   // wall to wall, outside (mm)
 section_len = stand_len / sections;                        // each piece, nominal — the centre prints longer by its tabs
 assert(section_len + 2 * tab_len <= 210,
@@ -384,6 +413,31 @@ module block_outline() {
     polygon(block_path);
 }
 
+// The block's silhouette carried up to the taller wall's top on both sides.
+// Nothing but a clip: it is what keeps anything added between the two tops
+// from standing out past the flanks.
+module block_envelope() {
+    polygon([[ half_w(0), 0], [ half_w(back_h), back_h],
+             [-half_w(back_h), back_h], [-half_w(0), 0]]);
+}
+
+// The notch in the end plate's top, filled: everything under the swoop and
+// down past the front wall's top face, clipped to the flanks. It reaches
+// 2 * top_r below that face to bury the rounding on the front's top corner,
+// which on the plate has no top face left to round into — stopping at the
+// face itself leaves the round biting a nick out of the flank just under the
+// swoop, since a round on a leaning corner reaches further along its edges
+// than its radius. Everything else it covers is solid plate already. Going
+// out to base_w on the right is nothing but slop for the clip to take off.
+module plate_swoop() {
+    y0 = front_h - 2 * top_r;
+    intersection() {
+        polygon(concat(bezier_curve(plate_bez, 48),
+                       [[base_w, front_h], [base_w, y0], [0, y0]]));
+        block_envelope();
+    }
+}
+
 module section() {
     difference() {
         block_outline();
@@ -465,7 +519,11 @@ module centre_piece()
 // face. The right end is this, mirrored.
 module end_piece_left()
     difference() {
-        body(section_len, -1 + 2 * end_wall / section_len, 1);
+        union() {
+            body(section_len, -1 + 2 * end_wall / section_len, 1);
+            translate([0, (end_wall - section_len) / 2, 0])
+                upright(end_wall) plate_swoop();
+        }
         sockets_on(section_len / 2, 1);
     }
 
