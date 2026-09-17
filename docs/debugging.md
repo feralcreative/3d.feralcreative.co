@@ -41,6 +41,9 @@ Sanity rules learned the hard way:
 - **A reassigned parameter.** The last top-level assignment wins file-wide, so a value can be quietly overridden from a line far below the geometry that uses it.
 - **A preset that never reached the job.** Correct file, correctly selected, stale project configuration. The only detector is the probe output.
 - **A `.json` copied without its `.info` sidecar.** The preset does not appear in Flash Studio's dropdown, with no error.
+- **Negative genus straight after an `import()`.** The mesh is several overlapping shells and the boolean kept them all. `Genus: -3` with `Status: NoError` is this, not a broken part. Split it with `utils/stl-shells.py` and union the pieces; see decisions.
+- **A genus that is one too many on a clean part.** Before blaming the boolean, find the hole: build each shell alone, or slice the built STL and look for a separate loop in a single band. The fish koozie's extra hole is where the scanned fishing line stands clear of the lip for a millimetre, and it is real.
+- **A face-on elevation that shows no tabs, no sockets, no deboss.** A feature on a plane parallel to the camera shades identically to the face around it. Read the iso or the underside view.
 - **Stale STL.** `slice.sh` on a `.scad` rebuilds the mesh first for this reason; slicing a hand-picked STL does not. Check the timestamp and the part name before treating any `.stl` or `.3mf` as evidence—a wrong conclusion was published from a five-hour-old project file for a different part.
 
 ## The chalk holder jams

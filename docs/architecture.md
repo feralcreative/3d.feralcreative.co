@@ -13,7 +13,7 @@ How the pieces fit. Read before changing a script or adding a stage to the loop.
 | `docs/_PLANS/` | Round-by-round record of in-flight work. Gitignored by the blanket `_PLANS` rule, so local-only. |
 | `utils/` | Every script. Never `scripts/`. |
 | `renders/`, `stl/`, `slice/`, `3mf/` | Generated, gitignored, reproducible. |
-| `_incoming/` | Legacy SketchUp-era STLs, gitignored. Reference geometry to measure against, not authored source. |
+| `_incoming/` | Legacy SketchUp-era STLs, downloaded scans, and SVG traces, gitignored. Reference geometry to measure against, not authored source. A scan that arrives as several shells is split here by `utils/stl-shells.py` into `<name>-shells/`, beside the original, and the part imports the pieces. |
 | `MODELS` | Symlink into `~/www/feral/3d.feralcreative.co/public/models`. Gitignored. |
 
 ## The four-stage loop

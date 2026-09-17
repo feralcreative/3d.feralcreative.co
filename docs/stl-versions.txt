@@ -4,6 +4,12 @@ cat-gap-wedge-coupon 5
 deck-door-stop 4
 deck-door-stop-coupon 3
 deck-door-stop-truss 5
+delonghi-heater-stand 10
+delonghi-heater-stand-centre 1
+delonghi-heater-stand-coupon 12
+delonghi-heater-stand-end-left 1
+delonghi-heater-stand-end-right 1
+delonghi-heater-stand-joint-coupon 1
 desk-cup-holder 8
 desk-cup-holder-starbucks 9
 door-stop-base 2
@@ -12,6 +18,8 @@ door-stop-post 2
 door-stop-spinner 2
 doorbell-wire-channel 48
 doorbell-wire-channel-cap 27
+fish-koozie-12oz 1
+fish-koozie-12oz-coupon 1
 hobbs-chalk-holder-coupon 5
 large-door-stop 2
 large-door-stop-coupon 2
@@ -63,11 +71,3 @@ tpu-door-stop-deck 1
 zr-cube 3
 zr-mark-plaque 1
 zr-monogram-stamp-2026 5
-fish-koozie-12oz 1
-fish-koozie-12oz-coupon 1
-delonghi-heater-stand 10
-delonghi-heater-stand-coupon 12
-delonghi-heater-stand-end-left 1
-delonghi-heater-stand-end-right 1
-delonghi-heater-stand-centre 1
-delonghi-heater-stand-joint-coupon 1

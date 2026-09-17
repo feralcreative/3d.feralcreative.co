@@ -20,6 +20,18 @@ Three failure modes, each of which had already happened:
 
 Native sizes are measured off OpenSCAD's own import rather than read off the SVG `viewBox`, because the two disagree—the importer works in millimetres at 96 dpi and the artwork carries its own whitespace. Remeasure if a file is replaced.
 
+## Scanned meshes come in as shells, split first
+
+A scanned STL is often several closed shells in one file—a head with the eyes dropped on as spheres—and `import()` keeps them that way. Every boolean on that import leaves the overlaps in: negative genus, the overlapped volume counted twice, internal faces for the slicer to guess about. Unioning the file with itself does not fix it; coincident faces are degenerate for an exact boolean and the result was worse than the input (genus 980 on the fish koozie). So `utils/stl-shells.py` writes one file per shell and the part imports them as separate `union()` operands, which Manifold resolves cleanly. The shell count lives in the part as a parameter because a missing shell file is a warning and exit 0. Decided 2026-09-16 on `fish-koozie-12oz.scad`.
+
+## A derivative of an ND-licensed model stays private
+
+The fish koozie is CC BY-NC-ND. Reboring it for a different can is a derivative, which the licence permits for private use and forbids sharing. The `.scad` is committed—it carries numbers and no mesh—and the source mesh stays in `_incoming/`, uncommitted. The built STL is not committed either, even though the repo is private and `stl/*.stl` normally is: it is an 8 MB derivative that rebuilds in a second, and a copy on GitHub is a copy on someone else's server. It does not go to Printables, the NAS viewer, or `--push`. Decided 2026-09-16.
+
+## Big parts are sectioned with dovetails printed on the sections
+
+The heater stand's edge is 500 mm on a bed that probes 210. Three equal sections, the joints locked by dovetail tabs printed on the centre piece and sockets in the end pieces—no loose keys, no rails—because that is the fewest parts and nothing can go missing. The tabs sit low on the end faces, where a trapezoid block's shoulders are widest, and the sockets open at the underside with a 45-degree pyramid roof, so a piece is lifted over the tab and lowered on, nothing shows once it is down, and nothing bridges in the print. Ziad's choices, 2026-09-16, from four alternatives put to him.
+
 ## Binary STL by default
 
 OpenSCAD defaults to ASCII, which is the same geometry at roughly seven times the size: a part carrying artwork ran 63 MB ASCII and 11 MB binary, which is slow to rsync and worse to open in the web viewer. `build.sh` passes `--export-format=binstl`; `--ascii` is there for reading or diffing a mesh by eye.
