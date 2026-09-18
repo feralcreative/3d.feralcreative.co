@@ -34,6 +34,24 @@
 // corners are as traced. The mouth's tangent on the front is the tip's
 // lean, and the block stops at the trace anyway; only the chamfer sees it.
 //
+// THE BEND CAME BACK OUT, and that is the third correction — the first one
+// off a printed piece rather than a coupon held against the heater. With
+// front_tip_in at 8 the mouth measured 54.5 as cut, at the front's lip, and
+// the heater forced the printed center open to about 60: a 5 mm
+// interference, not a clearance problem. The coupons were gauges pressed
+// against the rail's end profile and never a fit test over the panel, and
+// the raw trace is 60.2 wide at that lip — within a few tenths of what the
+// heater made the print measure. So the trace was right over the stretch the
+// wall now covers, and the cubic was carrying the curl too far down the
+// wall. front_tip_in is 0.25, which puts the mouth at 61.0, Ziad's number,
+// 2026-09-17. Two things follow. The front follows the trace again over its
+// whole height, so expect a couple of millimetres of air along its middle,
+// where v10 wanted the wall to touch — a V cradles on its floor and its two
+// lips and does not need that contact. And if the rail does curl in at the
+// top, the curl is above y = 65: off the end of the front wall since
+// front_down, and no longer the stand's business. Raising the wall back up
+// would bring the bind back with it.
+//
 // THE BACK IS LEANED IN, and that is the second correction a coupon made.
 // Held against the heater, the v13 coupon was right everywhere but low on the
 // back, where Ziad saw 1.5 to 2 mm of air. Half a millimetre of that is the
@@ -186,7 +204,7 @@ show = "stand";     // [stand, end-left, end-right, center, coupon, joint-coupon
 clearance = 0.5;    // gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
 cool_depth = 23;    // how far the heater's cool back panel reaches forward of its own back face (mm). Above the rail, nothing of the stand may stand against the heater past this: it is the mesh screen and the hot plate from there forward. Ziad, 2026-09-17
 back_floor_in = 1.25; // how far the back comes in at the floor, nothing at the flat edge — the traced back rotated about the mouth (mm). 1.25 is the 1.5-2 of air Ziad saw on the v13 coupon, less the clearance that is meant to be in there
-front_tip_in = 8;   // how far left (toward the back) the front's tip moves, on an arc that starts at the knee (mm). 5 off the v06 coupon, then "a few mm more" off v09; 0 is the trace as traced
+front_tip_in = 0.25; // how far left (toward the back) the front's tip moves, on an arc that starts at the knee (mm). 5 off the v06 coupon, then "a few mm more" off v09, so 8; 0.25 off the printed center, 2026-09-17 — see THE BEND CAME BACK OUT in the header. 0 is the trace as traced
 front_knee   = 0.30; // where the bend starts, as a fraction of the front's length up from the floor corner. Was 0.5; Ziad moved it to 0.3 after v09
 front_tip_lean = 0;  // the wall's angle from vertical at the tip (deg); positive opens outward like the trace's own 4, negative leans in. Plumb, off the v10 coupon
 lead_in   = 2;      // 45-degree chamfer on both lips of the mouth (mm)
@@ -343,6 +361,17 @@ function wall_x(side, y) =
 // to where the wall is still opening out.
 front_lip_y   = HEATER_H - front_down;
 front_reentry = max([for (p = front_pts) if (p[1] <= front_lip_y) p[0]]) - wall_x(1, front_lip_y);
+
+// The V's opening at the front's lip, as cut (mm): the two walls where they
+// end, each pushed out along its own normal by the clearance, which for a
+// wall leaning m off plumb is clearance * sqrt(1 + m^2) horizontally. This
+// is the aperture the heater has to pass, and it is NOT the width at the
+// trace's flat edge — there is no front wall up there any more, and reading
+// that number instead is how the mouth got quoted 1.4 too wide on
+// 2026-09-17.
+function wall_m(side, y) = (wall_x(side, y + 0.25) - wall_x(side, y - 0.25)) / 0.5;
+mouth_w = (wall_x( 1, front_lip_y) + clearance * sqrt(1 + pow(wall_m( 1, front_lip_y), 2)))
+        - (wall_x(-1, front_lip_y) - clearance * sqrt(1 + pow(wall_m(-1, front_lip_y), 2)));
 
 // ---- derived ---------------------------------------------------------------
 
@@ -586,7 +615,7 @@ module coupon() {
 }
 
 echo(str("front tip ", front_tip_in, " in, ", front_tip_lean, " deg at the tip, knee at ", front_knee * 100, "%: tip at x ", front_tip[0] + x_off,
-         " (was ", HEATER_W + x_off, "), mouth ", front_tip[0], " wide at the trace, ",
+         " (was ", HEATER_W + x_off, "), mouth ", mouth_w, " wide as cut at the front's lip (", front_tip[0], " at the trace's flat edge), ",
          "wall in by ", front_d(front_arm / 2), " halfway up the bend, ",
          "mouth narrower than the V below it by ", front_reentry));
 
