@@ -13,13 +13,35 @@
 #
 #   utils/finalize.sh slim-can-holder-3in-explicit
 #   utils/finalize.sh slim-can-holder-3in-explicit slim-can-holder-3in-censored
+#   utils/finalize.sh 'delonghi-heater-stand*'    # every name that matches
+#   utils/finalize.sh stl/delonghi-heater-stand*  # same, expanded by the shell
 #   utils/finalize.sh --all          # every series in stl/
 #
 #   utils/finalize.sh --shitcan doorbell-wire-channel-upper   # say what would go
 #   utils/finalize.sh --shitcan --apply doorbell-wire-channel-upper
+#   utils/finalize.sh --shitcan 'doorbell-wire-channel-*'
 #
 # Names are OUTPUT names, the same ones build.sh --name takes and the same ones
 # docs/stl-versions.txt is keyed on — not .scad paths.
+#
+# WILDCARDS (Ziad, 2026-09-17). A name may be a glob. It is matched here, not
+# by the shell, against the output names that actually exist: every stl/*.stl
+# reduced to its name, and for --shitcan also the ledger, slice/ and 3mf/,
+# because a name can leave those behind with no mesh left. QUOTE IT. zsh
+# refuses an unmatched glob outright, and nothing in the repo root is called
+# delonghi-heater-stand*, so unquoted the pattern never reaches this script.
+# The one unquoted form that does work is a path the shell can expand,
+# stl/delonghi-heater-stand*, and that is accepted too: a path is reduced to
+# its name — directory, extension and -vNN stripped, duplicates dropped — so a
+# directory's worth of drafts comes out as the handful of names they belong to.
+#
+# A WILDCARD NEVER YIELDS A COUPON ON A FINALIZE. A coupon is not a part and is
+# never final; its parent's finalize sweeps it, and if the pattern walked into
+# it afterwards it would find nothing there and fail the run for it. So the
+# match drops any name with "coupon" in it and says so, and --all does the
+# same — a run that ended in exit 1 on a coupon its own parent had just swept
+# was the reason. A coupon typed out in full is still taken at its word.
+# --shitcan keeps them: there the whole point is to take everything.
 #
 # WHICH MESH SURVIVES. stl/<name>.stl itself — build.sh keeps it as a real copy
 # of the newest build — so this only deletes the numbered drafts beside it. Not
@@ -113,6 +135,8 @@ OUTDIR="${OUTDIR:-${REPO_ROOT}/stl}"
 
 usage() {
   echo "usage: $0 <name> [<name>...]" >&2
+  echo "       $0 '<pattern>' [...]     quoted: zsh will not hand over an unmatched glob" >&2
+  echo "       $0 stl/<name>*           or a path it can expand" >&2
   echo "       $0 --all" >&2
   echo "       $0 --shitcan [--apply] <name> [<name>...]" >&2
   echo >&2
@@ -155,13 +179,112 @@ all_names() {
     | sort -u
 }
 
+LEDGER="${REPO_ROOT}/docs/stl-versions.txt"
+
+# Every output name with a mesh in stl/, plain or versioned. What a pattern is
+# matched against when finalizing: the ledger knows more names, but one with
+# no mesh left has nothing to finalize and would only SKIP.
+stl_names() {
+  find "$OUTDIR" -maxdepth 1 -name '*.stl' -print \
+    | sed 's|.*/||; s|\.stl$||; s|-v[0-9][0-9][0-9]*$||' \
+    | sort -u
+}
+
+# Wider, for --shitcan: anything a name can leave behind counts, down to a
+# ledger line with nothing else left.
+shitcan_names() {
+  {
+    stl_names
+    if [[ -f "$LEDGER" ]]; then awk '{ print $1 }' "$LEDGER"; fi
+    if [[ -d "${REPO_ROOT}/slice" ]]; then
+      find "${REPO_ROOT}/slice" -mindepth 1 -maxdepth 1 -type d -print | sed 's|.*/||; s|\.keep$||'
+    fi
+    if [[ -d "${REPO_ROOT}/3mf" ]]; then
+      find "${REPO_ROOT}/3mf" -maxdepth 1 -name '*.3mf' -print | sed 's|.*/||; s|\.keep\.3mf$||; s|\.3mf$||'
+    fi
+  } | sort -u
+}
+
+# Arguments to output names, one per line, in order, deduplicated, coupons
+# and all. A bare name passes through as typed. A pattern (any of * ? [) is
+# matched against the names this mode can act on; a path (a / in it, or .stl
+# or .3mf on the end) is reduced to its name. See WILDCARDS in the header for
+# why the pattern has to arrive quoted. Fails on a pattern that matches
+# nothing, since that is almost always a typo.
+expand_names() {
+  local mode="$1"; shift
+  local arg n m hit
+  local universe=() out=()
+
+  if [[ "$mode" == "shitcan" ]]; then
+    while IFS= read -r n; do [[ -n "$n" ]] && universe+=("$n"); done < <(shitcan_names)
+  else
+    while IFS= read -r n; do [[ -n "$n" ]] && universe+=("$n"); done < <(stl_names)
+  fi
+
+  for arg in "$@"; do
+    n="${arg##*/}"; n="${n%.stl}"; n="${n%.3mf}"
+    case "$n" in
+      *[*?[]*)
+        hit=0
+        for m in ${universe[@]+"${universe[@]}"}; do
+          [[ "$m" == $n ]] || continue
+          out+=("$m"); hit=1
+        done
+        [[ "$hit" -eq 1 ]] || { echo "error: nothing matches '$arg'" >&2; return 1; }
+        ;;
+      *)
+        if [[ "$n" != "$arg" && "$n" =~ ^(.*)-v[0-9][0-9]+$ ]]; then n="${BASH_REMATCH[1]}"; fi
+        out+=("$n")
+        ;;
+    esac
+  done
+
+  [[ "${#out[@]}" -gt 0 ]] || return 0
+  printf '%s\n' "${out[@]}" | awk '!seen[$0]++'
+}
+
+# A filter for the finalize side only: a coupon name that arrived by any
+# expansion — pattern, path or --all — is dropped and named once on stderr.
+# See A WILDCARD NEVER YIELDS A COUPON in the header. A coupon typed out in
+# full never passes through here, so it is still taken at its word.
+drop_coupons() {
+  local n
+  while IFS= read -r n; do
+    [[ -n "$n" ]] || continue
+    if [[ "$n" == *coupon* ]]; then
+      printf '  %-40s skipped — a coupon is never final; name it in full to force it\n' "$n" >&2
+      continue
+    fi
+    printf '%s\n' "$n"
+  done
+}
+
 NAMES=()
 if [[ "$1" == "--all" ]]; then
   [[ $# -eq 1 ]] || { echo "error: --all takes no other arguments" >&2; exit 64; }
-  while IFS= read -r n; do [[ -n "$n" ]] && NAMES+=("$n"); done < <(all_names)
+  while IFS= read -r n; do [[ -n "$n" ]] && NAMES+=("$n"); done < <(all_names | drop_coupons)
   [[ "${#NAMES[@]}" -gt 0 ]] || { echo "nothing to finalize: no versioned STLs in $OUTDIR"; exit 0; }
+elif [[ "$SHITCAN" -eq 1 ]]; then
+  expanded="$(expand_names shitcan "$@")"
+  while IFS= read -r n; do [[ -n "$n" ]] && NAMES+=("$n"); done <<< "$expanded"
 else
-  NAMES=("$@")
+  # Typed names are taken as they are, coupon or not; only what an expansion
+  # produced goes through drop_coupons. So the two are sorted apart first,
+  # and the expansions go through in one call so a draft series the shell
+  # handed over file by file collapses to its name once, not once per file.
+  TO_EXPAND=()
+  for arg in "$@"; do
+    case "$arg" in
+      *[*?[]*|*/*|*.stl|*.3mf) TO_EXPAND+=("$arg") ;;
+      *) NAMES+=("$arg") ;;
+    esac
+  done
+  if [[ "${#TO_EXPAND[@]}" -gt 0 ]]; then
+    expanded="$(expand_names finalize "${TO_EXPAND[@]}" | drop_coupons)"
+    while IFS= read -r n; do [[ -n "$n" ]] && NAMES+=("$n"); done <<< "$expanded"
+  fi
+  [[ "${#NAMES[@]}" -gt 0 ]] || { echo "error: nothing left to finalize — every name given was a coupon" >&2; exit 1; }
 fi
 
 # renders/<name>-<one segment>.png, untracked only. Echoes the count so the
@@ -181,6 +304,22 @@ sweep_renders() {
     rm -f "$f"
     n=$((n + 1))
   done
+  echo "$n"
+}
+
+# stl/<name>-*coupon*.stl, untracked only. Echoes the count, like sweep_renders.
+sweep_coupons() {
+  local name="$1"
+  local n=0 f
+  while IFS= read -r f; do
+    [[ -n "$f" ]] || continue
+    if git -C "$REPO_ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
+      printf '  %-40s note: %s is tracked, left alone\n' "" "$(basename "$f")" >&2
+      continue
+    fi
+    rm -f "$f"
+    n=$((n + 1))
+  done < <(find "$OUTDIR" -maxdepth 1 -name "${name}-*coupon*.stl")
   echo "$n"
 }
 
@@ -220,10 +359,14 @@ finalize_one() {
     < <(find "$OUTDIR" -maxdepth 1 -name "${name}-v[0-9][0-9]*.stl" | sort)
 
   if [[ "${#versions[@]}" -eq 0 && -z "$keep" ]]; then
-    # Still sweep: a part can be final and have renders of it lying around.
-    local only_renders
+    # Still sweep: a part can be final and have coupons and renders of it
+    # lying around. Until 2026-09-17 this returned before the coupons, so a
+    # part that had never carried a draft kept every coupon it ever had.
+    local only_coupons only_renders
+    only_coupons="$(sweep_coupons "$name")"
     only_renders="$(sweep_renders "$name")"
-    printf '  %-40s already final%s\n' "$name" \
+    printf '  %-40s already final%s%s\n' "$name" \
+      "$( [[ "$only_coupons" -gt 0 ]] && echo ", $only_coupons coupon file(s) removed" )" \
       "$( [[ "$only_renders" -gt 0 ]] && echo ", $only_renders render(s) removed" )"
     return 0
   fi
@@ -244,18 +387,8 @@ finalize_one() {
   done
 
   # The coupons: every output name that starts with this one and says so.
-  local coupons=0
-  while IFS= read -r f; do
-    [[ -n "$f" ]] || continue
-    if git -C "$REPO_ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
-      printf '  %-40s note: %s is tracked, left alone\n' "" "$(basename "$f")"
-      continue
-    fi
-    rm -f "$f"
-    coupons=$((coupons + 1))
-  done < <(find "$OUTDIR" -maxdepth 1 -name "${name}-*coupon*.stl")
-
-  local rendered
+  local coupons rendered
+  coupons="$(sweep_coupons "$name")"
   rendered="$(sweep_renders "$name")"
 
   local kept_tag="already a plain file"
@@ -265,8 +398,6 @@ finalize_one() {
     "$( [[ "$coupons" -gt 0 ]] && echo ", $coupons coupon file(s) removed" )" \
     "$( [[ "$rendered" -gt 0 ]] && echo ", $rendered render(s) removed" )"
 }
-
-LEDGER="${REPO_ROOT}/docs/stl-versions.txt"
 
 # Everything generated that carries one output name. Lists it, and removes it
 # only when --apply says so. Returns 1 if the name turned up nothing at all,
