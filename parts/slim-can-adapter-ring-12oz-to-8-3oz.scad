@@ -33,15 +33,20 @@
 // It is not a structural part — the holder carries it — and PETG at 1.68 over
 // 94 mm is a tube, not a membrane.
 //
-// THE LIP. The holder's mouth has a 1.20 lead-in on radius over 2.00 of
-// height, so a plain sleeve flush with the rim would show a 1.7 mm ring of
-// air around itself. The lip covers that, sets the ring's depth off the rim
-// instead of off the floor — so the bottom of the sleeve hangs 0.60 clear of
-// the holder's floor and never has to be the exact depth — and is what you
-// get a fingernail under to lift it out. It bears on the rim's flat, which
-// runs from the top of the lead-in at r 30.40 out to the top chamfer at
-// 37.10; a Ø64 lip lands 1.60 mm of it, plenty for a ring that carries a
-// can and nothing else.
+// THE LIP IS THE HOLDER'S WHOLE TOP. Ø76.20, the barrel's own 3 inches, with
+// the barrel's own 1.00 chamfer on its edge, so seated it reads as the rim
+// of the holder rather than a washer sitting on it (Ziad, 2026-09-19: it
+// should cover the existing top edge). It covers the mouth lead-in — 1.20 on
+// radius over 2.00 of height, which a flush sleeve would leave showing as a
+// 1.7 mm ring of air — and the top chamfer, and bears on all 6.70 mm of the
+// rim's flat between them. The holder's chamfer under the lip's flat
+// underside leaves a 1 mm V reveal round the joint, which is the seam
+// declared rather than hidden. It also sets the ring's depth off the rim
+// instead of off the floor — the sleeve hangs 0.60 clear of the floor and
+// never has to be the exact depth — and it is what you get a fingernail
+// under to lift the ring out. The flutes run off the holder's top chamfer,
+// so under the lip's edge are twenty-four 0.8 mm crescents of air; nothing
+// bears there and nothing shows.
 //
 // ORIENTATION. Drawn as used, z = 0 at the open bottom, lip at the top.
 // PRINTED LIP-DOWN — flip = true, the default, turns it over — and that
@@ -118,6 +123,10 @@ host_mouth_r = 1.20;
 // ...and the rim's flat runs from the top of that lead-in out to the start of
 // the holder's top chamfer, at this radius (mm): out_r 38.10 - top_cham 1.00.
 host_rim_flat_r = 37.10;
+// The holder's outside (mm), 3 inches, and the size of its top chamfer (mm).
+// The lip copies both.
+host_od = 76.20;
+host_top_cham = 1.00;
 
 /* [Sleeve] */
 
@@ -134,18 +143,21 @@ base_cham = 0.60;
 
 /* [Lip] */
 
-// Outside diameter of the lip (mm). It has to reach past the top of the
-// holder's lead-in (r 30.40) to land on the rim's flat; 64 lands 1.60 mm of
-// it and stays well inside the top chamfer at 37.10.
-lip_od = 64.0;
+// Outside diameter of the lip (mm). The holder's own, so the lip covers the
+// rim and its chamfer edge-to-edge and is flush with the barrel. It has to
+// reach past the top of the holder's lead-in (r 30.40) to bear on the rim's
+// flat at all; anything between that and 76.20 is a washer on the rim
+// rather than a rim.
+lip_od = host_od;
 // Lip thickness (mm). It is the base of the print, and 2.30 is exactly the
 // layer stack — a 0.30 first layer and ten at 0.20 — so the sleeve starts on
 // a layer boundary.
 lip_t = 2.30;
-// 45-degree chamfer on the lip's outward edge (mm). That edge is on the bed,
-// and the chamfer is what stands in for the slicer's elephant-foot
-// compensation, per the fit rules.
-lip_cham = 0.50;
+// 45-degree chamfer on the lip's outward edge (mm). The holder's own top
+// chamfer, so the profile carries on up the barrel. That edge is also on the
+// bed, and the chamfer is what stands in for the slicer's elephant-foot
+// compensation, per the fit rules — 1.00 is twice what that needs.
+lip_cham = host_top_cham;
 
 /* [Mouth] */
 
@@ -233,8 +245,10 @@ assert(wall_w >= 1.26,
 assert(lip_r > host_lead_in_r + 1.0,
        str("the lip does not reach the rim's flat: it needs r > ",
            host_lead_in_r + 1.0, " to land a millimetre of it"));
-assert(lip_r < host_rim_flat_r,
-       "the lip hangs over the holder's top chamfer: reduce lip_od");
+assert(lip_r <= host_od / 2,
+       "the lip is wider than the holder: reduce lip_od");
+assert(lip_cham < lip_t,
+       "the lip's chamfer is taller than the lip");
 assert(under_gap > 0,
        "the sleeve would bottom on the holder's floor before the lip seats");
 assert(bore_r + mouth_cham_r < lip_r - lip_cham,
@@ -320,8 +334,10 @@ echo(str("ring: outside ", sleeve_od, "  bore ", bore_d,
          " lip  (", total_h, " overall)  lip ", lip_od));
 echo(str("in the holder: faces ", host_across_ribs,
          " across its printed ribs, clearance ", host_clear,
-         " on diameter; lip bears on ", lip_r - host_lead_in_r,
-         " mm of rim; bottom hangs ", under_gap, " off the floor"));
+         " on diameter; lip bears on ",
+         min(lip_r, host_rim_flat_r) - host_lead_in_r,
+         " mm of rim and stands ", lip_r - host_od / 2,
+         " proud of the barrel; bottom hangs ", under_gap, " off the floor"));
 echo(str("on the can: printed bore ", bore_d - host_bore_loss,
          ", across ribs ", bore_d - host_bore_loss - 2 * rib_h,
          ", clearance ", bore_d - host_bore_loss - 2 * rib_h - can_d,
