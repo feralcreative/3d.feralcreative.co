@@ -4,9 +4,42 @@
 // vintage foam koozie: a fish head, mouth gaping upward, the can goes in the
 // mouth, a lure hooked in the corner of it) is bored for a standard 12 oz can.
 // Ziad wants it to hold a Red Bull, which is the same 355 ml in a sleek can:
-// Ø57.40 instead of Ø66, and 156 tall instead of 122. Nothing about the fish
-// changes. The old bore is filled solid and a new one is cut on the same
-// axis, with the bore recipe every slim-can holder in this repo prints with.
+// Ø57.40 instead of Ø66, and 156 tall instead of 122 — and he wants it inside
+// 3 inches, like every other can holder here. The old bore is filled solid
+// and a new one is cut, with the bore recipe every slim-can holder in this
+// repo prints with; the skin is pulled in around it to fit the envelope.
+//
+// THREE INCHES, AND HOW THE FISH GETS THERE. As scanned the head is 82.6 x
+// 96.2 in plan, and the wall is where the size is: the skin sits 35 to 47 mm
+// off the bore axis, 6 to 18 mm of solid around a can that needs 2. A straight
+// scale cannot fix that, because it shrinks the bore too — mesh_scale under
+// 0.91 left no wall — so instead (Ziad, 2026-09-19) the skin is brought in
+// and the bore is left alone: the fish is scaled in X and Y only, about an
+// axis moved 3.2 mm toward the head's centre, and the Ø58.40 bore is cut
+// afterwards at full size on that axis. Z is not scaled, so the height, the
+// bore depth and how much can shows are all as before.
+//
+// The numbers came out of a search over the built mesh, not a guess. The
+// bore sits off-centre in the head — the thinnest skin is on the lure side,
+// the fin is on the other — so the axis shift is what buys the wall, and
+// squashing Y a little more than X (the fin's direction) buys a little more:
+//
+//     even 0.846, axis on the scan's         thinnest wall  -0.89  (breaks out)
+//     even 0.846, axis shifted 3.8           thinnest wall   1.98
+//     X 0.88, Y 0.85, axis shifted 3.2       thinnest wall   2.79  <- this file
+//
+// That 2.79 is one spot, 20 to 30 mm up on the side away from the lure; the
+// wall is 3.0 to 3.5 for the rest of the bore's height and 5 to 15 mm on the
+// fin side. It is measured on the built mesh — nothing in this file can see
+// the skin — so re-measure if any number in [Mesh] moves.
+//
+// THE FIN DOES NOT FIT AND IS SHAVED. It stands 45 mm off the axis after the
+// scale, and no scale keeps it inside 3 inches: by the time it is in, the
+// skin opposite has gone inside the bore (X 0.87, Y 0.72 was the best the
+// search found, and it left -1.0 of wall). So the whole part is clipped to a
+// Ø76.20 cylinder on the bore axis and the fin gets a flat face 6.9 mm in,
+// over its bottom 40 mm. One other spot touches the cylinder: the outside of
+// the lip at 70 to 90 mm up crosses it by 0.5 mm and comes out flat there.
 //
 // ⚠️ LICENCE. CC BY-NC-ND 4.0 — NoDerivatives. This part is a derivative,
 // which the licence permits for private use and forbids sharing. It does not
@@ -49,15 +82,18 @@
 // old bore survive as sealed voids inside the wall. It cannot be much bigger
 // either, because the fish's own wall is thinner than it looks: a foam koozie,
 // scanned and scaled down, with the scale lines cut into it. Over the fill's
-// height the skin comes as close as r 34.93 to the axis — on the lure side,
-// about 19 mm up — which is 0.5 mm outside a Ø68.80 fill. Measured on the
-// built mesh: no ray out of the bore leaves the part through the fill
+// height the skin comes as close as r 34.93 to the scan's axis — on the lure
+// side, about 19 mm up — which is 0.5 mm outside a Ø68.80 fill. Measured on
+// the built mesh: no ray out of the bore leaves the part through the fill
 // anywhere, so nothing of the cylinder shows. (The head shell is thinner still
 // in two places, 0.38 mm, but those are the sockets under the -x eye and the
 // lure, and the shells that sit in them cover them.)
 //
-// ⚠️ The thinnest wall on the finished part is therefore 34.93 - 29.20, about
-// 5.7 mm, and it is the fish's skin that sets it, not anything here.
+// The fill lives in the scan's frame and goes through the same scale and
+// shift as the fish, so on the part it is an ellipse, 30.3 x 29.2 on radius,
+// centred 3.2 mm off the bore. On the near side the bore cuts clean through
+// it and on into the fish's own wall; on the far side its edge stands 2.6 mm
+// outside the bore, and the lead-in below takes care of that.
 //
 // THE BORE is the repo's settled recipe, carried unchanged from
 // slim-can-holder-12oz.scad: drawn 58.40 (can + 0.40 slop + 0.60 for this
@@ -68,11 +104,14 @@
 // the drain is recut on the axis.
 //
 // THE MOUTH. Above z 76.5 the scan's own bore flares open, so the fill stops
-// there and a 45-degree lead-in opens the new bore out to meet it: from
-// Ø58.40 to the fill's edge over 5.20 of height, then 0.60 more into the
-// scan's lip so there is no ledge where the two surfaces hand over. It widens
-// going up, so printed floor-down it is an upward-facing slope and needs
-// nothing under it.
+// there and a lead-in opens the new bore out to meet it: the hull of the bore
+// at the bottom and the fill's outline, grown by lead_over, at the top. That
+// is a skewed cone — 45 degrees on the far side of the fill, where it has
+// 2.6 mm to cover, and inside the bore on the near side, where the bore is
+// already past the fill's edge — so there is no ledge where the two surfaces
+// hand over and nothing is cut on the near side that the bore had not cut
+// already. It widens going up, so printed floor-down it is an upward-facing
+// slope and needs nothing under it.
 //
 // HOW MUCH CAN SHOWS. The bore is 80.6 deep from the floor's top, so 75 mm of
 // a 156 mm can stands above the throat and 44 mm above the tips of the lips.
@@ -110,7 +149,15 @@ bore_comp = 0.60;
 // The split shells, from utils/stl-shells.py, beside the original download.
 mesh_dir    = "../_incoming/fish-can-koozie-model_files/fish_koozie-shells/";
 mesh_shells = 7;      // what the split reported. See the warning above
-mesh_scale  = 1.0;    // uniform, about the bore axis and the bottom. The can and its bore do not scale
+// Scale on x, y and z, about the bore axis and the bottom. The can and its
+// bore do not scale. [0.88, 0.85, 1] is what puts the head inside 3 inches
+// with the most wall left: see THREE INCHES in the header, and re-measure
+// the wall on the built mesh if this moves.
+mesh_scale  = [0.88, 0.85, 1.0];
+// Where the new bore's axis sits relative to the scanned bore's centre, in
+// mesh mm, before the scale. Toward the head's centre and away from the
+// thin skin on the lure side; it is worth 2.9 mm of wall.
+axis_shift  = [1.0, 3.0];
 
 // Measured off the mesh, in its own frame and its own millimetres. These
 // place the fish so the bore axis is the z axis and the bottom is z = 0.
@@ -121,6 +168,13 @@ mesh_top      = 107.38;               // tips of the lips (mm)
 // The fill, in mesh millimetres (radius). Covers the old bore's r 34.39 and
 // stands 0.25 proud of the skin in two gill grooves; see the header.
 fill_r = 34.40;
+
+/* [Envelope] */
+
+// The cylinder the finished part is clipped to, on the bore axis (mm). 76.20
+// is 3 inches, the family's number. What crosses it is shaved flat — the
+// dorsal fin, mostly. 0 for no clip.
+envelope_d = 76.20;
 
 /* [Floor] */
 
@@ -168,21 +222,33 @@ function facets(r, e = chord_err) = ceil(180 / acos(1 - e / r));
 // Radius that makes the INSCRIBED polygon's inner radius equal r.
 function r_hole(r, n) = r / cos(180 / n);
 
-s        = mesh_scale;
+sx = mesh_scale[0];
+sy = mesh_scale[1];
+sz = mesh_scale[2];
 bore_d   = can_d + can_slop + bore_comp;
 bore_r   = bore_d / 2;
-fill_R   = fill_r * s;
-bore_top = (mesh_bore_top - mesh_bottom) * s;   // top of the fill, above the bed
-total_h  = (mesh_top - mesh_bottom) * s;
+bore_top = (mesh_bore_top - mesh_bottom) * sz;   // top of the fill, above the bed
+total_h  = (mesh_top - mesh_bottom) * sz;
 
-nseg    = facets(fill_R);
+nseg    = facets(fill_r);
 r_bore  = r_hole(bore_r, nseg);
-r_fill  = r_hole(fill_R, nseg);   // circumscribed, so its flats clear the scan's r 34.39
+r_fill  = r_hole(fill_r, nseg);   // circumscribed, so its flats clear the scan's r 34.39; mesh mm
 r_drain = drain_d > 0 ? r_hole(drain_d / 2, nseg) : 0;
 
-// Lead-in: 45 degrees from the bore out to the fill's edge, then lead_over
-// further into the scan's own flare.
-lead_h  = fill_R - bore_r + lead_over;
+// The fill on the part: an ellipse about the scan's axis, which sits at
+// old_axis once the shift and the scale have been applied.
+old_axis   = [-axis_shift[0] * sx, -axis_shift[1] * sy];
+fill_rx    = fill_r * sx;
+fill_ry    = fill_r * sy;
+// How far the fill's edge gets from the bore axis, at the worst. This is
+// what the lead-in has to reach.
+fill_reach = max([for (t = [0 : 1 : 359])
+                  norm([old_axis[0] + fill_rx * cos(t),
+                        old_axis[1] + fill_ry * sin(t)])]);
+
+// Lead-in: from the bore up and out to the fill's edge plus lead_over, at
+// 45 degrees where the reach is greatest.
+lead_h  = fill_reach + lead_over - bore_r;
 lead_z0 = bore_top + lead_over - lead_h;
 
 // Ribs: a circular arc rib_w wide at exactly rib_h proud of the bore.
@@ -191,9 +257,10 @@ rib_ax = bore_r + rib_r - rib_h;
 rib_z0 = floor_t + 1.0;
 rib_z1 = lead_z0 - 1.0;
 
-assert(fill_R - bore_r >= 2.10,
-       str("fill is only ", fill_R - bore_r, " outside the bore; mesh_scale under ",
-           (bore_r + 2.10) / fill_r, " leaves no wall around the can"));
+assert(lead_h > lead_over,
+       "the fill is entirely inside the bore: the scale has gone too far");
+assert(envelope_d == 0 || envelope_d / 2 > bore_r + 2.10,
+       "the envelope leaves under 5 walls around the bore");
 assert(rib_z1 - rib_z0 > rib_ramp + rib_foot + 5,
        "no full-proud rib left between the floor and the lead-in");
 assert(coupon_h > rib_ramp + 2,
@@ -207,15 +274,38 @@ module fish_raw()
             import(str(mesh_dir, "shell-", i < 10 ? "0" : "", i, ".stl"),
                    convexity = 10);
 
-// The fish stood on the bed with its bore axis on z.
-module fish()
-    scale(s) translate([-mesh_axis[0], -mesh_axis[1], -mesh_bottom]) fish_raw();
+// Mesh frame to part frame: the new axis on z, the bottom on the bed, then
+// the scale. Everything drawn in the scan's millimetres goes through this.
+module placed()
+    scale(mesh_scale)
+        translate([-(mesh_axis[0] + axis_shift[0]),
+                   -(mesh_axis[1] + axis_shift[1]), -mesh_bottom])
+            children();
+
+module fish() placed() fish_raw();
+
+// The fill, drawn on the scan's own axis so it lands exactly on the old bore
+// whatever the scale and shift do.
+module fill()
+    placed()
+        translate([mesh_axis[0], mesh_axis[1], mesh_bottom])
+            cylinder(r = r_fill, h = mesh_bore_top - mesh_bottom, $fn = nseg);
 
 // The fish with the old bore filled solid from the bottom to the mouth.
 module body()
     union() {
         fish();
-        cylinder(r = r_fill, h = bore_top, $fn = nseg);
+        fill();
+    }
+
+// The lead-in: see THE MOUTH in the header.
+module lead_in()
+    hull() {
+        translate([0, 0, lead_z0])
+            cylinder(r = r_bore, h = eps, $fn = nseg);
+        translate([0, 0, bore_top + lead_over - eps])
+            linear_extrude(height = eps)
+                offset(r = lead_over) projection() fill();
     }
 
 module new_bore() {
@@ -224,8 +314,7 @@ module new_bore() {
     if (drain_d > 0)
         translate([0, 0, -eps])
             cylinder(r = r_drain, h = floor_t + 2 * eps, $fn = nseg);
-    translate([0, 0, lead_z0])
-        cylinder(r1 = r_bore, r2 = r_bore + lead_h, h = lead_h, $fn = nseg);
+    lead_in();
 }
 
 // Each rib is a 3.90 mm arc of which only 0.30 is wanted; the rest would run
@@ -250,10 +339,21 @@ module ribs() {
     }
 }
 
+// Everything outside envelope_d goes; the fin, mostly.
+module clipped()
+    if (envelope_d > 0)
+        intersection() {
+            children();
+            translate([0, 0, -1])
+                cylinder(r = envelope_d / 2, h = total_h + 2,
+                         $fn = facets(envelope_d / 2));
+        }
+    else children();
+
 module fish_koozie()
     union() {
         difference() {
-            body();
+            clipped() body();
             new_bore();
         }
         if (rib_count > 0 && rib_h > 0) ribs();
@@ -262,8 +362,11 @@ module fish_koozie()
 echo(str("bore ", bore_d, "  across ribs ", bore_d - 2 * rib_h,
          "  floor ", floor_t, "  bore depth ", bore_top - floor_t,
          "  lead-in ", lead_h, " from z ", lead_z0,
-         "  fish ", total_h, " tall at scale ", s,
-         "  fill ", 2 * fill_R, " (", fill_R - bore_r, " outside the bore)"));
+         "  fish ", total_h, " tall at scale ", mesh_scale,
+         "  axis ", norm(axis_shift), " off the scan's",
+         "  fill ", 2 * fill_rx, " x ", 2 * fill_ry,
+         " reaching ", fill_reach - bore_r, " outside the bore",
+         "  clipped to ", envelope_d));
 
 // The fit coupon: the top coupon_h of the bore, from where the lead-in
 // begins, as a plain tube dropped onto the bed the same way up as the part.
