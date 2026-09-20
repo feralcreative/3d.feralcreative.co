@@ -15,7 +15,9 @@
 //     x  ->  across the panel, centered
 //     y  ->  out from the glass toward the viewer. The glass's front face is
 //            y = 0 and the glass itself is y < 0, so the hook's leg is the
-//            only thing at negative y.
+//            only thing at negative y. Only the channel wall at the top and
+//            the two feet at the bottom touch y = 0; the spine between them
+//            stands `standoff` off the glass so water behind it runs out.
 //     z  ->  up, with z = 0 at the top of the cap. Everything hangs below.
 //
 // The cradle is authored in its own frame, tilted `tilt` degrees about x, and
@@ -27,8 +29,8 @@
 // PRINTING. On a side, one rail down; `orient = "print"` writes the STL that
 // way, yawed 45 degrees so 216 mm fits the plate's diagonal inside the safe
 // envelope. Every face is then vertical except the upper rail's 45 degree lip,
-// the top-end chamfers, and the ledge over the notch, which bridges 13.6 mm
-// from the backrest to the front bar. No support. Standing it on the hook end,
+// the upper foot's 45 degree inner face, the top-end chamfers, and the ledge
+// over the notch, which bridges 13.6 mm from the backrest to the front bar. No support. Standing it on the hook end,
 // as the first design planned, is worse: the face the phone stands on would be
 // an overhang 15 degrees off horizontal, and the part is over the 215 mm safe
 // height that way.
@@ -72,9 +74,18 @@ wrap      = 15.0;  // how far the leg reaches down the back face (mm)
 lead_in   = 1.0;   // guide at the channel's mouth (mm)
 
 /* [Spine] */
-// The plate down the glass from the hook to the cradle. It is the channel's
-// front wall and it carries the cradle's whole moment.
+// The plate down the glass from the hook to the cradle. It carries the
+// cradle's whole moment.
 spine_t = 3.09;  // (mm)
+// The spine does not lie on the glass. It bears at the top through the
+// channel's front wall and at the bottom through two feet, and between them
+// it stands off by this much, so the gap behind it is open along both sides
+// and across the bottom and water runs out instead of sitting there. The
+// first design lay flat on the glass and drained through slots, which was
+// not enough.
+standoff = 5.0;   // spine's back face to the glass (mm)
+foot_w   = 12.0;  // each foot, in from the part's side face (mm)
+foot_h   = 15.0;  // each foot, up from the bottom (mm)
 
 /* [Cradle] */
 cradle_len = 82.0;  // how much of the phone's edge is held, up from its bottom (mm)
@@ -115,16 +126,19 @@ c = cos(tilt);
 // Cradle origin: the phone's bottom-back corner. In front of the spine by the
 // thinnest the backrest gets, and as far down as puts the lowest point of the
 // cradle - the front-bottom corner of the ledge - at overall_len.
-y0 = spine_t + back_min;
+spine_back  = standoff;
+spine_front = standoff + spine_t;
+y0 = spine_front + back_min;
 z0 = -overall_len + front * s + ledge_t * c;
 
 // Cradle frame to hung frame. Same map as in_cradle().
 function H(yp, zp) = [y0 + yp * c + zp * s, z0 - yp * s + zp * c];
 
 // Where the cradle's top plane runs back into the spine's front face, and
-// where its bottom plane runs back to the glass.
-yp_top = (spine_t - y0 - cradle_len * s) / c;
-yp_bot = -(y0 - ledge_t * s) / c;
+// where its bottom plane runs back to the spine's back face.
+yp_top = (spine_front - y0 - cradle_len * s) / c;
+yp_bot = (spine_back - y0 + ledge_t * s) / c;
+z_foot = H(yp_bot, -ledge_t).y;  // the lowest point of the spine's back face
 
 y_min = -(gch + leg_t);
 y_max = H(front, cradle_len).x;
@@ -142,12 +156,14 @@ module in_cradle() {
 // sweep of this or added to it afterward. Top level rather than inside body()
 // because oriented() reads it too, to center the print pose on the plate.
 silhouette = [
-    [y_min,   0],                        // leg outer face, top
-    [spine_t, 0],                        // cap front, top
+    [y_min,       0],                    // leg outer face, top
+    [spine_front, 0],                    // cap front, top
     H(yp_top, cradle_len),               // the wedge's top meets the spine
     H(front,  cradle_len),               // cradle front, top
     H(front, -ledge_t),                  // cradle front, bottom: the lowest point
-    H(yp_bot, -ledge_t),                 // the bottom runs back to the glass
+    H(yp_bot, -ledge_t),                 // the bottom runs back to the spine
+    [spine_back, -cap_t - wrap],         // up the spine's back face, standing off
+    [0,          -cap_t - wrap],         // out to the glass: the channel wall's foot
     [0,    -cap_t],                      // up the glass face to the cap
     [-gch, -cap_t],                      // across the channel's closed end
     [-gch, -cap_t - wrap + lead_in],     // down the leg's inner face
@@ -213,6 +229,28 @@ module flare_cut() {
         }
 }
 
+// Two feet at the bottom corners of the spine's back face, out to the glass.
+// The inner face of each is a 45 degree slope, because in the print pose the
+// upper foot hangs off the spine with nothing under it. Trimmed to the same
+// plane as the rest of the bottom.
+module feet() {
+    intersection() {
+        for (side = [-1, 1])
+            translate([0, 0, z_foot - standoff])
+                linear_extrude(height = foot_h + standoff)
+                    polygon([
+                        [side * W / 2, 0],
+                        [side * W / 2, spine_back + eps],
+                        [side * (W / 2 - foot_w), spine_back + eps],
+                        [side * (W / 2 - foot_w + standoff), 0],
+                    ]);
+
+        in_cradle()
+            translate([-W, -tall, -ledge_t])
+                cube([2 * W, 2 * tall, tall]);
+    }
+}
+
 module phone_holder() {
     difference() {
         union() {
@@ -223,6 +261,7 @@ module phone_holder() {
             }
 
             lips();
+            feet();
         }
 
         flare_cut();
@@ -263,8 +302,8 @@ oriented() {
     if (show == "fitcheck") {
         // The panel, centered in the channel, its top edge on the cap.
         color("PaleTurquoise", 0.35)
-            translate([-W / 2 - 20, -gch + glass_fit / 2, -cap_t - 120])
-                cube([W + 40, glass_t, 120]);
+            translate([-W / 2 - 20, -gch + glass_fit / 2, -cap_t - 230])
+                cube([W + 40, glass_t, 230]);
 
         // The phone, on the ledge, centered in the slack.
         color("DimGray", 0.5)
