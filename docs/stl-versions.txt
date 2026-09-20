@@ -30,8 +30,9 @@ patio-leg-spacer-base 8
 patio-leg-spacer-coupon 1
 patio-leg-spacer-receiver 7
 patio-leg-spacer-shim 6
-phone-shower-holder 5
+phone-shower-holder 6
 phone-shower-holder-assembled 1
+phone-shower-holder-print 1
 plant-screen 7
 plant-screen-130 1
 plant-screen-130-coupon 1
