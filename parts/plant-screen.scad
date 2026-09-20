@@ -11,19 +11,9 @@
 // twist-extruded up the tube; the two hands cross and make the diamonds. The
 // struts run at 45 degrees from vertical, the reference's overhang limit, so
 // nothing overhangs, and every diamond's top is a node — a point — so nothing
-// bridges. A hexagon or a horizontal ring would bridge or overhang; a diamond
-// does neither, which is why it is a diamond.
-//
-// THE TOP BAND SITS ON TEETH. A flat band over a lattice has to cross the gap
-// between struts, and at 36 mm openings that gap is 16 mm: Flash Studio
-// flagged it as an overhang wanting supports, and it would have printed as
-// 34 free-hanging wall loops. So every strut top carries a tooth — a solid
-// wedge that widens at the strut angle both ways — and the teeth meet their
-// neighbours at points, half a row pitch up, where the flat band starts. The
-// band's underside is then a zigzag with every face at the strut angle and
-// nothing horizontal anywhere. It costs half a row of lattice and ~8 g, and
-// it closes the pattern: a row of small diamonds sits between the last full
-// ones, and the underside of the rim reads as part of the lattice.
+// bridges except the top band's underside, which crosses gaps of ~8 mm
+// between struts. A hexagon or a horizontal ring would bridge or overhang;
+// a diamond does neither, which is why it is a diamond.
 //
 // THE STRUT IS FOUR LINES. 1.74 through the wall is 0.42 + 0.45 + 0.45 + 0.42,
 // the corrected four-loop rung in the slicing reference, and the installed
@@ -41,12 +31,12 @@
 // THE PATTERN CLOSES. The strut angle floats a hair under 45 so that an integer
 // number of node rows fits the visible lattice, and the left-hand set is
 // rotated half a bar pitch so both ends of the lattice fall midway between
-// rows. Midway between rows the 2N struts are evenly spaced, which is what
-// gives every tooth the same footprint and the same neighbour on each side;
-// at a node row they sit merged in pairs, a pitch apart. It also makes the
-// genus predictable: 1 + N * (rows + 2) — a diamond is centred on every node
-// row, the foot cuts a row of triangles off the bottom, and the teeth turn
-// the row of triangles at the top into a row of small diamonds.
+// rows. That is what keeps the top band's bridges at p/2 - island rather than
+// a full pitch: at a node row the struts merge in pairs and the band would
+// have to cross ~13 mm; midway between rows they are evenly spaced and it
+// crosses ~8. It also makes the genus predictable: 1 + N * (rows + 2) — a
+// diamond is centred on every node row, and the bands cut a row of triangles
+// off each end.
 //
 // STACKING IS SPIGOT-DOWN ON A CONE SEAT. The bottom 6 mm of each unit is a
 // spigot ring inset by the band wall plus a clearance, so it drops inside the
@@ -158,18 +148,6 @@ hand_skew = 0.10;
 // Round the right-hand struts' ends (see hand_skew). false leaves them flat,
 // for comparison; it is not the shipping shape.
 round_ends = true;
-// How much wider than the strut it swallows a tooth is drawn at its base, on
-// each side, beyond hand_skew (mm). The strut's top is buried in the tooth
-// and this keeps the tooth's faces parallel to the strut's and clear of
-// them, never in them — the hand_skew lesson again. The bottom of the tooth
-// is a ledge this wide plus hand_skew on each side of the strut, a third of
-// a line, which the slicer absorbs.
-tooth_margin = 0.15;
-// How far the teeth sit inside the band's inner and outer faces (mm). The
-// teeth are twisted, so their arc polygons turn against the band's and
-// would poke 0.02 mm slivers through its flats where they are buried, just
-// as the struts would without strut_inset.
-tooth_inset = 0.05;
 
 /* [Joint] */
 
@@ -189,9 +167,9 @@ seat_cham = 1.00;
 
 /* [Coupon] */
 
-// Height of the fit coupon (mm): the whole foot, one row of nodes, the teeth,
-// and the whole top band. Print two and stack them.
-coupon_h = 50.00;
+// Height of the fit coupon (mm): the whole foot, one row of nodes, and the
+// whole top band. Print two and stack them.
+coupon_h = 40.00;
 
 /* [Quality] */
 
@@ -221,43 +199,30 @@ N          = max(8, round(2 * PI * R_smid / (opening + island)));
 p          = 2 * PI * R_smid / N;       // node pitch round the ring
 half       = p / 2;                     // node-row pitch up the tube, at 45 degrees
 clear_diag = p - island;                // clear diagonal of a diamond at 45 degrees
+bridge_gap = half - island;             // what the top band's underside crosses
 
 stack_pitch = total_h - (spigot_h + spigot_clear + seat_cham);
 
 // Per-height lattice numbers, so the part and the coupon share one set of
-// rules. The zone between the bands holds the visible lattice plus the teeth;
-// the lattice is rows node rows with half a pitch above and below, and the
-// teeth are half a pitch more, so the zone is (rows + 1/2) pitches. Whole
-// rows, the pitch that makes them fit exactly (never under half, so the angle
-// never passes 45), the tooth height, twist per hand over the buried
-// extrusion, and the half-pitch phase of the left-hand set, corrected for the
-// bury so the visible ends sit midway between rows. Positive twist turns the
-// profile clockwise seen from +Z.
-function zone_of(h)   = h - top_band_h - foot_h;
-function rows_of(h)   = floor(zone_of(h) / half - 0.5);
-function pitch_of(h)  = zone_of(h) / (rows_of(h) + 0.5);
-function tooth_of(h)  = pitch_of(h) / 2;
-function vis_of(h)    = rows_of(h) * pitch_of(h);
-function rate_of(h)   = half / pitch_of(h);                // tan of the strut angle
+// rules. Visible lattice, whole node rows in it, the angle that makes them fit
+// exactly, twist per hand over the buried extrusion, and the half-pitch phase
+// of the left-hand set, corrected for the bury so the visible ends sit midway
+// between rows. Positive twist turns the profile clockwise seen from +Z.
+function vis_of(h)    = h - top_band_h - foot_h;
+function rows_of(h)   = floor(vis_of(h) / half);
+function rate_of(h)   = rows_of(h) * half / vis_of(h);     // tan of the strut angle
 function angle_of(h)  = atan(rate_of(h));
 function ext_of(h)    = vis_of(h) + 2 * bury;
 function twist_of(h)  = ext_of(h) * rate_of(h) / R_smid * 180 / PI;
 function slices_of(h) = ceil(twist_of(h) / slice_deg);
 function phase_of(h)  = 180 / N - 2 * twist_of(h) * bury / ext_of(h);
 function genus_of(h)  = 1 + N * (rows_of(h) + 2);
-// Where the right-hand struts have turned to by the top of the visible
-// lattice (degrees, clockwise); the left-hand set is midway between them.
-function top_turn(h)  = twist_of(h) * (vis_of(h) + bury) / ext_of(h);
-// Twist over a tooth, at the strut rate, and a tooth's base width in degrees.
-function tooth_tw(h)  = tooth_of(h) * rate_of(h) / R_smid * 180 / PI;
-tooth_w_deg = (island + 2 * (hand_skew + tooth_margin)) / R_smid * 180 / PI;
 
 // Volume estimate (mm3): sheared prisms are base times height, less the node
 // overlaps, plus the bands as plain rings. The slicer's grams are the real
 // figure; this is for the echo.
 function lattice_vol(h) = 2 * N * strut_t * island * vis_of(h)
-                        - N * rows_of(h) * strut_t * island * island / (2 * rate_of(h))
-                        + 2 * N * band_t * tooth_of(h) * (island + half) / 2;
+                        - N * rows_of(h) * strut_t * island * island / (2 * rate_of(h));
 function ring_vol(ro, ri, hh) = PI * (ro * ro - ri * ri) * hh;
 function bands_vol(h) = ring_vol(sp_ro, sp_ri, spigot_h)
                       + ring_vol(R_in + crank / 2, sp_ri + crank / 2, crank)
@@ -294,13 +259,12 @@ assert(seat_cham < band_t,
        "seat_cham is deeper than the band wall");
 assert(foot_chamfer < spigot_h,
        "foot_chamfer is taller than the spigot");
-assert(rows_of(total_h) >= 1,
-       "the lattice is shorter than one node row plus its teeth: raise total_h");
-assert(rows_of(coupon_h) >= 1,
-       str("the coupon needs more than ", foot_h + top_band_h + 1.5 * half,
-           " to hold one node row plus its teeth"));
-assert(tooth_w_deg + 2 * tooth_tw(total_h) < 180,
-       "a tooth would grow past a half ring: check tooth_of");
+assert(bridge_gap <= 30,
+       str("the top band would bridge ", bridge_gap, " mm: reduce opening"));
+assert(vis_of(total_h) > half,
+       "the lattice is shorter than one node row: raise total_h");
+assert(vis_of(coupon_h) > half,
+       str("the coupon needs more than ", foot_h + top_band_h + half, " to hold one node row"));
 
 // One hand of the lattice in 2D: N radial bars, each strut_t through the wall
 // and island wide, on a ring. The right hand (skew = 0) is a stadium, its
@@ -338,42 +302,6 @@ module lattice(h) {
     }
 }
 
-// A half ring of the band's wall, inset, from angle a over 180 degrees
-// counter-clockwise. The tooth is cut from two of these.
-module half_ring(a) {
-    ro = R - tooth_inset;
-    ri = R_in + tooth_inset;
-    k  = nseg / 2;
-    polygon([for (i = [0 : k]) [ro * cos(a + i * 180 / k), ro * sin(a + i * 180 / k)],
-             for (i = [k : -1 : 0]) [ri * cos(a + i * 180 / k), ri * sin(a + i * 180 / k)]]);
-}
-
-// One tooth: a wedge that starts a strut's width plus margins wide at the
-// top of the visible lattice and widens both ways at the strut angle, up to
-// the band. Each face is the edge of a half ring twisted at the strut rate —
-// the counter-clockwise edge of one twisted counter-clockwise, the clockwise
-// edge of the other twisted clockwise — and the tooth is where the two
-// overlap. The extra bury at the top is inside the band.
-module tooth(h) {
-    th = tooth_of(h) + bury;
-    tw = th * rate_of(h) / R_smid * 180 / PI;
-    sl = max(2, ceil(tw / slice_deg));
-    intersection() {
-        linear_extrude(height = th, twist = -tw, slices = sl, segments = 1, convexity = 4)
-            half_ring(tooth_w_deg / 2 - 180);
-        linear_extrude(height = th, twist = tw, slices = sl, segments = 1, convexity = 4)
-            half_ring(-tooth_w_deg / 2);
-    }
-}
-
-// All 2N teeth, one on every strut top, which sit 180 / N apart there.
-module teeth(h) {
-    translate([0, 0, foot_h + vis_of(h)])
-        for (j = [0 : 2 * N - 1])
-            rotate(j * 180 / N - top_turn(h))
-                tooth(h);
-}
-
 // The foot, one section spun round: spigot bore, spigot's chamfered outer
 // bottom edge, spigot outside, the crank out to full radius, the plain band,
 // then back down the inside.
@@ -408,7 +336,6 @@ module unit(h) {
     union() {
         foot();
         lattice(h);
-        teeth(h);
         top_band(h);
     }
 }
@@ -425,12 +352,11 @@ echo(str("plant screen: Ø", outer_d, " x ", total_h, ", bore Ø", 2 * R_in,
 echo(str("lattice: ", N, " struts per hand, pitch ", p, ", clear diagonal ",
          clear_diag, ", strut ", strut_t, " x ", island, " island; ",
          rows_of(total_h), " node rows at ", angle_of(total_h),
-         " degrees, pitch ", pitch_of(total_h), ", teeth ", tooth_of(total_h),
-         " tall, twist ", twist_of(total_h), " over ", slices_of(total_h),
-         " slices, phase ", phase_of(total_h), "; expect genus ", genus_of(total_h)));
+         " degrees, twist ", twist_of(total_h), " over ", slices_of(total_h),
+         " slices, phase ", phase_of(total_h), "; top band bridges ",
+         bridge_gap, "; expect genus ", genus_of(total_h)));
 echo(str("coupon: ", coupon_h, " tall, ", rows_of(coupon_h), " node row at ",
-         angle_of(coupon_h), " degrees, teeth ", tooth_of(coupon_h),
-         " tall; expect genus ", genus_of(coupon_h)));
+         angle_of(coupon_h), " degrees; expect genus ", genus_of(coupon_h)));
 echo(str("volume estimate: unit ", round(unit_vol(total_h) / 100) / 10,
          " cm3 (", round(unit_vol(total_h) * 1.27 / 100) / 10, " g PETG), coupon ",
          round(unit_vol(coupon_h) / 100) / 10, " cm3 (",
