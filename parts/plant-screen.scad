@@ -20,11 +20,13 @@
 // process slices two wall loops, so anything wider than 1.74 comes out as the
 // same four lines plus a gap-fill core. The bands are 2.10 because they can
 // afford the one continuous line of gap fill and it stiffens the rim. Each
-// strut is a 1.74 x 2.46 island on every lattice layer, sixty-two of them
+// strut is a 1.74 x 2.46 island on every lattice layer, thirty-four of them
 // round the ring; the slicing reference's feed-drive rule is deposit per
-// layer against retractions, and at ~16 mm of filament per layer against
-// 62 x 0.8 mm retracted this is a 3:1 layer, nowhere near the 13:1 that
-// starved the collet.
+// layer against retractions, and at ~9 mm of filament per layer against
+// 34 x 0.8 mm retracted this is a 3:1 layer, nowhere near the 13:1 that
+// starved the collet. Every island costs the same retract, hop and travel
+// whatever its size, so the island count, not the plastic, is the print
+// time: 62 of them was 32 s a layer for 16 mm of filament.
 //
 // THE PATTERN CLOSES. The strut angle floats a hair under 45 so that an integer
 // number of node rows fits the visible lattice, and the left-hand set is
@@ -119,8 +121,9 @@ strut_w = 1.74;
 // strut ends poke 0.03 mm slivers out through the band.
 strut_inset = 0.05;
 // Target clear diagonal of each diamond (mm), across the opening. Sets N.
-// Leaves stay mostly inside 18; a cat's muzzle does not go through it.
-opening = 18.0;
+// Was 18, which sliced as 62 islands a layer and a 9.5 hour job; 36 halves
+// the islands and the time, and Max is not a small cat (Ziad, 2026-09-19).
+opening = 36.0;
 // Degrees of twist per slice of the extrusion. 1.5 puts the helix's chord
 // error under 0.01 mm at this radius.
 slice_deg = 1.5;
@@ -166,7 +169,7 @@ seat_cham = 1.00;
 
 // Height of the fit coupon (mm): the whole foot, one row of nodes, and the
 // whole top band. Print two and stack them.
-coupon_h = 30.00;
+coupon_h = 40.00;
 
 /* [Quality] */
 
