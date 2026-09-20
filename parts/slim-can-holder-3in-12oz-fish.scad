@@ -103,14 +103,21 @@
 // here is a new decision. The floor is raised from the scan's 2.35 to 5.40 and
 // the drain is recut on the axis.
 //
-// THE MOUTH. Above z 76.5 the scan's own bore flares open, so the fill stops
-// there and a lead-in opens the new bore out to meet it: the hull of the bore
-// at the bottom and the fill's outline, grown by lead_over, at the top. That
-// is a skewed cone — 45 degrees on the far side of the fill, where it has
-// 2.6 mm to cover, and inside the bore on the near side, where the bore is
-// already past the fill's edge — so there is no ledge where the two surfaces
-// hand over and nothing is cut on the near side that the bore had not cut
-// already. It widens going up, so printed floor-down it is an upward-facing
+// THE MOUTH. The fill stops at z 76.5 (mesh), the top of the scanned bore,
+// and a lead-in opens the new bore out to meet the scan's own cavity above
+// it: the hull of the bore at the bottom and the fill's outline, grown by
+// lead_over, at the top — a skewed cone, 45 degrees on the far side of the
+// fill, inside the bore on the near side. The cone reaches past the scan's
+// cavity on purpose, so that nothing of the fill's top is left as a shelf,
+// and it is cut WITH THE SCAN SUBTRACTED FROM IT, so it removes fill and air
+// and never the fish's own wall. Measured on the raw scan, the old bore does
+// not flare in the mouth at all: it runs straight up through both jaws at
+// the same r 31.5 on the far side (2.3 outside the new bore) until the jaws
+// end. Round 02 cut the cone into that wall and the wall stepped back in
+// above it — a 1.2 mm ledge, overhanging, at z 86.6, which Ziad saw at once
+// (2026-09-19). Now the cone runs from the bore to where it meets the old
+// cavity's wall, about 2.3 mm up, and the wall carries on smoothly from
+// there. It widens going up, so printed floor-down it is an upward-facing
 // slope and needs nothing under it.
 //
 // HOW MUCH CAN SHOWS. The bore is 80.6 deep from the floor's top, so 75 mm of
@@ -187,8 +194,10 @@ drain_d = 12.0;
 
 /* [Mouth] */
 
-// How far past the top of the fill the lead-in keeps opening (mm), so the
-// cone runs out into the scan's own flare rather than stopping at a ledge.
+// How far past the top of the fill the lead-in keeps opening (mm). The cone
+// has to reach the scan's cavity wall everywhere before the fill's top, or a
+// shelf of fill is left; it cannot reach too far, because the scan is
+// subtracted from the cut. See THE MOUTH.
 lead_over = 0.60;
 
 /* [Grip ribs] */
@@ -308,13 +317,21 @@ module lead_in()
                 offset(r = lead_over) projection() fill();
     }
 
+// The lead-in as it is actually cut: the cone less the scan, so it takes
+// fill and air and leaves the fish's own wall alone. See THE MOUTH.
+module lead_in_cut()
+    difference() {
+        lead_in();
+        fish();
+    }
+
 module new_bore() {
     translate([0, 0, floor_t])
         cylinder(r = r_bore, h = total_h, $fn = nseg);
     if (drain_d > 0)
         translate([0, 0, -eps])
             cylinder(r = r_drain, h = floor_t + 2 * eps, $fn = nseg);
-    lead_in();
+    lead_in_cut();
 }
 
 // Each rib is a 3.90 mm arc of which only 0.30 is wanted; the rest would run

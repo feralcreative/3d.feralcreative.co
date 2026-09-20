@@ -7,3 +7,4 @@ hobbs-chalk-holder ring 3 3131f870dc490098613c0d2c4d330e07038431d595c0f2a9dfecb5
 plant-screen fit 2 76766e032225e1a094d2f19462d15492fe9cd4307a73c33484ce9a4300bea609 - - included
 slim-can-adapter-ring-fish-12oz-to-8-3oz fit 1 b483f243038348fc273901f160ab1cecfebfb05510d46741c531b31bf2c1570f - - included
 slim-can-holder-3in fit 1 adc53bc0163d520cf948dfc1eb1a3b3320fb194030271023e7896c710396ac14 1 adc53bc0163d520cf948dfc1eb1a3b3320fb194030271023e7896c710396ac14 included
+slim-can-holder-3in-12oz-fish fit 3 2ef73b39e8546122da0c77bf84abcaf6b49fcd547511e15b5410d29e3ff033da - - included
