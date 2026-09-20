@@ -30,11 +30,23 @@
 // which stand the bottom of the spine off the glass by whatever the feet are
 // proud of the bore. The part carries no feet of its own.
 //
+// ROUNDING. Nothing on it is sharp. The big corners are rounded where they
+// are drawn - the side profile through round_corners(), the front outline
+// through the rounded rectangle the body is intersected with - and then
+// every remaining convex edge gets `rnd` by a morphological opening: the
+// whole part is built `rnd` smaller than drawn (2D erosion of every profile,
+// every cutter grown by `rnd`), and minkowski() with a sphere of `rnd` grows
+// it back. Faces land exactly where drawn, convex edges come out at `rnd`,
+// concave ones stay sharp. Anything thinner than 2 * rnd would vanish in the
+// erosion, which is why the walls and the leg are 2.64 and not 2.19, and why
+// `rnd` is the one number here that must not be raised casually. Pass
+// -D rnd=0 for the sharp part, which builds in a second instead of a minute.
+//
 // PRINTING. On a side, one rail down; `orient = "print"` writes the STL that
 // way, yawed 45 degrees so 216 mm fits the plate's diagonal inside the safe
 // envelope. Every face is then vertical except the upper rail's 45 degree lip,
-// the top-end chamfers, the ledge over the notch (a 45 degree underside), and
-// the roofs of the two bores. No support. Standing it on the hook end, as the
+// the top-end chamfers, the ledge over the notch (a 45 degree underside), the
+// roofs of the two bores, and the rounds. No support. Standing it on the hook end, as the
 // first design planned, is worse: the face the phone stands on would be an
 // overhang 15 degrees off horizontal, and the part is over the 215 mm safe
 // height that way.
@@ -70,12 +82,11 @@ overall_len = 216.0;  // top of the cap to the lowest point of the cradle (mm)
 glass_t   = 12.0;  // panel thickness, calipered 2026-09-20 (mm)
 glass_fit = 0.40;  // total slack across the channel; it goes on and off wet (mm)
 // Both faces exposed, so the rungs are 0.84, 1.29, 1.74, 2.19, 2.64, 3.09.
-leg_t     = 2.19;  // the leg that drops behind the glass (mm)
+// 2.64 rather than 2.19 so that 2 * rnd leaves something. The leg's end is
+// rounded by rnd, which is the lead-in.
+leg_t     = 2.64;  // the leg that drops behind the glass (mm)
 cap_t     = 5.0;   // material over the glass's top edge (mm)
 wrap      = 15.0;  // how far the leg reaches down the back face (mm)
-// 45 deg, eating into the leg; held to 1.0 so the flat left on the leg's end
-// stays over the 0.84 floor for a load-bearing feature.
-lead_in   = 1.0;   // guide at the channel's mouth (mm)
 
 /* [Spine] */
 // The plate down the glass from the hook to the cradle. It is the channel's
@@ -92,7 +103,7 @@ foot_inset      = 3.0;   // bore edge to the part's side face and bottom (mm)
 
 /* [Cradle] */
 cradle_len = 82.0;  // how much of the phone's edge is held, up from its bottom (mm)
-wall       = 2.19;  // the rail walls, outside the phone's edges (mm)
+wall       = 2.64;  // the rail walls, outside the phone's edges; see leg_t (mm)
 // The lip is a 45 degree bevel, not a flat tab, so that it prints with the
 // part on its side: the upper rail's lip hangs from its wall and 45 is the
 // steepest it can hang. Its reach is measured at the front face; at the level
@@ -104,12 +115,21 @@ back_min   = 2.64;  // backrest thickness at the ledge, where the wedge is thinn
 // fed through. Its width is at the face the phone stands on; the sides flare
 // out at 45 degrees through the ledge so the ledge over it prints on its side.
 notch_w    = 40.0;  // lanyard gap in the ledge, centered (mm)
-// Chamfer on the rails' inner edges at the top end, where the phone goes in.
-// Small, because the walls are only 2.19.
-flare      = 1.0;   // (mm)
+
+/* [Rounding] */
+rnd        = 1.2;   // every convex edge; see ROUNDING above (mm)
+// The corners of the side profile, by silhouette vertex. Anything under rnd
+// comes out at rnd regardless.
+r_cap      = 2.5;   // the cap's top edges (mm)
+r_wedge    = 3.0;   // fillet where the wedge's top meets the spine (mm)
+r_front    = 4.0;   // the cradle's front corners, top and bottom (mm)
+r_bottom   = 2.0;   // where the bottom meets the glass (mm)
+// The corners of the front outline: the cap's, and the ledge's at the bottom.
+r_outline  = 4.0;   // (mm)
 
 /* [Quality] */
-$fn = 64;  // segments per full circle; the bores are the only round thing
+$fn = 48;       // segments per full circle, for the bores and the drawn rounds
+sphere_fn = 20; // for the rounding sphere; every facet of it lands on every edge
 
 // Small overshoot used on every subtracted solid so its faces are never
 // coplanar with the parent's.
@@ -133,6 +153,7 @@ c = cos(tilt);
 // thinnest the backrest gets, and as far down as puts the lowest point of the
 // cradle - the front-bottom corner of the ledge - at overall_len.
 y0 = spine_t + back_min;
+sq2 = sqrt(2);
 z0 = -overall_len + front * s + ledge_t * c;
 
 // Cradle frame to hung frame. Same map as in_cradle().
@@ -168,23 +189,39 @@ silhouette = [
     H(yp_bot, -ledge_t),                 // the bottom runs back to the glass
     [0,    -cap_t],                      // up the glass face to the cap
     [-gch, -cap_t],                      // across the channel's closed end
-    [-gch, -cap_t - wrap + lead_in],     // down the leg's inner face
-    [-gch - lead_in, -cap_t - wrap],     // the lead-in
+    [-gch, -cap_t - wrap],               // down the leg's inner face
     [y_min, -cap_t - wrap],              // leg outer face, bottom
 ];
+// One radius per vertex above. The channel's corners stay sharp: the glass's
+// top edge sits in them.
+silhouette_r = [r_cap, r_cap, r_wedge, r_front, r_front, r_bottom, 0, 0, 0, 0];
 
+// The body, rnd under size: the rounded silhouette eroded by rnd and swept
+// 2 * rnd short of the width, then cut to the front outline, also eroded.
 module body() {
-    rotate([90, 0, 90])
-        linear_extrude(height = W, center = true, convexity = 6)
-            polygon(silhouette);
+    intersection() {
+        rotate([90, 0, 90])
+            linear_extrude(height = W - 2 * rnd, center = true, convexity = 6)
+                offset(r = -rnd)
+                    polygon(round_corners(silhouette, radius = silhouette_r));
+
+        translate([0, 0, -overall_len / 2])
+            rotate([90, 0, 0])
+                linear_extrude(height = 2 * tall, center = true)
+                    rect([W - 2 * rnd, overall_len - 2 * rnd],
+                         rounding = r_outline - rnd);
+    }
 }
 
 // What the phone sits in: open at the front and at the top, floored by the
-// ledge, backed by the wedge.
+// ledge, backed by the wedge. Grown by rnd on every side, with the growth's
+// own edges rounded, which is what a void grown by a sphere looks like; that
+// is what keeps the pocket's inside corners sharp after the sphere.
 module pocket() {
     in_cradle()
-        translate([-ch_w / 2, 0, 0])
-            cube([ch_w, tall, tall]);
+        translate([0, -rnd, -rnd])
+            cuboid([ch_w + 2 * rnd, tall, tall], rounding = rnd,
+                   anchor = FRONT + BOTTOM);
 }
 
 // Through the ledge, backrest to front face, so the lanyard drops in from the
@@ -194,77 +231,87 @@ module pocket() {
 // 18.6 mm cantilever.
 module notch() {
     in_cradle()
-        translate([0, front + eps, 0])
+        translate([0, front + rnd, 0])
             rotate([90, 0, 0])
-                linear_extrude(height = front + 2 * eps)
-                    polygon([
-                        [-notch_w / 2, eps],
-                        [ notch_w / 2, eps],
-                        [ notch_w / 2 + ledge_t + eps, -ledge_t - eps],
-                        [-notch_w / 2 - ledge_t - eps, -ledge_t - eps],
-                    ]);
+                linear_extrude(height = front + 2 * rnd)
+                    offset(r = rnd)
+                        polygon([
+                            [-notch_w / 2, 0],
+                            [ notch_w / 2, 0],
+                            [ notch_w / 2 + ledge_t, -ledge_t],
+                            [-notch_w / 2 - ledge_t, -ledge_t],
+                        ]);
 }
 
 // One 45 degree bevel per rail, root on the wall, running the length of the
 // cradle, with its top end cut back at 45 degrees so a phone coming down from
 // above is steered in behind it rather than stopped on it.
+//
+// Drawn already eroded, as the rail - wall plus lip - would erode as one
+// solid: the front face and the hypotenuse move in by rnd, the wall's inner
+// face is not a boundary where the lip joins it, and the root is carried out
+// to the wall's eroded outer face so the two are one piece. The chamfer's
+// plane moves by rnd along its normal.
 module lips() {
+    yp_root = h_ch + rnd * (sq2 - 1);               // hypotenuse meets the eroded wall
+    x_tip   = ch_w / 2 - lip_r + rnd * (sq2 + 1);   // hypotenuse meets the eroded front
+
     for (side = [-1, 1])
         in_cradle()
             difference() {
-                linear_extrude(height = cradle_len)
-                    polygon([
-                        [side * (ch_w / 2 + eps), h_ch],
-                        [side * (ch_w / 2 + eps), front],
-                        [side * (ch_w / 2 - lip_r), front],
-                    ]);
+                translate([0, 0, -rnd - 0.5])
+                    linear_extrude(height = cradle_len + 0.5)
+                        polygon([
+                            [side * (W / 2 - rnd),    yp_root],
+                            [side * (W / 2 - rnd),    front - rnd],
+                            [side * x_tip,            front - rnd],
+                            [side * (ch_w / 2 + rnd), yp_root],
+                        ]);
 
-                translate([0, h_ch, cradle_len])
+                translate([0, h_ch - rnd / sq2, cradle_len - rnd / sq2])
                     rotate([-45, 0, 0])
                         translate([-W, 0, 0])
                             cube([2 * W, tall, tall]);
             }
 }
 
-// Chamfer on the walls' inner edges at the top end. Confined to the depth
-// behind the lips so it never undercuts a lip's root.
-module flare_cut() {
-    in_cradle()
-        hull() {
-            translate([-ch_w / 2, 0, cradle_len - flare])
-                cube([ch_w, h_ch, eps]);
-
-            translate([-ch_w / 2 - flare, 0, cradle_len])
-                cube([ch_w + 2 * flare, h_ch, tall]);
-        }
-}
-
 // The two recesses for the silicone feet, in the glass face at the bottom
-// corners.
+// corners. Grown by rnd like the pocket, ends rounded for the same reason.
 module foot_bores() {
     for (side = [-1, 1])
         translate([side * (W / 2 - foot_inset - foot_bore_d / 2),
-                   foot_bore_depth,
+                   foot_bore_depth / 2,
                    z_bot + foot_inset + foot_bore_d / 2])
             rotate([90, 0, 0])
-                cylinder(d = foot_bore_d, h = foot_bore_depth + eps);
+                cyl(d = foot_bore_d + 2 * rnd, l = foot_bore_depth + 2 * rnd,
+                    rounding = rnd);
+}
+
+// The part rnd under size everywhere, sharp.
+module core() {
+    union() {
+        difference() {
+            body();
+            pocket();
+            notch();
+            foot_bores();
+        }
+
+        lips();
+    }
 }
 
 module phone_holder() {
-    difference() {
-        union() {
-            difference() {
-                body();
-                pocket();
-                notch();
-                foot_bores();
-            }
-
-            lips();
+    // "aligned" puts vertices of the sphere on its axes. OpenSCAD's own
+    // sphere() has none at the poles, and every flat face would land
+    // rnd * (1 - cos(90 / rings)) short of where it was drawn.
+    if (rnd > 0)
+        minkowski() {
+            core();
+            spheroid(r = rnd, style = "aligned", $fn = sphere_fn);
         }
-
-        flare_cut();
-    }
+    else
+        core();
 }
 
 // ---------------------------------------------------------------- output
