@@ -22,14 +22,22 @@
 //
 // So there is no lip, and the sleeve works the other way round from the
 // ring: it stands on the fish's floor instead of hanging off a rim, and it
-// is tall enough to come up through the mouth and stand proud of the low
-// corner by 10 mm. That exposed arc of rim, 15–25 mm of it, is what a thumb
-// inside and a finger outside pinch to pull the sleeve out — after the can,
-// which stands 40 mm above it anyway. The bottom is open, like the ring's,
-// so the can sits on the fish's own floor and the fish's drain still pushes
-// it out from underneath. Nothing sets the depth but the floor, which is
-// flat and on the axis; a lip seated on the fish's skewed lead-in would have
-// sat crooked.
+// comes up through the bore's top and the lead-in to end 1 mm below the low
+// corner of the mouth, so that nothing of it shows outside the fish (Ziad,
+// 2026-09-19: the ring should not be visible outside the fish's mouth; the
+// first draft stood 10 mm proud there as a handle). The bottom is open, like
+// the ring's, so the can sits on the fish's own floor and the fish's drain
+// still pushes it out from underneath. Nothing sets the depth but the
+// floor, which is flat and on the axis; a lip seated on the fish's skewed
+// lead-in would have sat crooked.
+//
+// ⚠️ WITH THE RIM HIDDEN THERE IS NOTHING TO PULL THE SLEEVE OUT BY. The
+// fish's ribs hold it at 0.21 on diameter, snug, and the rim is a 1.68 mm
+// edge flush inside a Ø58.4 channel. The can comes out through the drain
+// as before; the sleeve does not, short of a fingernail on its rim. If that
+// matters, the fix is a floor: a closed bottom with its own small drain
+// turns the fish's Ø12 drain into an ejector for the sleeve, and gives the
+// print a disc to stand on instead of a ring. Not done, not asked for.
 //
 // THE WALL IS ONE RUNG, for the ring's reason: between a Ø54.00 bore and an
 // outside that has to pass the fish's ribs there is 1.68 of wall and no more.
@@ -43,7 +51,7 @@
 // up, the rib feet grow inward at 8 degrees, the rib ramps and the base
 // chamfer narrow, and the mouth lead-in at the top opens the bore outward,
 // all of which the printer sees as nothing. The rim's outside chamfer
-// narrows going up too. A 94 mm tube on a 1.2 mm ring is tall for its foot;
+// narrows going up too. An 83 mm tube on a 1.2 mm ring is tall for its foot;
 // if it lets go of the plate, a brim is the slicer's answer, not a wider
 // foot that would not pass the ribs.
 //
@@ -116,8 +124,9 @@ host_drain_d = 12.0;
 // WALL IS ONE RUNG in the header.
 wall_w = 1.68;
 // How far the rim stands above the lowest corner of the fish's mouth (mm).
-// It is the handle: enough to get a thumb and a finger on.
-proud = 10.0;
+// Negative puts it below, out of sight: -1 is a millimetre of margin under
+// the corner, and still 2.3 above the top of the bore.
+proud = -1.0;
 // 45-degree chamfer on the outside of the bottom edge (mm). On the bed, so
 // it is the elephant-foot chamfer — the reference's PETG minimum — and the
 // lead-in past the fish's ribs on the way down.
@@ -187,8 +196,8 @@ assert(bore_r + mouth_cham_r < sleeve_r - rim_cham,
        "the mouth lead-in has run into the rim's chamfer: the rim has no top");
 assert(bore_d > host_drain_d + 2,
        "the sleeve's bottom ring sits over the fish's drain");
-assert(rim_z > host_bore_top_z + 5,
-       "the rim is inside the fish's bore: raise proud");
+assert(rim_z > host_bore_top_z + 1,
+       "the rim is down inside the fish's bore: raise proud");
 assert(rib_z1 - rib_ramp > rib_z0 + rib_foot,
        "the rib ramp and foot overlap: the sleeve is too short for them");
 assert(coupon_h > rib_z0 + rib_foot + 5,
@@ -259,7 +268,7 @@ echo(str("sleeve: outside ", sleeve_od, "  bore ", bore_d,
 echo(str("in the fish: faces ", host_across_ribs,
          " across its printed ribs, clearance ", host_clear,
          " on diameter; rim stands ", proud,
-         " above the low corner of the mouth and ",
+         " above the low corner of the mouth (negative is below it) and ",
          rim_z - host_bore_top_z, " above the bore's top"));
 echo(str("on the can: printed bore ", bore_d - host_bore_loss,
          ", across ribs ", bore_d - host_bore_loss - 2 * rib_h,

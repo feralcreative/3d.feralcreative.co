@@ -51,7 +51,7 @@ screen-fence-rigid 1
 screen-fence-test-rail 4
 screen-fence-twin-coupon 1
 slim-can-adapter 1
-slim-can-adapter-ring-fish-12oz-to-8-3oz 1
+slim-can-adapter-ring-fish-12oz-to-8-3oz 2
 slim-can-adapter-ring-fish-12oz-to-8-3oz-coupon 1
 slim-can-holder-3in 2
 slim-can-holder-3in-12oz 9
