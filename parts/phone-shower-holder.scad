@@ -31,25 +31,36 @@
 // proud of the bore. The part carries no feet of its own.
 //
 // ROUNDING. Nothing on it is sharp. The big corners are rounded where they
-// are drawn - the side profile through round_corners(), the front outline
-// through the rounded rectangle the body is intersected with - and then
-// every remaining convex edge gets `rnd` by a morphological opening: the
-// whole part is built `rnd` smaller than drawn (2D erosion of every profile,
-// every cutter grown by `rnd`), and minkowski() with a sphere of `rnd` grows
-// it back. Faces land exactly where drawn, convex edges come out at `rnd`,
-// concave ones stay sharp. Anything thinner than 2 * rnd would vanish in the
-// erosion, which is why the walls and the leg are 2.64 and not 2.19, and why
-// `rnd` is the one number here that must not be raised casually. Pass
-// -D rnd=0 for the sharp part, which builds in a second instead of a minute.
+// are drawn - the side profile through round_corners(), the cap's top corners
+// and the cradle's front and bottom corners through corner_keep() prisms the
+// body is intersected with, each in the frame its edge actually runs in -
+// and then every remaining convex edge gets `rnd` by a morphological opening:
+// the whole part is built `rnd` smaller than drawn (2D erosion of every
+// profile, every cutter grown by `rnd`), and minkowski() with a sphere of
+// `rnd` grows it back. Faces land exactly where drawn, convex edges come out
+// at `rnd`, concave ones stay sharp. Anything thinner than 2 * rnd would
+// vanish in the erosion, which is why the walls and the leg are 2.64 and not
+// 2.19, and why `rnd` is the one number here that must not be raised
+// casually. Pass -D rnd=0 for the sharp part, which builds in a second
+// instead of a minute.
 //
-// PRINTING. On a side, one rail down; `orient = "print"` writes the STL that
-// way, yawed 45 degrees so 216 mm fits the plate's diagonal inside the safe
-// envelope. Every face is then vertical except the upper rail's 45 degree lip,
-// the top-end chamfers, the ledge over the notch (a 45 degree underside), the
-// roofs of the two bores, and the rounds. No support. Standing it on the hook end, as the
-// first design planned, is worse: the face the phone stands on would be an
-// overhang 15 degrees off horizontal, and the part is over the 215 mm safe
-// height that way.
+// PRINTING. On its -x side, one rail down; `orient = "print"` writes the STL
+// that way, yawed 45 degrees so 216 mm fits the plate's diagonal inside the
+// safe envelope. Every face is then vertical except: the upper rail's 45
+// degree lip; the top-end chamfers; the ledge over the notch, whose underside
+// is the 45 degree flank; the upper wall's inner face, which is the pocket's
+// ceiling and bridges 13.6 mm from the backrest to the lip; and the roofs of
+// the two bores, which are teardrops for that reason. No support.
+//
+// The rounding respects that pose in two places. The -x face is the bed, so
+// it is not rounded: the core is built past the bed plane and the finished
+// part is cut back to it with a small 45 degree chamfer, which gives a
+// full-size first layer where a round would have left the spine standing on
+// a 0.7 mm line. And the three big rounds that meet that face - the cap's
+// top corner, the cradle's bottom edge, the cradle's front edge - are
+// teardrops there, the arc giving way to a 45 degree foot where the arc
+// itself reaches 45 degrees, because a plain arc lies flat on the bed at its
+// start and the first millimetre of it would hang.
 
 include <BOSL2/std.scad>
 
@@ -99,7 +110,7 @@ spine_t = 3.09;  // (mm)
 // wedge is behind the spine, so a 2 mm bore leaves over 5 mm of solid.
 foot_bore_d     = 13.0;  // (mm)
 foot_bore_depth = 2.0;   // (mm)
-foot_inset      = 3.0;   // bore edge to the part's side face and bottom (mm)
+foot_inset      = 5.0;   // bore edge to the part's side face and bottom; the teardrop's point needs the room (mm)
 
 /* [Cradle] */
 cradle_len = 82.0;  // how much of the phone's edge is held, up from its bottom (mm)
@@ -118,14 +129,18 @@ notch_w    = 40.0;  // lanyard gap in the ledge, centered (mm)
 
 /* [Rounding] */
 rnd        = 1.2;   // every convex edge; see ROUNDING above (mm)
-// The corners of the side profile, by silhouette vertex. Anything under rnd
-// comes out at rnd regardless.
-r_cap      = 2.5;   // the cap's top edges (mm)
+// The corners of the side profile. Anything under rnd comes out at rnd.
+r_cap      = 2.5;   // the cap's top-front and top-back edges (mm)
 r_wedge    = 3.0;   // fillet where the wedge's top meets the spine (mm)
-r_front    = 4.0;   // the cradle's front corners, top and bottom (mm)
 r_bottom   = 2.0;   // where the bottom meets the glass (mm)
-// The corners of the front outline: the cap's, and the ledge's at the bottom.
-r_outline  = 4.0;   // (mm)
+// The cradle box's front-top, front-bottom, front-side, and bottom-side
+// edges. Not its top-side edges: a round there would end in a step against
+// the spine's side face.
+r_cradle   = 4.0;   // (mm)
+// The cap's top-side edges, the corners of the front outline.
+r_top      = 4.0;   // (mm)
+// The -x side face is the print bed, and gets this instead of rnd.
+bed_chamfer = 0.5;  // (mm)
 
 /* [Quality] */
 $fn = 48;       // segments per full circle, for the bores and the drawn rounds
@@ -148,12 +163,12 @@ front = h_ch + lip_r;                 // backrest to the cradle's front face
 
 s = sin(tilt);
 c = cos(tilt);
+sq2 = sqrt(2);
 
 // Cradle origin: the phone's bottom-back corner. In front of the spine by the
 // thinnest the backrest gets, and as far down as puts the lowest point of the
 // cradle - the front-bottom corner of the ledge - at overall_len.
 y0 = spine_t + back_min;
-sq2 = sqrt(2);
 z0 = -overall_len + front * s + ledge_t * c;
 
 // Cradle frame to hung frame. Same map as in_cradle().
@@ -168,18 +183,26 @@ z_bot  = H(yp_bot, -ledge_t).y;  // the lowest point of the glass face
 y_min = -(gch + leg_t);
 y_max = H(front, cradle_len).x;
 
+// How far past the bed plane the core is built, so that the part is full
+// section there when it is cut back.
+bed_ext = 1.0;
+
 module in_cradle() {
     translate([0, y0, z0])
         rotate([-tilt, 0, 0])
             children();
 }
 
+function corner_arc(cp, r, a0, a1) =
+    let (n = max(3, round($fn * abs(a1 - a0) / 360)))
+    [for (i = [0 : n]) let (a = a0 + (a1 - a0) * i / n) cp + r * [cos(a), sin(a)]];
+
 // ---------------------------------------------------------------- body
 
 // The whole side silhouette - hook, spine, wedge, and the cradle's box - as
 // one polygon in (y, z). Everything that is not full width is cut out of the
 // sweep of this or added to it afterward. Top level rather than inside body()
-// because oriented() reads it too, to center the print pose on the plate.
+// because oriented() and bed_cut() read it too.
 silhouette = [
     [y_min,   0],                        // leg outer face, top
     [spine_t, 0],                        // cap front, top
@@ -194,34 +217,88 @@ silhouette = [
 ];
 // One radius per vertex above. The channel's corners stay sharp: the glass's
 // top edge sits in them.
-silhouette_r = [r_cap, r_cap, r_wedge, r_front, r_front, r_bottom, 0, 0, 0, 0];
+silhouette_r = [r_cap, r_cap, r_wedge, r_cradle, r_cradle, r_bottom, 0, 0, 0, 0];
+silhouette_rounded = round_corners(silhouette, radius = silhouette_r);
 
-// The body, rnd under size: the rounded silhouette eroded by rnd and swept
-// 2 * rnd short of the width, then cut to the front outline, also eroded.
+// Everything but one corner, in a local (u, v) frame: u runs from one face
+// of the part inward, v from the other, and the edge between them is the
+// origin. The corner is rounded to R - rnd about the center the finished R
+// will have, so the sphere brings it out at exactly R. The outer boundary
+// sits half a millimetre outside the core's faces so no two faces coincide.
+//
+// A teardrop keeps the arc only to 45 degrees and then runs straight, at 45
+// degrees, out past u = 0: for an edge on the print bed, where the rest of
+// the arc would lie flat and hang.
+module corner_keep(R, teardrop = false) {
+    big = tall;
+    ext = bed_ext + rnd + 1;
+    r   = R - rnd;
+    cp  = [R, R];
+    p45 = cp + r * [cos(225), sin(225)];
+
+    polygon(teardrop
+        ? concat([[big, rnd - 0.5], [R, rnd - 0.5]],
+                 corner_arc(cp, r, -90, -135),
+                 [[-ext, p45.y + p45.x + ext], [-ext, big], [big, big]])
+        : concat([[big, rnd - 0.5], [R, rnd - 0.5]],
+                 corner_arc(cp, r, -90, -180),
+                 [[rnd - 0.5, R], [rnd - 0.5, big], [big, big]]));
+}
+
+// The body, rnd under size: the rounded silhouette eroded by rnd, swept from
+// past the bed plane to rnd short of the far face, then the six big corners
+// that are not in the silhouette, each cut in the frame its edge runs in.
 module body() {
     intersection() {
-        rotate([90, 0, 90])
-            linear_extrude(height = W - 2 * rnd, center = true, convexity = 6)
-                offset(r = -rnd)
-                    polygon(round_corners(silhouette, radius = silhouette_r));
+        translate([-W / 2 - bed_ext, 0, 0])
+            rotate([90, 0, 90])
+                linear_extrude(height = W + bed_ext - rnd, convexity = 6)
+                    offset(r = -rnd)
+                        polygon(silhouette_rounded);
 
-        translate([0, 0, -overall_len / 2])
+        // the cap's top-side edges, along y: u in from the side, v down
+        translate([-W / 2, 0, 0])
+            mirror([0, 0, 1]) rotate([90, 0, 0])
+                linear_extrude(height = 2 * tall, center = true)
+                    corner_keep(r_top, teardrop = true);
+        translate([W / 2, 0, 0])
+            mirror([1, 0, 0]) mirror([0, 0, 1]) rotate([90, 0, 0])
+                linear_extrude(height = 2 * tall, center = true)
+                    corner_keep(r_top);
+
+        // the cradle's bottom-side edges, along y': u in from the side, v up
+        in_cradle() translate([-W / 2, 0, -ledge_t])
             rotate([90, 0, 0])
                 linear_extrude(height = 2 * tall, center = true)
-                    rect([W - 2 * rnd, overall_len - 2 * rnd],
-                         rounding = r_outline - rnd);
+                    corner_keep(r_cradle, teardrop = true);
+        in_cradle() translate([W / 2, 0, -ledge_t])
+            mirror([1, 0, 0]) rotate([90, 0, 0])
+                linear_extrude(height = 2 * tall, center = true)
+                    corner_keep(r_cradle);
+
+        // the cradle's front-side edges, along z': u in from the side, v back
+        in_cradle() translate([-W / 2, front, 0])
+            mirror([0, 1, 0])
+                linear_extrude(height = 2 * tall, center = true)
+                    corner_keep(r_cradle, teardrop = true);
+        in_cradle() translate([W / 2, front, 0])
+            mirror([1, 0, 0]) mirror([0, 1, 0])
+                linear_extrude(height = 2 * tall, center = true)
+                    corner_keep(r_cradle);
     }
 }
 
 // What the phone sits in: open at the front and at the top, floored by the
-// ledge, backed by the wedge. Grown by rnd on every side, with the growth's
-// own edges rounded, which is what a void grown by a sphere looks like; that
-// is what keeps the pocket's inside corners sharp after the sphere.
+// ledge, backed by the wedge. Grown by rnd on every side but with its own
+// edges left sharp, so the sphere leaves a fillet of rnd along the pocket's
+// inside corners. A cutter with rounded edges would keep them sharp, but
+// every facet of that rounding is a reflex edge for the minkowski to
+// decompose around and it cost minutes; the phone's case has bigger radii
+// than the fillets anyway.
 module pocket() {
     in_cradle()
-        translate([0, -rnd, -rnd])
-            cuboid([ch_w + 2 * rnd, tall, tall], rounding = rnd,
-                   anchor = FRONT + BOTTOM);
+        translate([-ch_w / 2 - rnd, -rnd, -rnd])
+            cube([ch_w + 2 * rnd, tall, tall]);
 }
 
 // Through the ledge, backrest to front face, so the lanyard drops in from the
@@ -234,7 +311,7 @@ module notch() {
         translate([0, front + rnd, 0])
             rotate([90, 0, 0])
                 linear_extrude(height = front + 2 * rnd)
-                    offset(r = rnd)
+                    offset(delta = rnd)  // sharp, for the same reason as pocket()
                         polygon([
                             [-notch_w / 2, 0],
                             [ notch_w / 2, 0],
@@ -276,42 +353,69 @@ module lips() {
 }
 
 // The two recesses for the silicone feet, in the glass face at the bottom
-// corners. Grown by rnd like the pocket, ends rounded for the same reason.
+// corners. Cut after the rounding, not before: a round hole is 48 reflex
+// edges for the minkowski and these are against the glass where no edge is
+// ever touched, so their rims stay sharp. Teardrops, pointed toward +x,
+// which is up in the print pose: the roof of a round 13 mm hole would
+// otherwise hang 9 mm across at the top.
 module foot_bores() {
     for (side = [-1, 1])
         translate([side * (W / 2 - foot_inset - foot_bore_d / 2),
-                   foot_bore_depth / 2,
+                   foot_bore_depth,
                    z_bot + foot_inset + foot_bore_d / 2])
             rotate([90, 0, 0])
-                cyl(d = foot_bore_d + 2 * rnd, l = foot_bore_depth + 2 * rnd,
-                    rounding = rnd);
+                linear_extrude(height = foot_bore_depth + eps)
+                    hull() {
+                        circle(d = foot_bore_d);
+                        translate([foot_bore_d / 2 * sq2, 0]) circle(r = eps);
+                    }
 }
 
-// The part rnd under size everywhere, sharp.
+// The part rnd under size everywhere, sharp, and running past the bed plane.
 module core() {
     union() {
         difference() {
             body();
             pocket();
             notch();
-            foot_bores();
         }
 
         lips();
     }
 }
 
+// The bed plane: everything at x < -W / 2 goes, and the edge that leaves is
+// a bed_chamfer 45 degree chamfer rather than a round. The prism is the
+// silhouette a hair oversize so that none of its faces lies on the part's.
+module bed_cut() {
+    slack = 0.05;
+
+    translate([-W / 2, 0, 0])
+        rotate([90, 0, 90])
+            offset_sweep(offset(ccw_polygon(silhouette_rounded), delta = slack, closed = true),
+                         height = W + 2,
+                         bottom = os_chamfer(width = bed_chamfer + slack));
+}
+
 module phone_holder() {
     // "aligned" puts vertices of the sphere on its axes. OpenSCAD's own
     // sphere() has none at the poles, and every flat face would land
     // rnd * (1 - cos(90 / rings)) short of where it was drawn.
-    if (rnd > 0)
-        minkowski() {
-            core();
-            spheroid(r = rnd, style = "aligned", $fn = sphere_fn);
+    difference() {
+        intersection() {
+            if (rnd > 0)
+                minkowski() {
+                    core();
+                    spheroid(r = rnd, style = "aligned", $fn = sphere_fn);
+                }
+            else
+                core();
+
+            bed_cut();
         }
-    else
-        core();
+
+        foot_bores();
+    }
 }
 
 // ---------------------------------------------------------------- output
