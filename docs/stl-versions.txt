@@ -18,10 +18,6 @@ door-stop-post 2
 door-stop-spinner 2
 doorbell-wire-channel 48
 doorbell-wire-channel-cap 27
-fish-koozie-12oz 1
-fish-koozie-12oz-coupon 1
-fish-koozie-sleeve-12oz-to-8-3oz 1
-fish-koozie-sleeve-12oz-to-8-3oz-coupon 1
 hobbs-chalk-holder-coupon 5
 large-door-stop 2
 large-door-stop-coupon 2
@@ -55,9 +51,13 @@ screen-fence-rigid 1
 screen-fence-test-rail 4
 screen-fence-twin-coupon 1
 slim-can-adapter 1
+slim-can-adapter-ring-fish-12oz-to-8-3oz 1
+slim-can-adapter-ring-fish-12oz-to-8-3oz-coupon 1
 slim-can-holder-3in 2
 slim-can-holder-3in-12oz 9
 slim-can-holder-3in-12oz-coupon 7
+slim-can-holder-3in-12oz-fish 1
+slim-can-holder-3in-12oz-fish-coupon 1
 slim-can-holder-3in-12oz-wagon-queen 7
 slim-can-holder-3in-12oz-wagon-queen-coupon 6
 slim-can-holder-3in-censored 5

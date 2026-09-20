@@ -2,8 +2,8 @@
 # Written by utils/coupon.sh. The printed columns move only when you pass
 # --printed, because printing is a thing that happens off this machine.
 # Seeded 2026-08-12 from the v3 coupon, which Ziad printed along with v2.
-fish-koozie-sleeve-12oz-to-8-3oz fit 1 b483f243038348fc273901f160ab1cecfebfb05510d46741c531b31bf2c1570f - - included
 hobbs-chalk-holder handle 5 66ee0cacceb958d25a0fbb21480a0144ae26ca15059253a8c768ec83b590abdd 3 3f024abd4e58a205a60b8f4aa5b89462ea1dabdca02cd597e65c38de6e787924 included
 hobbs-chalk-holder ring 3 3131f870dc490098613c0d2c4d330e07038431d595c0f2a9dfecb5348931eccc 3 3131f870dc490098613c0d2c4d330e07038431d595c0f2a9dfecb5348931eccc omitted
 plant-screen fit 2 76766e032225e1a094d2f19462d15492fe9cd4307a73c33484ce9a4300bea609 - - included
+slim-can-adapter-ring-fish-12oz-to-8-3oz fit 1 b483f243038348fc273901f160ab1cecfebfb05510d46741c531b31bf2c1570f - - included
 slim-can-holder-3in fit 1 adc53bc0163d520cf948dfc1eb1a3b3320fb194030271023e7896c710396ac14 1 adc53bc0163d520cf948dfc1eb1a3b3320fb194030271023e7896c710396ac14 included

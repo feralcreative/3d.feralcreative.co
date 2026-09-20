@@ -16,7 +16,7 @@
 // rim, no ledge and no room: the mouth is the bore, continued, with the jaws
 // standing 105 to 117 mm up on two sides and the corners of the mouth down
 // at 89 and 92–98 on the other two. Measured on the built mesh of
-// fish-koozie-12oz v02, in 30-degree sectors from +x: 97.5, 110.1, 116.9,
+// slim-can-holder-3in-12oz-fish v02, in 30-degree sectors from +x: 97.5, 110.1, 116.9,
 // 116.8, 109.9, 98.3, 89.3, 104.6, 111.9, 111.9, 105.5, 91.9. A lip cannot
 // go anywhere in that.
 //
@@ -87,7 +87,7 @@ bore_comp = 0.60;
 
 /* [Host — the fish this drops into] */
 
-// Read off parts/fish-koozie-12oz.scad and its built mesh. Change them only
+// Read off parts/slim-can-holder-3in-12oz-fish.scad and its built mesh. Change them only
 // if the fish changes; nothing here is a choice.
 
 // The fish's bore as drawn (mm): can 57.40 + slop 0.40 + comp 0.60.

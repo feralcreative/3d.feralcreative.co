@@ -22,7 +22,7 @@ Native sizes are measured off OpenSCAD's own import rather than read off the SVG
 
 ## Scanned meshes come in as shells, split first
 
-A scanned STL is often several closed shells in one file—a head with the eyes dropped on as spheres—and `import()` keeps them that way. Every boolean on that import leaves the overlaps in: negative genus, the overlapped volume counted twice, internal faces for the slicer to guess about. Unioning the file with itself does not fix it; coincident faces are degenerate for an exact boolean and the result was worse than the input (genus 980 on the fish koozie). So `utils/stl-shells.py` writes one file per shell and the part imports them as separate `union()` operands, which Manifold resolves cleanly. The shell count lives in the part as a parameter because a missing shell file is a warning and exit 0. Decided 2026-09-16 on `fish-koozie-12oz.scad`.
+A scanned STL is often several closed shells in one file—a head with the eyes dropped on as spheres—and `import()` keeps them that way. Every boolean on that import leaves the overlaps in: negative genus, the overlapped volume counted twice, internal faces for the slicer to guess about. Unioning the file with itself does not fix it; coincident faces are degenerate for an exact boolean and the result was worse than the input (genus 980 on the fish koozie). So `utils/stl-shells.py` writes one file per shell and the part imports them as separate `union()` operands, which Manifold resolves cleanly. The shell count lives in the part as a parameter because a missing shell file is a warning and exit 0. Decided 2026-09-16 on `slim-can-holder-3in-12oz-fish.scad`.
 
 ## A derivative of an ND-licensed model stays private
 
