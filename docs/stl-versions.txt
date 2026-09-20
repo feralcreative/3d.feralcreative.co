@@ -1,3 +1,4 @@
+4k-camera-window-mount 5
 batleth 6
 cat-gap-wedge 12
 cat-gap-wedge-coupon 5
@@ -53,6 +54,8 @@ screen-fence-rigid 1
 screen-fence-test-rail 4
 screen-fence-twin-coupon 1
 slim-can-adapter 1
+slim-can-adapter-ring-12oz-to-8-3oz 2
+slim-can-adapter-ring-12oz-to-8-3oz-coupon 2
 slim-can-adapter-ring-fish-12oz-to-8-3oz 2
 slim-can-adapter-ring-fish-12oz-to-8-3oz-coupon 1
 slim-can-holder-3in 2
