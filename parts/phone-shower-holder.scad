@@ -15,9 +15,7 @@
 //     x  ->  across the panel, centered
 //     y  ->  out from the glass toward the viewer. The glass's front face is
 //            y = 0 and the glass itself is y < 0, so the hook's leg is the
-//            only thing at negative y. Only the channel wall at the top and
-//            the two feet at the bottom touch y = 0; the spine between them
-//            stands `standoff` off the glass so water behind it runs out.
+//            only thing at negative y.
 //     z  ->  up, with z = 0 at the top of the cap. Everything hangs below.
 //
 // The cradle is authored in its own frame, tilted `tilt` degrees about x, and
@@ -26,13 +24,19 @@
 // dimension is in that frame, so "front" means the phone's screen side and
 // "top" means toward the phone's top, whatever those come to in hung z.
 //
+// WATER. The spine lies on the glass, and water behind it does not drain on
+// its own - the first design's slots were for that and were not enough. Two
+// shallow bores in the back face at the bottom take stick-on silicone feet,
+// which stand the bottom of the spine off the glass by whatever the feet are
+// proud of the bore. The part carries no feet of its own.
+//
 // PRINTING. On a side, one rail down; `orient = "print"` writes the STL that
 // way, yawed 45 degrees so 216 mm fits the plate's diagonal inside the safe
 // envelope. Every face is then vertical except the upper rail's 45 degree lip,
-// the upper foot's 45 degree inner face, the top-end chamfers, and the ledge
-// over the notch, which bridges 13.6 mm from the backrest to the front bar. No support. Standing it on the hook end,
-// as the first design planned, is worse: the face the phone stands on would be
-// an overhang 15 degrees off horizontal, and the part is over the 215 mm safe
+// the top-end chamfers, the ledge over the notch (a 45 degree underside), and
+// the roofs of the two bores. No support. Standing it on the hook end, as the
+// first design planned, is worse: the face the phone stands on would be an
+// overhang 15 degrees off horizontal, and the part is over the 215 mm safe
 // height that way.
 
 include <BOSL2/std.scad>
@@ -74,18 +78,17 @@ wrap      = 15.0;  // how far the leg reaches down the back face (mm)
 lead_in   = 1.0;   // guide at the channel's mouth (mm)
 
 /* [Spine] */
-// The plate down the glass from the hook to the cradle. It carries the
-// cradle's whole moment.
+// The plate down the glass from the hook to the cradle. It is the channel's
+// front wall and it carries the cradle's whole moment.
 spine_t = 3.09;  // (mm)
-// The spine does not lie on the glass. It bears at the top through the
-// channel's front wall and at the bottom through two feet, and between them
-// it stands off by this much, so the gap behind it is open along both sides
-// and across the bottom and water runs out instead of sitting there. The
-// first design lay flat on the glass and drained through slots, which was
-// not enough.
-standoff = 5.0;   // spine's back face to the glass (mm)
-foot_w   = 12.0;  // each foot, in from the part's side face (mm)
-foot_h   = 15.0;  // each foot, up from the bottom (mm)
+
+/* [Silicone feet] */
+// Two recesses in the back face at the bottom corners, for stick-on silicone
+// bumpers. Sized to the feet Ziad has, 2026-09-20. Where the bores sit the
+// wedge is behind the spine, so a 2 mm bore leaves over 5 mm of solid.
+foot_bore_d     = 13.0;  // (mm)
+foot_bore_depth = 2.0;   // (mm)
+foot_inset      = 3.0;   // bore edge to the part's side face and bottom (mm)
 
 /* [Cradle] */
 cradle_len = 82.0;  // how much of the phone's edge is held, up from its bottom (mm)
@@ -97,13 +100,16 @@ wall       = 2.19;  // the rail walls, outside the phone's edges (mm)
 lip_r      = 5.0;   // reach of each lip, inward from its wall (mm)
 ledge_t    = 3.09;  // the shelf the phone's bottom edge stands on (mm)
 back_min   = 2.64;  // backrest thickness at the ledge, where the wedge is thinnest (mm)
-notch_w    = 40.0;  // gap in the ledge for the lanyard, centered (mm)
+// Open at the front, so the lanyard drops in from the front rather than being
+// fed through. Its width is at the face the phone stands on; the sides flare
+// out at 45 degrees through the ledge so the ledge over it prints on its side.
+notch_w    = 40.0;  // lanyard gap in the ledge, centered (mm)
 // Chamfer on the rails' inner edges at the top end, where the phone goes in.
 // Small, because the walls are only 2.19.
 flare      = 1.0;   // (mm)
 
 /* [Quality] */
-$fn = 64;  // nothing here is round, but the template wants it set
+$fn = 64;  // segments per full circle; the bores are the only round thing
 
 // Small overshoot used on every subtracted solid so its faces are never
 // coplanar with the parent's.
@@ -126,19 +132,17 @@ c = cos(tilt);
 // Cradle origin: the phone's bottom-back corner. In front of the spine by the
 // thinnest the backrest gets, and as far down as puts the lowest point of the
 // cradle - the front-bottom corner of the ledge - at overall_len.
-spine_back  = standoff;
-spine_front = standoff + spine_t;
-y0 = spine_front + back_min;
+y0 = spine_t + back_min;
 z0 = -overall_len + front * s + ledge_t * c;
 
 // Cradle frame to hung frame. Same map as in_cradle().
 function H(yp, zp) = [y0 + yp * c + zp * s, z0 - yp * s + zp * c];
 
 // Where the cradle's top plane runs back into the spine's front face, and
-// where its bottom plane runs back to the spine's back face.
-yp_top = (spine_front - y0 - cradle_len * s) / c;
-yp_bot = (spine_back - y0 + ledge_t * s) / c;
-z_foot = H(yp_bot, -ledge_t).y;  // the lowest point of the spine's back face
+// where its bottom plane runs back to the glass.
+yp_top = (spine_t - y0 - cradle_len * s) / c;
+yp_bot = -(y0 - ledge_t * s) / c;
+z_bot  = H(yp_bot, -ledge_t).y;  // the lowest point of the glass face
 
 y_min = -(gch + leg_t);
 y_max = H(front, cradle_len).x;
@@ -156,14 +160,12 @@ module in_cradle() {
 // sweep of this or added to it afterward. Top level rather than inside body()
 // because oriented() reads it too, to center the print pose on the plate.
 silhouette = [
-    [y_min,       0],                    // leg outer face, top
-    [spine_front, 0],                    // cap front, top
+    [y_min,   0],                        // leg outer face, top
+    [spine_t, 0],                        // cap front, top
     H(yp_top, cradle_len),               // the wedge's top meets the spine
     H(front,  cradle_len),               // cradle front, top
     H(front, -ledge_t),                  // cradle front, bottom: the lowest point
-    H(yp_bot, -ledge_t),                 // the bottom runs back to the spine
-    [spine_back, -cap_t - wrap],         // up the spine's back face, standing off
-    [0,          -cap_t - wrap],         // out to the glass: the channel wall's foot
+    H(yp_bot, -ledge_t),                 // the bottom runs back to the glass
     [0,    -cap_t],                      // up the glass face to the cap
     [-gch, -cap_t],                      // across the channel's closed end
     [-gch, -cap_t - wrap + lead_in],     // down the leg's inner face
@@ -185,14 +187,22 @@ module pocket() {
             cube([ch_w, tall, tall]);
 }
 
-// Through the ledge, from the backrest forward to the phone's face, so the
-// lanyard can hang straight down out of the case. It stops short of the
-// front bar under the lips, which is what the ledge bridges from when the
-// part prints on its side.
+// Through the ledge, backrest to front face, so the lanyard drops in from the
+// front. notch_w wide at the top face, a ledge thickness wider each side at
+// the underside: the 45 degree flanks are what let the ledge over it print
+// with the part on its side, where that underside would otherwise be a flat
+// 18.6 mm cantilever.
 module notch() {
     in_cradle()
-        translate([-notch_w / 2, -eps, -ledge_t - eps])
-            cube([notch_w, h_ch + eps, ledge_t + 2 * eps]);
+        translate([0, front + eps, 0])
+            rotate([90, 0, 0])
+                linear_extrude(height = front + 2 * eps)
+                    polygon([
+                        [-notch_w / 2, eps],
+                        [ notch_w / 2, eps],
+                        [ notch_w / 2 + ledge_t + eps, -ledge_t - eps],
+                        [-notch_w / 2 - ledge_t - eps, -ledge_t - eps],
+                    ]);
 }
 
 // One 45 degree bevel per rail, root on the wall, running the length of the
@@ -229,26 +239,15 @@ module flare_cut() {
         }
 }
 
-// Two feet at the bottom corners of the spine's back face, out to the glass.
-// The inner face of each is a 45 degree slope, because in the print pose the
-// upper foot hangs off the spine with nothing under it. Trimmed to the same
-// plane as the rest of the bottom.
-module feet() {
-    intersection() {
-        for (side = [-1, 1])
-            translate([0, 0, z_foot - standoff])
-                linear_extrude(height = foot_h + standoff)
-                    polygon([
-                        [side * W / 2, 0],
-                        [side * W / 2, spine_back + eps],
-                        [side * (W / 2 - foot_w), spine_back + eps],
-                        [side * (W / 2 - foot_w + standoff), 0],
-                    ]);
-
-        in_cradle()
-            translate([-W, -tall, -ledge_t])
-                cube([2 * W, 2 * tall, tall]);
-    }
+// The two recesses for the silicone feet, in the glass face at the bottom
+// corners.
+module foot_bores() {
+    for (side = [-1, 1])
+        translate([side * (W / 2 - foot_inset - foot_bore_d / 2),
+                   foot_bore_depth,
+                   z_bot + foot_inset + foot_bore_d / 2])
+            rotate([90, 0, 0])
+                cylinder(d = foot_bore_d, h = foot_bore_depth + eps);
 }
 
 module phone_holder() {
@@ -258,10 +257,10 @@ module phone_holder() {
                 body();
                 pocket();
                 notch();
+                foot_bores();
             }
 
             lips();
-            feet();
         }
 
         flare_cut();
@@ -272,8 +271,8 @@ module phone_holder() {
 
 // Hung, or lying on its -x side yawed 45 degrees. The yaw is what fits 216 mm
 // inside the 205 mm safe envelope, and the part is centered after it: the
-// silhouette is no rectangle, so the centre of the yawed footprint is not the
-// centre of the hung one.
+// silhouette is no rectangle, so the center of the yawed footprint is not the
+// center of the hung one.
 print_yaw = 45;
 // Each silhouette vertex after the lay-down and the yaw: hung z runs along
 // print -x, hung y along print y.
