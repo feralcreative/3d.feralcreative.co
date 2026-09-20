@@ -31,8 +31,8 @@ patio-leg-spacer-receiver 7
 patio-leg-spacer-shim 6
 phone-shower-holder 5
 phone-shower-holder-assembled 1
-plant-screen 6
-plant-screen-coupon 3
+plant-screen 7
+plant-screen-coupon 4
 reversible-door-stop 1
 roku-stand 5
 roku-stand-r 2
