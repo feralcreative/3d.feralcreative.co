@@ -20,6 +20,8 @@ doorbell-wire-channel 48
 doorbell-wire-channel-cap 27
 fish-koozie-12oz 1
 fish-koozie-12oz-coupon 1
+fish-koozie-sleeve-12oz-to-8-3oz 1
+fish-koozie-sleeve-12oz-to-8-3oz-coupon 1
 hobbs-chalk-holder-coupon 5
 large-door-stop 2
 large-door-stop-coupon 2
