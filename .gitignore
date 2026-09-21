@@ -1,175 +1,176 @@
 # ============================================================
 # Ziad's boilerplate .gitignore
+# Updated: 20260920T0054Z
 # ------------------------------------------------------------
-# This is my personal starting point, reused across all of my
-# projects. It's intentionally broad and errs on the side of
-# ignoring too much rather than too little.
+# Personal starting point, reused across all of my projects.
+# Intentionally broad: it errs on the side of ignoring too
+# much. Treat it as a baseline, not gospel.
 #
-# Treat it as a baseline, not gospel: add, remove, or replace
-# anything to fit the project at hand.
-# 
-# https://github.com/feralcreative
+#/ Judgment call: worth committing in some projects.
+#! Trap: matches more than it looks like.
+#
+# https://feralcreative.dev
 # ============================================================
 
-# Ignore WordPress backup files
-**/*.wpress
-# Ignore macOS system files
-**/.DS_Store
-# Ignore archive folders
-**/_archive
-# Ignore design files
-**/*.psd
-**/*.ai
-# Ignore Adobe Premiere project files
-**/*.prproj
-**/*.aep
-# Ignore video files
-**/*.mp4
-**/*.mov
-**/*.mkv
-# Ignore WordPress core folders
-wp-includes/
-wp-admin/
-wp-content/cache/
-wp-content/languages/
-wp-content/plugins/
-# Ignore Node.js modules
-**/node_modules
-# Ignore environment variable files
-**/*.env
-# Ignore WordPress PHP files starting with wp-
-**/wp-*.php
-# Ignore the Twenty Twenty theme and its variations
-**/wp-content/themes/twenty*/
-# Ignore specific backup files
-wp-content/ai1wm-backups/*
-# Ignore XML-RPC file
-xmlrpc.php
-# Ignore readme and license files
-readme.html
-license.txt
-# Ignore the main index.php file
-/index.php
-# Ignore well-known directory
-.well-known/
+# --- OS -----------------------------------------------------
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+#! Also matches any five-character name starting with Icon (Icons/)
+Icon?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.cab
+*.msi
+*.msm
+*.msp
 
-# IDE and Editor files
+# --- Editors and AI agents ----------------------------------
 .idea/
 *.swp
 *.swo
 *~
 .sublime-project
 .sublime-workspace
+.history/
+.playwright-mcp
+.augment
+.codex
+_AI_AGENT_PRIMER.md
+.journal*
+JOURNAL.md
+#/ Shared workspace files and Claude project settings/skills
 *.code-workspace
+.claude
 
-# OS generated files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msm
-*.msp
-*.lnk
+# --- Secrets and local config -------------------------------
+.env
+.env.local
+.env.*.local
+*.env
+.secrets
+.private
+.htpasswd
+.htaccess.backup
+wp-config-local.php
+*.kubeconfig
+#/ Often a real, committed config that reads secrets from env
+config.php
 
-# Temporary files
-*.tmp
-*.temp
-*.log
-*.pid
-*.seed
-*.pid.lock
+# --- Private and archival folders ---------------------------
+_archive
+_private
+_deprecated
+_reference
+_tasks
+_SHAREPOINT
+console.txt
+*.syncthing*
+*.sync-conflict*
 
-# Node.js and JavaScript
+#/ --- Design and media sources -------------------------------
+*.psd
+*.psb
+*.psdt
+*.ai
+*.ait
+*.indd
+*.indt
+*.idml
+*.xd
+*.sketch
+*.fig
+*.afdesign
+*.afphoto
+*.afpub
+*.prproj
+*.aep
+*.aet
+*.mp4
+*.mov
+*.mkv
+*.mpeg
+*.mpg
+
+#/ --- Office documents --------------------------------------
+*.doc
+*.docx
+*.dot
+*.dotx
+*.xls
+*.xlsx
+*.xlsm
+*.xlt
+*.xltx
+*.ppt
+*.pptx
+*.pps
+*.ppsx
+*.pot
+*.potx
+*.pages
+*.numbers
+*.key
+*.odt
+*.ods
+*.odp
+*.rtf
+*.pdf
+
+# --- Adobe caches and previews ------------------------------
+*.PRV/
+Adobe Premiere Pro Video Previews/
+Adobe Premiere Pro Audio Previews/
+Adobe Premiere Pro Auto-Save/
+Adobe Premiere Pro Captured Video/
+Adobe After Effects Auto-Save/
+Adobe After Effects Disk Cache*/
+Media Cache/
+Media Cache Files/
+*.cfa
+*.pek
+*.ims
+*.mpgindex
+
+# --- WordPress ----------------------------------------------
+*.wpress
+wp-includes/
+wp-admin/
+wp-content/cache/
+wp-content/languages/
+wp-content/plugins/
+wp-content/ai1wm-backups/*
+**/wp-content/themes/twenty*/
+wp-*.php
+xmlrpc.php
+readme.html
+#/ Outside WordPress: a real license, the entry point, verification files
+license.txt
+/index.php
+.well-known/
+
+# --- Node and JavaScript ------------------------------------
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
 .npm
 .eslintcache
 .stylelintcache
-
-# Angular specific
-.angular/
-dist/
-tmp/
-out-tsc/
-bazel-out/
-
-# Dependency directories and files
-vendor/
-composer.phar
-
-# Build outputs
-dist/
-build/
-out/
-lib/
-coverage/
-*.tgz
-*.tar.gz
-
-# Framework specific builds
-.next/
-.nuxt/
-.output/
-.svelte-kit/
-.vite/
-storybook-static/
-
-# Deployment
-.vercel/
-.netlify/
-.firebase/
-.surge/
-
-# Cache directories
-.cache/
-.parcel-cache/
-.sass-cache/
+.prettiercache
 *.js.map
+#/ Lockfiles: apps normally commit them, libraries usually do not
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-## Compiled style docs
-*.css
-*.min.css
-*.css.map
-
-
-# Database files
-*.sql
-*.sqlite
-*.sqlite3
-*.db
-
-# Configuration files with sensitive data
-config.php
-wp-config-local.php
-.htaccess.backup
-.htpasswd
-
-# Backup and archive files
-*.bak
-*.backup
-*.old
-*.orig
-*.rej
-*.zip
-*.tar
-*.tar.gz
-*.rar
-*.7z
-
-# Documentation build files
-docs/_build/
-site/
-
-# Python
+# --- Python -------------------------------------------------
 __pycache__/
 *.py[cod]
 *$py.class
@@ -178,9 +179,9 @@ __pycache__/
 env/
 venv/
 ENV/
+.venv/
 env.bak/
 venv.bak/
-.venv/
 pip-log.txt
 pip-delete-this-directory.txt
 .pytest_cache/
@@ -196,69 +197,96 @@ MANIFEST
 .dmypy.json
 dmypy.json
 
-# Shell scripts
-*.sh~
-*.bash_history
+# --- PHP ----------------------------------------------------
+composer.phar
+#/ Go projects vendor on purpose
+vendor/
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.*.local
+#/ --- Compiled styles (hand-written CSS in a no-Sass project) --
+*.css
+*.min.css
+*.css.map
 
-# Testing and Coverage
+# --- Build output -------------------------------------------
+out-tsc/
+bazel-out/
+tmp/
+.angular/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.vite/
+storybook-static/
+docs/_build/
+#/ Published builds (GitHub Pages, libraries) or plain source dirs
+dist/
+build/
+out/
+lib/
+site/
+
+# --- Caches -------------------------------------------------
+.cache/
+*.cache
+.parcel-cache/
+.sass-cache/
+
+# --- Tests and coverage -------------------------------------
 coverage/
 .nyc_output/
 test-results/
-playwright-report/
 test-results.xml
+playwright-report/
 junit.xml
 
-# Linting and formatting
-.eslintcache
-.stylelintcache
-.prettiercache
-
-# Docker
-.dockerignore
-Dockerfile.dev
-docker-compose.override.yml
-.docker/
-
-# Kubernetes
-*.kubeconfig
-
-# Serverless
+# --- Deployment and containers ------------------------------
+.vercel/
+.netlify/
+.firebase/
+.surge/
 .serverless/
 serverless.yml.bak
+docker-compose.override.yml
+.docker/
+#/ Usually committed
+.dockerignore
+Dockerfile.dev
 
-# Miscellaneous
-.playwright-mcp
-.secrets
-.augment
-.claude
-.codex
-.DS_Store?
-Icon?
-._*
-.Spotlight-V100
-.Trashes
+#/ --- Databases (schemas, migrations, fixtures) ---------------
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+
+# --- Logs, temp, and backups --------------------------------
+*.log
+*.tmp
+*.temp
+*.pid
+*.pid.lock
+*.seed
+*.bak
+*.backup
+*.old
 *.orig
-.history/
-**/_archive
-**/_tasks
-**/console.txt
-**/_deprecated
-**/*.syncthing*
-**/*.sync-conflict*
-_reference
+*.rej
+*.sh~
+*.bash_history
+~$*
+.~lock.*#
+
+#/ --- Archives (release assets) -------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
 
 # ============================================================
 # END Ziad's boilerplate .gitignore
 # ============================================================
-
 
 # Generated output — reproducible from source, never committed
 renders/*
