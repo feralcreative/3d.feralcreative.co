@@ -32,8 +32,15 @@
 // apply). Nominal leaves 1.5 of clearance per side: enough to drop a grinder
 // in without aiming, not enough for it to wander off the pads.
 //
+// THE FEET are the same stick-on silicone bumpers as the phone shower holder,
+// in the same Ø13 x 2.0 recesses: four of them, one under each end of each
+// well, out where a foot does the most against a knock. They are the reason
+// the floor is 4.4 and not 2.4 — a 2 mm recess in a 2.4 floor leaves 0.4 mm
+// over it, so the floor carries the recess plus the 2.4 it had before.
+//
 // ORIENTATION. Printed as drawn, floor down, no supports. Every overhang is a
-// fillet or the 22-wide notch sill, which is a short ledge over solid wall.
+// fillet, the 22-wide notch sill, or the roof of a foot recess, which the
+// slicer bridges across 13 mm of flat ceiling ten layers up.
 // It is a 200 mm footprint on a 205 safe envelope, so it wants the plate to
 // itself and it is a long first layer — check the corners are down before
 // walking away.
@@ -57,8 +64,8 @@ divider_w = 5.79;   // mm
 // 0.42 outer + 7 x 0.45 inner + 0.42 outer.
 wall_w = 3.99;      // mm
 
-// Floor under the moat.
-floor_t = 2.4;      // mm
+// Floor under the moat. 2.4 of solid over a 2.0 foot recess; see the header.
+floor_t = 4.4;      // mm
 
 // Lip height, measured from the moat floor to the top of the rim.
 rim_h = 6;          // mm
@@ -71,6 +78,14 @@ pad_d = 16;         // mm
 pad_bolt_d = 74;    // mm, diameter of the circle the pads sit on
 pad_h = 3;          // mm, how far the base is lifted off the moat floor
 pad_round = 1;      // mm, rounding on the pad's top edge
+
+/* [Silicone feet] */
+
+// Recesses in the underside for stick-on silicone bumpers. Same feet, and the
+// same numbers, as parts/phone-shower-holder.scad.
+foot_bore_d     = 13.0;  // mm
+foot_bore_depth = 2.0;   // mm
+foot_inset      = 5.0;   // mm, bore edge to the outer surface
 
 /* [Notch] */
 
@@ -111,6 +126,12 @@ body_h   = floor_t + rim_h;
 sill_z   = floor_t + notch_sill;
 well_x   = [-pitch / 2, pitch / 2];
 
+// The feet sit at the well centres in x, so each one is under the load, and as
+// far out in y as foot_inset allows. At x = +-pitch/2 the outline is at its
+// tangent point, where the straight side and the end arc are the same distance
+// away, so one number holds for both.
+foot_y   = body_w / 2 - foot_inset - foot_bore_d / 2;
+
 // The outline is the hull of the two wells: a rect rounded by half its width.
 outline  = rect([body_l, body_w], rounding = body_w / 2);
 
@@ -145,6 +166,11 @@ module grinder_tray() {
         for (x = well_x)
             move([x, 0, body_h])
                 rounding_hole_mask(d = well_d + bore_comp, rounding = lip_r);
+
+        // The foot recesses, cut up into the underside.
+        for (x = well_x, y = [-foot_y, foot_y])
+            move([x, y, -eps])
+                cyl(d = foot_bore_d, h = foot_bore_depth + eps, anchor = BOTTOM);
     }
 
     // The pads go on after the wells are cut, or the cut would take them.
