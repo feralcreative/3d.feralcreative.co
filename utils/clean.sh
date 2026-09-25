@@ -43,6 +43,10 @@
 # there. Mark old versions rather than the newest one — it is already protected
 # by retention anyway.
 #
+# SUBFOLDERS. stl/ has per-part subdirectories in it and every rule here reaches
+# into them. The version rules run once per directory, so a name that exists in
+# two of them is two independent series and neither can push the other out.
+#
 # WHAT IS PROTECTED WITHOUT ANY MARKING
 #   - the newest N versions of each name (N = 2 unless --keep says otherwise)
 #   - whatever a stl/<name>.stl symlink points at, where a build older than
@@ -153,10 +157,10 @@ is_printed() {  # basename without extension
 # --- symlink targets (builds older than 2026-09-12) --------------------------
 
 LINKED=""
-for l in stl/*.stl; do
+while IFS= read -r l; do
   [[ -L "$l" ]] || continue
   LINKED="${LINKED}$(basename "$(readlink "$l")")"$'\n'
-done
+done < <(find stl -name '*.stl' 2>/dev/null)
 
 is_linked() { printf '%s\n' "$LINKED" | grep -qx -- "$1"; }
 
@@ -165,23 +169,30 @@ is_linked() { printf '%s\n' "$LINKED" | grep -qx -- "$1"; }
 echo "== scratch (exp-*)"
 for tree in renders stl slice 3mf; do
   [[ -d "$tree" ]] || continue
-  for p in "$tree"/exp-*; do
+  while IFS= read -r p; do
     [[ -e "$p" ]] || continue
     tracked "$p" && continue
     doom "$p" "scratch"
-  done
+  done < <(find "$tree" -name 'exp-*' -prune 2>/dev/null | sort)
 done
 [[ "${#DOOMED[@]}" -gt 0 ]] || echo "  none"
 
 if [[ "$SCRATCH_ONLY" -eq 0 ]]; then
   echo
   echo "== versioned output, keeping the newest $KEEP_N of each name"
-  # Group stl/<name>-vNN.stl by name, newest first, and doom past the Nth.
-  for name in $(ls stl 2>/dev/null | sed -n 's/^\(.*\)-v[0-9][0-9]*\.stl$/\1/p' \
+  # Group <name>-vNN.stl by name, newest first, and doom past the Nth.
+  #
+  # SUBFOLDERS (2026-09-22). Once per directory under stl/, rather than once
+  # over a recursive listing, because the rules rank a name's versions against
+  # each other: two parts that collided on a name in different subdirectories
+  # would otherwise be ranked as one series and the loser's newest build would
+  # be deleted as "older than the newest N".
+  for d in $(find stl -type d 2>/dev/null | sort); do
+  for name in $(ls "$d" 2>/dev/null | sed -n 's/^\(.*\)-v[0-9][0-9]*\.stl$/\1/p' \
                  | grep -v '^exp-' | sort -u); do
     n=0
     survived=0
-    for f in $(ls stl/"$name"-v*.stl 2>/dev/null | sort -r); do
+    for f in $(ls "$d"/"$name"-v*.stl 2>/dev/null | sort -r); do
       base="$(basename "$f" .stl)"
       [[ "$f" == *.keep.* ]] && { echo "  $f — kept by name"; survived=1; continue; }
       tracked "$f" && { survived=1; continue; }
@@ -209,9 +220,10 @@ if [[ "$SCRATCH_ONLY" -eq 0 ]]; then
     # Nothing of this name left to point at. A dangling stl/<name>.stl is worse
     # than no link at all: every doc path and every downstream script resolves
     # through it.
-    if [[ "$survived" -eq 0 && -L "stl/$name.stl" ]] && ! tracked "stl/$name.stl"; then
-      doom "stl/$name.stl" "symlink with nothing left to point at"
+    if [[ "$survived" -eq 0 && -L "$d/$name.stl" ]] && ! tracked "$d/$name.stl"; then
+      doom "$d/$name.stl" "symlink with nothing left to point at"
     fi
+  done
   done
 
   echo
@@ -252,7 +264,7 @@ if [[ "$SCRATCH_ONLY" -eq 0 ]]; then
       fi
       # Survives if the STL it was sliced from is still there, under either the
       # plain name or any surviving version of it.
-      if [[ -e "stl/${base}.stl" ]] || compgen -G "stl/${base}-v*.stl" >/dev/null; then
+      if [[ -n "$(find stl \( -name "${base}.stl" -o -name "${base}-v*.stl" \) -print -quit 2>/dev/null)" ]]; then
         continue
       fi
       doom "$d" "no STL left to match"

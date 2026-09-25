@@ -32,6 +32,12 @@
 # nothing about whether the part is done. FINISHED means finalize.sh has run:
 # the plain file stands alone. --all drops that test and sends every plain name.
 #
+# SUBFOLDERS. stl/ has per-part subdirectories and the finished set is gathered
+# from all of them. The far side stays FLAT — the viewer reads one models
+# directory — so two subfolders holding the same filename would overwrite each
+# other there. That is refused rather than resolved, since which one wins would
+# come down to rsync argument order.
+#
 # Nothing is deleted on the far side. A part removed here stays on the site until
 # someone removes it there deliberately — the models directory also holds
 # meshes that came from elsewhere, and --delete would take those with it.
@@ -72,12 +78,22 @@ SKIPPED=()
 while IFS= read -r f; do
   [[ -n "$f" ]] || continue
   name="$(basename "$f" .stl)"
-  if [[ "$ALL" -eq 0 ]] && compgen -G "${STL_DIR}/${name}-v[0-9][0-9]*.stl" >/dev/null; then
+  # Drafts count as beside it only within its own directory.
+  if [[ "$ALL" -eq 0 ]] && compgen -G "$(dirname "$f")/${name}-v[0-9][0-9]*.stl" >/dev/null; then
     SKIPPED+=("$name")
     continue
   fi
   FILES+=("$f")
-done < <(find "$STL_DIR" -maxdepth 1 -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl' | sort)
+done < <(find "$STL_DIR" -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl' | sort)
+
+# One flat destination: a repeated basename would land on itself over there.
+DUPES="$(for f in ${FILES[@]+"${FILES[@]}"}; do basename "$f"; done | sort | uniq -d)"
+if [[ -n "$DUPES" ]]; then
+  echo "error: these names appear in more than one stl/ subfolder and the site is flat:" >&2
+  printf '   %s\n' $DUPES >&2
+  echo "rename one of each, or sync them in separate runs." >&2
+  exit 1
+fi
 
 if [[ "${#SKIPPED[@]}" -gt 0 ]]; then
   echo "== ${#SKIPPED[@]} still moving (drafts beside them), not sent — finalize.sh or --all:"
@@ -91,7 +107,7 @@ if [[ "${#FILES[@]}" -eq 0 ]]; then
 fi
 
 echo "== ${#FILES[@]} finished part(s) -> ${USER_}@${HOST}:${REMOTE}/ ${DRY[*]:-}"
-for f in "${FILES[@]}"; do echo "   $(basename "$f")"; done
+for f in "${FILES[@]}"; do echo "   ${f#$STL_DIR/}"; done
 echo
 
 # -c compares by checksum rather than mtime: build.sh's copy step gives the

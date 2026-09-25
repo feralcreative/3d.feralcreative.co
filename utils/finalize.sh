@@ -24,6 +24,12 @@
 # Names are OUTPUT names, the same ones build.sh --name takes and the same ones
 # docs/stl-versions.txt is keyed on — not .scad paths.
 #
+# SUBFOLDERS. stl/ has per-part subdirectories in it — stl/gridfinity/ and the
+# rest — and a name is found wherever under stl/ its meshes actually are. Names
+# stay bare: you finalize `gridfinity-cup-1x1x6`, not a path to it. Setting
+# OUTDIR still narrows the search to one directory. See the note above
+# dirs_for() for what happens when one name is in two of them.
+#
 # WILDCARDS (Ziad, 2026-09-17). A name may be a glob. It is matched here, not
 # by the shell, against the output names that actually exist: every stl/*.stl
 # reduced to its name, and for --shitcan also the ledger, slice/ and 3mf/,
@@ -174,18 +180,35 @@ fi
 # Every name in stl/ that has at least one -vNN.stl beside it. Uses the same
 # two-digit-minimum shape build.sh stamps, so a v100 series is still found.
 all_names() {
-  find "$OUTDIR" -maxdepth 1 -name '*-v[0-9][0-9]*.stl' -print \
+  find "$OUTDIR" -name '*-v[0-9][0-9]*.stl' -print \
     | sed 's|.*/||; s|-v[0-9][0-9]*\.stl$||' \
     | sort -u
 }
 
 LEDGER="${REPO_ROOT}/docs/stl-versions.txt"
 
+# SUBFOLDERS (Ziad, 2026-09-22). stl/ grew per-part subdirectories —
+# stl/gridfinity/, stl/slim-can-holder/ — and everything here used to be a
+# -maxdepth 1 find, so a name that had moved into one simply came back as
+# "nothing found for this name". Names are still bare output names with no
+# directory in them, because that is what build.sh --name and the ledger use;
+# the directory is looked up from where the meshes actually are.
+#
+# One name in two directories is not resolved, it is reported and skipped: the
+# two are different parts that collided on a name, and picking one silently is
+# how the wrong file gets deleted.
+dirs_for() {
+  local name="$1"
+  find "$OUTDIR" -type f \
+    \( -name "${name}.stl" -o -name "${name}-v[0-9][0-9]*.stl" \) \
+    2>/dev/null | sed 's|/[^/]*$||' | sort -u
+}
+
 # Every output name with a mesh in stl/, plain or versioned. What a pattern is
 # matched against when finalizing: the ledger knows more names, but one with
 # no mesh left has nothing to finalize and would only SKIP.
 stl_names() {
-  find "$OUTDIR" -maxdepth 1 -name '*.stl' -print \
+  find "$OUTDIR" -name '*.stl' -print \
     | sed 's|.*/||; s|\.stl$||; s|-v[0-9][0-9][0-9]*$||' \
     | sort -u
 }
@@ -309,7 +332,7 @@ sweep_renders() {
 
 # stl/<name>-*coupon*.stl, untracked only. Echoes the count, like sweep_renders.
 sweep_coupons() {
-  local name="$1"
+  local name="$1" dir="$2"
   local n=0 f
   while IFS= read -r f; do
     [[ -n "$f" ]] || continue
@@ -319,13 +342,25 @@ sweep_coupons() {
     fi
     rm -f "$f"
     n=$((n + 1))
-  done < <(find "$OUTDIR" -maxdepth 1 -name "${name}-*coupon*.stl")
+  done < <(find "$dir" -maxdepth 1 -name "${name}-*coupon*.stl")
   echo "$n"
 }
 
 finalize_one() {
   local name="$1"
-  local plain="${OUTDIR}/${name}.stl"
+  local dirs=() d
+  while IFS= read -r d; do [[ -n "$d" ]] && dirs+=("$d"); done < <(dirs_for "$name")
+  if [[ "${#dirs[@]}" -eq 0 ]]; then
+    printf '  %-40s SKIPPED — nothing found for this name\n' "$name" >&2
+    return 1
+  fi
+  if [[ "${#dirs[@]}" -gt 1 ]]; then
+    printf '  %-40s SKIPPED — this name is in %d directories:\n' "$name" "${#dirs[@]}" >&2
+    printf '      %s\n' "${dirs[@]#$REPO_ROOT/}" >&2
+    return 1
+  fi
+  local dir="${dirs[0]}"
+  local plain="${dir}/${name}.stl"
   local keep=""
 
   # A symlink here is from a build older than 2026-09-12, when the plain name
@@ -336,7 +371,7 @@ finalize_one() {
   if [[ -L "$plain" ]]; then
     local target
     target="$(readlink "$plain")"
-    keep="${OUTDIR}/$(basename "$target")"
+    keep="${dir}/$(basename "$target")"
     if [[ ! -f "$keep" ]]; then
       printf '  %-40s SKIPPED — %s points at a missing file\n' "$name" "$(basename "$plain")" >&2
       return 1
@@ -346,7 +381,7 @@ finalize_one() {
   else
     # No plain name at all. Fall back to the highest version, and say so, since
     # this is the one case where the number is doing the choosing.
-    keep="$(find "$OUTDIR" -maxdepth 1 -name "${name}-v[0-9][0-9]*.stl" | sort | tail -1)"
+    keep="$(find "$dir" -maxdepth 1 -name "${name}-v[0-9][0-9]*.stl" | sort | tail -1)"
     [[ -n "$keep" ]] || {
       printf '  %-40s SKIPPED — nothing found for this name\n' "$name" >&2
       return 1
@@ -356,14 +391,14 @@ finalize_one() {
 
   local versions=()
   while IFS= read -r f; do [[ -n "$f" ]] && versions+=("$f"); done \
-    < <(find "$OUTDIR" -maxdepth 1 -name "${name}-v[0-9][0-9]*.stl" | sort)
+    < <(find "$dir" -maxdepth 1 -name "${name}-v[0-9][0-9]*.stl" | sort)
 
   if [[ "${#versions[@]}" -eq 0 && -z "$keep" ]]; then
     # Still sweep: a part can be final and have coupons and renders of it
     # lying around. Until 2026-09-17 this returned before the coupons, so a
     # part that had never carried a draft kept every coupon it ever had.
     local only_coupons only_renders
-    only_coupons="$(sweep_coupons "$name")"
+    only_coupons="$(sweep_coupons "$name" "$dir")"
     only_renders="$(sweep_renders "$name")"
     printf '  %-40s already final%s%s\n' "$name" \
       "$( [[ "$only_coupons" -gt 0 ]] && echo ", $only_coupons coupon file(s) removed" )" \
@@ -388,7 +423,7 @@ finalize_one() {
 
   # The coupons: every output name that starts with this one and says so.
   local coupons rendered
-  coupons="$(sweep_coupons "$name")"
+  coupons="$(sweep_coupons "$name" "$dir")"
   rendered="$(sweep_renders "$name")"
 
   local kept_tag="already a plain file"
@@ -408,12 +443,14 @@ shitcan_one() {
   local paths=()
   local p
 
-  for p in "${OUTDIR}/${name}.stl" "${REPO_ROOT}/3mf/${name}.3mf" "${REPO_ROOT}/3mf/${name}.keep.3mf"; do
+  # No single-directory rule here: --shitcan is taking every trace away, so it
+  # takes the name's meshes wherever under stl/ they turn up.
+  for p in "${REPO_ROOT}/3mf/${name}.3mf" "${REPO_ROOT}/3mf/${name}.keep.3mf"; do
     [[ -e "$p" ]] && paths[${#paths[@]}]="$p"
   done
   while IFS= read -r p; do
     [[ -n "$p" ]] && paths[${#paths[@]}]="$p"
-  done < <(find "$OUTDIR" -maxdepth 1 \( -name "${name}-v[0-9][0-9]*.stl" -o -name "${name}-*coupon*.stl" \) 2>/dev/null | sort)
+  done < <(find "$OUTDIR" -type f \( -name "${name}.stl" -o -name "${name}-v[0-9][0-9]*.stl" -o -name "${name}-*coupon*.stl" \) 2>/dev/null | sort)
   if [[ -d "${REPO_ROOT}/renders" ]]; then
     while IFS= read -r p; do
       [[ -n "$p" ]] && paths[${#paths[@]}]="$p"

@@ -8,6 +8,7 @@
 #   utils/slice.sh stl/x.stl --stock                      # no low-string overrides
 #   utils/slice.sh stl/x.stl --set filament:nozzle_temperature=235
 #   utils/slice.sh stl/x.stl --at-z 38                    # role breakdown up the collet
+#   utils/slice.sh stl/gridfinity/x.stl --magnet-pause    # enclosed 10x2 mm magnets
 #
 # Output lands in slice/<part>/ — plate_1.gcode, out.gcode.3mf, resolved.json —
 # and the sliced job is also copied to 3mf/<part>.3mf, which is the file to
@@ -68,7 +69,7 @@ STOCK_PROCESS="0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle"
 STOCK_FILAMENT="Flashforge HS PETG"
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: $0 <part.scad|file.stl|file.3mf> [--stock] [--set kind:key=value] [--at-z Z]" >&2
+  echo "usage: $0 <part.scad|file.stl|file.3mf> [--stock] [--set kind:key=value] [--at-z Z] [--magnet-pause]" >&2
   exit 64
 fi
 
@@ -77,12 +78,14 @@ shift
 
 STOCK=0
 AT_Z=""
+MAGNET_PAUSE=0
 EXTRA_SETS=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --stock) STOCK=1; shift ;;
     --set)   EXTRA_SETS+=("$2"); shift 2 ;;
     --at-z)  AT_Z="$2"; shift 2 ;;
+    --magnet-pause) MAGNET_PAUSE=1; shift ;;
     *) echo "error: unknown argument: $1" >&2; exit 64 ;;
   esac
 done
@@ -144,6 +147,23 @@ MACHINE_JSON="${PROFDIR}/machine.json"
 PROCESS_JSON="${PROFDIR}/process.json"
 FILAMENT_JSON="${PROFDIR}/filament.json"
 
+if [[ "$MAGNET_PAUSE" -eq 1 ]]; then
+  [[ "$INPUT" == *.stl ]] || {
+    echo "error: --magnet-pause requires the Gridfinity STL path" >&2
+    exit 64
+  }
+  MAGNET_STL="$INPUT"
+  # Export the fully resolved config without invoking the broken CLI thumbnail
+  # renderer. The source project supplies CPU thumbnails and a native pause.
+  "$FS_BIN" --load-settings "${MACHINE_JSON};${PROCESS_JSON}" \
+    --load-filaments "$FILAMENT_JSON" \
+    --export-settings "${OUTDIR}/pause-settings.json" "$INPUT" \
+    >"${OUTDIR}/pause-settings.log" 2>&1
+  python3 "${REPO_ROOT}/utils/magnet-project.py" "$INPUT" \
+    "${OUTDIR}/magnet-project.3mf" --settings "${OUTDIR}/pause-settings.json"
+  INPUT="${OUTDIR}/magnet-project.3mf"
+fi
+
 echo "== slicing"
 # Two path quirks, both learned the hard way and neither documented upstream:
 #   --export-3mf is resolved RELATIVE TO --outputdir, so an absolute path here
@@ -174,6 +194,11 @@ echo "== job"
 PROBE_ARGS=("$GCODE")
 [[ -n "$AT_Z" ]] && PROBE_ARGS+=(--at-z "$AT_Z")
 "${REPO_ROOT}/utils/gcode-probe.py" "${PROBE_ARGS[@]}"
+
+if [[ "$MAGNET_PAUSE" -eq 1 ]]; then
+  python3 "${REPO_ROOT}/utils/magnet-project.py" "$MAGNET_STL" \
+    "${OUTDIR}/out.gcode.3mf" --verify
+fi
 
 # The named copy. Flash Studio always writes out.gcode.3mf, so the part's name
 # is put back on the file here, where the printer-bound copy lives.

@@ -1,12 +1,12 @@
 // Salt and pepper grinder tray — a two-well dust catcher for the shelf.
 //
-// Both grinders have a Ø90 round base and both shed a little grit every time
+// Both grinders have a Ø80 round base and both shed a little grit every time
 // they are used. The tray gives each one a well to stand in and puts the
 // floor of that well BELOW where the grinder's base sits, so the dust it
 // drops never ends up under the base itself.
 //
 // THE PEDESTAL IS THE WHOLE IDEA. Each grinder stands on three pads, Ø16 and
-// 3 mm tall, on a Ø74 bolt circle — roughly under the outer rim of the base,
+// 3 mm tall, on a Ø64 bolt circle — roughly under the outer rim of the base,
 // where a grinder's foot is flat and stiff. Three and not four: three points
 // cannot rock, and four on a shelf that is not flat will. The base overhangs
 // the pads by 8 mm on every side, so everything that falls off the mechanism
@@ -21,12 +21,12 @@
 // is out of the way of a cloth. Tipping the whole tray over a bin empties it
 // over the notch.
 //
-// THE OUTLINE is the hull of the two wells — a stadium, 199.77 × 100.98 —
+// THE OUTLINE is the hull of the two wells — a stadium, 179.77 × 90.98 —
 // because there is nothing for a corner to do here except collect grit. The
 // wells sit at either end of it and a 5.79 divider separates them, so each
 // grinder lands in its own place instead of drifting into the other.
 //
-// FIT. The well is drawn 0.25 over its nominal Ø93 because a bore this size
+// FIT. The well is drawn 0.25 over its nominal Ø83 because a bore this size
 // comes off this machine about 0.25 under on diameter (slicing reference §
 // hole compensation — the 0.60 figure is a small-bore number and does not
 // apply). Nominal leaves 1.5 of clearance per side: enough to drop a grinder
@@ -41,16 +41,17 @@
 // ORIENTATION. Printed as drawn, floor down, no supports. Every overhang is a
 // fillet, the 22-wide notch sill, or the roof of a foot recess, which the
 // slicer bridges across 13 mm of flat ceiling ten layers up.
-// It is a 200 mm footprint on a 205 safe envelope, so it wants the plate to
-// itself and it is a long first layer — check the corners are down before
-// walking away.
+// The footprint is 180 × 91, inside the 205 safe envelope with room to spare
+// now that the grinders came down to Ø80 — it was 200 long at Ø90, which was
+// within 5 mm of the edge.
 
 include <../lib/BOSL2/std.scad>
 
 /* [Grinders] */
 
 // Diameter of the grinder's base. Both grinders measure the same.
-grinder_d = 90;     // mm
+// Ø80, corrected from Ø90 (Ziad, 2026-09-23).
+grinder_d = 80;     // mm
 
 // Clearance per side between the base and the well wall.
 well_gap = 1.5;     // mm
@@ -75,7 +76,13 @@ rim_h = 6;          // mm
 // The grinder stands on these. Three is deliberate — see the header.
 pad_count = 3;
 pad_d = 16;         // mm
-pad_bolt_d = 74;    // mm, diameter of the circle the pads sit on
+
+// Diameter of the circle the pads sit on. DERIVED, not a number: it puts the
+// pads' outer edge on the base's rim, which is the whole point of where they
+// are, and it has to move when grinder_d does. Held at a fixed 74 it survived
+// the drop to Ø80 as pads standing 5 mm PROUD of the base and buried 3.5 mm
+// into the well wall.
+pad_bolt_d = grinder_d - pad_d;   // mm
 pad_h = 3;          // mm, how far the base is lifted off the moat floor
 pad_round = 1;      // mm, rounding on the pad's top edge
 
