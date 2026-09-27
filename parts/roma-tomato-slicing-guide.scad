@@ -1,9 +1,9 @@
-// Roma tomato slicing guide — ⅛" crosswise slices, knife guided both sides.
+// Roma tomato slicing guide — 5 mm crosswise slices, knife guided both sides.
 //
 // The tomato lies on its side in a half-round trough cut into a solid block,
 // and the block is sliced through by a row of slots across its width. A knife
 // dropped into a slot is held square on both sides of the fruit, so every
-// slice comes out the same ⅛" (3.175 mm) thick.
+// slice comes out the same 5 mm thick.
 //
 // THE TROUGH IS ROUND so the tomato seats in it and cannot roll or wander
 // sideways under the knife. It is drawn trough_gap over the tomato's radius,
@@ -21,13 +21,16 @@
 // outside and round inside. The first draft stood 35 mm teeth up from the floor
 // on a 10 mm root, and those would snap.
 //
-// THE PITCH IS FIXED; THE SPLIT OF IT IS NOT. Fin plus slot is 3.175 and
-// nothing else. The fin is 1.29 because a fin is a thin feature with two
-// exposed faces, and on the installed profile that rung is 0.42 + 0.45 + 0.42
-// (slicing reference; the design reference's 1.26/1.68 ladder is wrong here).
-// That leaves a 1.885 slot, which clears a serrated tomato knife or a thin
-// slicer. The next rung, 1.74, would leave 1.435 — stiffer fins, but a lot of
-// knives will not go in.
+// THE PITCH IS FIXED; THE SPLIT OF IT IS NOT. Fin plus slot is 5 and nothing
+// else. A fin is a thin feature with two exposed faces, and on the installed
+// profile those rungs are 0.84 + 0.45n (0.42 outer walls, 0.45 inner; slicing
+// reference — the design reference's 0.42n ladder is wrong here). The fin is
+// 2.64, the 6-line rung, which leaves a 2.36 slot: wide enough for the spine of
+// Ziad's Global knives (just over 2.0 at the heel), which rides down inside the
+// slots at the end of a cut now that the walls clear the tomato. The price is
+// slop: a blade that is thinner than the slot where it cuts can wander in it.
+// The first draft cut ⅛" (3.175) on a 1.29 fin and a 1.885 slot, which the
+// spine would have jammed in.
 //
 // THE SLOTS RUN BELOW THE TROUGH. A knife that stops on the trough surface
 // leaves the bottom skin uncut, so every slot goes floor_kerf below the bottom
@@ -49,14 +52,14 @@ trough_gap = 1;     // mm
 
 /* [Slices] */
 
-// Slice thickness: fin + slot. ⅛" = 3.175.
-pitch = 3.175;      // mm
+// Slice thickness: fin + slot.
+pitch = 5;          // mm
 
-// Fin thickness along the pitch. 1.29 is a 3-line wall on the 0.4 nozzle.
-fin_t = 1.29;       // mm
+// Fin thickness along the pitch. 2.64 is a 6-line wall on the 0.4 nozzle.
+fin_t = 2.64;       // mm
 
-// Number of slots, which is slices + 1. 32 covers a 100 mm tomato.
-slot_n = 32;
+// Number of slots, which is slices + 1. 21 covers a 100 mm tomato.
+slot_n = 21;
 
 // Wall left outside the trough. Widened from 12 when the walls went up.
 wall_w = 16;        // mm
@@ -67,7 +70,7 @@ guide_over = 6;     // mm
 // Solid block at each end, unslotted.
 end_w = 6;          // mm
 
-// Flare at the top of each slot, per side. Leaves a 0.69 tip on each fin.
+// Flare at the top of each slot, per side. Leaves a 2.04 tip on each fin.
 lead_w = 0.3;       // mm
 
 // Height over which the flare closes back to the slot width.
