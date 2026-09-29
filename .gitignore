@@ -278,3 +278,14 @@ node_modules/
 package-lock.json
 **/public/models/*
 3d
+**/JOURNAL.md
+**/*.journal*
+
+# Canonical agent documentation
+!/docs/
+/docs/*
+!/docs/architecture.md
+!/docs/api.md
+!/docs/deployment.md
+!/docs/decisions.md
+!/docs/debugging.md
