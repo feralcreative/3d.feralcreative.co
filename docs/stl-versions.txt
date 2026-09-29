@@ -14,6 +14,9 @@ delonghi-heater-stand-end-right 5
 delonghi-heater-stand-joint-coupon 1
 desk-cup-holder 8
 desk-cup-holder-starbucks 9
+door-closer-casing-plate 3
+door-closer-casing-plate-coupon 10
+door-closer-casing-plate-coupon-flat-slope 1
 door-stop-base 2
 door-stop-fin 2
 door-stop-post 2
@@ -71,11 +74,13 @@ reversible-door-stop 1
 roku-stand 5
 roku-stand-r 2
 roku-stand-z 3
+roma-tomato-slicing-guide 4
+roma-tomato-slicing-guide-coupon 3
 salt-pepper-grinder-tray 3
 screen-fence-clip-coupon 1
 screen-fence-fit-pair 15
 screen-fence-flex 1
-screen-fence-insert 3
+screen-fence-insert 4
 screen-fence-key 8
 screen-fence-rail 1
 screen-fence-rail-coupon 4
@@ -109,6 +114,8 @@ sofa-monitor-stand-base-slice 6
 sofa-monitor-stand-coupon 1
 tpu-door-stop 2
 tpu-door-stop-deck 1
+wire-shelf-box-platform 3
+wire-shelf-box-platform-coupon 1
 zr-cube 3
 zr-mark-plaque 1
 zr-monogram-stamp-2026 5
