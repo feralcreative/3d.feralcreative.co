@@ -24,7 +24,10 @@ door-stop-spinner 2
 doorbell-wire-channel 48
 doorbell-wire-channel-cap 27
 gridfinity-baseplate-5x2 3
+gridfinity-baseplate-6x1 1
 gridfinity-baseplate-dogleg 4
+gridfinity-cup-1x1-9-chambers 5
+gridfinity-cup-1x1-9-chambers-fit-coupon 1
 gridfinity-cup-1x1x12 1
 gridfinity-cup-1x1x6 3
 gridfinity-cup-2x1x12 4
@@ -37,6 +40,7 @@ gridfinity-metal-cup-base 2
 gridfinity-picture-frame-base 1
 gridfinity-remote-holder 16
 gridfinity-remote-holder-coupon 4
+gridfinity-watch-charger-base 7
 gridfinity_baseplate 3
 hobbs-chalk-holder-coupon 5
 large-door-stop 2
@@ -116,6 +120,7 @@ tpu-door-stop 2
 tpu-door-stop-deck 1
 wire-shelf-box-platform 3
 wire-shelf-box-platform-coupon 1
+wire-shelf-cup-holder 1
 zr-cube 3
 zr-mark-plaque 1
 zr-monogram-stamp-2026 5
