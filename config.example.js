@@ -11,16 +11,8 @@ const CONFIG = {
   //   - https://yourdomain.com (for production)
   GOOGLE_CLIENT_ID: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
 
-  // Optional: Restrict to specific email addresses or domains
-  // Leave empty array [] to allow any Google account
-  // Examples:
-  //   - "user@example.com" - specific email
-  //   - "@yourdomain.com" - any email from this domain
-  ALLOWED_EMAILS: [
-    "@yourdomain.com",
-    "user1@example.com",
-    "user2@example.com",
-  ],
+  // Who may watch, and who may upload or send G-code, is managed in the
+  // feralcreative.tv admin panel; the proxy checks it at sign-in.
 
   // Stream URL configuration
   // Both point at the local proxy rather than at the NAS directly. Browsers will

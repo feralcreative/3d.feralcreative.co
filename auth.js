@@ -1,4 +1,6 @@
-// Google Authentication Handler
+// Google Authentication Handler. Access is decided by the feralcreative.tv hub: the
+// Google token goes to our proxy's /session, which asks the hub and sets a session
+// cookie. Upload and G-code need a hub admin. On localhost, DEV_MODE skips all of it.
 class GoogleAuth {
   constructor() {
     this.user = null;
@@ -19,28 +21,28 @@ class GoogleAuth {
     });
   }
 
-  // Handle the credential response from Google
-  handleCredentialResponse(response) {
-    try {
-      // Decode the JWT token to get user info
-      const payload = this.parseJwt(response.credential);
+  sessionUrl() {
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    return `${isLocalhost ? CONFIG.PRINTER_PROXY_URL.DEV : CONFIG.PRINTER_PROXY_URL.PROD}/session`;
+  }
 
-      // Check if email is allowed
-      if (!this.isEmailAllowed(payload.email)) {
-        this.showError(`Access denied. Email ${payload.email} is not authorized.`);
+  // Handle the credential response from Google
+  async handleCredentialResponse(response) {
+    try {
+      const result = await fetch(this.sessionUrl(), {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential: response.credential }),
+      });
+      const data = await result.json().catch(() => ({}));
+      if (!result.ok) {
+        this.showError(data.error || "Authentication failed. Please try again.");
         return;
       }
 
-      // Store user info
-      this.user = {
-        email: payload.email,
-        name: payload.name,
-        picture: payload.picture,
-        credential: response.credential,
-      };
-
-      // Store in localStorage for persistent login
-      localStorage.setItem("user", JSON.stringify(this.user));
+      const payload = this.parseJwt(response.credential);
+      this.user = { email: data.email, admin: data.admin, name: payload.name, picture: payload.picture };
 
       // Log the login event
       if (window.activityLogger) {
@@ -55,61 +57,13 @@ class GoogleAuth {
     }
   }
 
-  // Check if email is allowed based on CONFIG
-  isEmailAllowed(email) {
-    // If no restrictions, allow all
-    if (!CONFIG.ALLOWED_EMAILS || CONFIG.ALLOWED_EMAILS.length === 0) {
-      return true;
-    }
-
-    // Check against allowed emails/domains
-    return CONFIG.ALLOWED_EMAILS.some((allowed) => {
-      if (allowed.startsWith("@")) {
-        // Domain check
-        return email.endsWith(allowed);
-      } else {
-        // Exact email check
-        return email === allowed;
-      }
-    });
+  // Upload and G-code are for hub admins; the server enforces the same.
+  canUpload() {
+    return Boolean(this.user && this.user.admin);
   }
 
-  // Check if user has upload permissions
-  canUpload(email) {
-    // If no upload restrictions configured, deny by default for security
-    if (!CONFIG.UPLOAD_ALLOWED_EMAILS || CONFIG.UPLOAD_ALLOWED_EMAILS.length === 0) {
-      return false;
-    }
-
-    // Check against upload allowed emails/domains
-    return CONFIG.UPLOAD_ALLOWED_EMAILS.some((allowed) => {
-      if (allowed.startsWith("@")) {
-        // Domain check
-        return email.endsWith(allowed);
-      } else {
-        // Exact email check
-        return email === allowed;
-      }
-    });
-  }
-
-  // Check if user has access to advanced features
-  hasAdvancedFeatures(email) {
-    // If no advanced features list configured, deny by default
-    if (!CONFIG.ADVANCED_FEATURES || CONFIG.ADVANCED_FEATURES.length === 0) {
-      return false;
-    }
-
-    // Check against advanced features allowed emails/domains
-    return CONFIG.ADVANCED_FEATURES.some((allowed) => {
-      if (allowed.startsWith("@")) {
-        // Domain check
-        return email.endsWith(allowed);
-      } else {
-        // Exact email check
-        return email === allowed;
-      }
-    });
+  hasAdvancedFeatures() {
+    return Boolean(this.user && this.user.admin);
   }
 
   // Parse JWT token
@@ -137,21 +91,24 @@ class GoogleAuth {
     });
   }
 
-  // Check if user is already signed in (from localStorage)
-  checkSession() {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      this.user = JSON.parse(storedUser);
-
-      // Log session restoration
-      if (window.activityLogger) {
-        window.activityLogger.logEvent("session_restored", {}, this.user);
-      }
-
-      this.onAuthStateChanged();
-      return true;
+  // Restore a session from the proxy's cookie
+  async checkSession() {
+    try {
+      const response = await fetch(this.sessionUrl(), { cache: "no-store", credentials: "same-origin" });
+      if (!response.ok) return false;
+      this.user = await response.json();
+    } catch (error) {
+      console.error("[AUTH] Could not check the session:", error);
+      return false;
     }
-    return false;
+
+    // Log session restoration
+    if (window.activityLogger) {
+      window.activityLogger.logEvent("session_restored", {}, this.user);
+    }
+
+    this.onAuthStateChanged();
+    return true;
   }
 
   // Sign out
@@ -162,9 +119,10 @@ class GoogleAuth {
     }
 
     this.user = null;
-    localStorage.removeItem("user");
+    fetch(this.sessionUrl(), { method: "DELETE", credentials: "same-origin" }).catch(() => {});
     google.accounts.id.disableAutoSelect();
     this.onAuthStateChanged();
+    this.init().then(() => this.renderSignInButton());
   }
 
   // Update UI based on auth state
@@ -186,7 +144,7 @@ class GoogleAuth {
 
       // Show/hide upload button based on permissions
       if (uploadBtn) {
-        if (this.canUpload(this.user.email)) {
+        if (this.canUpload()) {
           uploadBtn.style.display = "flex";
         } else {
           uploadBtn.style.display = "none";
@@ -195,7 +153,7 @@ class GoogleAuth {
 
       // Show/hide filament change prep button based on advanced features access
       if (prepFilamentBtn) {
-        if (this.hasAdvancedFeatures(this.user.email)) {
+        if (this.hasAdvancedFeatures()) {
           prepFilamentBtn.style.display = "flex";
         } else {
           prepFilamentBtn.style.display = "none";
@@ -535,6 +493,7 @@ window.addEventListener("load", async () => {
     // Bypass authentication in dev mode
     auth.user = {
       email: "dev@localhost",
+      admin: true,
       name: "Developer",
       picture: null,
       credential: null,
@@ -543,8 +502,13 @@ window.addEventListener("load", async () => {
     return;
   }
 
+  // Sessions used to live in localStorage; the proxy's cookie replaces them.
+  try {
+    localStorage.removeItem("user");
+  } catch (error) {}
+
   // Check if already signed in
-  if (!auth.checkSession()) {
+  if (!(await auth.checkSession())) {
     // Wait for Google API to load, then initialize
     await auth.init();
     auth.renderSignInButton();
