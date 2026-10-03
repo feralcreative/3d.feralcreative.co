@@ -15,6 +15,8 @@ wall_t = 3.54;           // mm, two 0.42 mm outer lines plus six 0.45 mm inner l
 lip_h = 6;               // mm above the floor
 rear_t = 4.44;           // mm
 brace_run = 34;          // mm, underside rib projection forward of the mounting beam
+corner_r = 8;            // mm, the two front (+Y) outer corners; the rear sits
+                         // against the shelf, and the pocket stays square for the box
 
 /* [Underside channel] */
 channel_length = 128;    // mm, one continuous hook along the rear edge
@@ -23,16 +25,23 @@ channel_depth = 12;      // mm, original rear attachment's outer width
 hook_scale = 0.1;        // original 3MF build transform
 rib_spacing = 90;        // mm between underside braces; these are not shelf clips
 
-/* [Cross wires] */
-cross_wire_d = 7.7;      // mm, wires running front-to-back under the platform
-cross_wire_gap = 114;    // mm, measured clear gap between facing wire surfaces
-cross_wire_clearance = 0.5; // mm on each side and above the wires
+/* [Shelf floor wires] */
+// PROVEN 2026-10-03: the printed rail coupon fit the shelf perfectly. Every wire
+// shelf part uses floor_wire_reliefs() with these values; do not change them.
+floor_wire_d = 3.5;      // mm, the thicker of the two: 3.5 front-to-back, 2.25 left-right,
+                         // so the same slots fit a shelf's front edge or its side
+floor_wire_pitch = 20;   // mm centre to centre, measured on the 2.25 mm wires
+floor_wire_clearance = 0.5; // mm per side and above the wires
+floor_wire_offset = 0;   // mm along X; align the slot pattern with the shelf
+min_end_web = 3;         // mm; a slot nearer a beam end than this runs out through it
+support_wire_gap = 114;  // mm, measured clear gap between the front edge's support wires;
+                         // parts centre on that gap, so those wires sit at +/-58.75
 
 /* [Box fit coupon] */
 coupon_ledge = 5;        // mm of the original floor retained inside each lip
 
 /* [Display] */
-show = "platform";       // [platform, coupon, assembly, box-fit, box-insertion, wire-fit, wire-insertion, channel, section]
+show = "platform";       // [platform, coupon, mount-coupon, assembly, box-fit, box-insertion, floor-wire-fit, floor-wire-insertion, channel, section]
 
 /* [Hidden] */
 $fn = 64;
@@ -48,24 +57,23 @@ inner_w = box_w + 2 * box_clearance;
 inner_d = box_d + 2 * box_clearance;
 outer_w = inner_w + 2 * wall_t;
 outer_d = rear_t + inner_d + wall_t;
-cross_wire_pitch = cross_wire_gap + cross_wire_d;
-cross_slot_w = cross_wire_d + 2 * cross_wire_clearance;
 rail_d = 5;             // mm, circular seat diameter in the supplied hook profile
+lower_rail_z = 11;       // mm, original lower seat center after flipping the profile
 upper_rail_z = hook_bounds.y - 6; // mm, original lower seat becomes upper after flipping
-// Conservative height: the perpendicular wire can sit on top of the upper rail.
-// Open-bottom cuts also clear wires crossing lower down; no narrow vertical seat.
-cross_wire_z = upper_rail_z + rail_d / 2 + cross_wire_d / 2;
-deck_z = max(channel_height, cross_wire_z + cross_wire_d / 2 + cross_wire_clearance);
+rail_y = hook_bounds.x - (void_left + void_right) / 2; // mm, seat centre; measured span 3.5-8.5
+deck_z = 38.7;           // mm, the printed and physically fitted deck elevation
 floor_top = deck_z + floor_t;
 lip_top = floor_top + lip_h;
 box_probe_h = channel_height + floor_t; // envelope only, not measured box height
 insertion_travel = lip_top + box_probe_h;
 
+// Square pocket corner to the outer arc: keep at least two perimeter lines there.
+assert(corner_r - (corner_r - wall_t) * sqrt(2) >= 0.84,
+       "Corner radius leaves the corner wall too thin");
 assert(channel_length <= outer_w, "Channel must lie within the platform width");
 assert(channel_depth + brace_run < outer_d, "Underside ribs must end within the platform");
 assert(channel_height == hook_bounds.y && channel_depth == 12,
        "Retain the supplied attachment dimensions; do not distort its wire fit");
-assert(cross_wire_gap > 2 * cross_wire_clearance, "Cross-wire reliefs must remain separate");
 
 module original_midsection() {
     // Slice the middle of the original 5 mm thickness, avoiding its outer rounding.
@@ -87,10 +95,10 @@ module channel_profile() {
         }
 }
 
-module channel_cut() {
-    translate([-channel_length / 2 - eps, 0, 0])
+module channel_cut(length = channel_length) {
+    translate([-length / 2 - eps, 0, 0])
         rotate([90, 0, 90])
-            linear_extrude(height = channel_length + 2 * eps, convexity = 10)
+            linear_extrude(height = length + 2 * eps, convexity = 10)
                 channel_profile();
 }
 
@@ -104,13 +112,41 @@ module underside_ribs() {
                              [channel_depth - eps, deck_z + eps]]);
 }
 
-module cross_wire_reliefs() {
-    // Cut all material under the deck along each front-to-back wire path.
-    // At this width the reliefs reach the ends of the nominal 128 mm beam,
-    // leaving a continuous 113 mm grip between them without loose end slivers.
-    for (x = [-cross_wire_pitch / 2, cross_wire_pitch / 2])
-        translate([x - cross_slot_w / 2, -eps, -eps])
-            cube([cross_slot_w, outer_d + 2 * eps, deck_z + eps]);
+// Wire centre: resting on the lower rail, so tangent to the top of its seat.
+function floor_wire_z(wire_d = floor_wire_d) = lower_rail_z + rail_d / 2 + wire_d / 2;
+// Wire ends: at most the far tangent of the rail they are welded to.
+function floor_wire_end() = rail_y + rail_d / 2;
+
+// Slot centres: the 20 mm side-edge pattern plus the front edge's two support
+// wires either side of the part's centre, each kept only if it reaches the part.
+function wire_xs(width, wire_d, pitch, offset, margin) = concat(
+    [for (i = [ceil((-width / 2 - margin - offset) / pitch)
+               : floor((width / 2 + margin - offset) / pitch)]) offset + i * pitch],
+    [for (x = [-1, 1] * (support_wire_gap + wire_d) / 2)
+         if (abs(x) <= width / 2 + margin) x]);
+
+module floor_wire_reliefs(width, wire_d = floor_wire_d,
+                          pitch = floor_wire_pitch,
+                          clearance = floor_wire_clearance,
+                          offset = floor_wire_offset) {
+    // Thin wires are welded on TOP of the lower rail, the bottom circular seat.
+    // Open-bottom slots admit them during snap-on; no enclosed drilled holes.
+    // Each slot rises through the lower seat to clear the wire above it.
+    // The wires run from the rail back into the shelf (-Y) and end on the rail,
+    // so slots stop past its far side and the outer jaw stays solid.
+    slot_w = wire_d + 2 * clearance;
+    slot_top = floor_wire_z(wire_d) + wire_d / 2 + clearance;
+    slot_end = floor_wire_end() + clearance;
+    assert(slot_top < upper_rail_z - rail_d / 2, "Floor-wire slots must stay below the upper seat");
+    assert(wire_d > 0 && pitch > slot_w && clearance > 0);
+    assert(abs(offset) <= pitch / 2, "Use a floor-wire offset within half a pitch");
+    // A slot that would leave a thin stub at a beam end takes the stub with it.
+    for (x = wire_xs(width, wire_d, pitch, offset, slot_w / 2)) {
+        x0 = x - slot_w / 2 < -width / 2 + min_end_web ? -width / 2 - eps : x - slot_w / 2;
+        x1 = x + slot_w / 2 > width / 2 - min_end_web ? width / 2 + eps : x + slot_w / 2;
+        translate([x0, -eps, -eps])
+            cube([x1 - x0, slot_end + eps, slot_top + eps]);
+    }
 }
 
 module platform_body() {
@@ -126,11 +162,34 @@ module platform_body() {
     underside_ribs();
 }
 
+module rounded_footprint() {
+    // Round only the deck and lip; the beam and ribs below keep their shapes.
+    translate([-outer_w / 2, 0, deck_z - eps])
+        linear_extrude(height = floor_t + lip_h + 2 * eps, convexity = 10)
+            hull() {
+                translate([0, -eps]) square([outer_w, eps]);
+                for (x = [corner_r, outer_w - corner_r])
+                    translate([x, outer_d - corner_r]) circle(r = corner_r);
+            }
+    translate([-outer_w, -eps, -eps]) cube([2 * outer_w, outer_d + 2 * eps, deck_z]);
+}
+
 module box_platform() {
     difference() {
-        union() { platform_body(); }
+        intersection() { platform_body(); rounded_footprint(); }
         channel_cut();
-        cross_wire_reliefs();
+        floor_wire_reliefs(channel_length);
+    }
+}
+
+module mount_fit_coupon() {
+    // A literal slice of the production rail spanning three wire slots, with
+    // the deck strip above it that ties the beam together.
+    coupon_w = 3 * floor_wire_pitch;
+    intersection() {
+        box_platform();
+        translate([-coupon_w / 2, -eps, -eps])
+            cube([coupon_w, channel_depth + eps, floor_top + 2 * eps]);
     }
 }
 
@@ -157,30 +216,37 @@ module box_fit_coupon() {
         }
 }
 
-module cross_wire_at(x, drop = 0) {
-    // Circumscribed polygons conservatively contain the measured round wires.
-    probe_extra = cross_wire_d;
-    translate([x, -probe_extra, cross_wire_z - drop])
-        rotate([-90, 0, 0])
-            cylinder(h = outer_d + 2 * probe_extra,
-                     r = cross_wire_d / 2 / cos(180 / $fn));
+module floor_wire_envelope(width = channel_length,
+                           wire_d = floor_wire_d, pitch = floor_wire_pitch,
+                           offset = floor_wire_offset) {
+    wire_z = floor_wire_z(wire_d);
+    probe_length = floor_wire_end() + wire_d;
+    for (x = wire_xs(width, wire_d, pitch, offset, 0))
+        translate([x, -wire_d, wire_z])
+            rotate([-90, 0, 0])
+                cylinder(h = probe_length,
+                         r = wire_d / 2 / cos(180 / $fn));
 }
 
-module cross_wire_envelope() {
-    for (x = [-cross_wire_pitch / 2, cross_wire_pitch / 2]) cross_wire_at(x);
-}
-
-module cross_wire_sweep() {
-    // A continuous approach from wholly below the platform to the seated level.
-    for (x = [-cross_wire_pitch / 2, cross_wire_pitch / 2])
+module floor_wire_sweep(width = channel_length,
+                        wire_d = floor_wire_d, pitch = floor_wire_pitch,
+                        offset = floor_wire_offset) {
+    // Each wire has one connected straight approach from wholly below.
+    // Hull each wire separately: hulling the complete array would fill gaps.
+    wire_z = floor_wire_z(wire_d);
+    for (x = wire_xs(width, wire_d, pitch, offset, 0))
         hull() {
-            cross_wire_at(x);
-            cross_wire_at(x, cross_wire_z + cross_wire_d);
+            for (z = [wire_z, -wire_d])
+                translate([x, -wire_d, z])
+                    rotate([-90, 0, 0])
+                        cylinder(h = floor_wire_end() + wire_d,
+                                 r = wire_d / 2 / cos(180 / $fn));
         }
 }
 
 if (show == "platform") box_platform();
 else if (show == "coupon") box_fit_coupon();
+else if (show == "mount-coupon") mount_fit_coupon();
 else if (show == "channel") channel_cut();
 else if (show == "section") {
     intersection() {
@@ -191,14 +257,14 @@ else if (show == "section") {
 else if (show == "assembly") {
     box_platform();
     %box_envelope();
-    %cross_wire_envelope();
+    %floor_wire_envelope();
 } else if (show == "box-fit") {
     intersection() { box_platform(); box_envelope(); }
 } else if (show == "box-insertion") {
     // Continuous vertical swept volume, from wholly above the platform to seated.
     intersection() { box_platform(); box_envelope(insertion_travel); }
-} else if (show == "wire-fit") {
-    intersection() { box_platform(); cross_wire_envelope(); }
-} else if (show == "wire-insertion") {
-    intersection() { box_platform(); cross_wire_sweep(); }
+} else if (show == "floor-wire-fit") {
+    intersection() { box_platform(); floor_wire_envelope(); }
+} else if (show == "floor-wire-insertion") {
+    intersection() { box_platform(); floor_wire_sweep(); }
 }

@@ -58,6 +58,7 @@ magnet-polarity-tool-10x2-shaft-c 1
 magnet-polarity-tool-10x2-shaft-d 1
 middle-finger-emboss 14
 middle-finger-wrist-emboss 1
+nightlight-floor-hood 16
 patio-leg-foot 3
 patio-leg-spacer-base 8
 patio-leg-spacer-coupon 1
@@ -118,9 +119,10 @@ sofa-monitor-stand-base-slice 6
 sofa-monitor-stand-coupon 1
 tpu-door-stop 2
 tpu-door-stop-deck 1
-wire-shelf-box-platform 3
+wire-shelf-box-platform 7
 wire-shelf-box-platform-coupon 1
-wire-shelf-cup-holder 1
+wire-shelf-cup-holder 6
+wire-shelf-gridfinity-4x2 3
 zr-cube 3
 zr-mark-plaque 1
 zr-monogram-stamp-2026 5

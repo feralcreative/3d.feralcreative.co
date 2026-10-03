@@ -4,9 +4,9 @@
 use <wire-shelf-box-platform.scad>
 
 /* [Cup] */
-inside_d = 66;           // mm, exact clear inside diameter across the polygon flats
+inside_d = 69;           // mm, exact clear inside diameter across the polygon flats
 probe_clearance = 0.5;   // mm per side for the removable test envelope only
-cup_depth = 40;          // mm above the inside floor
+cup_depth = 25;          // mm above the inside floor
 
 /* [Body] */
 wall_t = 3.54;           // mm, two 0.42 mm outer lines plus six 0.45 mm inner lines
@@ -17,11 +17,15 @@ rib_spacing = 36;        // mm between underside braces
 /* [Mount] */
 mount_depth = 12;        // mm, retain the tested attachment's outer depth
 deck_z = 38.7;           // mm, retain the tested deck underside elevation
-cross_wire_gap = 114;    // mm clear space between front-to-back wires
-cross_wire_clearance = 0.5; // mm per side, same as the platform
+
+/* [Shelf floor wires] */
+floor_wire_d = 3.5;      // mm, fits either edge: 3.5 front-to-back, 2.25 left-right wires
+floor_wire_pitch = 20;   // mm centre to centre
+floor_wire_clearance = 0.5; // mm per side and above the wires
+floor_wire_offset = 0;   // mm along X; align the slot pattern with the shelf
 
 /* [Display] */
-show = "holder";         // [holder, assembly, cup-fit, cup-insertion, mount, section]
+show = "holder";         // [holder, assembly, cup-fit, cup-insertion, floor-wire-fit, floor-wire-insertion, mount, section]
 
 /* [Hidden] */
 $fn = 64;
@@ -41,8 +45,6 @@ insertion_travel = rim_z + probe_h;
 assert(inside_d > 0 && probe_clearance > 0 && cup_depth > 0);
 assert(mount_depth == 12 && deck_z == 38.7,
        "Keep the proven channel surround and deck elevation unchanged");
-assert(mount_w < cross_wire_gap - 2 * cross_wire_clearance,
-       "This holder must sit between the cross wires");
 assert(mount_w <= 128, "The source channel cutter is 128 mm long");
 assert(rib_spacing / 2 + wall_t / 2 < outer_r);
 assert(brace_run < outer_r, "Keep braces beneath the circular floor");
@@ -59,6 +61,8 @@ module mounting_beam() {
         translate([-mount_w / 2, 0, 0])
             cube([mount_w, mount_depth, deck_z + eps]);
         channel_cut();
+        floor_wire_reliefs(mount_w, floor_wire_d,
+                           floor_wire_pitch, floor_wire_clearance, floor_wire_offset);
     }
 }
 
@@ -98,11 +102,25 @@ else if (show == "mount") mounting_beam();
 else if (show == "assembly") {
     cup_holder();
     %cup_envelope();
+    %floor_wire_envelope(mount_w, floor_wire_d,
+                         floor_wire_pitch, floor_wire_offset);
 } else if (show == "cup-fit") {
     intersection() { cup_holder(); cup_envelope(); }
 } else if (show == "cup-insertion") {
     // Exact continuous vertical swept envelope, from wholly above to seated.
     intersection() { cup_holder(); cup_envelope(insertion_travel); }
+} else if (show == "floor-wire-fit") {
+    intersection() {
+        cup_holder();
+        floor_wire_envelope(mount_w, floor_wire_d,
+                            floor_wire_pitch, floor_wire_offset);
+    }
+} else if (show == "floor-wire-insertion") {
+    intersection() {
+        cup_holder();
+        floor_wire_sweep(mount_w, floor_wire_d,
+                        floor_wire_pitch, floor_wire_offset);
+    }
 } else if (show == "section") {
     intersection() {
         cup_holder();

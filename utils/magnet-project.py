@@ -3,6 +3,9 @@
 
 Reject old/open-pocket meshes. Pre-render thumbnails on the CPU because Flash
 Studio's CLI requests an invalid OpenGL 3.4 context when creating its own.
+The cavity height is read from the mesh, so a part printed upside down, with
+its cavities well off the bed, pauses at its own height; every cavity must
+share one Z range, and both ends must sit on 0.30/0.12 layer boundaries.
 The resulting project still needs utils/slice.sh; no G-code is patched here.
 Usage: python3 utils/magnet-project.py part.stl /tmp/part.3mf --settings resolved.json
 """
@@ -69,7 +72,7 @@ def mesh(path):
             a[2]*(b[0]*c[1]-b[1]*c[0])) / 6
     lo = [min(v[d] for v in vertices) for d in range(3)]
     hi = [max(v[d] for v in vertices) for d in range(3)]
-    cavities = []
+    cavities, spans = [], set()
     for group, volume in zip(groups, volumes):
         if volume >= 0:
             continue
@@ -77,17 +80,38 @@ def mesh(path):
         low = [min(v[d] for v in g) for d in range(3)]
         high = [max(v[d] for v in g) for d in range(3)]
         dims = [high[d]-low[d] for d in range(3)]
-        if not (abs(low[2]-lo[2]-.4) < .001 and
-                abs(high[2]-lo[2]-2.6) < .001 and
-                all(abs(d-10.5) < .03 for d in dims[:2])):
+        if not (all(abs(d-10.5) < .03 for d in dims[:2]) and 2.1 < dims[2] < 2.3):
             raise ValueError(f'Unexpected enclosed void: {low}, {high}')
+        spans.add((round(low[2]-lo[2], 3), round(high[2]-lo[2], 3)))
         cavities.append([(low[d]+high[d])/2 for d in range(3)])
     if not cavities or sum(v > 0 for v in volumes) != 1:
         raise ValueError('Expected one solid with enclosed magnet cavities')
+    if len(spans) != 1:
+        raise ValueError(f'Cavities at different heights: {sorted(spans)}')
     shift = [-(lo[0]+hi[0])/2, -(lo[1]+hi[1])/2, -lo[2]]
     vertices = [tuple(v[d]+shift[d] for d in range(3)) for v in vertices]
     cavities = [tuple(v[d]+shift[d] for d in range(3)) for v in cavities]
-    return vertices, faces, cavities
+    return vertices, faces, cavities, spans.pop()
+
+
+FIRST, LAYER = .3, .12
+
+
+def layer_top(i):
+    return FIRST + LAYER * i
+
+
+def layer_mid(i):
+    return layer_top(i) - (LAYER if i else FIRST) / 2
+
+
+def pause_layer(span):
+    """Index of the first layer whose middle is above the cavity top."""
+    for z in span:
+        # A cavity face at a layer's middle is a coin toss for the slicer.
+        if min(abs(z - layer_mid(i)) for i in range(400)) < .03:
+            raise ValueError(f'Cavity face Z {z} sits on a layer middle')
+    return next(i for i in range(400) if layer_mid(i) > span[1])
 
 
 def thumbnail(vertices, faces, top=False):
@@ -129,7 +153,8 @@ def write_project(source, output, settings):
             str(profile['enable_support']) != '0' or
             int(profile['raft_layers']) != 0):
         raise ValueError('Pause validated only for 0.30 first / 0.12 mm layers, no support or raft')
-    vertices, faces, cavities = mesh(source)
+    vertices, faces, cavities, span = mesh(source)
+    pause_z = round(layer_top(pause_layer(span)), 3)
     ns = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'
     model = ET.Element('model', unit='millimeter', xmlns=ns)
     ET.SubElement(model, 'metadata', name='Application').text = 'BambuStudio-2.3.2'
@@ -161,7 +186,7 @@ def write_project(source, output, settings):
     pauses = ET.Element('custom_gcodes_per_layer')
     plate = ET.SubElement(pauses, 'plate')
     ET.SubElement(plate, 'plate_info', id='1')
-    ET.SubElement(plate, 'layer', top_z='2.7', type='1', extruder='1', color='',
+    ET.SubElement(plate, 'layer', top_z=str(pause_z), type='1', extruder='1', color='',
                   extra=f'Insert {len(cavities)} 10x2 mm magnets; check polarity', gcode='PAUSE')
     ET.SubElement(plate, 'mode', value='SingleExtruder')
     iso, top = thumbnail(vertices,faces), thumbnail(vertices,faces,True)
@@ -175,19 +200,22 @@ def write_project(source, output, settings):
             z.writestr(name,ET.tostring(tree,encoding='utf-8',xml_declaration=True))
         for key,path in images.items():
             z.writestr(path, top if key in ('top_file','pick_file') else iso)
-    print(f'{source.stem}: {len(cavities)} cavities, Z 0.40–2.60; pause before layer Z 2.70 -> {output}')
+    print(f'{source.stem}: {len(cavities)} cavities, Z {span[0]:.2f}–{span[1]:.2f}; pause before layer Z {pause_z:.2f} -> {output}')
 
 
 def verify_job(source, job):
     """Read the shipped archive and check open cavities before the actual pause."""
-    _, _, cavities = mesh(source)
+    _, _, cavities, span = mesh(source)
+    layer = pause_layer(span)
+    pause_z = layer_top(layer)
+    open_from = next(layer_top(i) for i in range(400) if layer_mid(i) > span[0])
     with zipfile.ZipFile(job) as archive:
         if archive.testzip() is not None:
             raise ValueError('Corrupt 3MF')
         text = archive.read('Metadata/plate_1.gcode').decode()
         xml = ET.fromstring(archive.read('Metadata/custom_gcode_per_layer.xml'))
         markers = xml.findall('./plate/layer')
-        if len(markers) != 1 or markers[0].get('type') != '1' or abs(float(markers[0].get('top_z'))-2.7) > .001:
+        if len(markers) != 1 or markers[0].get('type') != '1' or abs(float(markers[0].get('top_z'))-pause_z) > .001:
             raise ValueError('Missing or wrong native pause marker')
     pause_lines = re.findall(r'^(?:PAUSE|M25|M600|M601)(?:[ \t].*)?$', text, re.M)
     if pause_lines != ['PAUSE']:
@@ -195,7 +223,7 @@ def verify_job(source, job):
     blocks = text.split(';LAYER_CHANGE')[1:]
     pause_block = next(i for i,b in enumerate(blocks) if '\nPAUSE\n' in b)
     z_of = lambda b: float(re.search(r'^;Z:([\d.]+)', b, re.M)[1])
-    if pause_block != 20 or abs(z_of(blocks[19])-2.58) > .001 or abs(z_of(blocks[20])-2.7) > .001:
+    if pause_block != layer or abs(z_of(blocks[layer-1])-layer_top(layer-1)) > .001 or abs(z_of(blocks[layer])-pause_z) > .001:
         raise ValueError('Pause moved away from the validated layer boundary')
     x = y = e = 0.0
     relative_e = False
@@ -221,21 +249,21 @@ def verify_job(source, job):
             e = e+values['E'] if relative_e else values['E']
         if extrusion > 0 and (nx,ny) != (x,y):
             bounds = [min(bounds[0],x,nx),min(bounds[1],y,ny),max(bounds[2],x,nx),max(bounds[3],y,ny)]
-            if .53 < layer_z < 2.71:
+            if open_from - .001 < layer_z < pause_z + .001:
                 for i,(cx,cy,_) in enumerate(cavities):
                     dx,dy = nx-x,ny-y
                     t = max(0,min(1,((cx-x)*dx+(cy-y)*dy)/(dx*dx+dy*dy)))
                     distance = math.hypot(x+t*dx-cx,y+t*dy-cy)
                     if distance < 4.95 and not paused:
                         raise ValueError(f'Extrusion in magnet opening {i+1} before pause at Z {layer_z}')
-                    if distance < 2.5 and abs(layer_z-2.7)<.001 and paused:
+                    if distance < 2.5 and abs(layer_z-pause_z)<.001 and paused:
                         bridged.add(i)
         x,y = nx,ny
     if len(bridged) != len(cavities):
         raise ValueError(f'Expected roofs after pause over {len(cavities)} magnets, found {len(bridged)}')
     if min(bounds[:2]) < -110 or max(bounds[2:]) > 110:
         raise ValueError(f'Extrusion outside bed: {bounds}')
-    print(f'VERIFIED {job.name}: {len(cavities)} open cavities; one pause before layer 21; all roofs after pause; extrusion bounds {bounds}')
+    print(f'VERIFIED {job.name}: {len(cavities)} open cavities, Z {open_from:.2f}–{span[1]:.2f}; one pause before layer {layer+1} (Z {pause_z:.2f}); all roofs after pause; extrusion bounds {bounds}')
 
 
 if __name__ == '__main__':
