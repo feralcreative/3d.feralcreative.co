@@ -128,7 +128,7 @@ wire-shelf-gridfinity-4x2-enforcer 2
 wire-shelf-gridfinity-4x2-joint-coupon 3
 wire-shelf-gridfinity-4x2-rail 3
 wire-shelf-gridfinity-4x2-rail-enforcer 2
-wire-shelf-gridfinity-4x2-set-rail 4
+wire-shelf-gridfinity-4x2-set-rail 5
 zr-cube 3
 zr-mark-plaque 1
 zr-monogram-stamp-2026 5

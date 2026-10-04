@@ -32,13 +32,13 @@ brace_run = 34;          // mm forward of the mounting beam
 brace_x = [-80, -30, 30, 80]; // mm, brace centres
 
 /* [Joint] */
-// Split print: the deck prints face up and the rail prints upside down, tail on
-// the bed, with supports under the rail beside the tail. They glue together on a sliding dovetail along X: the tail
+// Split print: the deck prints face up and the rail prints as mounted, channel
+// mouth on the bed. They glue together on a sliding dovetail along X: the tail
 // stands on the rail top and slides into a groove in the deck's underside.
 dt_mouth_w = 5;          // mm, groove width at the deck underside
 dt_root_w = 7;           // mm, groove width at its roof; 18 deg flanks
-dt_depth = 2.94;         // mm up into the deck; a 0.30/0.12 layer boundary, so the roof
-                         // is not split mid-layer and the enforcer reaches it
+dt_depth = 2.94;         // mm up into the deck; its roof is a 7 mm bridge, so neither
+                         // piece needs supports: the rail prints as mounted, tail up
 dt_clear = 0.2;          // mm per face, snug sliding plus a glue film
 dt_chamfer = 0.5;        // mm at 45 deg on the groove mouth, which prints on the bed
 coupon_len = 30;         // mm of joint in the fit coupon
@@ -46,7 +46,7 @@ coupon_roof = 1.2;       // mm of strip above the coupon's groove
 set_gap = 8;             // mm between deck and rail on the shared print plate
 
 /* [Display] */
-show = "plate";          // [plate, deck, rail, print-set, set-rail, enforcer, rail-enforcer, joint-coupon, split, mount, section]
+show = "plate";          // [plate, deck, rail, print-set, set-rail, enforcer, joint-coupon, split, mount, section]
 
 /* [Colors] */
 // Preview only; STLs carry no colour. Each printed piece gets its own.
@@ -176,20 +176,8 @@ module deck_pose() {
 }
 
 module set_rail_pose() {
-    // Behind the deck on the shared plate, upside down: the tail's wide face on
-    // the bed, so the tail flanks print without overhang.
-    // The tail stops dt_clear short of the groove roof.
-    translate([0, -set_gap, deck_z + dt_depth - dt_clear]) rotate([180, 0, 0]) children();
-}
-
-module rail_enforcer() {
-    // The rail's underside beside the tail hangs dt_depth off the bed in the
-    // set pose: enforce supports from the bed to 1 mm past it, and nowhere else.
-    color("Gold", 0.5) set_rail_pose() intersection() {
-        translate([-plate_w / 2, 0, deck_z - 1])
-            cube([plate_w, mount_depth + brace_run, dt_depth - dt_clear + 1]);
-        plate_footprint(deck_z - 1, dt_depth - dt_clear + 1);
-    }
+    // Behind the deck on the shared plate, as mounted, channel mouth on the bed.
+    translate([0, -(mount_depth + brace_run) - set_gap, 0]) children();
 }
 
 module groove_enforcer() {
@@ -237,10 +225,9 @@ module print_pose() {
 if (show == "plate") print_pose() shelf_plate();
 else if (show == "deck") deck_pose() deck();
 else if (show == "rail") rail();
-else if (show == "print-set") { deck_pose() deck(); set_rail_pose() rail(); groove_enforcer(); rail_enforcer(); }
+else if (show == "print-set") { deck_pose() deck(); set_rail_pose() rail(); groove_enforcer(); }
 else if (show == "set-rail") set_rail_pose() rail();
 else if (show == "enforcer") groove_enforcer();
-else if (show == "rail-enforcer") rail_enforcer();
 else if (show == "joint-coupon") joint_coupon();
 else if (show == "split") { translate([0, 0, 15]) deck(); rail(); }
 else if (show == "mount") mount();
