@@ -44,6 +44,12 @@ coupon_len = 30;         // mm of joint in the fit coupon
 /* [Display] */
 show = "plate";          // [plate, deck, rail, joint-coupon, split, mount, section]
 
+/* [Colors] */
+// Preview only; STLs carry no colour. Each printed piece gets its own.
+deck_color = "SteelBlue";
+rail_color = "DarkOrange";
+coupon_color = "MediumSeaGreen"; // the coupon's floor strip, which no full piece has
+
 /* [Hidden] */
 $fn = 48;
 mount_eps = 0.01;        // mm boolean overshoot
@@ -141,7 +147,7 @@ module plate_footprint(z0, h) {
 }
 
 module rail() {
-    difference() {
+    color(rail_color) difference() {
         intersection() {
             mount();
             translate([-plate_w, -mount_eps, -mount_eps])
@@ -152,8 +158,7 @@ module rail() {
 }
 
 module deck() {
-    gf_plate();
-    dovetail_tail();
+    color(deck_color) { gf_plate(); dovetail_tail(); }
 }
 
 module rail_pose() {
@@ -169,8 +174,9 @@ module joint_coupon() {
             cube([coupon_len, plate_d, deck_z + 2 * mount_eps]);
     }
     translate([0, -mount_depth - 6, 0]) {
-        translate([-coupon_len / 2, -mount_depth - 2, 0]) cube([coupon_len, mount_depth + 4, 2.1]);
-        translate([0, 0, deck_z + 2.1]) rotate([180, 0, 0])
+        color(coupon_color)
+            translate([-coupon_len / 2, -mount_depth - 2, 0]) cube([coupon_len, mount_depth + 4, 2.1]);
+        color(deck_color) translate([0, 0, deck_z + 2.1]) rotate([180, 0, 0])
             intersection() {
                 dovetail_tail();
                 translate([-coupon_len / 2, -mount_eps, 0]) cube([coupon_len, plate_d, deck_z + 1]);
@@ -179,8 +185,8 @@ module joint_coupon() {
 }
 
 module shelf_plate() {
-    mount();
-    gf_plate();
+    color(rail_color) mount();
+    color(deck_color) gf_plate();
 }
 
 module print_pose() {
