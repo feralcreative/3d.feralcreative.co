@@ -7,7 +7,15 @@ The cavity height is read from the mesh, so a part printed upside down, with
 its cavities well off the bed, pauses at its own height; every cavity must
 share one Z range, and both ends must sit on 0.30/0.12 layer boundaries.
 The resulting project still needs utils/slice.sh; no G-code is patched here.
+
+--with adds further pieces to the same plate as separate objects, and
+--enforcer attaches a support-enforcer volume to the magnet part. All STLs must
+share one coordinate frame (export them from the same layout); they are moved
+together. Supports are allowed only with an enforcer and a "(manual)" support
+type, so the slicer puts them inside the enforcer and never in a magnet cavity,
+and the verification fails if any support extrusion reaches a cavity.
 Usage: python3 utils/magnet-project.py part.stl /tmp/part.3mf --settings resolved.json
+       [--with other.stl ...] [--enforcer groove.stl]
 """
 
 import argparse
@@ -24,7 +32,7 @@ import xml.etree.ElementTree as ET
 from PIL import Image, ImageDraw
 
 
-def mesh(path):
+def read_stl(path):
     data = path.read_bytes()
     count = struct.unpack_from('<I', data, 80)[0]
     if len(data) != 84 + count * 50:
@@ -41,6 +49,12 @@ def mesh(path):
         if len(set(face)) != 3:
             raise ValueError('Collapsed triangle')
         faces.append(face)
+    return vertices, faces
+
+
+def mesh(path, cavities_required=True):
+    """Vertices, faces, cavity centres, and cavity Z span, in the file's frame."""
+    vertices, faces = read_stl(path)
     edges, adjacent = Counter(), defaultdict(set)
     for a, b, c in faces:
         for u, v in ((a, b), (b, c), (c, a)):
@@ -84,14 +98,38 @@ def mesh(path):
             raise ValueError(f'Unexpected enclosed void: {low}, {high}')
         spans.add((round(low[2]-lo[2], 3), round(high[2]-lo[2], 3)))
         cavities.append([(low[d]+high[d])/2 for d in range(3)])
-    if not cavities or sum(v > 0 for v in volumes) != 1:
+    if sum(v > 0 for v in volumes) != 1:
+        raise ValueError(f'Expected one solid in {path.name}')
+    if not cavities_required:
+        if cavities:
+            raise ValueError(f'{path.name} has magnet cavities; only the first STL may')
+        return vertices, faces, [], None
+    if not cavities:
         raise ValueError('Expected one solid with enclosed magnet cavities')
     if len(spans) != 1:
         raise ValueError(f'Cavities at different heights: {sorted(spans)}')
-    shift = [-(lo[0]+hi[0])/2, -(lo[1]+hi[1])/2, -lo[2]]
-    vertices = [tuple(v[d]+shift[d] for d in range(3)) for v in vertices]
-    cavities = [tuple(v[d]+shift[d] for d in range(3)) for v in cavities]
     return vertices, faces, cavities, spans.pop()
+
+
+def layout(source, extras=(), enforcer=None):
+    """Load every piece and centre them together on the bed, floor at Z=0."""
+    vertices, faces, cavities, span = mesh(source)
+    pieces = [(source, vertices, faces)] + [(p, *mesh(p, False)[:2]) for p in extras]
+    if enforcer:
+        pieces.append((enforcer, *read_stl(enforcer)))
+    every = [v for _, vs, _ in pieces[:1 + len(extras)] for v in vs]
+    lo = [min(v[d] for v in every) for d in range(3)]
+    hi = [max(v[d] for v in every) for d in range(3)]
+    for p, vs, _ in pieces[1:1 + len(extras)]:
+        if abs(min(v[2] for v in vs) - lo[2]) > .001:
+            raise ValueError(f'{p.name} does not stand on the bed')
+    shift = [-(lo[0]+hi[0])/2, -(lo[1]+hi[1])/2, -lo[2]]
+    move = lambda vs: [tuple(v[d]+shift[d] for d in range(3)) for v in vs]
+    pieces = [(p, move(vs), fs) for p, vs, fs in pieces]
+    # The magnet cavities' span is measured from the magnet part's own floor.
+    if abs(min(v[2] for v in pieces[0][1])) > .001:
+        raise ValueError(f'{source.name} does not stand on the bed')
+    return pieces, move(cavities), span
 
 
 FIRST, LAYER = .3, .12
@@ -142,53 +180,87 @@ def thumbnail(vertices, faces, top=False):
     return out.getvalue()
 
 
-def write_project(source, output, settings):
+def write_project(source, output, settings, extras=(), enforcer=None):
     profile = json.loads(settings.read_text())
     if profile['printable_area'] != ['-110x-110','110x-110','110x110','-110x110']:
         raise ValueError('Expected the AD5M Pro centered 220 mm bed')
     if profile.get('machine_pause_gcode', '').strip() != 'PAUSE':
         raise ValueError('Expected the AD5M Pro native PAUSE command')
+    supported = str(profile['enable_support']) != '0'
     if (float(profile['initial_layer_print_height']) != .3 or
             float(profile['layer_height']) != .12 or
-            str(profile['enable_support']) != '0' or
             int(profile['raft_layers']) != 0):
-        raise ValueError('Pause validated only for 0.30 first / 0.12 mm layers, no support or raft')
-    vertices, faces, cavities, span = mesh(source)
+        raise ValueError('Pause validated only for 0.30 first / 0.12 mm layers, no raft')
+    if supported and not (enforcer and str(profile['support_type']).endswith('(manual)')):
+        raise ValueError('Supports need --enforcer and a "(manual)" support_type, '
+                         'or auto supports fill the magnet cavities')
+    if supported and str(profile.get('independent_support_layer_height')) != '0':
+        raise ValueError('Supports on their own layer heights move the pause layer; '
+                         'set process:independent_support_layer_height=0')
+    if enforcer and not supported:
+        raise ValueError('--enforcer given but enable_support is off')
+    pieces, cavities, span = layout(source, extras, enforcer)
     pause_z = round(layer_top(pause_layer(span)), 3)
     ns = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'
     model = ET.Element('model', unit='millimeter', xmlns=ns)
     ET.SubElement(model, 'metadata', name='Application').text = 'BambuStudio-2.3.2'
     ET.SubElement(model, 'metadata', name='BambuStudio:3mfVersion').text = '1'
-    obj = ET.SubElement(ET.SubElement(model, 'resources'), 'object', id='1', type='model')
-    geometry = ET.SubElement(obj, 'mesh')
-    verts = ET.SubElement(geometry, 'vertices')
-    for v in vertices:
-        ET.SubElement(verts, 'vertex', **dict(zip(('x','y','z'),map(str,v))))
-    tris = ET.SubElement(geometry, 'triangles')
-    for f in faces:
-        ET.SubElement(tris, 'triangle', **dict(zip(('v1','v2','v3'),map(str,f))))
-    ET.SubElement(ET.SubElement(model, 'build'), 'item', objectid='1')
+    resources = ET.SubElement(model, 'resources')
+    build = ET.SubElement(model, 'build')
     config = ET.Element('config')
-    obj = ET.SubElement(config, 'object', id='1')
-    ET.SubElement(obj, 'metadata', key='name', value=source.stem)
-    ET.SubElement(obj, 'metadata', key='extruder', value='1')
-    part = ET.SubElement(obj, 'part', id='1', subtype='normal_part')
-    ET.SubElement(part, 'metadata', key='name', value=source.stem)
+    # One mesh object per piece. The magnet part is an assembly of its mesh plus
+    # the enforcer mesh; every other piece is a plain object of its own.
+    for n, (path, vertices, faces) in enumerate(pieces, 1):
+        obj = ET.SubElement(resources, 'object', id=str(n), type='model')
+        geometry = ET.SubElement(obj, 'mesh')
+        verts = ET.SubElement(geometry, 'vertices')
+        for v in vertices:
+            ET.SubElement(verts, 'vertex', **dict(zip(('x','y','z'),map(str,v))))
+        tris = ET.SubElement(geometry, 'triangles')
+        for f in faces:
+            ET.SubElement(tris, 'triangle', **dict(zip(('v1','v2','v3'),map(str,f))))
+    count = len(pieces)
+    objects = [(1, [(1, 'normal_part')] + ([(count, 'support_enforcer')] if enforcer else []))]
+    objects += [(n, [(n, 'normal_part')]) for n in range(2, 2 + len(extras))]
+    instances = []
+    for n, parts in objects:
+        if len(parts) > 1:
+            count += 1
+            obj = ET.SubElement(resources, 'object', id=str(count), type='model')
+            components = ET.SubElement(obj, 'components')
+            for part_id, _ in parts:
+                ET.SubElement(components, 'component', objectid=str(part_id))
+            object_id = count
+        else:
+            object_id = n
+        ET.SubElement(build, 'item', objectid=str(object_id))
+        instances.append(object_id)
+        obj = ET.SubElement(config, 'object', id=str(object_id))
+        ET.SubElement(obj, 'metadata', key='name', value=pieces[n - 1][0].stem)
+        ET.SubElement(obj, 'metadata', key='extruder', value='1')
+        for part_id, subtype in parts:
+            part = ET.SubElement(obj, 'part', id=str(part_id), subtype=subtype)
+            ET.SubElement(part, 'metadata', key='name', value=pieces[part_id - 1][0].stem)
     plate = ET.SubElement(config, 'plate')
     images = {'thumbnail_file':'Metadata/plate_1.png',
               'thumbnail_no_light_file':'Metadata/plate_no_light_1.png',
               'top_file':'Metadata/top_1.png', 'pick_file':'Metadata/pick_1.png'}
     for k,v in {'plater_id':'1', 'plater_name':source.stem, 'locked':'false', **images}.items():
         ET.SubElement(plate, 'metadata', key=k, value=v)
-    instance = ET.SubElement(plate, 'model_instance')
-    for k,v in {'object_id':'1','instance_id':'0','identify_id':'1'}.items():
-        ET.SubElement(instance, 'metadata', key=k, value=v)
+    for n, object_id in enumerate(instances, 1):
+        instance = ET.SubElement(plate, 'model_instance')
+        for k,v in {'object_id':str(object_id),'instance_id':'0','identify_id':str(n)}.items():
+            ET.SubElement(instance, 'metadata', key=k, value=v)
     pauses = ET.Element('custom_gcodes_per_layer')
     plate = ET.SubElement(pauses, 'plate')
     ET.SubElement(plate, 'plate_info', id='1')
     ET.SubElement(plate, 'layer', top_z=str(pause_z), type='1', extruder='1', color='',
                   extra=f'Insert {len(cavities)} 10x2 mm magnets; check polarity', gcode='PAUSE')
     ET.SubElement(plate, 'mode', value='SingleExtruder')
+    shown = pieces[:1 + len(extras)]
+    vertices = [v for _, vs, _ in shown for v in vs]
+    offsets = [sum(len(vs) for _, vs, _ in shown[:i]) for i in range(len(shown))]
+    faces = [[i + o for i in f] for (_, _, fs), o in zip(shown, offsets) for f in fs]
     iso, top = thumbnail(vertices,faces), thumbnail(vertices,faces,True)
     output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as z:
@@ -200,12 +272,19 @@ def write_project(source, output, settings):
             z.writestr(name,ET.tostring(tree,encoding='utf-8',xml_declaration=True))
         for key,path in images.items():
             z.writestr(path, top if key in ('top_file','pick_file') else iso)
-    print(f'{source.stem}: {len(cavities)} cavities, Z {span[0]:.2f}–{span[1]:.2f}; pause before layer Z {pause_z:.2f} -> {output}')
+    extra = f' + {len(extras)} more object(s)' if extras else ''
+    extra += ', supports only inside the enforcer' if enforcer else ''
+    print(f'{source.stem}{extra}: {len(cavities)} cavities, Z {span[0]:.2f}–{span[1]:.2f}; pause before layer Z {pause_z:.2f} -> {output}')
 
 
-def verify_job(source, job):
+def verify_job(source, job, extras=(), enforcer=None):
     """Read the shipped archive and check open cavities before the actual pause."""
-    _, _, cavities, span = mesh(source)
+    pieces, cavities, span = layout(source, extras, enforcer)
+    box = None
+    if enforcer:
+        ev = pieces[-1][1]
+        box = [min(v[0] for v in ev), min(v[1] for v in ev), min(v[2] for v in ev),
+               max(v[0] for v in ev), max(v[1] for v in ev), max(v[2] for v in ev)]
     layer = pause_layer(span)
     pause_z = layer_top(layer)
     open_from = next(layer_top(i) for i in range(400) if layer_mid(i) > span[0])
@@ -230,8 +309,12 @@ def verify_job(source, job):
     layer_z = 0.0
     paused = False
     bridged = set()
+    support_moves = 0
+    role = ''
     bounds = [math.inf, math.inf, -math.inf, -math.inf]
     for line in text.splitlines():
+        if line.startswith(';TYPE:'):
+            role = line[6:]
         if line.startswith(';Z:'):
             layer_z = float(line[3:])
         if line == 'PAUSE':
@@ -249,6 +332,22 @@ def verify_job(source, job):
             e = e+values['E'] if relative_e else values['E']
         if extrusion > 0 and (nx,ny) != (x,y):
             bounds = [min(bounds[0],x,nx),min(bounds[1],y,ny),max(bounds[2],x,nx),max(bounds[3],y,ny)]
+            if role.startswith('Support'):
+                support_moves += 1
+                if box is None:
+                    raise ValueError(f'Support extrusion at Z {layer_z} with no enforcer')
+                # Support bases spread past the enforcer, most on the first layer.
+                pad = 4.0 if layer_z < .31 else 2.0
+                if not (box[0]-pad <= min(x,nx) and max(x,nx) <= box[3]+pad and
+                        box[1]-pad <= min(y,ny) and max(y,ny) <= box[4]+pad and
+                        layer_z <= box[5]+.001):
+                    raise ValueError(f'Support outside the enforcer at Z {layer_z}: ({x},{y})-({nx},{ny})')
+                for i,(cx,cy,_) in enumerate(cavities):
+                    dx,dy = nx-x,ny-y
+                    t = max(0,min(1,((cx-x)*dx+(cy-y)*dy)/(dx*dx+dy*dy)))
+                    if (math.hypot(x+t*dx-cx,y+t*dy-cy) < 5.25 and
+                            span[0]-.001 < layer_z < span[1]+.2):
+                        raise ValueError(f'Support in magnet cavity {i+1} at Z {layer_z}')
             if open_from - .001 < layer_z < pause_z + .001:
                 for i,(cx,cy,_) in enumerate(cavities):
                     dx,dy = nx-x,ny-y
@@ -263,6 +362,11 @@ def verify_job(source, job):
         raise ValueError(f'Expected roofs after pause over {len(cavities)} magnets, found {len(bridged)}')
     if min(bounds[:2]) < -110 or max(bounds[2:]) > 110:
         raise ValueError(f'Extrusion outside bed: {bounds}')
+    if enforcer and not support_moves:
+        raise ValueError('Enforcer given but the job has no support extrusion')
+    if enforcer:
+        print(f'supports: {support_moves} extrusion moves, all inside the enforcer '
+              f'(X {box[0]:.1f}..{box[3]:.1f}, Y {box[1]:.1f}..{box[4]:.1f}, Z <= {box[5]:.2f}); none in a cavity')
     print(f'VERIFIED {job.name}: {len(cavities)} open cavities, Z {open_from:.2f}–{span[1]:.2f}; one pause before layer {layer+1} (Z {pause_z:.2f}); all roofs after pause; extrusion bounds {bounds}')
 
 
@@ -272,10 +376,13 @@ if __name__ == '__main__':
     parser.add_argument('output',type=Path)
     parser.add_argument('--settings',type=Path)
     parser.add_argument('--verify',action='store_true',help='verify output as a sliced job instead of creating a project')
+    parser.add_argument('--with',dest='extras',type=Path,action='append',default=[],
+                        help='another piece for the same plate, in the same frame')
+    parser.add_argument('--enforcer',type=Path,help='support-enforcer volume for the magnet part')
     args = parser.parse_args()
     if args.verify:
-        verify_job(args.stl,args.output)
+        verify_job(args.stl,args.output,args.extras,args.enforcer)
     elif args.settings:
-        write_project(args.stl,args.output,args.settings)
+        write_project(args.stl,args.output,args.settings,args.extras,args.enforcer)
     else:
         parser.error('--settings is required when creating a project')

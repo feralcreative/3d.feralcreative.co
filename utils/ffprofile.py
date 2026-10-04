@@ -116,11 +116,31 @@ def resolve(ref, kind, bundle):
     return merged, chain
 
 
-def apply_override(merged, key, raw, kind):
+def bundle_defines(key, kind, bundle):
+    """True when some profile of this kind in the bundle sets key.
+
+    A chain can leave a real setting at the slicer's built-in default by never
+    naming it (independent_support_layer_height is one); any other profile of
+    the same kind that names it proves the spelling.
+    """
+    for path in glob.glob(os.path.join(bundle, kind, "*.json")):
+        try:
+            with open(path) as fh:
+                if key in json.load(fh):
+                    return True
+        except (OSError, ValueError):
+            continue
+    return False
+
+
+def apply_override(merged, key, raw, kind, bundle=BUNDLE):
     """Set key to raw, matching the shape the resolved value already uses."""
     if key not in merged:
-        sys.exit("error: %s has no setting %r to override — check the spelling, "
-                 "since a typo here would otherwise pass silently" % (kind, key))
+        if not bundle_defines(key, kind, bundle):
+            sys.exit("error: %s has no setting %r to override — check the spelling, "
+                     "since a typo here would otherwise pass silently" % (kind, key))
+        merged[key] = str(raw)
+        return "(slicer default)"
     current = merged[key]
     merged[key] = [str(raw)] if isinstance(current, list) else str(raw)
     return current
@@ -166,7 +186,7 @@ def main():
         key, value = rest.split("=", 1)
         if kind not in resolved:
             sys.exit("error: --set kind must be machine, process or filament")
-        before = apply_override(resolved[kind], key, value, kind)
+        before = apply_override(resolved[kind], key, value, kind, args.bundle)
         applied.append((kind, key, before, resolved[kind][key]))
 
     # curr_bed_type is a project setting, not a profile one — no preset in the

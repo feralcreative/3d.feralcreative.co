@@ -9,6 +9,10 @@
 #   utils/slice.sh stl/x.stl --set filament:nozzle_temperature=235
 #   utils/slice.sh stl/x.stl --at-z 38                    # role breakdown up the collet
 #   utils/slice.sh stl/gridfinity/x.stl --magnet-pause    # enclosed 10x2 mm magnets
+#   utils/slice.sh stl/gridfinity/x.stl --magnet-pause --with y.stl \
+#       --enforcer groove.stl --name x-set \
+#       --set process:enable_support=1 --set 'process:support_type=normal(manual)'
+#                                     # more pieces on the plate, supports only in groove.stl
 #
 # Output lands in slice/<part>/ — plate_1.gcode, out.gcode.3mf, resolved.json —
 # and the sliced job is also copied to 3mf/<part>.3mf, which is the file to
@@ -69,7 +73,7 @@ STOCK_PROCESS="0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle"
 STOCK_FILAMENT="Flashforge HS PETG"
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: $0 <part.scad|file.stl|file.3mf> [--stock] [--set kind:key=value] [--at-z Z] [--magnet-pause]" >&2
+  echo "usage: $0 <part.scad|file.stl|file.3mf> [--stock] [--set kind:key=value] [--at-z Z] [--magnet-pause [--with file.stl]... [--enforcer file.stl]] [--name job-name]" >&2
   exit 64
 fi
 
@@ -80,15 +84,25 @@ STOCK=0
 AT_Z=""
 MAGNET_PAUSE=0
 EXTRA_SETS=()
+SET_ARGS=()
+NAME=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --stock) STOCK=1; shift ;;
     --set)   EXTRA_SETS+=("$2"); shift 2 ;;
     --at-z)  AT_Z="$2"; shift 2 ;;
     --magnet-pause) MAGNET_PAUSE=1; shift ;;
+    --with)     SET_ARGS+=(--with "$2"); shift 2 ;;
+    --enforcer) SET_ARGS+=(--enforcer "$2"); shift 2 ;;
+    --name)     NAME="$2"; shift 2 ;;
     *) echo "error: unknown argument: $1" >&2; exit 64 ;;
   esac
 done
+
+if [[ ${#SET_ARGS[@]} -gt 0 && "$MAGNET_PAUSE" -ne 1 ]]; then
+  echo "error: --with and --enforcer are only supported with --magnet-pause" >&2
+  exit 64
+fi
 
 if [[ ! -f "$INPUT" ]]; then
   echo "error: no such file: $INPUT" >&2
@@ -115,7 +129,7 @@ if [[ "$INPUT" == *.scad ]]; then
   INPUT="stl/$(basename "$INPUT" .scad).stl"
 fi
 
-BASE="$(basename "${INPUT%.*}")"
+BASE="${NAME:-$(basename "${INPUT%.*}")}"
 OUTDIR="${OUTROOT}/${BASE}"
 PROFDIR="${OUTDIR}/profiles"
 rm -rf "$OUTDIR"
@@ -160,7 +174,8 @@ if [[ "$MAGNET_PAUSE" -eq 1 ]]; then
     --export-settings "${OUTDIR}/pause-settings.json" "$INPUT" \
     >"${OUTDIR}/pause-settings.log" 2>&1
   python3 "${REPO_ROOT}/utils/magnet-project.py" "$INPUT" \
-    "${OUTDIR}/magnet-project.3mf" --settings "${OUTDIR}/pause-settings.json"
+    "${OUTDIR}/magnet-project.3mf" --settings "${OUTDIR}/pause-settings.json" \
+    "${SET_ARGS[@]+"${SET_ARGS[@]}"}"
   INPUT="${OUTDIR}/magnet-project.3mf"
 fi
 
@@ -197,7 +212,7 @@ PROBE_ARGS=("$GCODE")
 
 if [[ "$MAGNET_PAUSE" -eq 1 ]]; then
   python3 "${REPO_ROOT}/utils/magnet-project.py" "$MAGNET_STL" \
-    "${OUTDIR}/out.gcode.3mf" --verify
+    "${OUTDIR}/out.gcode.3mf" --verify "${SET_ARGS[@]+"${SET_ARGS[@]}"}"
 fi
 
 # The named copy. Flash Studio always writes out.gcode.3mf, so the part's name

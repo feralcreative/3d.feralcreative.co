@@ -11,7 +11,7 @@ ysize = 2;               // cells projecting away from the shelf
 /* [Plate] */
 // The split deck prints face up, underside on the bed, with the joint groove cut
 // up into that underside. The floor is thick enough to bury the magnets above
-// the groove: 3 mm groove, 0.66 mm roof, then skin, cavity and skin.
+// the groove: 2.94 mm groove, 0.72 mm roof, then skin, cavity and skin.
 floor_thickness = 6.28;  // mm of flat sheet under the sockets; it is the deck
 
 /* [Magnets] */
@@ -37,14 +37,16 @@ brace_x = [-80, -30, 30, 80]; // mm, brace centres
 // stands on the rail top and slides into a groove in the deck's underside.
 dt_mouth_w = 5;          // mm, groove width at the deck underside
 dt_root_w = 7;           // mm, groove width at its roof; 18 deg flanks
-dt_depth = 3;            // mm up into the deck
+dt_depth = 2.94;         // mm up into the deck; a 0.30/0.12 layer boundary, so the roof
+                         // is not split mid-layer and the enforcer reaches it
 dt_clear = 0.2;          // mm per face, snug sliding plus a glue film
 dt_chamfer = 0.5;        // mm at 45 deg on the groove mouth, which prints on the bed
 coupon_len = 30;         // mm of joint in the fit coupon
 coupon_roof = 1.2;       // mm of strip above the coupon's groove
+set_gap = 8;             // mm between deck and rail on the shared print plate
 
 /* [Display] */
-show = "plate";          // [plate, deck, rail, joint-coupon, split, mount, section]
+show = "plate";          // [plate, deck, rail, print-set, set-rail, enforcer, joint-coupon, split, mount, section]
 
 /* [Colors] */
 // Preview only; STLs carry no colour. Each printed piece gets its own.
@@ -173,6 +175,23 @@ module deck_pose() {
     translate([0, 0, -deck_z]) children();
 }
 
+module set_rail_pose() {
+    // Behind the deck on the shared plate, as mounted, channel mouth on the bed.
+    translate([0, -(mount_depth + brace_run) - set_gap, 0]) children();
+}
+
+module groove_enforcer() {
+    // Support enforcer for the shared plate: the groove, mouth chamfer included,
+    // from the bed to 1 mm past its roof, so the roof layer is inside it.
+    // Supports grow only under overhangs, so the overlap with solid is harmless.
+    w = max(dt_root_w, dt_mouth_w + 2 * dt_chamfer);
+    color("Gold", 0.5) deck_pose() intersection() {
+        translate([-plate_w / 2, (mount_depth - w) / 2, deck_z])
+            cube([plate_w, w, dt_depth + 1]);
+        plate_footprint(deck_z, dt_depth + 1);
+    }
+}
+
 module joint_coupon() {
     // A slice of the real rail with its tail, and a strip carrying the groove,
     // both in their print poses.
@@ -206,6 +225,9 @@ module print_pose() {
 if (show == "plate") print_pose() shelf_plate();
 else if (show == "deck") deck_pose() deck();
 else if (show == "rail") rail();
+else if (show == "print-set") { deck_pose() deck(); set_rail_pose() rail(); groove_enforcer(); }
+else if (show == "set-rail") set_rail_pose() rail();
+else if (show == "enforcer") groove_enforcer();
 else if (show == "joint-coupon") joint_coupon();
 else if (show == "split") { translate([0, 0, 15]) deck(); rail(); }
 else if (show == "mount") mount();
