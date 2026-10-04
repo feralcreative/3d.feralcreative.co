@@ -10,13 +10,14 @@ come from the process profile (the job's own settings when verifying).
 The resulting project still needs utils/slice.sh; no G-code is patched here.
 
 --with adds further pieces to the same plate as separate objects, and
---enforcer attaches a support-enforcer volume to the magnet part. All STLs must
+--enforcer (repeatable) attaches a support-enforcer volume to whichever piece
+its footprint centre falls on. All STLs must
 share one coordinate frame (export them from the same layout); they are moved
 together. Supports are allowed only with an enforcer and a "(manual)" support
 type, so the slicer puts them inside the enforcer and never in a magnet cavity,
 and the verification fails if any support extrusion reaches a cavity.
 Usage: python3 utils/magnet-project.py part.stl /tmp/part.3mf --settings resolved.json
-       [--with other.stl ...] [--enforcer groove.stl]
+       [--with other.stl ...] [--enforcer groove.stl ...]
 """
 
 import argparse
@@ -112,11 +113,11 @@ def mesh(path, cavities_required=True):
     return vertices, faces, cavities, spans.pop()
 
 
-def layout(source, extras=(), enforcer=None):
+def layout(source, extras=(), enforcers=()):
     """Load every piece and centre them together on the bed, floor at Z=0."""
     vertices, faces, cavities, span = mesh(source)
     pieces = [(source, vertices, faces)] + [(p, *mesh(p, False)[:2]) for p in extras]
-    if enforcer:
+    for enforcer in enforcers:
         pieces.append((enforcer, *read_stl(enforcer)))
     every = [v for _, vs, _ in pieces[:1 + len(extras)] for v in vs]
     lo = [min(v[d] for v in every) for d in range(3)]
@@ -187,7 +188,7 @@ def thumbnail(vertices, faces, top=False):
     return out.getvalue()
 
 
-def write_project(source, output, settings, extras=(), enforcer=None):
+def write_project(source, output, settings, extras=(), enforcers=()):
     profile = json.loads(settings.read_text())
     if profile['printable_area'] != ['-110x-110','110x-110','110x110','-110x110']:
         raise ValueError('Expected the AD5M Pro centered 220 mm bed')
@@ -197,15 +198,15 @@ def write_project(source, output, settings, extras=(), enforcer=None):
     if int(profile['raft_layers']) != 0:
         raise ValueError('Pause validated only without a raft')
     use_layers(profile)
-    if supported and not (enforcer and str(profile['support_type']).endswith('(manual)')):
+    if supported and not (enforcers and str(profile['support_type']).endswith('(manual)')):
         raise ValueError('Supports need --enforcer and a "(manual)" support_type, '
                          'or auto supports fill the magnet cavities')
     if supported and str(profile.get('independent_support_layer_height')) != '0':
         raise ValueError('Supports on their own layer heights move the pause layer; '
                          'set process:independent_support_layer_height=0')
-    if enforcer and not supported:
+    if enforcers and not supported:
         raise ValueError('--enforcer given but enable_support is off')
-    pieces, cavities, span = layout(source, extras, enforcer)
+    pieces, cavities, span = layout(source, extras, enforcers)
     pause_z = round(layer_top(pause_layer(span)), 3)
     ns = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'
     model = ET.Element('model', unit='millimeter', xmlns=ns)
@@ -214,8 +215,8 @@ def write_project(source, output, settings, extras=(), enforcer=None):
     resources = ET.SubElement(model, 'resources')
     build = ET.SubElement(model, 'build')
     config = ET.Element('config')
-    # One mesh object per piece. The magnet part is an assembly of its mesh plus
-    # the enforcer mesh; every other piece is a plain object of its own.
+    # One mesh object per piece. A piece with enforcers is an assembly of its
+    # mesh plus theirs; every other piece is a plain object of its own.
     for n, (path, vertices, faces) in enumerate(pieces, 1):
         obj = ET.SubElement(resources, 'object', id=str(n), type='model')
         geometry = ET.SubElement(obj, 'mesh')
@@ -226,8 +227,18 @@ def write_project(source, output, settings, extras=(), enforcer=None):
         for f in faces:
             ET.SubElement(tris, 'triangle', **dict(zip(('v1','v2','v3'),map(str,f))))
     count = len(pieces)
-    objects = [(1, [(1, 'normal_part')] + ([(count, 'support_enforcer')] if enforcer else []))]
-    objects += [(n, [(n, 'normal_part')]) for n in range(2, 2 + len(extras))]
+    solids = 1 + len(extras)
+    objects = [(n, [(n, 'normal_part')]) for n in range(1, solids + 1)]
+    for e in range(solids + 1, count + 1):
+        ev = pieces[e - 1][1]
+        cx = (min(v[0] for v in ev) + max(v[0] for v in ev)) / 2
+        cy = (min(v[1] for v in ev) + max(v[1] for v in ev)) / 2
+        owner = next((n for n in range(1, solids + 1)
+                      if min(v[0] for v in pieces[n-1][1]) <= cx <= max(v[0] for v in pieces[n-1][1])
+                      and min(v[1] for v in pieces[n-1][1]) <= cy <= max(v[1] for v in pieces[n-1][1])), None)
+        if owner is None:
+            raise ValueError(f'{pieces[e-1][0].name} sits on no piece')
+        objects[owner - 1][1].append((e, 'support_enforcer'))
     instances = []
     for n, parts in objects:
         if len(parts) > 1:
@@ -279,18 +290,17 @@ def write_project(source, output, settings, extras=(), enforcer=None):
         for key,path in images.items():
             z.writestr(path, top if key in ('top_file','pick_file') else iso)
     extra = f' + {len(extras)} more object(s)' if extras else ''
-    extra += ', supports only inside the enforcer' if enforcer else ''
+    extra += f', supports only inside {len(enforcers)} enforcer(s)' if enforcers else ''
     print(f'{source.stem}{extra}: {len(cavities)} cavities, Z {span[0]:.2f}–{span[1]:.2f}; pause before layer Z {pause_z:.2f} -> {output}')
 
 
-def verify_job(source, job, extras=(), enforcer=None):
+def verify_job(source, job, extras=(), enforcers=()):
     """Read the shipped archive and check open cavities before the actual pause."""
-    pieces, cavities, span = layout(source, extras, enforcer)
-    box = None
-    if enforcer:
-        ev = pieces[-1][1]
-        box = [min(v[0] for v in ev), min(v[1] for v in ev), min(v[2] for v in ev),
-               max(v[0] for v in ev), max(v[1] for v in ev), max(v[2] for v in ev)]
+    pieces, cavities, span = layout(source, extras, enforcers)
+    boxes = []
+    for _, ev, _ in pieces[len(pieces) - len(enforcers):]:
+        boxes.append([min(v[0] for v in ev), min(v[1] for v in ev), min(v[2] for v in ev),
+                      max(v[0] for v in ev), max(v[1] for v in ev), max(v[2] for v in ev)])
     with zipfile.ZipFile(job) as archive:
         use_layers(json.loads(archive.read('Metadata/project_settings.config')))
     layer = pause_layer(span)
@@ -342,13 +352,13 @@ def verify_job(source, job, extras=(), enforcer=None):
             bounds = [min(bounds[0],x,nx),min(bounds[1],y,ny),max(bounds[2],x,nx),max(bounds[3],y,ny)]
             if role.startswith('Support'):
                 support_moves += 1
-                if box is None:
+                if not boxes:
                     raise ValueError(f'Support extrusion at Z {layer_z} with no enforcer')
                 # Support bases spread past the enforcer, most on the first layer.
                 pad = 4.5 if layer_z < FIRST + .01 else 2.5
-                if not (box[0]-pad <= min(x,nx) and max(x,nx) <= box[3]+pad and
-                        box[1]-pad <= min(y,ny) and max(y,ny) <= box[4]+pad and
-                        layer_z <= box[5]+.001):
+                if not any(box[0]-pad <= min(x,nx) and max(x,nx) <= box[3]+pad and
+                           box[1]-pad <= min(y,ny) and max(y,ny) <= box[4]+pad and
+                           layer_z <= box[5]+.001 for box in boxes):
                     raise ValueError(f'Support outside the enforcer at Z {layer_z}: ({x},{y})-({nx},{ny})')
                 for i,(cx,cy,_) in enumerate(cavities):
                     dx,dy = nx-x,ny-y
@@ -370,11 +380,12 @@ def verify_job(source, job, extras=(), enforcer=None):
         raise ValueError(f'Expected roofs after pause over {len(cavities)} magnets, found {len(bridged)}')
     if min(bounds[:2]) < -110 or max(bounds[2:]) > 110:
         raise ValueError(f'Extrusion outside bed: {bounds}')
-    if enforcer and not support_moves:
+    if enforcers and not support_moves:
         raise ValueError('Enforcer given but the job has no support extrusion')
-    if enforcer:
-        print(f'supports: {support_moves} extrusion moves, all inside the enforcer '
-              f'(X {box[0]:.1f}..{box[3]:.1f}, Y {box[1]:.1f}..{box[4]:.1f}, Z <= {box[5]:.2f}); none in a cavity')
+    for box in boxes:
+        print(f'enforcer X {box[0]:.1f}..{box[3]:.1f}, Y {box[1]:.1f}..{box[4]:.1f}, Z <= {box[5]:.2f}')
+    if boxes:
+        print(f'supports: {support_moves} extrusion moves, all inside an enforcer; none in a cavity')
     print(f'VERIFIED {job.name}: {len(cavities)} open cavities, Z {open_from:.2f}–{span[1]:.2f}; one pause before layer {layer+1} (Z {pause_z:.2f}); all roofs after pause; extrusion bounds {bounds}')
 
 
@@ -386,11 +397,12 @@ if __name__ == '__main__':
     parser.add_argument('--verify',action='store_true',help='verify output as a sliced job instead of creating a project')
     parser.add_argument('--with',dest='extras',type=Path,action='append',default=[],
                         help='another piece for the same plate, in the same frame')
-    parser.add_argument('--enforcer',type=Path,help='support-enforcer volume for the magnet part')
+    parser.add_argument('--enforcer',dest='enforcers',type=Path,action='append',default=[],
+                        help='support-enforcer volume, attached to the piece it sits on')
     args = parser.parse_args()
     if args.verify:
-        verify_job(args.stl,args.output,args.extras,args.enforcer)
+        verify_job(args.stl,args.output,args.extras,args.enforcers)
     elif args.settings:
-        write_project(args.stl,args.output,args.settings,args.extras,args.enforcer)
+        write_project(args.stl,args.output,args.settings,args.extras,args.enforcers)
     else:
         parser.error('--settings is required when creating a project')
