@@ -123,6 +123,9 @@ wire-shelf-box-platform 7
 wire-shelf-box-platform-coupon 1
 wire-shelf-cup-holder 6
 wire-shelf-gridfinity-4x2 3
+wire-shelf-gridfinity-4x2-deck 1
+wire-shelf-gridfinity-4x2-joint-coupon 1
+wire-shelf-gridfinity-4x2-rail 1
 zr-cube 3
 zr-mark-plaque 1
 zr-monogram-stamp-2026 5
