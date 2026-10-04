@@ -69,7 +69,7 @@ Not required: nothing here needs a full print to be considered done by you. Prin
 ## 3. Prohibitions
 
 - **Never write `.scad` and hand it over without looking at a render.** A render you have not looked at is work not done. Blind solid geometry produces plausible code with wrong results—the code compiles, the STL exports, the part is garbage.
-- **Never `git commit` or `git push` without explicit permission.** See Commit conventions.
+- **Never `git push` without explicit permission.** Commits are made by the agent in logical blocks; see Commit conventions.
 - **Never pass `--push` or run `utils/deploy/prod.sh` on your own initiative.** Both rsync to a live production host (the NAS backing <https://3d.feralcreative.co>). Only when Ziad asks. The destination for `prod.sh` is read from `.vscode/sftp.json`; `build.sh --push` still carries its own copy of the host.
 - **Never verify a print setting in the slicer GUI.** Verify in the G-code with `utils/gcode-probe.py`. On 2026-08-09 a correct, correctly-selected filament preset contributed nothing to a job, the print ran 25 °C too hot, and it cost the top 6.41 mm of a collet.
 - **Never reintroduce a hardcoded override array in `utils/slice.sh`.** It used to carry `LOW_STRING` `--set` flags and apply them by default; command-line overrides outrank presets, so it silently beat everything in `docs/profiles/`—including a retraction length of 1.6 mm that kept being applied for hours after the preset had been corrected to 0.4, and which ground the extruder. If a value needs changing, change the preset.
@@ -149,7 +149,7 @@ Scripts live in `utils/`, never `scripts/`. Documentation other than `README.md`
 
 - Conventional Commits, imperative mood: `type(scope): subject`. Types in use: `feat`, `fix`, `docs`, `refactor`, `chore`, `revert`. Scopes are part or subsystem names (`chalk-holder`, `slicing`, `utils`, `logos`).
 - **No AI attribution of any kind**—no `Co-Authored-By`, no "Generated with" footer.
-- Never commit unasked. Hand over one chained line and let Ziad run it: `git add -A && git commit -m "type(scope): subject"`.
+- The agent commits in logical blocks—one feature, fix, or refactor step per commit. Pushing still needs Ziad's explicit permission.
 - Never committed: `renders/`, `slice/`, `3mf/`, `_incoming/`, `MODELS`, `_PLANS` (which is why `docs/_PLANS/` is local-only—Ziad's call whether to unignore), and anything matching `.env*`. No file matching a `.gitignore` entry may be read into a commit, a log, or a chat response.
 - **`stl/` is half-committed.** A finished part—no version in its name, see `utils/finalize.sh`—IS committed, because it is the deliverable. Every `-vNN.stl` beside it is not. The `.gitignore` does that with `stl/*`, then `!stl/*.stl`, then `stl/*-v[0-9][0-9]*.stl`: order matters, and the re-include only works because `stl/` itself is never excluded, only its contents.
 - Work on `main`. Branch first if the change is speculative.
