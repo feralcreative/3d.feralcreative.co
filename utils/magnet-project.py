@@ -5,7 +5,8 @@ Reject old/open-pocket meshes. Pre-render thumbnails on the CPU because Flash
 Studio's CLI requests an invalid OpenGL 3.4 context when creating its own.
 The cavity height is read from the mesh, so a part printed upside down, with
 its cavities well off the bed, pauses at its own height; every cavity must
-share one Z range, and both ends must sit on 0.30/0.12 layer boundaries.
+share one Z range, and neither end may sit on a layer middle. Layer heights
+come from the process profile (the job's own settings when verifying).
 The resulting project still needs utils/slice.sh; no G-code is patched here.
 
 --with adds further pieces to the same plate as separate objects, and
@@ -135,6 +136,12 @@ def layout(source, extras=(), enforcer=None):
 FIRST, LAYER = .3, .12
 
 
+def use_layers(profile):
+    global FIRST, LAYER
+    FIRST = float(profile['initial_layer_print_height'])
+    LAYER = float(profile['layer_height'])
+
+
 def layer_top(i):
     return FIRST + LAYER * i
 
@@ -187,10 +194,9 @@ def write_project(source, output, settings, extras=(), enforcer=None):
     if profile.get('machine_pause_gcode', '').strip() != 'PAUSE':
         raise ValueError('Expected the AD5M Pro native PAUSE command')
     supported = str(profile['enable_support']) != '0'
-    if (float(profile['initial_layer_print_height']) != .3 or
-            float(profile['layer_height']) != .12 or
-            int(profile['raft_layers']) != 0):
-        raise ValueError('Pause validated only for 0.30 first / 0.12 mm layers, no raft')
+    if int(profile['raft_layers']) != 0:
+        raise ValueError('Pause validated only without a raft')
+    use_layers(profile)
     if supported and not (enforcer and str(profile['support_type']).endswith('(manual)')):
         raise ValueError('Supports need --enforcer and a "(manual)" support_type, '
                          'or auto supports fill the magnet cavities')
@@ -285,6 +291,8 @@ def verify_job(source, job, extras=(), enforcer=None):
         ev = pieces[-1][1]
         box = [min(v[0] for v in ev), min(v[1] for v in ev), min(v[2] for v in ev),
                max(v[0] for v in ev), max(v[1] for v in ev), max(v[2] for v in ev)]
+    with zipfile.ZipFile(job) as archive:
+        use_layers(json.loads(archive.read('Metadata/project_settings.config')))
     layer = pause_layer(span)
     pause_z = layer_top(layer)
     open_from = next(layer_top(i) for i in range(400) if layer_mid(i) > span[0])
@@ -337,7 +345,7 @@ def verify_job(source, job, extras=(), enforcer=None):
                 if box is None:
                     raise ValueError(f'Support extrusion at Z {layer_z} with no enforcer')
                 # Support bases spread past the enforcer, most on the first layer.
-                pad = 4.0 if layer_z < .31 else 2.0
+                pad = 4.5 if layer_z < FIRST + .01 else 2.5
                 if not (box[0]-pad <= min(x,nx) and max(x,nx) <= box[3]+pad and
                         box[1]-pad <= min(y,ny) and max(y,ny) <= box[4]+pad and
                         layer_z <= box[5]+.001):
