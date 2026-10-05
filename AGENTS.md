@@ -151,8 +151,8 @@ Scripts live in `utils/`, never `scripts/`. Documentation other than `README.md`
 ## 7. Commit and PR conventions
 
 - Conventional Commits, imperative mood: `type(scope): subject`. Types in use: `feat`, `fix`, `docs`, `refactor`, `chore`, `revert`. Scopes are part or subsystem names (`chalk-holder`, `slicing`, `utils`, `logos`).
-- **No AI attribution of any kind**—no `Co-Authored-By`, no "Generated with" footer.
-- The agent commits in logical blocks—one feature, fix, or refactor step per commit. Pushing still needs Ziad's explicit permission.
+- **Use Ziad's configured Git name and identity and submit PRs through his account.** Never add co-author credit, generated-by text, or attribution for the agent or anyone else.
+- **Standing authorization for personal/Feral projects:** the agent may create branches, commit in logical blocks, and submit PRs on Ziad's behalf without requesting per-task permission for those actions. One feature, fix, or refactor step per commit. Publishing a branch as necessary to submit a PR is included; unrelated pushes, deployment, and other remote mutations still need explicit permission. This personal/Feral rule, confirmed by Ziad on 2026-10-05, supersedes inherited per-task approval requirements for these Git actions; it does not extend to Cannonball/client projects.
 - Never committed: `renders/`, `slice/`, `3mf/`, `_incoming/`, `MODELS`, `_PLANS` (which is why `docs/_PLANS/` is local-only—Ziad's call whether to unignore), and anything matching `.env*`. No file matching a `.gitignore` entry may be read into a commit, a log, or a chat response.
 - **`stl/` is half-committed.** A finished part—no version in its name, see `utils/finalize.sh`—IS committed, because it is the deliverable. Every `-vNN.stl` beside it is not. The `.gitignore` does that with `stl/*`, then `!stl/*.stl`, then `stl/*-v[0-9][0-9]*.stl`: order matters, and the re-include only works because `stl/` itself is never excluded, only its contents.
 - Work on `main`. Branch first if the change is speculative.
