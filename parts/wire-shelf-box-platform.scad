@@ -3,6 +3,7 @@
 // +X runs along the shelf, +Y points away from it, +Z is up in use.
 // COUPON-COMPONENTS: box-fit=coupon
 // COUPON-PLATE: coupon
+use <wire-shelf-dovetail.scad>
 
 /* [Box] */
 box_w = 128;             // mm, rear edge along the shelf
@@ -41,7 +42,14 @@ support_wire_gap = 114;  // mm, measured clear gap between the front edge's supp
 coupon_ledge = 5;        // mm of the original floor retained inside each lip
 
 /* [Display] */
-show = "platform";       // [platform, coupon, mount-coupon, assembly, box-fit, box-insertion, floor-wire-fit, floor-wire-insertion, channel, section]
+show = "print-set";      // [print-set, platform, deck, rail, set-rail, split, coupon, mount-coupon, assembly, box-fit, box-insertion, floor-wire-fit, floor-wire-insertion, joint-fit, joint-insertion, channel, section]
+
+/* [Print set] */
+set_gap = 8;             // mm between the two separately printed pieces
+
+/* [Colors] */
+deck_color = "SteelBlue";
+rail_color = "DarkOrange";
 
 /* [Hidden] */
 $fn = 64;
@@ -74,6 +82,7 @@ assert(channel_length <= outer_w, "Channel must lie within the platform width");
 assert(channel_depth + brace_run < outer_d, "Underside ribs must end within the platform");
 assert(channel_height == hook_bounds.y && channel_depth == 12,
        "Retain the supplied attachment dimensions; do not distort its wire fit");
+assert(floor_t - shelf_dovetail_depth() >= 1.2, "Retain a solid roof above the groove");
 
 module original_midsection() {
     // Slice the middle of the original 5 mm thickness, avoiding its outer rounding.
@@ -157,8 +166,12 @@ module platform_body() {
         translate([x, 0, deck_z]) cube([wall_t, outer_d, floor_t + lip_h]);
     translate([-outer_w / 2, rear_t + inner_d, deck_z])
         cube([outer_w, wall_t, floor_t + lip_h]);
+    platform_mount_body();
+}
+
+module platform_mount_body() {
     translate([-channel_length / 2, 0, 0])
-        cube([channel_length, channel_depth, deck_z + eps]);
+        cube([channel_length, channel_depth, deck_z]);
     underside_ribs();
 }
 
@@ -174,7 +187,7 @@ module rounded_footprint() {
     translate([-outer_w, -eps, -eps]) cube([2 * outer_w, outer_d + 2 * eps, deck_z]);
 }
 
-module box_platform() {
+module platform_unsplit() {
     difference() {
         intersection() { platform_body(); rounded_footprint(); }
         channel_cut();
@@ -182,12 +195,46 @@ module box_platform() {
     }
 }
 
+module box_deck() {
+    color(deck_color) difference() {
+        intersection() {
+            platform_unsplit();
+            translate([-outer_w / 2 - eps, -eps, deck_z])
+                cube([outer_w + 2 * eps, outer_d + 2 * eps, floor_t + lip_h + eps]);
+        }
+        // Open the groove through both wider deck ends so the rail can slide in.
+        shelf_dovetail_groove(outer_w, deck_z, channel_depth);
+    }
+}
+
+module box_rail() {
+    color(rail_color) union() {
+        difference() {
+            intersection() {
+                platform_mount_body();
+                translate([-outer_w / 2 - eps, -eps, -eps])
+                    cube([outer_w + 2 * eps, outer_d + 2 * eps, deck_z + eps]);
+            }
+            channel_cut();
+            floor_wire_reliefs(channel_length);
+        }
+        shelf_dovetail_tail(channel_length, deck_z, channel_depth);
+    }
+}
+
+module box_platform() { box_deck(); box_rail(); }
+
+module box_deck_pose() { translate([0, 0, -deck_z]) children(); }
+module box_set_rail_pose() {
+    translate([0, -channel_depth - brace_run - set_gap, 0]) children();
+}
+
 module mount_fit_coupon() {
     // A literal slice of the production rail spanning three wire slots, with
     // the deck strip above it that ties the beam together.
     coupon_w = 3 * floor_wire_pitch;
     intersection() {
-        box_platform();
+        platform_unsplit();
         translate([-coupon_w / 2, -eps, -eps])
             cube([coupon_w, channel_depth + eps, floor_top + 2 * eps]);
     }
@@ -206,7 +253,7 @@ module box_fit_coupon() {
     translate([0, 0, -deck_z])
         difference() {
             intersection() {
-                box_platform();
+                platform_unsplit();
                 translate([-outer_w / 2 - eps, -eps, deck_z])
                     cube([outer_w + 2 * eps, outer_d + 2 * eps, floor_t + lip_h + eps]);
             }
@@ -244,7 +291,12 @@ module floor_wire_sweep(width = channel_length,
         }
 }
 
-if (show == "platform") box_platform();
+if (show == "print-set") { box_deck_pose() box_deck(); box_set_rail_pose() box_rail(); }
+else if (show == "platform") box_platform();
+else if (show == "deck") box_deck_pose() box_deck();
+else if (show == "rail") box_rail();
+else if (show == "set-rail") box_set_rail_pose() box_rail();
+else if (show == "split") { translate([0, 0, 15]) box_deck(); box_rail(); }
 else if (show == "coupon") box_fit_coupon();
 else if (show == "mount-coupon") mount_fit_coupon();
 else if (show == "channel") channel_cut();
@@ -267,4 +319,16 @@ else if (show == "assembly") {
     intersection() { box_platform(); floor_wire_envelope(); }
 } else if (show == "floor-wire-insertion") {
     intersection() { box_platform(); floor_wire_sweep(); }
+} else if (show == "joint-fit") {
+    intersection() { box_rail(); box_deck(); }
+} else if (show == "joint-insertion") {
+    // One connected axial path, from wholly outside the deck to seated.
+    intersection() {
+        box_deck();
+        hull() {
+            shelf_dovetail_tail(channel_length, deck_z, channel_depth);
+            translate([outer_w + channel_length, 0, 0])
+                shelf_dovetail_tail(channel_length, deck_z, channel_depth);
+        }
+    }
 }

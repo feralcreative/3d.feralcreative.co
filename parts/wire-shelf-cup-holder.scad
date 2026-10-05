@@ -2,6 +2,7 @@
 // +X runs along the shelf, +Y points away from it, +Z is up in use.
 // Reuse the exact channel cutter; do not redraw or rescale the wire seats.
 use <wire-shelf-box-platform.scad>
+use <wire-shelf-dovetail.scad>
 
 /* [Cup] */
 inside_d = 69;           // mm, exact clear inside diameter across the polygon flats
@@ -25,7 +26,14 @@ floor_wire_clearance = 0.5; // mm per side and above the wires
 floor_wire_offset = 0;   // mm along X; align the slot pattern with the shelf
 
 /* [Display] */
-show = "holder";         // [holder, assembly, cup-fit, cup-insertion, floor-wire-fit, floor-wire-insertion, mount, section]
+show = "print-set";      // [print-set, holder, body, rail, set-rail, split, assembly, cup-fit, cup-insertion, floor-wire-fit, floor-wire-insertion, joint-fit, joint-insertion, mount, section]
+
+/* [Print set] */
+set_gap = 8;             // mm between the two separately printed pieces
+
+/* [Colors] */
+body_color = "SteelBlue";
+rail_color = "DarkOrange";
 
 /* [Hidden] */
 $fn = 64;
@@ -48,6 +56,7 @@ assert(mount_depth == 12 && deck_z == 38.7,
 assert(mount_w <= 128, "The source channel cutter is 128 mm long");
 assert(rib_spacing / 2 + wall_t / 2 < outer_r);
 assert(brace_run < outer_r, "Keep braces beneath the circular floor");
+assert(floor_t - shelf_dovetail_depth() >= 1.2, "Retain a solid roof above the groove");
 
 module floor_outline() {
     hull() {
@@ -76,7 +85,7 @@ module cup_braces() {
                              [mount_depth - eps, deck_z + eps]]);
 }
 
-module cup_holder() {
+module holder_unsplit() {
     difference() {
         union() {
             mounting_beam();
@@ -91,13 +100,46 @@ module cup_holder() {
     }
 }
 
+module holder_body() {
+    color(body_color) difference() {
+        intersection() {
+            holder_unsplit();
+            translate([-mount_w / 2 - eps, -eps, deck_z])
+                cube([mount_w + 2 * eps, cup_y + outer_r + 2 * eps, floor_t + cup_depth + eps]);
+        }
+        shelf_dovetail_groove(mount_w, deck_z, mount_depth);
+    }
+}
+
+module holder_rail() {
+    color(rail_color) union() {
+        intersection() {
+            union() { mounting_beam(); cup_braces(); }
+            translate([-mount_w / 2 - eps, -eps, -eps])
+                cube([mount_w + 2 * eps, mount_depth + brace_run + 2 * eps, deck_z + eps]);
+        }
+        shelf_dovetail_tail(mount_w, deck_z, mount_depth);
+    }
+}
+
+module cup_holder() { holder_body(); holder_rail(); }
+module holder_body_pose() { translate([0, 0, -deck_z]) children(); }
+module holder_set_rail_pose() {
+    translate([0, -mount_depth - brace_run - set_gap, 0]) children();
+}
+
 module cup_envelope(extra_h = 0) {
     translate([0, cup_y, floor_top + eps])
         cylinder(h = probe_h + extra_h,
                  r = (inner_r - probe_clearance) / cos(180 / cup_facets), $fn = cup_facets);
 }
 
-if (show == "holder") cup_holder();
+if (show == "print-set") { holder_body_pose() holder_body(); holder_set_rail_pose() holder_rail(); }
+else if (show == "holder") cup_holder();
+else if (show == "body") holder_body_pose() holder_body();
+else if (show == "rail") holder_rail();
+else if (show == "set-rail") holder_set_rail_pose() holder_rail();
+else if (show == "split") { translate([0, 0, 15]) holder_body(); holder_rail(); }
 else if (show == "mount") mounting_beam();
 else if (show == "assembly") {
     cup_holder();
@@ -120,6 +162,17 @@ else if (show == "assembly") {
         cup_holder();
         floor_wire_sweep(mount_w, floor_wire_d,
                         floor_wire_pitch, floor_wire_offset);
+    }
+} else if (show == "joint-fit") {
+    intersection() { holder_rail(); holder_body(); }
+} else if (show == "joint-insertion") {
+    intersection() {
+        holder_body();
+        hull() {
+            shelf_dovetail_tail(mount_w, deck_z, mount_depth);
+            translate([2 * mount_w, 0, 0])
+                shelf_dovetail_tail(mount_w, deck_z, mount_depth);
+        }
     }
 } else if (show == "section") {
     intersection() {

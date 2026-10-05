@@ -46,7 +46,7 @@ coupon_roof = 1.2;       // mm of strip above the coupon's groove
 set_gap = 8;             // mm between deck and rail on the shared print plate
 
 /* [Display] */
-show = "plate";          // [plate, deck, rail, print-set, set-rail, enforcer, joint-coupon, split, mount, section]
+show = "print-set";      // [print-set, plate, deck, rail, set-rail, enforcer, joint-coupon, split, mount, section]
 
 /* [Colors] */
 // Preview only; STLs carry no colour. Each printed piece gets its own.
@@ -225,7 +225,7 @@ module print_pose() {
 if (show == "plate") print_pose() shelf_plate();
 else if (show == "deck") deck_pose() deck();
 else if (show == "rail") rail();
-else if (show == "print-set") { deck_pose() deck(); set_rail_pose() rail(); groove_enforcer(); }
+else if (show == "print-set") { deck_pose() deck(); set_rail_pose() rail(); }
 else if (show == "set-rail") set_rail_pose() rail();
 else if (show == "enforcer") groove_enforcer();
 else if (show == "joint-coupon") joint_coupon();
