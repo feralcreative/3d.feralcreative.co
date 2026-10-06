@@ -14,8 +14,7 @@ label_clearance = 0.5;  // mm, recess clearance on each side of the label
 recess_depth = 0.6;     // mm, below the front face; leaves a 1.8 mm floor
 
 /* [Plate] */
-plate_w = 164;          // mm, overall back-face width
-plate_h = 125;          // mm, overall back-face height
+border_w = 11.1;        // mm, equal border from recess to back-face edge on all four sides
 plate_t = 2.4;          // mm, uniform plate thickness
 corner_r = 5;           // mm, rounded outside corners
 front_edge_r = 2.4;     // mm, front perimeter rolls all the way down to the back
@@ -45,11 +44,13 @@ $fn = 64;
 eps = 0.01;            // mm, overshoot for every through-cut
 hole_d = rivet_d + hole_clearance;
 hole_r = hole_d / (2 * cos(180 / $fn)); // circumscribed bore clears across flats
+pocket_w = label_w + 2 * label_clearance;
+pocket_h = label_h + 2 * label_clearance;
+plate_w = pocket_w + 2 * border_w;
+plate_h = pocket_h + 2 * border_w;
 hole_x = plate_w / 2 - hole_edge;
 hole_y = plate_h / 2 - hole_edge;
 hole_columns = rivet_count == 6 ? [-hole_x, 0, hole_x] : [-hole_x, hole_x];
-pocket_w = label_w + 2 * label_clearance;
-pocket_h = label_h + 2 * label_clearance;
 recess_floor_z = plate_t - recess_depth;
 head_pocket_d = head_d + head_clearance;
 head_pocket_r = head_pocket_d / (2 * cos(180 / $fn));
@@ -63,6 +64,7 @@ edge_profile_r = floor(front_edge_r * 1024) / 1024;
 assert(plate_t > 0 && corner_r > 0 && 2 * corner_r < min(plate_w, plate_h));
 assert(recess_depth > 0 && recess_depth < plate_t, "Recess must leave a solid floor");
 assert(label_clearance > 0 && label_clearance <= label_margin);
+assert(border_w > front_edge_r, "Border must extend beyond the perimeter roundover");
 assert(front_edge_r > 0 && front_edge_r <= plate_t && front_edge_r < corner_r);
 assert(head_style == "domed" || head_style == "countersunk");
 assert(head_d > hole_d && head_clearance > 0 && head_web > 0);

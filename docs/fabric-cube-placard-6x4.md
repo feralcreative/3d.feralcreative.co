@@ -4,9 +4,9 @@ A rounded plate for a 4 x 6 inch adhesive label, attached to a fabric storage cu
 
 | Dimension | Default |
 | --- | --- |
-| Overall plate at back face | 164 x 125 x 2.4 mm |
-| Border from recess to outside back edge | 5.3 mm at sides; 11.2 mm above and below |
-| Border on flat front face | About 2.9 mm at sides; 8.8 mm above and below |
+| Overall plate at back face | 175.6 x 124.8 x 2.4 mm |
+| Border from recess to outside back edge | 11.1 mm on every side |
+| Border on flat front face | About 8.7 mm on every side |
 | Label area | 152.4 x 101.6 mm (6 x 4 inches) |
 | Recess opening | 153.4 x 102.6 mm, square corners |
 | Clearance around label | 0.5 mm per side |
@@ -16,14 +16,14 @@ A rounded plate for a 4 x 6 inch adhesive label, attached to a fabric storage cu
 | Front perimeter roundover | 2.4 mm, down to the back; 24 arc segments |
 | Rivets | Six, three above and three below the label |
 | Hole diameter across flats | 3.3 mm, for nominal 1/8 inch (3.2 mm) rivets |
-| Hole centres | X = -75.6, 0, 75.6 mm; Y = -56.1, 56.1 mm |
+| Hole centres | X = -81.4, 0, 81.4 mm; Y = -56, 56 mm |
 | Default head seat | Flat-bottom counterbore for a domed pop-rivet head |
 | Assumed head diameter | 6.7 mm; confirm actual hardware |
 | Head pocket diameter across flats | 6.9 mm |
 | Head pocket depth | 1.2 mm |
 | Material beneath rivet head | 1.2 mm |
 
-Coordinates are measured from the plate centre. The head pockets remain at least 1.34 mm clear of the label recess and entirely inside the flat front face. The STL contains the plate, label recess, six shank holes, and six head pockets; `show="label-layout"` adds a preview-only guide at the label-recess floor. The circular edge profile is rounded down to BOSL2's 1/1024 mm precision, leaving less than 0.001 mm of straight edge at the back.
+Coordinates are measured from the plate centre. A single `border_w` parameter sets the border on all four sides; plate width and height are derived from the label recess, so the padding stays equal. The 11.1 mm border leaves at least 1.24 mm of material between the head pockets and label recess while retaining the 6.4 mm rivet centre-to-edge distance. The head pockets sit entirely inside the flat front face. The STL contains the plate, label recess, six shank holes, and six head pockets; `show="label-layout"` adds a preview-only guide at the label-recess floor. The circular edge profile is rounded down to BOSL2's 1/1024 mm precision, leaving less than 0.001 mm of straight edge at the back.
 
 The default assumes ordinary domed 1/8 inch pop rivets. A flat-bottom pocket supports their flat underside and recesses the head without a tapered seat. The representative 6.7 mm head envelope and 1.2 mm depth accommodate the manufacturer's listed 1/8 inch steel dome-head range of 6.05–6.66 mm diameter and 0.81–1.02 mm flange thickness; this is a sizing example, not identification of the user's hardware. [POP catalogue](https://www.stanleyengineeredfastening.com/-/media/Web/SEF/Resources/Docs/POP/POP-Rivet-Catalog.pdf)
 
@@ -45,4 +45,4 @@ The four-rivet variant omits the two centre holes. Larger rivets require updatin
 
 ## Verification
 
-Revision v03 tightens the border, adds head pockets, and rolls the front perimeter down to the back. The default geometry was inspected in all seven standard views, both plain and with the label guide. The binary STL measures 164 x 125 x 2.4 mm: 6,648 triangles, one connected shell, six through-holes (genus 6), no collapsed triangles, and no edge-incidence or winding errors. Its label recess measures 153.4 x 102.6 mm and its floor is at Z = 1.8 mm. Continuous axial insertion envelopes for the label, conservative 3.2 mm rivet shafts, and assumed 6.7 mm rivet heads have an empty intersection with the delivered binary STL, down to their respective floors with a 0.0001 mm numerical gap. These checks establish geometry and modelled insertion clearance for those envelopes; they do not establish actual hardware fit, gun access, or resistance to rivet-setting force.
+Revision v04 makes the border equal on all four sides and derives both plate dimensions from that shared border. The default geometry was inspected in all seven standard views. The binary STL measures 175.6 x 124.8 x 2.4 mm: 6,646 triangles, one connected shell, six through-holes (genus 6), no collapsed triangles, and no edge-incidence or winding errors. Independently measured distances from the recess to each outside edge are all 11.1 mm within binary-STL precision. Its label recess measures 153.4 x 102.6 mm and its floor is at Z = 1.8 mm. Continuous axial insertion envelopes for the label, conservative 3.2 mm rivet shafts, and assumed 6.7 mm rivet heads have an empty intersection with the delivered binary STL, down to their respective floors with a 0.0001 mm numerical gap. These checks establish geometry and modelled insertion clearance for those envelopes; they do not establish actual hardware fit, gun access, or resistance to rivet-setting force.
