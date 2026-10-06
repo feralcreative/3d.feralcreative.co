@@ -10,6 +10,14 @@
 // top before printing; an unmodified stock slice exceeds nominal travel.
 // Intended contents: a roll of Kirkland tall kitchen garbage bags. The
 // minimum inside clearance is 175 mm; the mouth is wider for easy loading.
+// Split for printing into a bottom, identical middle rings, and a top, glued
+// together. Every seam sits halfway up the overlap between two diamond rows,
+// where the cut crosses the least window (about 71% of the wall is solid).
+// An odd ring_rows makes each ring the next one turned half a column, so one
+// mesh serves every middle ring: glue each so its ribs continue the lattice.
+
+/* [Show] */
+show = "assembled"; // [assembled, exploded, bottom, ring, top]
 
 /* [Envelope] */
 clear_inner_d = 175;   // mm, minimum clear diameter, including floor gusset
@@ -25,6 +33,11 @@ window_h = 23;        // mm, diamond tip to tip
 base_band_h = 10;     // mm, solid skirt above the floor
 rim_band_h = 10;      // mm, uninterrupted upper collar
 
+/* [Sections] */
+first_seam_row = 1;   // window row whose lower overlap holds the first seam
+ring_rows = 3;        // window pitches per middle ring; odd keeps rings identical
+explode_gap = 25;     // mm, spacing between pieces in the exploded view
+
 /* [Reinforcement] */
 end_wall_t = 4.44;    // mm, thicker base and rim, all added inward
 end_blend_h = 1.5;    // mm, transition from main wall to thicker ends
@@ -32,7 +45,9 @@ floor_gusset = 1.5;   // mm, 45-degree inside floor-to-wall reinforcement
 edge_chamfer = 0.6;   // mm, bottom outer edge and both top rim edges
 
 /* [Colors] */
-basket_color = "MediumPurple"; // single printed piece, preview only
+bottom_color = "MediumPurple"; // preview only
+ring_color = "Orchid";         // preview only
+top_color = "SlateBlue";       // preview only
 
 /* [Resolution] */
 $fn = 144;            // about 0.022 mm chord error at the outside radius
@@ -54,6 +69,14 @@ diagonal_rib_w = (inner_r * sin(180 / window_columns) / window_w
                   + window_pitch / window_h - 1)
                  / sqrt(1 / (window_w * window_w) + 1 / (window_h * window_h));
 
+// Halfway up the band where row r-1's top tips overlap row r's bottom tips.
+seam_phase = (window_h - window_pitch) / 2;
+ring_count = floor((window_rows - 1 - first_seam_row) / ring_rows);
+seam_z = [for (k = [0 : ring_count])
+          base_band_h + (first_seam_row + k * ring_rows) * window_pitch + seam_phase];
+ring_h = ring_rows * window_pitch;
+slab_r = outer_r + 1;
+
 assert(window_rows >= 2 && window_columns >= 3, "Need at least two rows and three columns");
 assert(total_h <= 220, "Basket exceeds the target printer's nominal Z envelope");
 assert(outer_d > 2 * (end_wall_t + floor_gusset), "No usable interior remains");
@@ -65,6 +88,10 @@ assert(window_pitch > window_h / 2 && window_pitch < window_h,
 assert(inner_rib_w >= wall_t, "Lattice crossings too narrow at the inside face");
 assert(diagonal_rib_w >= wall_t, "Diagonal ribs too narrow at the inside face");
 assert(base_band_h > floor_t + floor_gusset + end_blend_h, "Windows enter the reinforced floor");
+assert(ring_rows % 2 == 1, "An even ring_rows makes alternate rings different meshes");
+assert(first_seam_row >= 1 && ring_count >= 1, "Not enough window rows for a middle ring");
+assert(seam_z[0] > base_band_h && seam_z[ring_count] < total_h - rim_band_h,
+       "Seams must cross the plain wall, not the reinforced ends");
 assert(rim_band_h > end_blend_h + edge_chamfer, "Windows enter the reinforced rim");
 
 module basket_shell() {
@@ -109,7 +136,6 @@ module window_cut() {
 }
 
 module basket() {
-    color(basket_color)
         difference() {
             basket_shell();
             for (row = [0 : window_rows - 1])
@@ -120,4 +146,35 @@ module basket() {
         }
 }
 
-basket();
+module slab(z0, z1) {
+    translate([0, 0, z0]) cylinder(r = slab_r, h = z1 - z0);
+}
+
+// Each piece is returned in basket coordinates; print poses drop it to Z=0.
+module bottom_piece() {
+    color(bottom_color)
+        intersection() { basket(); slab(-eps, seam_z[0]); }
+}
+
+module ring_piece(k = 0) {
+    color(ring_color)
+        intersection() { basket(); slab(seam_z[k], seam_z[k + 1]); }
+}
+
+module top_piece() {
+    color(top_color)
+        intersection() { basket(); slab(seam_z[ring_count], total_h + eps); }
+}
+
+module assembly(gap = 0) {
+    bottom_piece();
+    for (k = [0 : ring_count - 1])
+        translate([0, 0, (k + 1) * gap]) ring_piece(k);
+    translate([0, 0, (ring_count + 1) * gap]) top_piece();
+}
+
+if (show == "assembled") assembly();
+else if (show == "exploded") assembly(explode_gap);
+else if (show == "bottom") bottom_piece();
+else if (show == "ring") translate([0, 0, -seam_z[0]]) ring_piece(0);
+else if (show == "top") translate([0, 0, -seam_z[ring_count]]) top_piece();
