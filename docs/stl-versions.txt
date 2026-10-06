@@ -28,7 +28,7 @@ door-stop-post 2
 door-stop-spinner 2
 doorbell-wire-channel 48
 doorbell-wire-channel-cap 27
-fabric-cube-placard-6x4 2
+fabric-cube-placard-6x4 3
 gridfinity-baseplate-5x2 3
 gridfinity-baseplate-6x1 1
 gridfinity-baseplate-dogleg 4
