@@ -1,18 +1,22 @@
 # Fabric-cube placard for a 6 x 4 inch label
 
-A flat, rounded plate for an adhesive label, attached to a fabric storage cube with pop rivets. The label sits on the front face; there is no raised border or label pocket.
+A rounded plate for a 4 x 6 inch adhesive label, attached to a fabric storage cube with pop rivets. A shallow front recess accepts the label in landscape orientation. Sized to the user's stated 4 x 6 inch UPS label, number 0177400603; [UPS documents the 4 x 6 inch thermal-label format](https://www.campusship.ups.com/us/en/support/shipping-support/print-shipping-labels/thermal-printing-of-labels).
 
 | Dimension | Default |
 | --- | --- |
 | Overall plate | 175 x 135 x 2.4 mm |
 | Label area | 152.4 x 101.6 mm (6 x 4 inches) |
+| Recess opening | 153.4 x 102.6 mm, square corners |
+| Clearance around label | 0.5 mm per side |
+| Recess depth | 0.6 mm |
+| Floor beneath label | 1.8 mm |
 | Corner radius | 5 mm |
 | Rivets | Six, three above and three below the label |
 | Hole diameter across flats | 3.3 mm, for nominal 1/8 inch (3.2 mm) rivets |
 | Hole centres | X = -79.5, 0, 79.5 mm; Y = -59.5, 59.5 mm |
 | Reserved head or washer diameter | 12 mm |
 
-Coordinates are measured from the plate centre. A 12 mm head or washer remains 2.7 mm clear of the label. The STL contains just the plate and holes; `show="label-layout"` adds a preview-only guide for the label.
+Coordinates are measured from the plate centre. A 12 mm head or washer remains 2.7 mm clear of the label and 2.2 mm clear of the recess. The STL contains the plate, recess, and holes; `show="label-layout"` adds a preview-only guide at the recess floor.
 
 Print flat with the back on the bed and label face up. This orientation needs no supports. The default holes assume 1/8 inch rivets; check an actual rivet in a hole before fastening the plate. Printed hole fit and the fabric attachment have not been physically tested.
 
@@ -33,4 +37,4 @@ The four-rivet variant omits the two centre holes. The 4 mm rivet variant has 4.
 
 ## Verification
 
-The default geometry was inspected in all seven standard views, both plain and with the label guide. The binary STL measures 175 x 135 x 2.4 mm: one connected shell, six through-holes (genus 6), no collapsed triangles, and no edge-incidence or winding errors. A conservative 3.2 mm shaft envelope swept continuously through each hole has an empty intersection with the plate. These checks establish geometry and modelled insertion clearance; they do not establish printed fit or resistance to rivet-setting force.
+Revision v02 adds the recess. The default geometry was inspected in all seven standard views, both plain and with the label guide. The binary STL measures 175 x 135 x 2.4 mm: one connected shell, six through-holes (genus 6), no collapsed triangles, and no edge-incidence or winding errors. Its recess opening measures 153.4 x 102.6 mm and its floor is at Z = 1.8 mm. Continuous axial insertion envelopes for the 152.4 x 101.6 mm label down to the floor (with a 0.0001 mm numerical gap) and conservative 3.2 mm rivet shafts have an empty intersection with the delivered binary STL. These checks establish geometry and modelled insertion clearance; they do not establish printed fit or resistance to rivet-setting force.

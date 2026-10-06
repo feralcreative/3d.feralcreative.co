@@ -1,5 +1,5 @@
 // Flat adhesive-label placard for fabric storage cubes.
-// A 6 x 4 inch label sits on the uninterrupted front face. Three rivets above
+// A 6 x 4 inch adhesive label sits in a shallow front recess. Three rivets above
 // and three below the label keep the hardware clear of the label itself.
 // Print flat, back on the bed, label face upward. Use metal backing washers
 // on the fabric side and rivets whose grip range covers the complete stack.
@@ -8,6 +8,8 @@
 label_w = 152.4;         // mm, 6 inches
 label_h = 101.6;         // mm, 4 inches
 label_margin = 2;       // mm, clear space beyond each label edge
+label_clearance = 0.5;  // mm, recess clearance on each side of the label
+recess_depth = 0.6;     // mm, below the front face; leaves a 1.8 mm floor
 
 /* [Plate] */
 plate_w = 175;          // mm, overall width
@@ -37,8 +39,13 @@ hole_r = hole_d / (2 * cos(180 / $fn)); // circumscribed bore clears across flat
 hole_x = plate_w / 2 - hole_edge;
 hole_y = plate_h / 2 - hole_edge;
 hole_columns = rivet_count == 6 ? [-hole_x, 0, hole_x] : [-hole_x, hole_x];
+pocket_w = label_w + 2 * label_clearance;
+pocket_h = label_h + 2 * label_clearance;
+recess_floor_z = plate_t - recess_depth;
 
 assert(plate_t > 0 && corner_r > 0 && 2 * corner_r < min(plate_w, plate_h));
+assert(recess_depth > 0 && recess_depth < plate_t, "Recess must leave a solid floor");
+assert(label_clearance > 0 && label_clearance <= label_margin);
 assert(rivet_count == 4 || rivet_count == 6, "Choose four or six rivets");
 assert(rivet_d > 0 && hole_clearance > 0 && head_clear_d >= hole_d);
 assert(label_w + 2 * label_margin < plate_w, "Label needs clear space at the sides");
@@ -56,13 +63,15 @@ module placard() {
         for (x = hole_columns)
             for (y = [-hole_y, hole_y])
                 translate([x, y, -eps]) cylinder(r = hole_r, h = plate_t + 2 * eps);
+        translate([-pocket_w / 2, -pocket_h / 2, recess_floor_z])
+            cube([pocket_w, pocket_h, recess_depth + eps]);
     }
 }
 
 module label_reference() {
     // OpenSCAD's background modifier excludes this visual guide from STL exports.
     %color(label_color)
-        translate([-label_w / 2, -label_h / 2, plate_t + eps])
+        translate([-label_w / 2, -label_h / 2, recess_floor_z + eps])
             cube([label_w, label_h, eps]);
 }
 
