@@ -1,6 +1,6 @@
 4k-camera-window-mount 5
 basket-175x220 3
-basket-175x220-bottom 2
+basket-175x220-bottom 3
 basket-175x220-ring 2
 basket-175x220-top 2
 basket-75x220 2

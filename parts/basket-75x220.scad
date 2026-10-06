@@ -1,4 +1,4 @@
-// Upright, open-top basket. Print on the solid floor, without supports.
+// Upright, open-top basket. Print on the open cross-hatch floor, without supports.
 // Alternating half-cell offsets between diamond rows leave two families of
 // connected diagonal ribs: a criss-cross lattice with no horizontal lintels.
 // The upper sides of each diamond rise more steeply than 45 degrees, so
@@ -21,7 +21,7 @@ show = "assembled"; // [assembled, exploded, bottom, ring, top, joint-section, j
 clear_inner_d = 175;   // mm, minimum clear diameter, including floor gusset
 total_h = 220;         // mm, underside to top of rim
 wall_t = 3.54;         // mm, 2 x 0.42 outer + 6 x 0.45 inner extrusion widths
-floor_t = 3.6;         // mm, solid bottom
+floor_t = 3.6;         // mm, cross-hatch floor rib thickness
 
 /* [Windows] */
 window_columns = 40;  // diamonds around the circumference
@@ -74,6 +74,9 @@ window_pitch = (total_h - base_band_h - rim_band_h - window_h)
                / (window_rows - 1);
 cut_depth = end_wall_t + floor_gusset + 2 * eps;
 inner_rib_w = 2 * inner_r * sin(180 / window_columns) - window_w;
+floor_column_pitch = 2 * inner_r * sin(180 / window_columns); // mm, side lattice unrolled
+floor_column_count = ceil(clear_inner_r / floor_column_pitch) + 1;
+floor_row_count = ceil(clear_inner_r / window_pitch) + 1;
 // Perpendicular separation between the diagonal sides of adjacent diamonds.
 diagonal_rib_w = (inner_r * sin(180 / window_columns) / window_w
                   + window_pitch / window_h - 1)
@@ -235,9 +238,28 @@ module window_cut() {
                 window_profile();
 }
 
+module floor_window_cuts() {
+    // Unroll the side lattice onto XY: same 9 x 23 mm diamonds, staggered
+    // half a column, with the same rib spacing. Every opening cuts through
+    // the floor. Clip at the gusset's inner edge to retain its solid seat.
+    intersection() {
+        translate([0, 0, -eps])
+            cylinder(r = clear_inner_r, h = floor_t + 2 * eps);
+        union() {
+            for (row = [-floor_row_count : floor_row_count])
+                for (column = [-floor_column_count : floor_column_count])
+                    translate([(column + (row % 2) / 2) * floor_column_pitch,
+                               row * window_pitch, -eps])
+                        linear_extrude(height = floor_t + 2 * eps, convexity = 10)
+                            translate([0, -window_h / 2]) window_profile();
+        }
+    }
+}
+
 module basket() {
         difference() {
             basket_shell();
+            floor_window_cuts();
             for (row = [0 : window_rows - 1])
                 for (column = [0 : window_columns - 1])
                     rotate([0, 0, (column + (row % 2) / 2) * 360 / window_columns])

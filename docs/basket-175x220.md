@@ -2,6 +2,8 @@
 
 The basket in `parts/basket-75x220.scad` retains its 175 mm minimum inside clearance, approximately 186.92 mm outside diameter, and 220 mm assembled height. It is split into one bottom, three identical middle rings, and one top. The filename predates the current diameter.
 
+The floor is an open cross-hatch using the side lattice's diamond size, stagger, and rib spacing, laid onto the XY plane. Its 109 openings cut through the full 3.6 mm floor thickness for drainage. The reinforced perimeter and floor-to-wall gusset remain solid; the pattern stops at the gusset's inner edge. The current bottom is v03; the middle ring and top remain v02.
+
 ## Print and assembly
 
 | Piece | Quantity | STL | Upright print height |
@@ -22,9 +24,11 @@ The source provides `assembled`, `exploded`, and the three print variants. `join
 
 On 2026-10-06, all seven assembled views, seven exploded views, and seven joint-section views were inspected. The four seated joints had no penetrating volume; the only contact was at their shoulder stops. A nine-state axial configuration-space path from 11 mm above seating to the stop was reachable, with every edge certified by the continuous envelope. The wrong-phase check produced approximately 21.93 mm³ of interference.
 
-All three v02 binary STLs passed independent collapsed-triangle, edge-incidence, winding, and connected-component checks: one solid per piece and zero bad triangles or edges. OpenSCAD reported `NoError`, with genus 40 for the bottom, 121 for the ring, and 41 for the top. Raw exports contained collapsed triangles at coincident surfaces; re-importing each binary mesh and intersecting it with a containing cube removed those artifacts. Maximum measured volume change was less than 0.0003 mm³.
+All three keyed-joint v02 binary STLs passed independent collapsed-triangle, edge-incidence, winding, and connected-component checks: one solid per piece and zero bad triangles or edges. OpenSCAD reported `NoError`, with genus 40 for the original solid-floor bottom, 121 for the ring, and 41 for the top. Raw exports contained collapsed triangles at coincident surfaces; re-importing each binary mesh and intersecting it with a containing cube removed those artifacts. Maximum measured volume change was less than 0.0003 mm³.
 
-These are geometry and modeled insertion checks. The joints have not been physically printed or dry-fitted, glue strength is untested, and no revised basket print jobs were generated in this change.
+The open-floor v03 bottom was subsequently inspected in all seven views and independently checked: 8,910 triangles, one connected solid, zero collapsed triangles, bad edges, or winding errors, and `NoError` with genus 149. Cross-sections at Z=0.05, 1.80, and 3.59 mm each had 109 floor openings plus the outer perimeter, confirming that the cells remain open throughout the floor. Cleanup changed the volume by less than 0.0003 mm³. Floor cutters end at Z=3.61 mm, entirely below the lowest glue collar at Z=25.85 mm.
+
+These are geometry and modeled insertion checks. The joints and floor have not been physically printed, floor load capacity and glue strength are untested, and no revised basket print jobs were generated in these changes.
 
 ## Rebuild
 
