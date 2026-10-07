@@ -12,6 +12,7 @@ The replacement for the lattice basket is a freestanding, solid-walled cylinder 
 | Assembled height | 249.8 mm |
 | Bottom print height | 136.6 mm |
 | Upper print height | 131.2 mm |
+| Outside top rim | 2 mm radius |
 | Dispensing opening | 38 mm nominal, rounded on both edges |
 | Guide rise | 12 mm, entirely above the clear roll cavity |
 | Screw joint | Right-handed, 6 mm pitch, 18 mm engagement |
@@ -24,6 +25,8 @@ The 180 mm minimum bore includes the male thread neck. The cavity widens away fr
 Print the bottom upright on its floor. Print the upper half upside down on its flat lid face—the `top` variant already applies that orientation. Each half needs its own plate. The solid walls, floor and lid let the slicer supply infill; infill is not modelled as lattice geometry.
 
 First print the `coupon-bottom` and `coupon-top` variants. These short, full-diameter rings preserve the complete production threads and their approach surfaces. Their heights are 26 mm and 31.25 mm. Check that they start easily, screw all the way to the shoulder and release without binding before printing the tall halves.
+
+Scaling both coupons to 50% checks engagement at half size, but also halves the nominal clearances: 0.3 mm radial becomes 0.15 mm and 0.2 mm per flank becomes 0.1 mm. Printer dimensional errors do not scale along with the model, so this is not a full-size fit check.
 
 Load the roll vertically through the lower half's open mouth. Find the centre bag end and feed it through the upper half's opening before screwing the upper half down to the shoulder. Avoid twisting the bag end while turning the cap.
 
@@ -41,6 +44,8 @@ Always give each build variant its own output name. The source defaults to the e
 ## Verification—2026-10-07
 
 All seven assembled renders and all seven section renders were inspected. Version 02 exports for both full halves and both coupons report `NoError`. The bottom has genus 0; the upper half and coupons have genus 1. The delivered binary meshes each have one connected component, zero collapsed triangles, zero bad edge incidences and consistent winding. Re-import/intersection cleanup removed export degeneracies with less than 0.000001 mm³ volume change. Repeat the independent binary checks after future exports; OpenSCAD's status alone does not detect these artifacts.
+
+The outside top chamfer was subsequently replaced with a 2 mm tangent radius. The revised upper half is version 03: `NoError`, genus 1, one component and zero collapsed triangles, bad edges or winding errors. All seven revised assembled views were inspected. This change only removes material at the outside top corner; the roll cavity, guide, threads and coupon geometry are unchanged. Version 02 print-time estimates below predate this rim change.
 
 The measured roll fits the assembly, and its continuous straight loading sweep through the bottom is empty. Cap-over-roll intersections are empty from the seated pose through the outside approach. Full-half screw-pose checks from 24 mm lift to seating are empty except the seated shoulder's planar contact (about 0.000002 mm³ numerical residue). A deliberately wrong 180-degree thread phase produces about 1855 mm³ interference, confirming that the probe detects collisions.
 

@@ -24,7 +24,8 @@ clear_h = 230;         // mm, floor to lowest point of the guide underside
 wall_t = 2.94;         // mm, body and thread-root wall thickness
 floor_t = 3.6;         // mm, closed floor, infill supplied by the slicer
 lid_t = 4.2;           // mm, minimum thickness beside the centre opening
-edge_chamfer = 0.6;    // mm, outer bed edge and lid perimeter
+edge_chamfer = 0.6;    // mm, bottom outer bed edge
+top_rim_round = 2;     // mm, radius around the outside top edge
 bed_size = 220;        // mm, maximum printable width, depth, and height
 
 /* [Dispensing guide] */
@@ -85,6 +86,7 @@ inner_round_center = [hole_r + hole_round,
     guide_peak_z + hole_round * (sqrt(1 + guide_slope * guide_slope) - guide_slope)];
 inner_round_end = 270 - guide_angle;
 outer_round_center = [hole_r + hole_round, top_h - hole_round];
+top_rim_center = [outer_r - top_rim_round, top_h - top_rim_round];
 thread_start_clear = thread_h + thread_pitch;
 probe_r = outer_r + wall_t;
 coupon_bottom_z = seam_z - coupon_grip_h;
@@ -111,10 +113,10 @@ function tooth_profile(extra = 0) = [
     [0.5, -thread_depth / thread_pitch]
 ];
 
-function edge_arc(center, a0, a1) = [
+function edge_arc(center, a0, a1, radius = hole_round) = [
     for (i = [0 : round_segments])
         let(a = a0 + (a1 - a0) * i / round_segments)
-        center + hole_round * [cos(a), sin(a)]
+        center + radius * [cos(a), sin(a)]
 ];
 
 assert(clear_d >= roll_d && clear_h >= roll_h,
@@ -132,6 +134,9 @@ assert(hole_d > 2 * hole_round && hole_r + hole_round < inner_r,
        "Opening too small for its rounded guide edges");
 assert(top_h - hole_round > inner_round_center[1],
        "Lid too thin to separate the two opening-edge fillets");
+assert(top_rim_round > 0 && top_rim_round <= lid_t
+       && outer_r - top_rim_round > hole_r + hole_round,
+       "Top rim radius must leave the lid and flat printing face intact");
 assert(coupon_top_h < guide_base_z && seam_z > joint_blend_h + floor_t,
        "Joint/coupon geometry overlaps the floor or guide");
 assert(path_motion_bound < path_guard,
@@ -235,8 +240,8 @@ module bottom() {
 module top() {
     color(top_color) difference() {
         rotate_extrude(convexity = 10) polygon([
-            [outer_r, 0], [outer_r, top_h - edge_chamfer],
-            [outer_r - edge_chamfer, top_h],
+            [outer_r, 0],
+            each edge_arc(top_rim_center, 0, 90, top_rim_round),
             each edge_arc(outer_round_center, 90, 180),
             each edge_arc(inner_round_center, 180, inner_round_end),
             [main_inner_r, guide_base_z],

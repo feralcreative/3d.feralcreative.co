@@ -48,7 +48,7 @@ hobbs-chalk-holder-coupon 5
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom 2
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-coupon-bottom 2
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-coupon-top 2
-kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top 2
+kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top 3
 large-door-stop 2
 large-door-stop-coupon 2
 large-door-stop-coupon-profile 1
