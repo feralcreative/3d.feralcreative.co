@@ -42,6 +42,18 @@ guide_h = 12;          // mm, shallow rise from outer guide edge to hole
 hole_round = 1.5;      // mm, radius on both edges of the dispensing hole
 round_segments = 18;   // segments per opening-edge arc
 
+/* [Top lettering] */
+label_text = "GARBAGE BAGS"; // clockwise lettering around the dispensing opening
+label_font = "Helvetica Neue:style=Condensed Black"; // same bold face as the can-holder labels
+label_size = 16;       // mm, nominal text size
+label_radius = 28;     // mm, circular baseline radius from the hole centre
+label_start_angle = 150; // degrees, first letter at the upper left
+label_depth = 1;       // mm, deboss into the outer lid face
+label_taper = 70;      // degrees from horizontal, widening toward the surface
+label_steps = 5;       // bands in the settled tapered-deboss construction
+label_margin = 2;      // mm, separation from hole roundover and outer rim
+label_facets = 48;     // segments on curved glyph outlines
+
 /* [Screw joint] */
 thread_pitch = 6;      // mm, axial travel per turn, single start/right handed
 thread_h = 18;         // mm, three turns of engagement
@@ -154,6 +166,13 @@ assert(top_h - hole_round > inner_round_center[1],
 assert(top_rim_round > 0 && top_rim_round <= lid_t
        && outer_r - top_rim_round > hole_r + hole_round,
        "Top rim radius must leave the lid and flat printing face intact");
+assert(label_depth > 0 && label_depth < lid_t
+       && label_taper > 0 && label_taper < 90
+       && label_steps >= 1 && label_steps == floor(label_steps),
+       "The label needs positive depth, a tapered cut and whole bands");
+assert(label_radius > hole_r + hole_round + label_margin
+       && label_radius + label_size + label_margin < outer_r - top_rim_round,
+       "Keep the lettering clear of the opening and outer rim");
 assert(coupon_top_h < guide_base_z && seam_z > joint_blend_h + floor_t,
        "Joint/coupon geometry overlaps the floor or guide");
 assert(path_motion_bound < path_guard,
@@ -173,6 +192,27 @@ module grip_ridges(z0, z1) {
                     translate([0, 0, z1 - grip_radius])
                         sphere(r = grip_radius, $fn = grip_facets);
                 }
+}
+
+module label_artwork() {
+    // One extra blank sector separates the final S from the first G.
+    for (i = [0 : len(label_text) - 1])
+        if (label_text[i] != " ")
+            rotate([0, 0, label_start_angle - i * 360 / (len(label_text) + 1) - 90])
+                translate([0, label_radius])
+                    text(label_text[i], size = label_size, font = label_font,
+                         halign = "center", valign = "baseline", $fn = label_facets);
+}
+
+module label_cut() {
+    // Same 70-degree/five-band treatment recorded in docs/STATUS.md.
+    // Full-size outlines at the mouth, progressively inset deeper in the lid.
+    // Offset each stroke; scaling would move letters rather than taper them.
+    band = label_depth / label_steps;
+    for (k = [0 : label_steps - 1])
+        translate([0, 0, top_h - band * (k + 1)])
+            linear_extrude(height = band + eps, convexity = 10)
+                offset(delta = -band * k / tan(label_taper)) label_artwork();
 }
 
 module male_thread() {
@@ -282,6 +322,7 @@ module top() {
             grip_ridges(grip_seam_gap, top_h - top_rim_round);
         }
         socket_cut();
+        label_cut();
     }
 }
 

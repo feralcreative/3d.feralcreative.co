@@ -16,6 +16,8 @@ The replacement for the lattice basket is a freestanding, solid-walled cylinder 
 | Bottom print height | 184.53 mm, including the 18 mm threaded neck |
 | Upper print height | 83.27 mm |
 | Outside top rim | 2 mm radius |
+| Circular top label | GARBAGE BAGS, 28 mm baseline radius, 16 mm nominal type |
+| Label deboss | 1 mm deep, 70-degree outward taper in five bands |
 | Dispensing opening | 38 mm nominal, rounded on both edges |
 | Guide rise | 12 mm, entirely above the clear roll cavity |
 | Screw joint | Right-handed, 6 mm pitch, 18 mm engagement |
@@ -24,6 +26,8 @@ The replacement for the lattice basket is a freestanding, solid-walled cylinder 
 The 180 mm minimum bore includes the male thread neck. The cavity widens away from the joint. The lowest point of the guide is 230 mm above the floor, so its cone does not steal height from the roll. Parameter assertions protect the measured roll envelope and the 220 mm printer envelope.
 
 The vertical ridges cover both sidewalls. Each ridge ends 0.8 mm short of its section's seam face, leaving clearance as the halves turn. The upper ridges also stop below the rounded top rim. The ridges add grip without changing the internal joint or roll envelope.
+
+`GARBAGE BAGS` runs clockwise around the dispensing opening, with a blank sector separating the end from the beginning. The lettering is recessed into the lid using the settled treatment in [STATUS.md](STATUS.md): the visible mouth is full size, and five inset bands narrow the strokes deeper in the cut. This preserves the flat printing face around the lettering. The label uses `Helvetica Neue:style=Condensed Black`, the same face as the can-holder labels.
 
 ## Printing and loading
 
@@ -48,13 +52,15 @@ Always give each build variant its own output name. The source defaults to the e
 
 ## Verification—2026-10-07
 
-Current exports are bottom version 04, upper version 05 and both coupons version 03. All report `NoError`. The bottom has genus 0; the upper section and coupons have genus 1. Each delivered binary mesh has one connected component, zero collapsed triangles, zero bad edge incidences and consistent winding. Re-import/intersection cleanup removed bottom and bottom-coupon export degeneracies, changing each volume by less than 0.495 mm³ (under ten parts per million). Repeat the independent binary checks after future exports; OpenSCAD's status alone does not detect these artifacts.
+Current exports are bottom version 04, labelled upper version 06 and both coupons version 03. All report `NoError`. The bottom has genus 0; the upper section and coupons have genus 1. Each delivered binary mesh has one connected component, zero collapsed triangles, zero bad edge incidences and consistent winding. Re-import/intersection cleanup removed bottom and bottom-coupon export degeneracies, changing each volume by less than 0.495 mm³ (under ten parts per million). The labelled upper export passed without cleanup. Repeat the independent binary checks after future exports; OpenSCAD's status alone does not detect these artifacts.
 
 All seven current assembled renders were inspected; the original internal guide was also reviewed in seven section renders. With the ridges, whole-piece screw-pose checks at 24, 12, 3, 0.1 and 0 mm lift are empty. Roll-fit, the continuous straight loading sweep through the bottom and the cap-over-roll intersection are empty. The ridges remain on opposite sides of the seam throughout the screw approach, so they cannot interfere between sampled poses. Earlier deliberately wrong 180-degree thread alignment produced about 1855 mm³ interference, confirming that the probe detects collisions.
 
+The labelled lid was additionally inspected in a close oblique render. Its 1 mm cut stays within the lid, so the dispensing opening remains the only through-hole. Lettering only removes material from the exterior top face and leaves the guide, roll space, joint and coupons intact. Face-on renders shade the recess floors like the surrounding lid; use the oblique detail to inspect the letter edges. Physical lettering readability is still untested.
+
 The continuous thread check uses a full periodic male helix, an enclosing 0.1 mm motion cube and a verified enlarged guard. `thread-guard-fit` is empty. `thread-path` checks guarded midpoints every 0.1 degree over the repeating 2-degree mesh cell; the maximum intervening screw motion is below 0.084 mm. That covers the continuous path between samples. The open socket mouth, blunt male ends and 0.8 mm tip gap handle the finite ends.
 
-The earlier equal-height, smooth-wall version was checked in Flash Studio G-code using the existing `0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle` process and `Flashforge PETG Pro` filament: 15% infill, two wall loops, Textured PEI Plate, supports disabled and no support toolpaths. Its estimates were 7h 16m / 291 g for the bottom and 8h 55m / 324 g for the upper half. Those estimates predate the rounded rim, taller bottom and grip ridges. The current geometry has not been resliced; no new printer-ready 3MF was produced.
+The earlier equal-height, smooth-wall version was checked in Flash Studio G-code using the existing `0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle` process and `Flashforge PETG Pro` filament: 15% infill, two wall loops, Textured PEI Plate, supports disabled and no support toolpaths. Its estimates were 7h 16m / 291 g for the bottom and 8h 55m / 324 g for the upper half. Those estimates predate the rounded rim, taller bottom, grip ridges and label. The current geometry has not been resliced; no new printer-ready 3MF was produced.
 
 The refreshed coupons include matching grip ridges. Their thread geometry and clearances are unchanged, so the original smooth-wall coupons already being printed still test this joint.
 
