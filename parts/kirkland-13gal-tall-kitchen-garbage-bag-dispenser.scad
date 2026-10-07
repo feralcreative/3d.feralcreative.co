@@ -1,7 +1,7 @@
 // Centre-pull dispenser for a 9 inch tall x 7 inch diameter Kirkland roll.
 // The tall bottom and short upper section screw together; features stay outside the
 // full-height roll envelope. The upper half includes the dispensing lid.
-// The outside is one straight cylinder; the thread thickening is all inside.
+// Rounded vertical grip ridges surround the straight cylinder; threads stay inside.
 // Its underside is a shallow cone rising towards a rounded centre opening.
 // The outside lid face is flat: print the upper half upside down on that face,
 // and the bottom upright on its floor. Both orientations need no supports.
@@ -28,6 +28,13 @@ edge_chamfer = 0.6;    // mm, bottom outer bed edge
 top_rim_round = 2;     // mm, radius around the outside top edge
 bottom_fraction = 2/3; // fraction of assembled height below the seam, excluding threads
 bed_size = 220;        // mm, maximum printable width, depth, and height
+
+/* [Grip ridges] */
+grip_count = 48;       // ridges evenly spaced around each section
+grip_radius = 1.8;     // mm, rounded ridge cross-section and end-cap radius
+grip_height = 1.2;     // mm, radial projection beyond the cylinder wall
+grip_seam_gap = 0.8;   // mm, each ridge's setback from the threaded seam
+grip_facets = 24;      // segments around each ridge and rounded end
 
 /* [Dispensing guide] */
 hole_d = 38;           // mm, nominal centre opening
@@ -124,8 +131,15 @@ assert(clear_d >= roll_d && clear_h >= roll_h,
        "Never reduce the clear cavity below the measured roll dimensions");
 assert(roll_d >= 177.8 && roll_h >= 228.6,
        "The roll envelope must remain at least 7 inches diameter x 9 inches tall");
-assert(2 * outer_r <= bed_size && max(bottom_h, top_h) <= bed_size,
+assert(2 * (outer_r + grip_height) <= bed_size && max(bottom_h, top_h) <= bed_size,
        "A print piece exceeds the 220 mm printer envelope");
+assert(grip_count >= 8 && grip_count == floor(grip_count)
+       && grip_radius > grip_height && grip_height > 0
+       && 2 * grip_radius - grip_height < wall_t && grip_seam_gap > 0,
+       "Grip ridges need wall overlap, bore clearance and a gap at the seam");
+assert(min(seam_z - grip_seam_gap - edge_chamfer,
+           top_h - top_rim_round - grip_seam_gap) > 2 * grip_radius,
+       "Body sections are too short for the rounded grip ridges");
 assert(bottom_fraction > 0 && bottom_fraction < 1,
        "The seam must divide the assembled height into two positive sections");
 assert(thread_h >= 2 * thread_pitch && thread_radial_clearance > 0
@@ -147,6 +161,18 @@ assert(path_motion_bound < path_guard,
 
 module slab(z0, z1, r = probe_r) {
     translate([0, 0, z0]) cylinder(r = r, h = z1 - z0);
+}
+
+module grip_ridges(z0, z1) {
+    for (i = [0 : grip_count - 1])
+        rotate([0, 0, i * 360 / grip_count])
+            translate([outer_r + grip_height - grip_radius, 0, 0])
+                hull() {
+                    translate([0, 0, z0 + grip_radius])
+                        sphere(r = grip_radius, $fn = grip_facets);
+                    translate([0, 0, z1 - grip_radius])
+                        sphere(r = grip_radius, $fn = grip_facets);
+                }
 }
 
 module male_thread() {
@@ -229,6 +255,7 @@ module bottom() {
                 [main_inner_r, seam_z - joint_blend_h],
                 [main_inner_r, floor_t], [0, floor_t]
             ]);
+            grip_ridges(edge_chamfer, seam_z - grip_seam_gap);
             translate([0, 0, seam_z]) male_thread();
         }
         // Clear the entire male core without shrinking the loading bore.
@@ -242,15 +269,18 @@ module bottom() {
 
 module top() {
     color(top_color) difference() {
-        rotate_extrude(convexity = 10) polygon([
-            [outer_r, 0],
-            each edge_arc(top_rim_center, 0, 90, top_rim_round),
-            each edge_arc(outer_round_center, 90, 180),
-            each edge_arc(inner_round_center, 180, inner_round_end),
-            [main_inner_r, guide_base_z],
-            [main_inner_r, socket_h + joint_blend_h],
-            [inner_r, socket_h], [inner_r, 0]
-        ]);
+        union() {
+            rotate_extrude(convexity = 10) polygon([
+                [outer_r, 0],
+                each edge_arc(top_rim_center, 0, 90, top_rim_round),
+                each edge_arc(outer_round_center, 90, 180),
+                each edge_arc(inner_round_center, 180, inner_round_end),
+                [main_inner_r, guide_base_z],
+                [main_inner_r, socket_h + joint_blend_h],
+                [inner_r, socket_h], [inner_r, 0]
+            ]);
+            grip_ridges(grip_seam_gap, top_h - top_rim_round);
+        }
         socket_cut();
     }
 }
