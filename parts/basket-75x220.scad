@@ -1,4 +1,6 @@
-// Upright, open-top basket. Print on the open cross-hatch floor, without supports.
+// Upright, open-top basket. Default: continuous walls and floor, with infill
+// supplied by the slicer. Print upright without supports.
+// The optional lattice retains the original open cross-hatch design.
 // Alternating half-cell offsets between diamond rows leave two families of
 // connected diagonal ribs: a criss-cross lattice with no horizontal lintels.
 // The upper sides of each diamond rise more steeply than 45 degrees, so
@@ -18,10 +20,11 @@
 show = "assembled"; // [assembled, exploded, bottom, ring, top, joint-section, joint-fit, joint-insertion, joint-wrong-angle]
 
 /* [Envelope] */
+shell_style = "solid"; // [solid, lattice]
 clear_inner_d = 175;   // mm, minimum clear diameter, including floor gusset
 total_h = 220;         // mm, underside to top of rim
 wall_t = 3.54;         // mm, 2 x 0.42 outer + 6 x 0.45 inner extrusion widths
-floor_t = 3.6;         // mm, cross-hatch floor rib thickness
+floor_t = 3.6;         // mm, floor thickness; slicer supplies skins and infill
 
 /* [Windows] */
 window_columns = 40;  // diamonds around the circumference
@@ -257,6 +260,9 @@ module floor_window_cuts() {
 }
 
 module basket() {
+    assert(shell_style == "solid" || shell_style == "lattice", "Unknown shell style");
+    if (shell_style == "solid") basket_shell();
+    else
         difference() {
             basket_shell();
             floor_window_cuts();

@@ -2,7 +2,9 @@
 
 The basket in `parts/basket-75x220.scad` retains its 175 mm minimum inside clearance, approximately 186.92 mm outside diameter, and 220 mm assembled height. It is split into one bottom, three identical middle rings, and one top. The filename predates the current diameter.
 
-The floor is an open cross-hatch using the side lattice's diamond size, stagger, and rib spacing, laid onto the XY plane. Its 109 openings cut through the full 3.6 mm floor thickness for drainage. The reinforced perimeter and floor-to-wall gusset remain solid; the pattern stops at the gusset's inner edge. The current bottom is v03; the middle ring and top remain v02.
+The default `shell_style="solid"` has continuous 3.54 mm walls and a closed 3.6 mm floor. Skins, perimeters, and infill are supplied by the slicer; solid CAD does not mean 100% printed infill. The reinforced ends, floor-to-wall gusset, envelope, section heights, and keyed glue joints are unchanged. The current bottom is v04; the middle ring and top are v03.
+
+`shell_style="lattice"` retains the previous diamond side lattice and open cross-hatch floor, including its 109 drainage openings. Build this option under separate output names so it cannot overwrite the solid pieces.
 
 ## Print and assembly
 
@@ -14,7 +16,7 @@ The floor is an open cross-hatch using the side lattice's diamond size, stagger,
 
 Print every piece upright as exported: floor or downward-open socket on the bed, insertion lip upward. The 4 mm lips overlap the next section, so the printed heights do not add up to the assembled height. Use these three meshes for the split basket; the older whole-basket STL is not a split print set.
 
-Each seam has an annular insertion lip, a matching socket, and three asymmetrically spaced keys. The lip is 1.29 mm thick with 4 mm axial engagement. The socket leaves 0.2 mm clearance per radial and tangential face and 0.3 mm above the lip. The flat shoulder controls seating depth. Continuous collars fill the lattice for 4.5 mm below and 7 mm above each seam, keeping the outside diameter and inside clearance unchanged. Socket roofs close at 45 degrees; collar transitions include short bridges across the diamond openings.
+Each seam has an annular insertion lip, a matching socket, and three asymmetrically spaced keys. The lip is 1.29 mm thick with 4 mm axial engagement. The socket leaves 0.2 mm clearance per radial and tangential face and 0.3 mm above the lip. The flat shoulder controls seating depth. Continuous collars surround each seam for 4.5 mm below and 7 mm above it, keeping the outside diameter and inside clearance unchanged. Socket roofs close at 45 degrees; in the lattice variant, collar transitions include short bridges across the diamond openings.
 
 Dry-fit all five pieces first. Line up the three keys and slide each arriving section straight down until its shoulder seats. Each successive middle ring turns 4.5° relative to the preceding one; the keys enforce the correct phase. Apply glue to the overlapping lip and socket surfaces, then seat the joint. The keys locate the pieces—they do not snap or lock together without glue.
 
@@ -29,6 +31,25 @@ All three keyed-joint v02 binary STLs passed independent collapsed-triangle, edg
 The open-floor v03 bottom was subsequently inspected in all seven views and independently checked: 8,910 triangles, one connected solid, zero collapsed triangles, bad edges, or winding errors, and `NoError` with genus 149. Cross-sections at Z=0.05, 1.80, and 3.59 mm each had 109 floor openings plus the outer perimeter, confirming that the cells remain open throughout the floor. Cleanup changed the volume by less than 0.0003 mm³. Floor cutters end at Z=3.61 mm, entirely below the lowest glue collar at Z=25.85 mm.
 
 These are geometry and modeled insertion checks. The joints and floor have not been physically printed, floor load capacity and glue strength are untested, and no revised basket print jobs were generated in these changes.
+
+## Solid shell revision
+
+On 2026-10-07, Ziad reported that the basket was too brittle. The default was changed to continuous walls and floor while retaining the previous lattice as an option. All seven assembled views were inspected using full geometry rendering; fast preview shows coplanar surface artifacts on the continuous shell.
+
+After the same re-import/containing-cube cleanup described below, the solid bottom, ring, and top have 4,422, 4,616, and 3,824 triangles respectively. All three have zero collapsed triangles, bad edges, or winding errors. OpenSCAD reports `NoError`, with genus 0 for the closed-bottom piece and genus 1 for each open ring/top. Cleanup preserved each volume to within 0.000001 mm³.
+
+All four seams were rechecked at axial offsets 11, 8, 6, 4, 3, 2, 1, 0.5, and 0 mm. Every elevated state is empty; the seated intersection contains only planar shoulder contacts with effectively zero signed volume. The unchanged conservative continuous insertion envelope is also empty, certifying the axial path between the sampled states.
+
+The old and new split pieces were sliced using the existing basket job's named profiles: `0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle` and `Flashforge PETG Pro`. G-code confirms 0.20 mm layers, two wall loops, 15% grid infill, and no supports. These are slicer estimates, not measured print times.
+
+| Piece | Quantity | Lattice time | Solid time | Lattice filament | Solid filament |
+| --- | --- | --- | --- | --- | --- |
+| Bottom | 1 | 3h 53m 00s | 2h 46m 26s | 97.11 g | 115.58 g |
+| Middle ring | 3 | 4h 01m 41s each | 2h 12m 29s each | 77.75 g each | 87.51 g each |
+| Top | 1 | 1h 38m 04s | 1h 15m 25s | 45.53 g | 49.33 g |
+| Complete basket | 5 pieces | 17h 36m 07s | 10h 39m 18s | 375.89 g | 427.44 g |
+
+The solid basket is estimated to print 39.5% faster with 13.7% more filament. Strength remains untested. Comparison G-code stays in the session's temporary directory. Flash Studio's known OpenGL thumbnail failure prevented the initial 3MF exports; subsequent timing runs skipped that export. No new printer job was delivered or sent, and the existing whole-basket 3MF still represents the previous design. Use the three current split STLs above to create the revised jobs.
 
 ## Rebuild
 
