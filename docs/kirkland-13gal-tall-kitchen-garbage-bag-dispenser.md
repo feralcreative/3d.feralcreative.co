@@ -1,6 +1,6 @@
 # Kirkland 13-gallon tall kitchen bag dispenser
 
-The replacement for the lattice basket is a freestanding, solid-walled cylinder with two screw-together halves. The upper half includes the lid. Its underside rises gently toward a rounded centre opening to guide bags from the centre of the roll. Both halves have the same outside diameter; all thread reinforcement is inside.
+The replacement for the lattice basket is a freestanding, solid-walled cylinder with two screw-together sections. The seam divides the assembled height into a two-thirds bottom and one-third top. The upper section includes the lid. Its underside rises gently toward a rounded centre opening to guide bags from the centre of the roll. Both sections have the same outside diameter; all thread reinforcement is inside.
 
 ## Dimensions
 
@@ -10,8 +10,9 @@ The replacement for the lattice basket is a freestanding, solid-walled cylinder 
 | Minimum clear cavity | 180 mm across flats × 230 mm high |
 | Outside diameter | 194.82 mm |
 | Assembled height | 249.8 mm |
-| Bottom print height | 136.6 mm |
-| Upper print height | 131.2 mm |
+| Seam height from bottom | 166.53 mm (two-thirds of assembled height) |
+| Bottom print height | 184.53 mm, including the 18 mm threaded neck |
+| Upper print height | 83.27 mm |
 | Outside top rim | 2 mm radius |
 | Dispensing opening | 38 mm nominal, rounded on both edges |
 | Guide rise | 12 mm, entirely above the clear roll cavity |
@@ -46,6 +47,8 @@ Always give each build variant its own output name. The source defaults to the e
 All seven assembled renders and all seven section renders were inspected. Version 02 exports for both full halves and both coupons report `NoError`. The bottom has genus 0; the upper half and coupons have genus 1. The delivered binary meshes each have one connected component, zero collapsed triangles, zero bad edge incidences and consistent winding. Re-import/intersection cleanup removed export degeneracies with less than 0.000001 mm³ volume change. Repeat the independent binary checks after future exports; OpenSCAD's status alone does not detect these artifacts.
 
 The outside top chamfer was subsequently replaced with a 2 mm tangent radius. The revised upper half is version 03: `NoError`, genus 1, one component and zero collapsed triangles, bad edges or winding errors. All seven revised assembled views were inspected. This change only removes material at the outside top corner; the roll cavity, guide, threads and coupon geometry are unchanged. Version 02 print-time estimates below predate this rim change.
+
+The seam was then moved to two-thirds of the assembled height using `bottom_fraction = 2/3`. Current full-piece exports are bottom version 03 and upper version 04. Both have `NoError`, one component, zero collapsed triangles, zero bad edges and consistent winding; their genus values remain 0 and 1. Bottom re-import/intersection cleanup changed volume by 0.495 mm³ at most (less than two parts per million). All seven updated assembled renders were inspected. The sampled full-piece screw approach, seated intersection, roll-fit, straight roll-loading sweep and cap-over-roll intersections are empty. The local thread geometry and dimensions are preserved, so the existing version 02 coupons and continuous thread guard remain applicable. The prior print-time estimates below predate this split change as well.
 
 The measured roll fits the assembly, and its continuous straight loading sweep through the bottom is empty. Cap-over-roll intersections are empty from the seated pose through the outside approach. Full-half screw-pose checks from 24 mm lift to seating are empty except the seated shoulder's planar contact (about 0.000002 mm³ numerical residue). A deliberately wrong 180-degree thread phase produces about 1855 mm³ interference, confirming that the probe detects collisions.
 

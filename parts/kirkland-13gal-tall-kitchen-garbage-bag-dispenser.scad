@@ -1,5 +1,5 @@
 // Centre-pull dispenser for a 9 inch tall x 7 inch diameter Kirkland roll.
-// Two halves screw together at the middle; every feature stays outside the
+// The tall bottom and short upper section screw together; features stay outside the
 // full-height roll envelope. The upper half includes the dispensing lid.
 // The outside is one straight cylinder; the thread thickening is all inside.
 // Its underside is a shallow cone rising towards a rounded centre opening.
@@ -26,6 +26,7 @@ floor_t = 3.6;         // mm, closed floor, infill supplied by the slicer
 lid_t = 4.2;           // mm, minimum thickness beside the centre opening
 edge_chamfer = 0.6;    // mm, bottom outer bed edge
 top_rim_round = 2;     // mm, radius around the outside top edge
+bottom_fraction = 2/3; // fraction of assembled height below the seam, excluding threads
 bed_size = 220;        // mm, maximum printable width, depth, and height
 
 /* [Dispensing guide] */
@@ -71,13 +72,13 @@ socket_root_r = socket_major_r - thread_depth;
 outer_r = socket_major_r + wall_t;
 main_inner_r = outer_r - wall_t;
 joint_blend_h = main_inner_r - inner_r;
-seam_z = floor_t + clear_h / 2;
+assembled_h = floor_t + clear_h + guide_h + lid_t;
+seam_z = assembled_h * bottom_fraction;
 socket_h = thread_h + thread_tip_clearance;
 guide_base_z = floor_t + clear_h - seam_z;
 guide_peak_z = guide_base_z + guide_h;
 top_h = guide_peak_z + lid_t;
 bottom_h = seam_z + thread_h;
-assembled_h = seam_z + top_h;
 hole_r = hole_d / 2;
 guide_slope = guide_h / (main_inner_r - hole_r);
 guide_angle = atan(guide_slope);
@@ -125,6 +126,8 @@ assert(roll_d >= 177.8 && roll_h >= 228.6,
        "The roll envelope must remain at least 7 inches diameter x 9 inches tall");
 assert(2 * outer_r <= bed_size && max(bottom_h, top_h) <= bed_size,
        "A print piece exceeds the 220 mm printer envelope");
+assert(bottom_fraction > 0 && bottom_fraction < 1,
+       "The seam must divide the assembled height into two positive sections");
 assert(thread_h >= 2 * thread_pitch && thread_radial_clearance > 0
        && thread_axial_clearance > 0 && thread_tip_clearance > 0,
        "The joint needs at least two turns and positive clearance");
