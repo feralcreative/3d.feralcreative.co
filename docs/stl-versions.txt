@@ -1,9 +1,4 @@
 4k-camera-window-mount 5
-basket-175x220 3
-basket-175x220-bottom 4
-basket-175x220-ring 3
-basket-175x220-top 3
-basket-75x220 2
 batleth 6
 bin-stacking-clip 19
 cat-gap-wedge 12
@@ -50,6 +45,10 @@ gridfinity-remote-holder-coupon 4
 gridfinity-watch-charger-base 7
 gridfinity_baseplate 3
 hobbs-chalk-holder-coupon 5
+kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom 2
+kirkland-13gal-tall-kitchen-garbage-bag-dispenser-coupon-bottom 2
+kirkland-13gal-tall-kitchen-garbage-bag-dispenser-coupon-top 2
+kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top 2
 large-door-stop 2
 large-door-stop-coupon 2
 large-door-stop-coupon-profile 1
