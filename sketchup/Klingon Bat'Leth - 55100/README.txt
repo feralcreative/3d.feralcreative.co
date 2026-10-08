@@ -1,0 +1,4 @@
+Klingon Bat'Leth by tmorris9 on Thingiverse: https://www.thingiverse.com/thing:55100
+
+Summary:
+I could not find one here so I made one. Klingon Bat'Leth right out of Star Trek. Update I really wanted a smooth surface. Well I sell doming epoxy for a living for doming name badges, jewelry and promotional items.I decided to dome the Bat'leth, it looks killer with the clear dome and the silky smooth surface but you can still see the print marks so I also did one with silver paint. Now it looks more like the real thing (only much smaller). Still need to get some leather lacing to make the grips.New photos added with the epoxy and paint.

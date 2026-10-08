@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="36" height="36" viewBox="0 0 36 36">
+  <defs>
+    <clipPath id="clip-icon-electric">
+      <rect width="36" height="36"/>
+    </clipPath>
+  </defs>
+  <g id="icon-electric" clip-path="url(#clip-icon-electric)">
+    
+    <path id="Path_5487" data-name="Path 5487" d="M1259.352,870.7l10.431,8.7-10.868-13.949-2.523,5.8-9.363-7.91,9.9,12.689Z" transform="translate(-1240.406 -853.362)" fill="#191919"/>
+  </g>
+</svg>

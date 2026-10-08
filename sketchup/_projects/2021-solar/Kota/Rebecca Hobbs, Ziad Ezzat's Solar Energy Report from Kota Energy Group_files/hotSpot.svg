@@ -1,0 +1,27 @@
+<svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="43"
+        height="43"
+        viewBox="0 0 43 43"
+      >
+        <g
+          id="Ellipse_837"
+          data-name="Ellipse 837"
+          fill="rgba(255,255,255,0)"
+          stroke="#fff"
+          stroke-width="2"
+          opacity="0.532"
+        >
+          <circle cx="21.5" cy="21.5" r="21.5" stroke="none" />
+          <circle cx="21.5" cy="21.5" r="20.5" fill="none" />
+        </g>
+        <circle
+          id="Ellipse_92"
+          data-name="Ellipse 92"
+          cx="11.5"
+          cy="11.5"
+          r="11.5"
+          transform="translate(10 10)"
+          fill="#fff"
+        />
+      </svg>
