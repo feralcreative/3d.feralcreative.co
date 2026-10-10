@@ -1,0 +1,28 @@
+{
+    "name": "Overture PETG White",
+    "from": "User",
+    "inherits": "Flashforge PETG Pro",
+    "version": "2.3.0.3",
+    "filament_settings_id": [
+        "Overture PETG White"
+    ],
+    "compatible_printers": [
+        "Flashforge Adventurer 5M Pro 0.4 Nozzle"
+    ],
+    "is_custom_defined": "0",
+    "filament_vendor": [
+        "Overture"
+    ],
+    "nozzle_temperature_initial_layer": [
+        "240"
+    ],
+    "nozzle_temperature": [
+        "240"
+    ],
+    "fan_min_speed": [
+        "30"
+    ],
+    "fan_max_speed": [
+        "50"
+    ]
+}
