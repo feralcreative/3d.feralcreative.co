@@ -1,4 +1,5 @@
-// Pumpkin body: a ribbed tealight cover, open underneath, with a socket for a separate stem.
+// Pumpkin body: a ribbed lamp shade over a Bambu Lab LED Lamp Kit-001 puck, with a
+// socket for a separate stem. The puck presses up into a pocket in the floor.
 // Remade from Sabre Design's "Halloween Pumpkin (tealight compatible)", Printables
 // model 1003177, pumpkin-body.3mf (CC BY-NC-ND 4.0, personal use only). The original
 // sits in _originals/halloween-pumpkin-tealight-compatible-model_files/.
@@ -10,11 +11,18 @@
 // to a few tenths of a millimetre over the body, worse right at the rim and socket.
 // The original's ~0.5 mm fillets on the rib corners are not reproduced.
 //
-// Axes: Z up, open bottom on the bed at Z=0, a lobe seam centred on +X+20°, a lobe
-// centred on +X. Print upright; the original asks for tree supports and a brim inside.
+// The original was open underneath for a loose tealight. This one closes the rim with
+// a floor holding the puck from below, lens up, its back flush with the table, and
+// the cable leaving through a groove in the underside. Puck numbers are Bambu's own
+// drawing and dummy model (_originals/lighting/Dummy+LED+Lamp+Kit-001.3mf); Ziad's
+// circular and twist lamp bases pocket the same puck at Ø60.0.
+//
+// Axes: Z up, floor on the bed at Z=0, a lobe seam centred on +X+20°, a lobe centred
+// on +X. Print upright. The pocket roof is a 45° chamfer and needs no support; the
+// dome still does, as the original's did.
 
 /* [View] */
-show = "body"; // [body, section]
+show = "body"; // [body, section, assembly]
 
 /* [Size] */
 size = 1.0; // uniform scale of the measured form; 0.75 still takes a tealight, per the designer
@@ -26,6 +34,19 @@ ribs_per_lobe = 6; // raised ribs per lobe; a groove sits on every lobe centre a
 rib_fraction = 0.54; // rib arc / rib pitch, measured 3.6° of 6.67°
 rib_depth_scale = 1.0; // multiplies the measured rib height (about 4.8 mm at the waist)
 notch_scale = 1.0; // multiplies the measured seam notch (about 5 mm at the waist)
+
+/* [LED puck] */
+puck_d = 59.4; // mm, Bambu drawing
+puck_h = 8.0; // mm, Bambu drawing
+puck_fit = 0.15; // mm per side; snug enough to stay put when the pumpkin is lifted
+puck_depth_extra = 0.1; // mm, so the puck's back never stands proud of the rim
+puck_lens_d = 47.6; // mm, lit window on the puck's face; kept fully clear
+puck_roof = 1.5; // mm, floor above the pocket; its 45° chamfer is the stop
+puck_wall = 1.2; // mm, least shell outside the pocket; the seams are eased to keep it
+cable_d = 2.8; // mm, Bambu dummy model
+cable_clear = 0.3; // mm per side
+cable_angle = 0; // degrees; 0 runs it out under a lobe centre, through a rib groove
+puck_fn = 180;
 
 /* [Stem socket] */
 socket_bore_d = 23.2; // mm, stem plug is 23.0
@@ -42,6 +63,7 @@ socket_fn = 96;
 
 /* [Colors] */
 body_color = "#E9B489"; // the original's own colour
+puck_color = "#C8C8C8"; // assembly view only; not printed
 
 eps = 0.01;
 
@@ -131,6 +153,12 @@ function off_dir(s) = s < MER_WAIST ? [1, 0] : let (t = mer_tan(s)) [t[1], -t[0]
 
 // ---------- surface ----------
 
+// Puck pocket, needed by the rings as well as the floor.
+pocket_d = puck_d + 2 * puck_fit;
+pocket_h = puck_h + puck_depth_extra;
+floor_top = pocket_h + puck_roof;
+
+
 rib_n = lobes * ribs_per_lobe;
 rib_pitch = 360 / rib_n;
 lobe_pitch = 360 / lobes;
@@ -169,22 +197,27 @@ function ring(s, inner) =
          pocket_mm = rib_arc * PI / 180 * r - 2 * wall,
          min_pocket = 0.3,
          ins = inner ? (pocket_mm >= min_pocket ? wall_deg : (rib_arc - min_pocket / r * 180 / PI) / 2) : 0,
-         pocket_f = inner ? max(0, min(1, pocket_mm / 1.5)) : 1)
+         pocket_f = inner ? max(0, min(1, pocket_mm / 1.5)) : 1,
+         // The seams dip to r~28 at the rim, inside the puck pocket, which then cut a
+         // slot through each of them. Within the floor, hold the outer skin out to
+         // the pocket plus puck_wall; offsets there are horizontal, so this is radial.
+         o_min = (s < MER_WAIST && size * m[1] < floor_top)
+             ? (pocket_d / 2 + puck_wall) / size - m[0] : -1e9)
     [for (k = [0:rib_n - 1])
         let (a0 = k * rib_pitch, ra = a0 + (rib_pitch - rib_arc) / 2, rb = ra + rib_arc,
              ia = ra + ins, ib = rb - ins, a1 = a0 + rib_pitch)
         each concat(
             // groove, cell start up to the rib's leading wall
             [for (j = [0:groove_pts - 1]) let (a = a0 + (ia - a0) * j / (groove_pts - 1))
-                pt(m, n, a, off_groove(m, a) - (inner ? wall_n * wall_k(m, a, false) : 0))],
+                pt(m, n, a, inner ? off_groove(m, a) - wall_n * wall_k(m, a, false) : max(o_min, off_groove(m, a)))],
             // rib top
             [for (j = [0:rib_pts - 1]) let (a = ia + (ib - ia) * j / (rib_pts - 1),
                     g = off_groove(m, a) - (inner ? wall_n * wall_k(m, a, false) : 0),
                     o = off_rib(m, a) - (inner ? wall_n * wall_k(m, a, true) : 0))
-                pt(m, n, a, inner ? g + max(0.05, (o - g) * pocket_f) : o)],
+                pt(m, n, a, inner ? g + max(0.05, (o - g) * pocket_f) : max(o_min, o))],
             // groove, trailing wall to the cell end (exclusive)
             [for (j = [0:groove_pts - 2]) let (a = ib + (a1 - ib) * j / (groove_pts - 1))
-                pt(m, n, a, off_groove(m, a) - (inner ? wall_n * wall_k(m, a, false) : 0))]
+                pt(m, n, a, inner ? off_groove(m, a) - wall_n * wall_k(m, a, false) : max(o_min, off_groove(m, a)))]
         )];
 
 ring_count = ceil((mer_end - mer_start) / ring_step) + 1;
@@ -246,14 +279,52 @@ module socket() {
     }
 }
 
+assert(size * MER[0][0] - wall > pocket_d / 2 + 2,
+       "size is too small for the LED puck: the rim no longer clears its pocket");
+
+// A circle's polygon sits inside the circle; scale it out so the bore is full size.
+function circumscribed(d, fn) = d / cos(180 / fn);
+
+// Fills the shell from the bed to floor_top, ribs and all.
+module puck_floor() {
+    intersection() {
+        outer_solid();
+        translate([0, 0, -1]) cylinder(r = 200, h = floor_top + 1);
+    }
+}
+
+module puck_cutouts() {
+    pd = circumscribed(pocket_d, puck_fn);
+    translate([0, 0, -eps]) cylinder(d = pd, h = pocket_h + eps, $fn = puck_fn);
+    // 45° roof: from the pocket wall in toward the lens, ending well outside it
+    translate([0, 0, pocket_h - eps])
+        cylinder(d1 = pd, d2 = pd - 2 * (puck_roof + 2 * eps), h = puck_roof + 2 * eps, $fn = puck_fn);
+    // cable groove under the floor, out through the rim
+    cw = cable_d + 2 * cable_clear;
+    rotate([0, 0, cable_angle]) translate([0, -cw / 2, -eps]) cube([100, cw, cw + eps]);
+}
+
+module puck_dummy() {
+    color(puck_color) {
+        difference() {
+            cylinder(d = puck_d, h = puck_h, $fn = puck_fn);
+            translate([0, 0, puck_h - 0.4]) cylinder(d = puck_lens_d, h = 1, $fn = puck_fn);
+        }
+        rotate([0, 0, cable_angle]) translate([puck_d / 2 - 2, 0, cable_d / 2])
+            rotate([0, 90, 0]) cylinder(d = cable_d, h = 40, $fn = 24);
+    }
+}
+
 module pumpkin_body() {
     color(body_color) difference() {
         union() {
             shell();
             socket();
+            puck_floor();
         }
         // flat rim on the bed
         translate([0, 0, -50]) cube([300, 300, 100], center = true);
+        puck_cutouts();
         // stem bore down to the ledge, then the through hole
         translate([0, 0, size * ledge_top_z]) cylinder(d = size * socket_bore_d, h = 50, $fn = socket_fn);
         translate([0, 0, size * ledge_top_z - 10]) cylinder(d = size * ledge_id, h = 20, $fn = socket_fn);
@@ -261,7 +332,11 @@ module pumpkin_body() {
 }
 
 if (show == "body") pumpkin_body();
-else if (show == "section") difference() {
-    pumpkin_body();
-    translate([0, -150, -1]) cube([300, 300, 200]);
+else if (show == "section" || show == "assembly") difference() {
+    union() {
+        pumpkin_body();
+        if (show == "assembly") puck_dummy();
+    }
+    // cut on the cable's plane so the groove shows
+    rotate([0, 0, cable_angle]) translate([-150, 0, -1]) cube([300, 300, 200]);
 }

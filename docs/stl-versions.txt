@@ -81,7 +81,7 @@ plant-screen 7
 plant-screen-130 1
 plant-screen-130-coupon 1
 plant-screen-coupon 4
-pumpkin-body 3
+pumpkin-body 4
 reversible-door-stop 1
 roku-stand 5
 roku-stand-r 2
