@@ -25,7 +25,7 @@ src_h = 5;              // mm, plate thickness of the original
 
 /* [Rim] */
 core_r   = 34;          // mm, original mesh kept inside this radius (petal valleys are at 35.7)
-rim_od   = 90;          // mm, diameter at the rib tips (original petal tips: 98)
+rim_od   = 80;          // mm, diameter at the rib tips (original petal tips: 98, valleys: 71.4)
 rib_n    = 48;          // number of ribs
 rib_depth = 1.5;        // mm, tip-to-root
 chamfer  = 0.6;         // mm, on both rim edges
