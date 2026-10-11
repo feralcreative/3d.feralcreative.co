@@ -23,10 +23,12 @@
 // Z=0, so that face meets the body and this one faces out). It is the house
 // deboss recorded in docs/STATUS.md: 1 mm deep, cut as five bands that narrow
 // at 70 degrees, so the mouth is full size and nothing in the cut needs a
-// bridge or a support whichever face is on the bed. Letters sit on an even
-// angular pitch with one blank slot where the phrase ends and begins, the way
-// the Kirkland lid does it. The main body uses the same module on its flange
-// underside, mirrored so it reads from below.
+// bridge or a support whichever face is on the bed. The phrase goes round
+// label_copies times with a bullet after each, set tight: every character is
+// placed by its own advance width (textmetrics), and the whole ring is spread
+// evenly over the full circle so the last bullet closes it. The main body
+// uses the same module on its flange underside, mirrored so it reads from
+// below.
 
 /* [Source] */
 src = "../_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl";
@@ -41,6 +43,8 @@ chamfer  = 0.6;         // mm, on both rim edges
 
 /* [Lettering] */
 label_text   = "FERAL CREATIVE";
+label_sep    = " • ";   // follows every copy, so it also closes the ring
+label_copies = 2;
 label_font   = "Helvetica Neue:style=Condensed Black"; // the house label face
 label_size   = 8;       // mm, nominal text size; caps stand about 8 mm
 label_radius = 29.25;   // mm, baseline radius (thread major is 27.5, rib roots 39.25)
@@ -93,15 +97,25 @@ module ribbed_rim(h = src_h, inner_r = core_r - 1) {
     }
 }
 
-label_pitch = 360 / (len(label_text) + 1);
+function repeat_str(s, n) = n <= 0 ? "" : str(s, repeat_str(s, n - 1));
+function label_adv(s) = textmetrics(s, size = label_size, font = label_font).advance[0];
 
-// Upright and reading clockwise from +Z, centred on +Y.
+label_ring  = repeat_str(str(label_text, label_sep), label_copies);
+label_advs  = [for (c = label_ring) label_adv(c)];
+label_cum   = [for (i = 0, a = 0; i < len(label_advs); a = a + label_advs[i], i = i + 1) a];
+label_total = label_cum[len(label_cum) - 1] + label_advs[len(label_advs) - 1];
+
+assert(label_total <= 2 * PI * label_radius,
+       "The lettering is longer than its baseline circle; shrink it or drop a copy");
+
+// Upright and reading clockwise from +Z, the first copy centred on +Y.
 module label_artwork() {
-    for (i = [0 : len(label_text) - 1])
-        if (label_text[i] != " ")
-            rotate([0, 0, (len(label_text) - 1) / 2 * label_pitch - i * label_pitch])
+    for (i = [0 : len(label_ring) - 1])
+        if (label_ring[i] != " ")
+            rotate([0, 0, (label_adv(label_text) / 2 - label_cum[i] - label_advs[i] / 2)
+                          * 360 / label_total])
                 translate([0, label_radius])
-                    text(label_text[i], size = label_size, font = label_font,
+                    text(label_ring[i], size = label_size, font = label_font,
                          halign = "center", valign = "baseline", $fn = label_facets);
 }
 
