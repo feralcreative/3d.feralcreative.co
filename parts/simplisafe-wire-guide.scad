@@ -1,4 +1,4 @@
-// shelf-wire-clip.scad
+// simplisafe-wire-guide.scad
 //
 // Taped-on clips that hold a 3.5 mm round wire up the side of a shelf whose
 // edge is 21 mm wide (Ziad, 2026-10-11).
@@ -93,7 +93,7 @@ module clip_profile() {
 }
 
 // As mounted: back on z = 0, wire along Y.
-module shelf_wire_clip() {
+module simplisafe_wire_guide() {
   color(clip_color)
     rotate([90, 0, 0])
       translate([0, 0, -clip_len / 2])
@@ -102,7 +102,7 @@ module shelf_wire_clip() {
 
 // Face down on the bed, groove up.
 module clip_face_down() {
-  translate([0, 0, clip_t]) rotate([180, 0, 0]) shelf_wire_clip();
+  translate([0, 0, clip_t]) rotate([180, 0, 0]) simplisafe_wire_guide();
 }
 
 module print_set() {
@@ -118,5 +118,5 @@ module print_set() {
       clip_face_down();
 }
 
-if (show == "clip") shelf_wire_clip();
+if (show == "clip") simplisafe_wire_guide();
 else print_set();

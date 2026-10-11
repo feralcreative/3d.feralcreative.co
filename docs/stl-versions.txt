@@ -120,7 +120,7 @@ screen-fence-rail-nokey-coupon 1
 screen-fence-rigid 1
 screen-fence-test-rail 4
 screen-fence-twin-coupon 1
-shelf-wire-clip 2
+simplisafe-wire-guide 2
 slim-can-adapter 1
 slim-can-adapter-ring-12oz-to-8-3oz 2
 slim-can-adapter-ring-12oz-to-8-3oz-coupon 2
