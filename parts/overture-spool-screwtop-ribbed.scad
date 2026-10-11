@@ -53,11 +53,13 @@ module original_core() {
     }
 }
 
-module ribbed_rim() {
+// Also used by overture-spool-main-body-ribbed.scad, so both ends of the
+// spool carry the same grip.
+module ribbed_rim(h = src_h, inner_r = core_r - 1) {
     intersection() {
         difference() {
-            linear_extrude(src_h, convexity = 4) polygon(rib_profile());
-            translate([0, 0, -eps]) cylinder(r = core_r - 1, h = src_h + 2 * eps);
+            linear_extrude(h, convexity = 4) polygon(rib_profile());
+            translate([0, 0, -eps]) cylinder(r = inner_r, h = h + 2 * eps);
         }
         // Chamfer both edges: a solid of revolution that pulls in by `chamfer`
         // at the top and bottom faces.
@@ -65,9 +67,9 @@ module ribbed_rim() {
             [0, 0],
             [rim_od / 2 - chamfer, 0],
             [rim_od / 2 + eps, chamfer],
-            [rim_od / 2 + eps, src_h - chamfer],
-            [rim_od / 2 - chamfer, src_h],
-            [0, src_h],
+            [rim_od / 2 + eps, h - chamfer],
+            [rim_od / 2 - chamfer, h],
+            [0, h],
         ]);
     }
 }
