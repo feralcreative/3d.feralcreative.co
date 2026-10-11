@@ -1,29 +1,31 @@
 // shelf-wire-clip.scad
 //
 // Taped-on clips that hold a 3.5 mm round wire up the side of a shelf whose
-// edge is 21 mm wide (Ziad, 2026-10-11). Each clip is a flat base, taped to
-// the shelf, with a snap channel standing on it: stick the clips down
-// first, then press the wire into them.
+// edge is 21 mm wide (Ziad, 2026-10-11).
 //
-// THE CHANNEL IS A SNAP. The bore is a little bigger than the wire and its
-// mouth a little smaller, so the lips spread as the wire goes in and close
-// behind it. The lead-in chamfer at the mouth is what lets a thumb do it.
-// If the wire goes in too hard, open snap_open; if it falls out, close it.
+// THE WIRE RUNS BEHIND THE CLIP. Each clip is a plain plate with a groove
+// down its back; lay the wire on the shelf, set a clip over it, and the
+// tape on the two rails either side of the groove holds both down. The
+// shelf itself is the groove's fourth wall. (Ziad, 2026-10-11: the first
+// draft was a snap channel on the front, wire showing; he wanted it behind.)
+// doorbell-wire-channel.scad is the same idea as a continuous raceway.
 //
-// THE CLIP PRINTS STANDING ON ITS END. Lying on its base, the lips would
-// flex across the layer lines and split there. On end, the whole section is
-// one 2D profile extruded up, each lip bends inside its own layers, and
-// nothing overhangs. The base's back is a vertical wall in that pose, so it
-// comes out smooth for the tape.
+// THE GROOVE IS AS DEEP AS THE WIRE, so with thin tape the wire is held
+// snug against the shelf. Foam tape stands the rails off the shelf by its
+// own thickness and leaves the wire that much slack; take groove_depth down
+// by the tape's thickness if that matters.
 //
-// The base is clip_w wide, centred in shelf_w with a margin either side so
-// it does not hang over the edge if placed a little off. Walls are on the
-// slicing reference's ladder: 1.29 is three loops, 1.74 is four.
+// The plate is clip_w wide, centred in shelf_w with a margin either side so
+// it does not hang over the edge if placed a little off.
 //
-// Drawn as mounted: base on z = 0, wire along Y, channel opening up (+Z).
+// Prints face down: the groove opens upward and nothing overhangs, and the
+// rails' top surface is the smooth one, for the tape.
+//
+// Drawn as mounted: back against the shelf at z = 0, wire along Y, front
+// facing +Z.
 
 /* [Output] */
-// set  — count clips standing on end, the way they print
+// set  — count clips face down, the way they print
 // clip — one clip, as mounted
 show = "set";  // [set, clip]
 
@@ -37,26 +39,22 @@ shelf_w = 21;
 /* [Wire] */
 // Wire diameter, mm.
 wire_d = 3.5;
-// Bore over the wire, diametral, mm.
-bore_clear = 0.3;
-// Width of the channel's mouth, mm. Below wire_d so the wire snaps in.
-snap_open = 3.0;
-// Lead-in chamfer at the mouth, per side, mm.
-lead_in = 0.8;
+// Groove width over the wire, mm.
+groove_w = 3.8;
+// Groove depth from the back face, mm. Wire depth for a snug hold on thin tape.
+groove_depth = 3.5;
 
 /* [Clip] */
-// Base width across the shelf face, mm.
+// Width across the shelf face, mm.
 clip_w = 18;
-// Length along the wire, mm. Also the print height.
+// Length along the wire, mm.
 clip_len = 15;
-// Base thickness, mm (four loops).
-base_t = 1.74;
-// Wall around the bore, mm (three loops).
-lip_wall = 1.29;
-// Fillet where the channel meets the base, mm.
-fillet_r = 1.2;
-// Round on outside edges, mm.
-edge_r = 0.5;
+// Plate over the groove, mm (four loops' worth of layers is plenty).
+cover_t = 1.4;
+// Round on the front edges, mm.
+front_r = 1.5;
+// Round on the back edges, mm.
+back_r = 0.4;
 
 /* [Plate] */
 // Gap between clips on the plate, mm.
@@ -71,43 +69,30 @@ clip_color = "SlateGray";
 $fn = 96;
 eps = 0.01;
 
-bore_d = wire_d + bore_clear;
-bore_z = base_t + bore_d / 2;            // bore centre above the base's back
-boss_r = bore_d / 2 + lip_wall;
-// Height where the boss circle is as wide as the mouth: top of the lips.
-lip_top = bore_z + sqrt(boss_r * boss_r - (snap_open / 2 + lead_in) * (snap_open / 2 + lead_in));
-clip_h = bore_z + boss_r;
+clip_t = groove_depth + cover_t;
 
 assert(clip_w <= shelf_w, "clip_w is wider than the shelf");
-assert(snap_open < wire_d, "snap_open must be under wire_d or nothing holds the wire");
+assert(groove_w > wire_d, "groove_w must clear the wire");
+assert(front_r + back_r <= clip_t, "edge rounds overlap");
 
 // Section across the wire: x across the shelf, y out from the shelf.
 module clip_profile() {
   difference() {
-    // Round convex edges, then fill the concave corners at the boss.
-    offset(r = edge_r) offset(delta = -edge_r)
-      offset(r = -fillet_r) offset(delta = fillet_r)
-        union() {
-          translate([-clip_w / 2, 0]) square([clip_w, base_t]);
-          translate([0, bore_z]) circle(r = boss_r);
-        }
-    // Bore, sized on its flats so the inscribed polygon still clears.
-    translate([0, bore_z]) circle(d = bore_d / cos(180 / $fn));
-    // Mouth, straight up out of the bore.
-    translate([-snap_open / 2, bore_z]) square([snap_open, boss_r + eps]);
-    // Lead-in chamfer at the mouth.
-    polygon([
-      [-snap_open / 2, lip_top - lead_in],
-      [snap_open / 2, lip_top - lead_in],
-      [snap_open / 2 + lead_in + 2 * eps, lip_top + eps],
-      [snap_open / 2 + lead_in + 2 * eps, clip_h + eps],
-      [-snap_open / 2 - lead_in - 2 * eps, clip_h + eps],
-      [-snap_open / 2 - lead_in - 2 * eps, lip_top + eps],
-    ]);
+    hull() {
+      for (s = [-1, 1]) {
+        translate([s * (clip_w / 2 - back_r), back_r]) circle(r = back_r);
+        translate([s * (clip_w / 2 - front_r), clip_t - front_r]) circle(r = front_r);
+      }
+    }
+    // Groove, round at its roof so the wire seats in it.
+    hull() {
+      translate([-groove_w / 2, -eps]) square([groove_w, eps]);
+      translate([0, groove_depth - groove_w / 2]) circle(d = groove_w);
+    }
   }
 }
 
-// As mounted: base on z = 0, wire along Y.
+// As mounted: back on z = 0, wire along Y.
 module shelf_wire_clip() {
   color(clip_color)
     rotate([90, 0, 0])
@@ -115,15 +100,14 @@ module shelf_wire_clip() {
         linear_extrude(height = clip_len, convexity = 4) clip_profile();
 }
 
-// Standing on end, the section in XY and the wire along Z.
-module clip_on_end() {
-  color(clip_color)
-    linear_extrude(height = clip_len, convexity = 4) clip_profile();
+// Face down on the bed, groove up.
+module clip_face_down() {
+  translate([0, 0, clip_t]) rotate([180, 0, 0]) shelf_wire_clip();
 }
 
 module print_set() {
   pitch_x = clip_w + plate_gap;
-  pitch_y = clip_h + plate_gap;
+  pitch_y = clip_len + plate_gap;
   rows = ceil(count / plate_cols);
   for (i = [0 : count - 1])
     translate([
@@ -131,7 +115,7 @@ module print_set() {
       (floor(i / plate_cols) - (rows - 1) / 2) * pitch_y,
       0,
     ])
-      clip_on_end();
+      clip_face_down();
 }
 
 if (show == "clip") shelf_wire_clip();
