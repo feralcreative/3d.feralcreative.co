@@ -17,8 +17,8 @@
 // ⚠️ ASSUMED: 118 mm is the hole the collar goes into (Ziad, 2026-10-11),
 // and whatever it grips (drywall edge or can wall) is at least as deep as
 // grip_z. Not yet confirmed which it is, or how deep it runs.
-// ⚠️ ASSUMED: an LED lamp. PETG softens around 80 °C; an incandescent or
-// halogen lamp this close to the lens and collar will warp them.
+// The lamp is an LED (Ziad, 2026-10-11). PETG softens around 80 °C, so
+// never fit an incandescent or halogen lamp behind this lens.
 // ⚠️ ASSUMED: nothing in the can (lamp, socket) reaches down within
 // collar_h of the ceiling.
 //
@@ -31,7 +31,7 @@
 //   utils/build.sh parts/can-light-trim.scad -D 'show="lens"' --name can-light-lens
 
 /* [View] */
-show = "lens"; // [assembly, section, trim, lens]
+show = "assembly"; // [assembly, section, trim, lens]
 
 /* [Measured] */
 hole_d = 118; // mm, ceiling hole the collar goes into
