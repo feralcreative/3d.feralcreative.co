@@ -26,8 +26,10 @@
 // bridge or a support whichever face is on the bed. The phrase goes round
 // label_copies times, each copy centred on its own share of the circle, with
 // the feral favicon centred in the gap between copies. Characters are placed
-// by their own advance widths (textmetrics) plus label_tracking, so the
-// tracking is set here rather than by how much circle is left over. The
+// by their own advance widths (textmetrics) plus tracking, and the tracking
+// is solved per ring so the copies fill the circle: the gap either side of
+// each favicon comes out exactly one word space plus the tracking, the same
+// as the gap between FERAL and CREATIVE. A smaller ring gets less tracking. The
 // favicon stands label_mark_scale of the capitals' height, centred on them.
 // The ring is centred across the flat face between the thread and the rib
 // roots. The main body uses the same module on its flange underside, mirrored
@@ -50,7 +52,6 @@ label_copies = 2;       // a favicon sits centred between each pair
 label_mark_scale = 0.75; // favicon height as a fraction of the capitals, centred on them
 label_font   = "Helvetica Neue:style=Condensed Black"; // the house label face
 label_size   = 6;       // mm, nominal text size; caps stand about 6.1 mm
-label_tracking = 0.4;   // mm added between characters
 label_mid    = (27.5 + 39.25) / 2; // mm, ring centre line: midway from thread major to rib roots
 label_depth  = 1;       // mm
 label_taper  = 70;      // degrees from horizontal, widening toward the face
@@ -108,8 +109,17 @@ function label_adv(s) = textmetrics(s, size = label_size, font = label_font).adv
 label_cap_h  = textmetrics("E", size = label_size, font = label_font).size[1];
 label_mark_w = label_mark_scale * label_cap_h * FERAL_FAVICON_BOX[1][0] / FERAL_FAVICON_BOX[1][1];
 label_advs   = [for (c = label_text) label_adv(c)];
-label_cum    = [for (i = 0, a = 0; i < len(label_advs); a = a + label_advs[i] + label_tracking, i = i + 1) a];
-label_width  = label_cum[len(label_cum) - 1] + label_advs[len(label_advs) - 1];
+label_space  = label_adv(" ");
+label_ink    = [for (i = 0, a = 0; i < len(label_advs); a = a + label_advs[i], i = i + 1) a];
+label_adv_sum = label_ink[len(label_ink) - 1] + label_advs[len(label_advs) - 1];
+
+// Tracking that fills a baseline circle of `radius`: each copy's share of the
+// circle holds the copy, its favicon, and two word spaces beside the favicon,
+// with the tracking repeated in every gap — len - 1 inside the copy, two
+// beside the favicon.
+function label_tracking(radius) =
+    (2 * PI * radius / label_copies - label_adv_sum - label_mark_w - 2 * label_space)
+    / (len(label_text) + 1);
 
 // Baseline radius that centres the capitals on a given centre line.
 function label_baseline(mid) = mid - label_cap_h / 2;
@@ -120,13 +130,14 @@ module label_artwork(mid = label_mid) {
     radius = label_baseline(mid);
     deg = 180 / (PI * radius);          // degrees per mm of baseline
     share = 360 / label_copies;
-    assert(label_copies * (label_width + label_mark_w) * deg < 360,
-           "The lettering is longer than its baseline circle; shrink it or drop a copy");
+    t = label_tracking(radius);
+    width = label_adv_sum + (len(label_text) - 1) * t;
+    assert(t >= 0, "The lettering is longer than its baseline circle; shrink it or drop a copy");
     for (c = [0 : label_copies - 1]) {
         for (i = [0 : len(label_text) - 1])
             if (label_text[i] != " ")
                 rotate([0, 0, -c * share
-                              - (label_cum[i] + label_advs[i] / 2 - label_width / 2) * deg])
+                              - (label_ink[i] + i * t + label_advs[i] / 2 - width / 2) * deg])
                     translate([0, radius])
                         text(label_text[i], size = label_size, font = label_font,
                              halign = "center", valign = "baseline", $fn = label_facets);
