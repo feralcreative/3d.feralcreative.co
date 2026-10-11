@@ -22,6 +22,10 @@
 // gap. The face the cardboard core sits against, and everything above it,
 // keeps its height relative to the flange top, so the gap for the core is
 // unchanged. The part is flange_extra taller overall.
+//
+// FERAL CREATIVE is debossed into the flange underside with the screwtop's
+// label_cut(), mirrored so it reads from below. That face prints on the bed,
+// so the cut opens on the first layer and narrows upward at 70 degrees.
 
 use <overture-spool-screwtop-ribbed.scad>
 
@@ -50,13 +54,16 @@ module original_body_core() {
 }
 
 module main_body() {
-    color(body_color) union() {
-        translate([0, 0, flange_extra]) original_body_core();
-        ribbed_rim(h = flange_h + flange_extra, inner_r = body_core_r - 1);
-        difference() {
-            cylinder(r = body_core_r, h = flange_extra + eps);
-            translate([0, 0, -eps]) cylinder(r = bore_r, h = flange_extra + 3 * eps);
+    color(body_color) difference() {
+        union() {
+            translate([0, 0, flange_extra]) original_body_core();
+            ribbed_rim(h = flange_h + flange_extra, inner_r = body_core_r - 1);
+            difference() {
+                cylinder(r = body_core_r, h = flange_extra + eps);
+                translate([0, 0, -eps]) cylinder(r = bore_r, h = flange_extra + 3 * eps);
+            }
         }
+        label_cut(mirrored = true);
     }
 }
 

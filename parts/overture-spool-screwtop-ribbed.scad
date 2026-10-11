@@ -18,6 +18,15 @@
 // the outer wall and do not chew fingers. Both rim edges are chamfered, which
 // also trims the rib tips there and keeps the first layer free of elephant's
 // foot on the grip.
+//
+// FERAL CREATIVE rings the outward face (+Z: the thread's plain lead-in is at
+// Z=0, so that face meets the body and this one faces out). It is the house
+// deboss recorded in docs/STATUS.md: 1 mm deep, cut as five bands that narrow
+// at 70 degrees, so the mouth is full size and nothing in the cut needs a
+// bridge or a support whichever face is on the bed. Letters sit on an even
+// angular pitch with one blank slot where the phrase ends and begins, the way
+// the Kirkland lid does it. The main body uses the same module on its flange
+// underside, mirrored so it reads from below.
 
 /* [Source] */
 src = "../_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl";
@@ -29,6 +38,16 @@ rim_od   = 80;          // mm, diameter at the rib tips (original petal tips: 98
 rib_n    = 48;          // number of ribs
 rib_depth = 1.5;        // mm, tip-to-root
 chamfer  = 0.6;         // mm, on both rim edges
+
+/* [Lettering] */
+label_text   = "FERAL CREATIVE";
+label_font   = "Helvetica Neue:style=Condensed Black"; // the house label face
+label_size   = 8;       // mm, nominal text size; caps stand about 8 mm
+label_radius = 29.25;   // mm, baseline radius (thread major is 27.5, rib roots 39.25)
+label_depth  = 1;       // mm
+label_taper  = 70;      // degrees from horizontal, widening toward the face
+label_steps  = 5;       // bands in the settled tapered-deboss construction
+label_facets = 48;      // segments on curved glyph outlines
 
 /* [Colors] */
 screwtop_color = "#d22bd8";
@@ -74,10 +93,36 @@ module ribbed_rim(h = src_h, inner_r = core_r - 1) {
     }
 }
 
+label_pitch = 360 / (len(label_text) + 1);
+
+// Upright and reading clockwise from +Z, centred on +Y.
+module label_artwork() {
+    for (i = [0 : len(label_text) - 1])
+        if (label_text[i] != " ")
+            rotate([0, 0, (len(label_text) - 1) / 2 * label_pitch - i * label_pitch])
+                translate([0, label_radius])
+                    text(label_text[i], size = label_size, font = label_font,
+                         halign = "center", valign = "baseline", $fn = label_facets);
+}
+
+// The cut, mouth on Z=0 and narrowing toward +Z. Place it with a transform;
+// `mirrored` flips the artwork so it reads from -Z, for a face on the bed.
+module label_cut(mirrored = false) {
+    band = label_depth / label_steps;
+    for (k = [0 : label_steps - 1])
+        translate([0, 0, band * k - (k == 0 ? eps : 0)])
+            linear_extrude(height = band + (k == 0 ? 2 : 1) * eps, convexity = 10)
+                offset(delta = -band * k / tan(label_taper))
+                    mirror([mirrored ? 1 : 0, 0, 0]) label_artwork();
+}
+
 module screwtop() {
-    color(screwtop_color) union() {
-        original_core();
-        ribbed_rim();
+    color(screwtop_color) difference() {
+        union() {
+            original_core();
+            ribbed_rim();
+        }
+        translate([0, 0, src_h]) mirror([0, 0, 1]) label_cut();
     }
 }
 
