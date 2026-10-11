@@ -30,7 +30,7 @@
 show = "set";  // [set, clip]
 
 // Clips on the plate.
-count = 8;
+count = 1;
 
 /* [Shelf] */
 // Width of the shelf face the clip sits on, mm.
