@@ -25,7 +25,10 @@
 //
 // FERAL CREATIVE is debossed into the flange underside with the screwtop's
 // label_cut(), mirrored so it reads from below. That face prints on the bed,
-// so the cut opens on the first layer and narrows upward at 70 degrees.
+// so the cut opens on the first layer and narrows upward at 70 degrees. The
+// flange face runs from the 24.5 bore to the rib roots, wider than the
+// screwtop's, so the ring is centred across it rather than on the screwtop's
+// radius.
 
 use <overture-spool-screwtop-ribbed.scad>
 
@@ -38,6 +41,9 @@ flange_extra = 3;       // mm, added below the flange so it matches the 5 mm scr
 
 /* [Rim] */
 body_core_r = 34;       // mm, original mesh kept inside this radius (barrel is r 27.5)
+
+/* [Lettering] */
+body_label_mid = (24.5 + 39.25) / 2; // mm, midway between the bore and the rib roots
 
 /* [Colors] */
 body_color = "#2bb5d8";
@@ -63,7 +69,7 @@ module main_body() {
                 translate([0, 0, -eps]) cylinder(r = bore_r, h = flange_extra + 3 * eps);
             }
         }
-        label_cut(mirrored = true);
+        label_cut(mirrored = true, radius = body_label_mid - label_cap_height() / 2);
     }
 }
 

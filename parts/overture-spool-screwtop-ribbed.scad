@@ -27,8 +27,8 @@
 // label_copies times with the feral favicon after each, set tight: every character is
 // placed by its own advance width (textmetrics), and the whole ring is spread
 // evenly over the full circle so the last favicon closes it. The favicon
-// stands the height of the capitals, on the baseline, and takes the bullet's
-// place in label_sep: "•" there is a placeholder for it, never cut as a dot. The main body
+// stands label_mark_scale of the capitals' height, centred on them, and takes
+// the bullet's place in label_sep: "•" there is a placeholder for it, never cut as a dot. The main body
 // uses the same module on its flange underside, mirrored so it reads from
 // below.
 
@@ -46,6 +46,7 @@ chamfer  = 0.6;         // mm, on both rim edges
 /* [Lettering] */
 label_text   = "FERAL CREATIVE";
 label_sep    = " • ";   // follows every copy; "•" is drawn as the feral favicon
+label_mark_scale = 0.75; // favicon height as a fraction of the capitals, centred on them
 label_copies = 2;
 label_font   = "Helvetica Neue:style=Condensed Black"; // the house label face
 label_size   = 8;       // mm, nominal text size; caps stand about 8 mm
@@ -106,23 +107,26 @@ function label_adv(s) = textmetrics(s, size = label_size, font = label_font).adv
 
 label_mark  = "•";
 label_cap_h = textmetrics("E", size = label_size, font = label_font).size[1];
-label_mark_w = label_cap_h * FERAL_FAVICON_BOX[1][0] / FERAL_FAVICON_BOX[1][1];
+label_mark_w = label_mark_scale * label_cap_h * FERAL_FAVICON_BOX[1][0] / FERAL_FAVICON_BOX[1][1];
+
+// For parts that `use` this file and need to place the ring themselves.
+function label_cap_height() = label_cap_h;
 
 label_ring  = repeat_str(str(label_text, label_sep), label_copies);
 label_advs  = [for (c = label_ring) c == label_mark ? label_mark_w : label_adv(c)];
 label_cum   = [for (i = 0, a = 0; i < len(label_advs); a = a + label_advs[i], i = i + 1) a];
 label_total = label_cum[len(label_cum) - 1] + label_advs[len(label_advs) - 1];
 
-assert(label_total <= 2 * PI * label_radius,
-       "The lettering is longer than its baseline circle; shrink it or drop a copy");
-
-// Upright and reading clockwise from +Z, the first copy centred on +Y.
-module label_artwork() {
+// Upright and reading clockwise from +Z, the first copy centred on +Y, its
+// baseline on a circle of `radius`.
+module label_artwork(radius = label_radius) {
+    assert(label_total <= 2 * PI * radius,
+           "The lettering is longer than its baseline circle; shrink it or drop a copy");
     for (i = [0 : len(label_ring) - 1])
         if (label_ring[i] != " ")
             rotate([0, 0, (label_adv(label_text) / 2 - label_cum[i] - label_advs[i] / 2)
                           * 360 / label_total])
-                translate([0, label_radius])
+                translate([0, radius])
                     if (label_ring[i] == label_mark)
                         translate([0, label_cap_h / 2]) feral_favicon(label_mark_w);
                     else
@@ -132,13 +136,13 @@ module label_artwork() {
 
 // The cut, mouth on Z=0 and narrowing toward +Z. Place it with a transform;
 // `mirrored` flips the artwork so it reads from -Z, for a face on the bed.
-module label_cut(mirrored = false) {
+module label_cut(mirrored = false, radius = label_radius) {
     band = label_depth / label_steps;
     for (k = [0 : label_steps - 1])
         translate([0, 0, band * k - (k == 0 ? eps : 0)])
             linear_extrude(height = band + (k == 0 ? 2 : 1) * eps, convexity = 10)
                 offset(delta = -band * k / tan(label_taper))
-                    mirror([mirrored ? 1 : 0, 0, 0]) label_artwork();
+                    mirror([mirrored ? 1 : 0, 0, 0]) label_artwork(radius);
 }
 
 module screwtop() {
