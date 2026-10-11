@@ -24,9 +24,11 @@
 // deboss recorded in docs/STATUS.md: 1 mm deep, cut as five bands that narrow
 // at 70 degrees, so the mouth is full size and nothing in the cut needs a
 // bridge or a support whichever face is on the bed. The phrase goes round
-// label_copies times with a bullet after each, set tight: every character is
+// label_copies times with the feral favicon after each, set tight: every character is
 // placed by its own advance width (textmetrics), and the whole ring is spread
-// evenly over the full circle so the last bullet closes it. The main body
+// evenly over the full circle so the last favicon closes it. The favicon
+// stands the height of the capitals, on the baseline, and takes the bullet's
+// place in label_sep: "•" there is a placeholder for it, never cut as a dot. The main body
 // uses the same module on its flange underside, mirrored so it reads from
 // below.
 
@@ -43,7 +45,7 @@ chamfer  = 0.6;         // mm, on both rim edges
 
 /* [Lettering] */
 label_text   = "FERAL CREATIVE";
-label_sep    = " • ";   // follows every copy, so it also closes the ring
+label_sep    = " • ";   // follows every copy; "•" is drawn as the feral favicon
 label_copies = 2;
 label_font   = "Helvetica Neue:style=Condensed Black"; // the house label face
 label_size   = 8;       // mm, nominal text size; caps stand about 8 mm
@@ -57,6 +59,8 @@ label_facets = 48;      // segments on curved glyph outlines
 screwtop_color = "#d22bd8";
 
 /* [Hidden] */
+include <../logos/marks.scad>
+
 $fn = 180;
 eps = 0.01;
 
@@ -100,8 +104,12 @@ module ribbed_rim(h = src_h, inner_r = core_r - 1) {
 function repeat_str(s, n) = n <= 0 ? "" : str(s, repeat_str(s, n - 1));
 function label_adv(s) = textmetrics(s, size = label_size, font = label_font).advance[0];
 
+label_mark  = "•";
+label_cap_h = textmetrics("E", size = label_size, font = label_font).size[1];
+label_mark_w = label_cap_h * FERAL_FAVICON_BOX[1][0] / FERAL_FAVICON_BOX[1][1];
+
 label_ring  = repeat_str(str(label_text, label_sep), label_copies);
-label_advs  = [for (c = label_ring) label_adv(c)];
+label_advs  = [for (c = label_ring) c == label_mark ? label_mark_w : label_adv(c)];
 label_cum   = [for (i = 0, a = 0; i < len(label_advs); a = a + label_advs[i], i = i + 1) a];
 label_total = label_cum[len(label_cum) - 1] + label_advs[len(label_advs) - 1];
 
@@ -115,8 +123,11 @@ module label_artwork() {
             rotate([0, 0, (label_adv(label_text) / 2 - label_cum[i] - label_advs[i] / 2)
                           * 360 / label_total])
                 translate([0, label_radius])
-                    text(label_ring[i], size = label_size, font = label_font,
-                         halign = "center", valign = "baseline", $fn = label_facets);
+                    if (label_ring[i] == label_mark)
+                        translate([0, label_cap_h / 2]) feral_favicon(label_mark_w);
+                    else
+                        text(label_ring[i], size = label_size, font = label_font,
+                             halign = "center", valign = "baseline", $fn = label_facets);
 }
 
 // The cut, mouth on Z=0 and narrowing toward +Z. Place it with a transform;

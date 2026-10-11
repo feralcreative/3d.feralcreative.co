@@ -79,8 +79,8 @@ magnet-polarity-tool-10x2-shaft-d 1
 middle-finger-emboss 14
 middle-finger-wrist-emboss 1
 nightlight-floor-hood 16
-overture-spool-main-body-ribbed 5
-overture-spool-screwtop-ribbed 6
+overture-spool-main-body-ribbed 6
+overture-spool-screwtop-ribbed 7
 patio-leg-foot 3
 patio-leg-spacer-base 8
 patio-leg-spacer-coupon 1
