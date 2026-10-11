@@ -15,6 +15,8 @@ bong-stabilizer-collar-set 1
 bong-stabilizer-coupon-base 2
 bong-stabilizer-screw 2
 bong-stabilizer-screw-set 2
+can-light-lens 1
+can-light-trim 1
 cat-gap-wedge 12
 cat-gap-wedge-coupon 5
 deck-door-stop 4
