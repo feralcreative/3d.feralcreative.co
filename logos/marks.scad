@@ -34,13 +34,14 @@
 // rather than their own. Easy to get wrong by hand; impossible to get wrong from
 // here, which is the whole reason the split layers share one box below.
 //
-// WHAT CAN BE CUT THROUGH: the Hobbs figure and both ZR marks. Everything
-// else carries counters that a through-cut drops on the floor — HOBBS has three,
-// the feral logo has its entire wordmark floating inside the frame, and the
+// WHAT CAN BE CUT THROUGH: the Hobbs figure, both ZR marks, and the feral
+// favicon. Everything else carries counters that a through-cut drops on the
+// floor — HOBBS has three, the feral logo has its entire wordmark floating inside the frame, and the
 // Vampires rocker is knocked out of a solid banner, so every letter in it is a
 // hole. Deboss or raise those. The two ZRs are safe because neither has a
 // counter at all: extruded, they come out as three and four disjoint solids
 // with nothing enclosed, so a through-cut leaves holes and nothing loose.
+// The favicon is one solid silhouette with no counters at all.
 //
 // NATIVE SIZES are measured off OpenSCAD's own import rather than read off the
 // viewBox, because the two do not agree — the importer works in millimetres at
@@ -54,6 +55,7 @@
 HOBBS_BOX      = [[  0.000, 0.180], [705.551, 471.131]];  // figure and word together
 HOBBS_WORD_BOX = [[121.237, 0.180], [401.015,  75.219]];  // the wordmark on its own
 FERAL_BOX      = [[  0.000, 0.000], [292.453, 342.019]];
+FERAL_FAVICON_BOX = [[  5.293, 17.286], [342.193, 318.204]];
 VMC_BOX        = [[  0.000, 3.845], [352.777, 256.928]];
 ZR_BOX         = [[  0.000, 0.000], [333.309, 270.705]];
 ZR_MONO_BOX    = [[  0.000, 0.000], [181.150, 123.472]];
@@ -78,6 +80,7 @@ function mark_height(box, width)   = width * box[1][1] / box[1][0];
 function hobbs_mark_height(width)  = mark_height(HOBBS_BOX, width);
 function hobbs_word_height(width)  = mark_height(HOBBS_WORD_BOX, width);
 function feral_logo_height(width)  = mark_height(FERAL_BOX, width);
+function feral_favicon_height(width) = mark_height(FERAL_FAVICON_BOX, width);
 function vmc_rocker_height(width)  = mark_height(VMC_BOX, width);
 function zr_mark_height(width)     = mark_height(ZR_BOX, width);
 function zr_monogram_height(width) = mark_height(ZR_MONO_BOX, width);
@@ -120,6 +123,13 @@ module hobbs_word_alone(width = 30, $fn = 0) {
 
 module feral_logo(width = 30, $fn = 0) {
     place_mark(FERAL_BOX, width) import("feral-creative-logo.svg");
+}
+
+// The feral favicon: the logo's frame and notch as one solid silhouette, no
+// lettering. Small enough marks lose the wordmark anyway; this is the one to
+// use as an inline glyph or a bullet.
+module feral_favicon(width = 30, $fn = 0) {
+    place_mark(FERAL_FAVICON_BOX, width) import("favicon.svg");
 }
 
 module vmc_top_rocker(width = 30, $fn = 0) {

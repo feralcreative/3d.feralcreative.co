@@ -42,6 +42,7 @@ cell(2, 0, "hobbs_mark_word",   "crimson")    hobbs_mark_word(width);
 cell(3, 0, "hobbs_word_alone",  "crimson")    hobbs_word_alone(width);
 cell(4, 0, "feral_logo",        "steelblue")  feral_logo(width);
 cell(5, 0, "vmc_top_rocker",    "seagreen")   vmc_top_rocker(width);
+cell(6, 0, "feral_favicon · cut-safe", "steelblue") feral_favicon(width);
 
 cell(0, 1, "zr_mark · cut-safe",     "darkorange") zr_mark(width);
 cell(1, 1, "zr_monogram · cut-safe", "darkorange") zr_monogram(width);
