@@ -24,13 +24,14 @@
 // deboss recorded in docs/STATUS.md: 1 mm deep, cut as five bands that narrow
 // at 70 degrees, so the mouth is full size and nothing in the cut needs a
 // bridge or a support whichever face is on the bed. The phrase goes round
-// label_copies times with the feral favicon after each, set tight: every character is
-// placed by its own advance width (textmetrics), and the whole ring is spread
-// evenly over the full circle so the last favicon closes it. The favicon
-// stands label_mark_scale of the capitals' height, centred on them, and takes
-// the bullet's place in label_sep: "•" there is a placeholder for it, never cut as a dot. The main body
-// uses the same module on its flange underside, mirrored so it reads from
-// below.
+// label_copies times, each copy centred on its own share of the circle, with
+// the feral favicon centred in the gap between copies. Characters are placed
+// by their own advance widths (textmetrics) plus label_tracking, so the
+// tracking is set here rather than by how much circle is left over. The
+// favicon stands label_mark_scale of the capitals' height, centred on them.
+// The ring is centred across the flat face between the thread and the rib
+// roots. The main body uses the same module on its flange underside, mirrored
+// so it reads from below.
 
 /* [Source] */
 src = "../_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl";
@@ -45,12 +46,12 @@ chamfer  = 0.6;         // mm, on both rim edges
 
 /* [Lettering] */
 label_text   = "FERAL CREATIVE";
-label_sep    = " • ";   // follows every copy; "•" is drawn as the feral favicon
+label_copies = 2;       // a favicon sits centred between each pair
 label_mark_scale = 0.75; // favicon height as a fraction of the capitals, centred on them
-label_copies = 2;
 label_font   = "Helvetica Neue:style=Condensed Black"; // the house label face
-label_size   = 8;       // mm, nominal text size; caps stand about 8 mm
-label_radius = 29.25;   // mm, baseline radius (thread major is 27.5, rib roots 39.25)
+label_size   = 6;       // mm, nominal text size; caps stand about 6.1 mm
+label_tracking = 0.4;   // mm added between characters
+label_mid    = (27.5 + 39.25) / 2; // mm, ring centre line: midway from thread major to rib roots
 label_depth  = 1;       // mm
 label_taper  = 70;      // degrees from horizontal, widening toward the face
 label_steps  = 5;       // bands in the settled tapered-deboss construction
@@ -102,47 +103,47 @@ module ribbed_rim(h = src_h, inner_r = core_r - 1) {
     }
 }
 
-function repeat_str(s, n) = n <= 0 ? "" : str(s, repeat_str(s, n - 1));
 function label_adv(s) = textmetrics(s, size = label_size, font = label_font).advance[0];
 
-label_mark  = "•";
-label_cap_h = textmetrics("E", size = label_size, font = label_font).size[1];
+label_cap_h  = textmetrics("E", size = label_size, font = label_font).size[1];
 label_mark_w = label_mark_scale * label_cap_h * FERAL_FAVICON_BOX[1][0] / FERAL_FAVICON_BOX[1][1];
+label_advs   = [for (c = label_text) label_adv(c)];
+label_cum    = [for (i = 0, a = 0; i < len(label_advs); a = a + label_advs[i] + label_tracking, i = i + 1) a];
+label_width  = label_cum[len(label_cum) - 1] + label_advs[len(label_advs) - 1];
 
-// For parts that `use` this file and need to place the ring themselves.
-function label_cap_height() = label_cap_h;
+// Baseline radius that centres the capitals on a given centre line.
+function label_baseline(mid) = mid - label_cap_h / 2;
 
-label_ring  = repeat_str(str(label_text, label_sep), label_copies);
-label_advs  = [for (c = label_ring) c == label_mark ? label_mark_w : label_adv(c)];
-label_cum   = [for (i = 0, a = 0; i < len(label_advs); a = a + label_advs[i], i = i + 1) a];
-label_total = label_cum[len(label_cum) - 1] + label_advs[len(label_advs) - 1];
-
-// Upright and reading clockwise from +Z, the first copy centred on +Y, its
-// baseline on a circle of `radius`.
-module label_artwork(radius = label_radius) {
-    assert(label_total <= 2 * PI * radius,
+// Upright and reading clockwise from +Z, the first copy centred on +Y, the
+// capitals centred on a circle of `mid`.
+module label_artwork(mid = label_mid) {
+    radius = label_baseline(mid);
+    deg = 180 / (PI * radius);          // degrees per mm of baseline
+    share = 360 / label_copies;
+    assert(label_copies * (label_width + label_mark_w) * deg < 360,
            "The lettering is longer than its baseline circle; shrink it or drop a copy");
-    for (i = [0 : len(label_ring) - 1])
-        if (label_ring[i] != " ")
-            rotate([0, 0, (label_adv(label_text) / 2 - label_cum[i] - label_advs[i] / 2)
-                          * 360 / label_total])
-                translate([0, radius])
-                    if (label_ring[i] == label_mark)
-                        translate([0, label_cap_h / 2]) feral_favicon(label_mark_w);
-                    else
-                        text(label_ring[i], size = label_size, font = label_font,
+    for (c = [0 : label_copies - 1]) {
+        for (i = [0 : len(label_text) - 1])
+            if (label_text[i] != " ")
+                rotate([0, 0, -c * share
+                              - (label_cum[i] + label_advs[i] / 2 - label_width / 2) * deg])
+                    translate([0, radius])
+                        text(label_text[i], size = label_size, font = label_font,
                              halign = "center", valign = "baseline", $fn = label_facets);
+        rotate([0, 0, -c * share - share / 2])
+            translate([0, radius + label_cap_h / 2]) feral_favicon(label_mark_w);
+    }
 }
 
 // The cut, mouth on Z=0 and narrowing toward +Z. Place it with a transform;
 // `mirrored` flips the artwork so it reads from -Z, for a face on the bed.
-module label_cut(mirrored = false, radius = label_radius) {
+module label_cut(mirrored = false, mid = label_mid) {
     band = label_depth / label_steps;
     for (k = [0 : label_steps - 1])
         translate([0, 0, band * k - (k == 0 ? eps : 0)])
             linear_extrude(height = band + (k == 0 ? 2 : 1) * eps, convexity = 10)
                 offset(delta = -band * k / tan(label_taper))
-                    mirror([mirrored ? 1 : 0, 0, 0]) label_artwork(radius);
+                    mirror([mirrored ? 1 : 0, 0, 0]) label_artwork(mid);
 }
 
 module screwtop() {

@@ -27,8 +27,8 @@
 // label_cut(), mirrored so it reads from below. That face prints on the bed,
 // so the cut opens on the first layer and narrows upward at 70 degrees. The
 // flange face runs from the 24.5 bore to the rib roots, wider than the
-// screwtop's, so the ring is centred across it rather than on the screwtop's
-// radius.
+// screwtop's, so the ring is centred on this face's own centre line rather
+// than the screwtop's.
 
 use <overture-spool-screwtop-ribbed.scad>
 
@@ -69,7 +69,7 @@ module main_body() {
                 translate([0, 0, -eps]) cylinder(r = bore_r, h = flange_extra + 3 * eps);
             }
         }
-        label_cut(mirrored = true, radius = body_label_mid - label_cap_height() / 2);
+        label_cut(mirrored = true, mid = body_label_mid);
     }
 }
 
