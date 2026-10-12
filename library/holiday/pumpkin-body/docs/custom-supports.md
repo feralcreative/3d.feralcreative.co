@@ -1,5 +1,11 @@
 # Pumpkin custom supports
 
+## Files
+
+- [Release coupon: pumpkin-body-support-coupon-overture-petg.3mf](../_work/3mf/pumpkin-body-support-coupon-overture-petg.3mf)
+- [Full pumpkin: pumpkin-body-supported-overture-petg.3mf](../_work/3mf/pumpkin-body-supported-overture-petg.3mf)
+- [Seven cutaway views: pumpkin-custom-supports-overview.png](../_work/renders/pumpkin-custom-supports-overview.png)
+
 Experimental removable supports for our upright pumpkin body with the fitted LED-puck pocket. The pumpkin geometry, wall thickness, stem socket, and puck fit are unchanged. The default `show="body"` still exports the original body alone.
 
 The supported variant adds 54 narrow radial fins, one under each roof groove, plus a hollow tower under the floating stem seat. Each fin is 0.84 mm thick and sits on its own 2.10 mm square post. The support tops follow the actual inner roof triangles in 1 mm radial steps. A nominal 0.20 mm air gap is quantized downward to the 0.20 mm layer grid, so the actual contact clearance varies slightly. These are normal model geometry; automatic slicer supports are disabled.
