@@ -57,12 +57,14 @@
 
 set -euo pipefail
 
+BUILD_OUTDIR_EXPLICIT="${OUTDIR+x}"
 OUTDIR="${OUTDIR:-stl}"
 
 # Libraries live in lib/, which is not one of OpenSCAD's default search paths.
 # Exporting OPENSCADPATH is what lets a part say `include <BOSL2/std.scad>` and
 # have it resolve — and it works no matter which directory you invoke from.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "${REPO_ROOT}/utils/model-paths.sh"
 export OPENSCADPATH="${REPO_ROOT}/lib${OPENSCADPATH:+:$OPENSCADPATH}"
 
 # The version ledger. One `<name> <n>` line per output name, sorted, so a diff
@@ -128,7 +130,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ ! -f "$SCAD" ]]; then
+model_resolve "$SCAD"
+SCAD="$MODEL_INPUT"
+if [[ -n "$MODEL_DIR" && -z "$BUILD_OUTDIR_EXPLICIT" ]]; then OUTDIR="$MODEL_WORK_STL"; fi
+
+if [[ "$SCAD" != *.scad || ! -f "$SCAD" ]]; then
   echo "error: no such file: $SCAD" >&2
   exit 66
 fi
@@ -138,7 +144,8 @@ OPENSCAD="$(find_openscad)" || {
   exit 69
 }
 
-BASE="${NAME:-$(basename "$SCAD" .scad)}"
+BASE="${NAME:-$MODEL_DEFAULT_NAME}"
+if [[ -n "$MODEL_DIR" ]]; then python3 "${REPO_ROOT}/utils/library.py" register-export "$MODEL_DIR" "$BASE" --check; fi
 mkdir -p "$OUTDIR"
 
 if [[ "$VERSIONED" -eq 1 ]]; then
@@ -176,8 +183,10 @@ fi
 # --export-format goes before the caller's own args, so passing one explicitly
 # still wins.
 echo "rendering $SCAD -> $OUT (this may take a while)"
-"$OPENSCAD" -o "$OUT" --export-format="$FORMAT" "${ARGS[@]+"${ARGS[@]}"}" "$SCAD"
+"$OPENSCAD" -o "$OUT" --export-format="$FORMAT" "${MODEL_OPENSCAD_ARGS[@]+"${MODEL_OPENSCAD_ARGS[@]}"}" "${ARGS[@]+"${ARGS[@]}"}" "$SCAD"
+[[ -s "$OUT" ]] || { echo "error: OpenSCAD produced no mesh: $OUT" >&2; exit 70; }
 echo "built $OUT ($(du -h "$OUT" | cut -f1), $FORMAT)"
+if [[ -n "$MODEL_DIR" ]]; then python3 "${REPO_ROOT}/utils/library.py" register-export "$MODEL_DIR" "$BASE"; fi
 
 # The counter moves only once a mesh actually exists, so a failed render does
 # not burn a number. The plain name is removed before the copy rather than

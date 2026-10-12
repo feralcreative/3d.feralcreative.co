@@ -14,6 +14,7 @@
 set -euo pipefail
 
 IMGSIZE="${IMGSIZE:-1200,900}"
+RENDER_OUTDIR_EXPLICIT="${OUTDIR+x}"
 OUTDIR="${OUTDIR:-renders}"
 # Part colour and background together; OpenSCAD's default is Cornfield, the
 # yellow-on-cream look. Ziad chose Metallic on 2026-09-12, then a magenta
@@ -27,6 +28,7 @@ COLORSCHEME="${COLORSCHEME:-Feral Magenta}"
 # Exporting OPENSCADPATH is what lets a part say `include <BOSL2/std.scad>` and
 # have it resolve — and it works no matter which directory you invoke from.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "${REPO_ROOT}/utils/model-paths.sh"
 export OPENSCADPATH="${REPO_ROOT}/lib${OPENSCADPATH:+:$OPENSCADPATH}"
 
 SCHEME_SRC="$REPO_ROOT/docs/color-schemes"
@@ -98,7 +100,11 @@ fi
 SCAD="$1"
 shift
 
-if [[ ! -f "$SCAD" ]]; then
+model_resolve "$SCAD"
+SCAD="$MODEL_INPUT"
+if [[ -n "$MODEL_DIR" && -z "$RENDER_OUTDIR_EXPLICIT" ]]; then OUTDIR="$MODEL_WORK_RENDERS"; fi
+
+if [[ "$SCAD" != *.scad || ! -f "$SCAD" ]]; then
   echo "error: no such file: $SCAD" >&2
   exit 66
 fi
@@ -126,6 +132,7 @@ for view in "${VIEWS[@]}"; do
     --projection="$proj" \
     --viewall \
     --autocenter \
+    "${MODEL_OPENSCAD_ARGS[@]+"${MODEL_OPENSCAD_ARGS[@]}"}" \
     "$@" \
     "$SCAD"
 

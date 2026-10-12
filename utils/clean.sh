@@ -92,6 +92,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 LOG="${PRINT_LOG:-docs/print-log.txt}"
+LIBRARY_CLEAN_ARGS=("$@")
 KEEP_N=2
 APPLY=0
 SCRATCH_ONLY=0
@@ -110,6 +111,7 @@ done
 
 [[ "$KEEP_N" =~ ^[0-9]+$ ]] || { echo "error: --keep wants a number" >&2; exit 64; }
 [[ -z "$STALE" || "$STALE" =~ ^[0-9]+$ ]] || { echo "error: --stale wants a number of days" >&2; exit 64; }
+python3 "${REPO_ROOT}/utils/library.py" clean "${LIBRARY_CLEAN_ARGS[@]+"${LIBRARY_CLEAN_ARGS[@]}"}"
 
 DOOMED=()
 BYTES=0

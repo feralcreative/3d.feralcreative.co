@@ -42,7 +42,9 @@ import re
 import sys
 
 E_PETG = 2000.0  # MPa
-PART = pathlib.Path(__file__).resolve().parent.parent / "parts" / "screen-fence-rail.scad"
+from library import lookup
+
+PART = lookup("screen-fence-rail")[1]
 
 
 def read_params(path):

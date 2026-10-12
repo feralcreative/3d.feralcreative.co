@@ -42,6 +42,9 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "${REPO_ROOT}/utils/model-paths.sh"
+SLICE_OUTROOT_EXPLICIT="${OUTROOT+x}"
+SLICE_MFROOT_EXPLICIT="${MF_ROOT+x}"
 OUTROOT="${OUTROOT:-${REPO_ROOT}/slice}"
 MF_ROOT="${MF_ROOT:-${REPO_ROOT}/3mf}"
 
@@ -79,6 +82,12 @@ fi
 
 INPUT="$1"
 shift
+model_resolve "$INPUT"
+INPUT="$MODEL_INPUT"
+if [[ -n "$MODEL_DIR" ]]; then
+  [[ -n "$SLICE_OUTROOT_EXPLICIT" ]] || OUTROOT="$MODEL_WORK_SLICE"
+  [[ -n "$SLICE_MFROOT_EXPLICIT" ]] || MF_ROOT="$MODEL_WORK_3MF"
+fi
 
 STOCK=0
 AT_Z=""
@@ -92,8 +101,7 @@ while [[ $# -gt 0 ]]; do
     --set)   EXTRA_SETS+=("$2"); shift 2 ;;
     --at-z)  AT_Z="$2"; shift 2 ;;
     --magnet-pause) MAGNET_PAUSE=1; shift ;;
-    --with)     SET_ARGS+=(--with "$2"); shift 2 ;;
-    --enforcer) SET_ARGS+=(--enforcer "$2"); shift 2 ;;
+    --with|--enforcer) resolved_extra="$(python3 "${REPO_ROOT}/utils/library.py" resolve "$2")"; SET_ARGS+=("$1" "$resolved_extra"); shift 2 ;;
     --name)     NAME="$2"; shift 2 ;;
     *) echo "error: unknown argument: $1" >&2; exit 64 ;;
   esac
@@ -126,10 +134,16 @@ fi
 if [[ "$INPUT" == *.scad ]]; then
   echo "== building mesh"
   "${REPO_ROOT}/utils/build.sh" "$INPUT"
-  INPUT="stl/$(basename "$INPUT" .scad).stl"
+  BUILD_STL_DIR="${OUTDIR:-${MODEL_WORK_STL:-}}"
+  BUILD_STL_DIR="${BUILD_STL_DIR:-${REPO_ROOT}/stl}"
+  INPUT="${BUILD_STL_DIR}/${MODEL_DEFAULT_NAME}.stl"
 fi
 
 BASE="${NAME:-$(basename "${INPUT%.*}")}"
+if [[ "$BASE" == */* || "$BASE" == . || "$BASE" == .. || -z "$BASE" ]]; then
+  echo "error: job name must be a filename without a directory" >&2
+  exit 64
+fi
 OUTDIR="${OUTROOT}/${BASE}"
 PROFDIR="${OUTDIR}/profiles"
 rm -rf "$OUTDIR"

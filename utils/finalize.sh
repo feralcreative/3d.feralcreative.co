@@ -137,6 +137,19 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ "${1:-}" == --shitcan ]]; then
+  library_names=(); library_apply=()
+  for arg in "${@:2}"; do
+    if [[ "$arg" == --apply ]]; then library_apply=(--apply); else library_names+=("$arg"); fi
+  done
+  if python3 "${REPO_ROOT}/utils/library.py" can-finalize "${library_names[@]}" 2>/dev/null; then
+    exec python3 "${REPO_ROOT}/utils/library.py" discard "${library_apply[@]+"${library_apply[@]}"}" "${library_names[@]}"
+  fi
+elif [[ "${1:-}" == --all ]]; then
+  python3 "${REPO_ROOT}/utils/library.py" finalize --all
+elif [[ "${1:-}" != --shitcan ]] && python3 "${REPO_ROOT}/utils/library.py" can-finalize "$@" 2>/dev/null; then
+  exec python3 "${REPO_ROOT}/utils/library.py" finalize "$@"
+fi
 OUTDIR="${OUTDIR:-${REPO_ROOT}/stl}"
 
 usage() {

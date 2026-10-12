@@ -62,6 +62,11 @@ for arg in "$@"; do
   esac
 done
 
+LIBRARY_FLAGS=()
+[[ "$ALL" -eq 0 ]] || LIBRARY_FLAGS+=(--all)
+# Resolve the selection before publication; a manifest error must stop the run.
+LIBRARY_FILES="$(python3 "${REPO_ROOT}/utils/library.py" publish-files "${LIBRARY_FLAGS[@]+"${LIBRARY_FLAGS[@]}"}")"
+
 [[ -f "$CONF" ]] || { echo "no $CONF" >&2; exit 1; }
 
 HOST="$(jq -er '.host' "$CONF")"
@@ -84,7 +89,12 @@ while IFS= read -r f; do
     continue
   fi
   FILES+=("$f")
-done < <(find "$STL_DIR" -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl' | sort)
+done < <(
+  {
+    find "$STL_DIR" -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl'
+    printf '%s\n' "$LIBRARY_FILES"
+  } | sort
+)
 
 # One flat destination: a repeated basename would land on itself over there.
 DUPES="$(for f in ${FILES[@]+"${FILES[@]}"}; do basename "$f"; done | sort | uniq -d)"

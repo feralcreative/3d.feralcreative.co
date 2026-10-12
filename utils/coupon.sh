@@ -43,6 +43,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "${REPO_ROOT}/utils/model-paths.sh"
 LOG="${PRINT_LOG:-${REPO_ROOT}/docs/print-log.txt}"
 VERSIONS_FILE="${VERSIONS_FILE:-${REPO_ROOT}/docs/stl-versions.txt}"
 
@@ -53,6 +54,10 @@ fi
 
 SCAD="$1"
 shift
+model_resolve "$SCAD"
+SCAD="$MODEL_INPUT"
+COUPON_STL_DIR="${OUTDIR:-${MODEL_WORK_STL:-}}"
+COUPON_STL_DIR="${COUPON_STL_DIR:-${REPO_ROOT}/stl}"
 
 ALL=0
 SLICE=0
@@ -68,7 +73,7 @@ done
 
 [[ -f "$SCAD" ]] || { echo "error: no such file: $SCAD" >&2; exit 66; }
 
-PART="$(basename "$SCAD" .scad)"
+PART="$MODEL_DEFAULT_NAME"
 NAME="${PART}-coupon"
 
 # The directives, read out of the part itself.
@@ -173,7 +178,7 @@ for pair in $COMPONENTS; do
   show="${pair#*=}"
 
   out="${SCRATCH}/${comp}.stl"
-  "$OPENSCAD" -o "$out" --export-format=binstl -D "show=\"${show}\"" "$SCAD" \
+  "$OPENSCAD" -o "$out" --export-format=binstl "${MODEL_OPENSCAD_ARGS[@]+"${MODEL_OPENSCAD_ARGS[@]}"}" -D "show=\"${show}\"" "$SCAD" \
     >/dev/null 2>&1 || { echo "error: failed to build component $comp" >&2; exit 70; }
 
   sha="$(shasum -a 256 "$out" | cut -d' ' -f1)"
@@ -238,7 +243,7 @@ done
 
 if [[ "$SLICE" -eq 1 ]]; then
   echo
-  "${REPO_ROOT}/utils/slice.sh" "stl/${NAME}.stl"
+  "${REPO_ROOT}/utils/slice.sh" "${COUPON_STL_DIR}/${NAME}.stl"
 fi
 
 echo
