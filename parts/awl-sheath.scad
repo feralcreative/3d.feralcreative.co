@@ -46,9 +46,9 @@ outer_chamfer = 0.5; // mm, 45° on the outer bed edge
 /* [Crush ribs] */
 rib_count = 3;
 rib_w = 1.2; // mm, across the rib
-rib_interference = 0.5; // mm per side into the blade, allowing for bore_shrink
-// The first coupon was too loose (2026-10-12). Move each rib inward
-// 0.30 mm; keep the running bore and tip pocket unchanged for this test.
+rib_interference = 0.45; // mm per side into the blade, allowing for bore_shrink
+// Fit feedback, 2026-10-12: 0.20 was too loose; 0.50 was a little too snug.
+// Ease each rib outward by 0.05 mm for the next coupon.
 rib_start = 4; // mm above the mouth
 rib_l = 20; // mm, along the bore
 
@@ -94,7 +94,7 @@ module bore() {
 module ribs() {
   bore_r = blade_d / 2 + bore_extra / 2;
   // Shrink compensation is an estimate, not a measured rib allowance.
-  // CAD tips sit at 2.745 mm radius: 0.20 mm inside the measured shank.
+  // At defaults, CAD tips sit at 2.795 mm radius: 0.15 mm inside the shank.
   // The next printed coupon must confirm insertion and retention.
   inner_r = blade_d / 2 - rib_interference + bore_shrink / 2;
   for (i = [0:rib_count - 1])
