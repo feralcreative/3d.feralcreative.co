@@ -1,7 +1,8 @@
 // overture-spool-screwtop-ribbed.scad
 //
 // The screw-top ring from "Reusable Spool for Overture Cardboard Spools"
-// (_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-
+// (stl/3d-printer-tools/originals/printer-tools/
+// reusable-spool-for-overture-cardboard-spools-
 // model_files/), with its eight-petal flower outline swapped for a round,
 // ribbed grip edge.
 //
@@ -37,7 +38,7 @@
 // so it reads from below.
 
 /* [Source] */
-src = "../_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl";
+src = "../stl/3d-printer-tools/originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl";
 src_h = 5;              // mm, plate thickness of the original
 
 /* [Rim] */

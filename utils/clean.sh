@@ -117,6 +117,8 @@ BYTES=0
 size_of() { du -sk "$1" 2>/dev/null | cut -f1; }
 
 doom() {  # path reason
+  # Imported source meshes are archives, even before they have been staged.
+  case "$1" in stl/*/originals|stl/*/originals/*) return ;; esac
   DOOMED+=("$1|$2")
   BYTES=$(( BYTES + $(size_of "$1") ))
 }
@@ -160,7 +162,7 @@ LINKED=""
 while IFS= read -r l; do
   [[ -L "$l" ]] || continue
   LINKED="${LINKED}$(basename "$(readlink "$l")")"$'\n'
-done < <(find stl -name '*.stl' 2>/dev/null)
+done < <(find stl -type d -name originals -prune -o -name '*.stl' -print 2>/dev/null)
 
 is_linked() { printf '%s\n' "$LINKED" | grep -qx -- "$1"; }
 
@@ -187,7 +189,7 @@ if [[ "$SCRATCH_ONLY" -eq 0 ]]; then
   # each other: two parts that collided on a name in different subdirectories
   # would otherwise be ranked as one series and the loser's newest build would
   # be deleted as "older than the newest N".
-  for d in $(find stl -type d 2>/dev/null | sort); do
+  for d in $(find stl -type d -name originals -prune -o -type d -print 2>/dev/null | sort); do
   for name in $(ls "$d" 2>/dev/null | sed -n 's/^\(.*\)-v[0-9][0-9]*\.stl$/\1/p' \
                  | grep -v '^exp-' | sort -u); do
     n=0
@@ -264,7 +266,7 @@ if [[ "$SCRATCH_ONLY" -eq 0 ]]; then
       fi
       # Survives if the STL it was sliced from is still there, under either the
       # plain name or any surviving version of it.
-      if [[ -n "$(find stl \( -name "${base}.stl" -o -name "${base}-v*.stl" \) -print -quit 2>/dev/null)" ]]; then
+      if [[ -n "$(find stl -type d -name originals -prune -o \( -name "${base}.stl" -o -name "${base}-v*.stl" \) -print -quit 2>/dev/null)" ]]; then
         continue
       fi
       doom "$d" "no STL left to match"

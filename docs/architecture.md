@@ -6,13 +6,16 @@ How the pieces fit. Read before changing a script or adding a stage to the loop.
 
 | Path | Role |
 | --- | --- |
-| `parts/` | One `.scad` per design. The only source of truth. `example-spacer.scad` is the house-style template. |
+| `parts/` | One `.scad` per authored design. `example-spacer.scad` is the house-style template. Designs that adapt imported meshes also depend on those source STLs. |
 | `logos/` | SVG artwork plus `marks.scad`, the library that places it. Parts call the library, never `import()`. |
 | `lib/BOSL2` | Git submodule, v2.0.747. Rounding, chamfering, threading, attachment. |
 | `docs/` | References, status, deep dives, and `profiles/` (the durable copy of slicer presets). |
 | `docs/_PLANS/` | Round-by-round record of in-flight work. Gitignored by the blanket `_PLANS` rule, so local-only. |
 | `utils/` | Every script. Never `scripts/`. |
-| `renders/`, `stl/`, `slice/`, `3mf/` | Generated, gitignored, reproducible. |
+| `stl/` | Finished exports are committed; numbered build drafts are gitignored. Category folders hold related models. |
+| `stl/<category>/originals/` | Committed source STLs moved from `_originals/`, preserving model folders and filenames. Loose files are sorted into each category's `originals/loose/`. These archives are excluded from cleanup, finalization, and bulk publishing, including `--all`. |
+| `_originals/` | Non-STL source assets and accompanying licenses; the STL archive now lives under `stl/`. |
+| `renders/`, `slice/`, `3mf/` | Generated, gitignored, reproducible. |
 | `_incoming/` | Legacy SketchUp-era STLs, downloaded scans, and SVG traces, gitignored. Reference geometry to measure against, not authored source. A scan that arrives as several shells is split here by `utils/stl-shells.py` into `<name>-shells/`, beside the original, and the part imports the pieces. |
 | `MODELS` | Symlink into `~/www/feral/3d.feralcreative.co/public/models`. Gitignored. |
 
