@@ -14,8 +14,11 @@ How the pieces fit. Read before changing a script or adding a stage to the loop.
 | `utils/` | Every script. Never `scripts/`. |
 | `stl/` | Finished exports are committed; numbered build drafts are gitignored. Category folders hold related models. |
 | `stl/<category>/originals/` | Committed source STLs moved from `_originals/`, preserving model folders and filenames. Loose files are sorted into each category's `originals/loose/`. These archives are excluded from cleanup, finalization, and bulk publishing, including `--all`. |
-| `_originals/` | Non-STL source assets and accompanying licenses; the STL archive now lives under `stl/`. |
-| `renders/`, `slice/`, `3mf/` | Generated, gitignored, reproducible. |
+| `3mf/` | Named copies of generated slice jobs, gitignored. Existing tracked jobs remain tracked. |
+| `3mf/<category>/originals/` | Committed 3MF archives moved from `_originals/`, using the STL categories and preserving model folders and filenames. Cleanup skips these archives, including `--all`. |
+| `skp/<category>/` | Committed SketchUp files moved from `_originals/`, with the same categories and original model folders. Formerly loose files live under each category's `loose/`. |
+| `_originals/` | Remaining assets and accompanying licenses; STL, 3MF, and SketchUp files now live under their respective format folders. |
+| `renders/`, `slice/` | Generated, gitignored, reproducible. |
 | `_incoming/` | Legacy SketchUp-era STLs, downloaded scans, and SVG traces, gitignored. Reference geometry to measure against, not authored source. A scan that arrives as several shells is split here by `utils/stl-shells.py` into `<name>-shells/`, beside the original, and the part imports the pieces. |
 | `MODELS` | Symlink into `~/www/feral/3d.feralcreative.co/public/models`. Gitignored. |
 

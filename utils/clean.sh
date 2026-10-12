@@ -117,8 +117,8 @@ BYTES=0
 size_of() { du -sk "$1" 2>/dev/null | cut -f1; }
 
 doom() {  # path reason
-  # Imported source meshes are archives, even before they have been staged.
-  case "$1" in stl/*/originals|stl/*/originals/*) return ;; esac
+  # Imported meshes and 3MF projects are archives, even before staging.
+  case "$1" in stl/*/originals|stl/*/originals/*|3mf/*/originals|3mf/*/originals/*) return ;; esac
   DOOMED+=("$1|$2")
   BYTES=$(( BYTES + $(size_of "$1") ))
 }
@@ -175,7 +175,7 @@ for tree in renders stl slice 3mf; do
     [[ -e "$p" ]] || continue
     tracked "$p" && continue
     doom "$p" "scratch"
-  done < <(find "$tree" -name 'exp-*' -prune 2>/dev/null | sort)
+  done < <(find "$tree" -type d -name originals -prune -o -name 'exp-*' -prune -print 2>/dev/null | sort)
 done
 [[ "${#DOOMED[@]}" -gt 0 ]] || echo "  none"
 
@@ -233,14 +233,22 @@ if [[ "$SCRATCH_ONLY" -eq 0 ]]; then
     echo "== renders and 3mf, untouched in $STALE days"
     for tree in renders 3mf; do
       [[ -d "$tree" ]] || continue
-      for p in "$tree"/*; do
+      while IFS= read -r p; do
         [[ -e "$p" ]] || continue
         [[ "$p" == *.keep.* ]] && { echo "  $p — kept by name"; continue; }
         tracked "$p" && continue
         [[ "$p" == */exp-* ]] && continue     # already doomed as scratch
         stale "$p" || continue
         doom "$p" "not touched in $STALE days"
-      done
+      done < <(
+        if [[ "$tree" == 3mf ]]; then
+          # Walk jobs individually: a category also contains source archives,
+          # so deleting its whole directory would discard those with the jobs.
+          find "$tree" -type d -name originals -prune -o -type f -print
+        else
+          printf '%s\n' "$tree"/*
+        fi
+      )
     done
   else
     echo "== renders and 3mf — left alone; --stale N or --all to clear them"

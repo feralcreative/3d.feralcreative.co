@@ -327,6 +327,16 @@ stl/gridfinity/wire-shelf-gridfinity-4x2*.stl
 !stl/*/originals/**/*.stl
 !stl/*/originals/**/*.STL
 
+# Generated slice-job copies stay local; imported 3MF archives are sources.
+3mf/*
+!3mf/.gitkeep
+!3mf/*/
+3mf/*/*
+!3mf/*/originals/
+!3mf/*/originals/**/
+!3mf/*/originals/**/*.3mf
+!3mf/*/originals/**/*.3MF
+
 slice/
 _incoming
 MODELS
