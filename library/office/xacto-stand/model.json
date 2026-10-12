@@ -1,0 +1,36 @@
+{
+  "id": "xacto-stand",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/xacto-stand.skp": "xacto-stand.skp",
+    "_originals/desk/xacto-stand.stl": "xacto-stand.stl",
+    "_originals/office/feral-xacto-stand.stl": "feral-xacto-stand.stl",
+    "_originals/office/xacto-stand-base.stl": "xacto-stand-base.stl",
+    "_originals/office/xacto-stand-bottom.stl": "xacto-stand-bottom.stl",
+    "_originals/office/xacto-stand-top.stl": "xacto-stand-top.stl",
+    "_originals/office/xacto-stand.3mf": "xacto-stand.3mf",
+    "_originals/office/xacto-stand.skp": "originals/office/xacto-stand.skp",
+    "_originals/office/xacto-stand.stl": "originals/office/xacto-stand.stl",
+    "_originals/office/xacto-stand~.skp": "xacto-stand~.skp",
+    "_originals/tools/xacto-stand.stl": "originals/tools/xacto-stand.stl"
+  },
+  "protected_assets": [
+    "feral-xacto-stand.stl",
+    "originals/office/xacto-stand.skp",
+    "originals/office/xacto-stand.stl",
+    "originals/tools/xacto-stand.stl",
+    "xacto-stand-base.stl",
+    "xacto-stand-bottom.stl",
+    "xacto-stand-top.stl",
+    "xacto-stand.3mf",
+    "xacto-stand.skp",
+    "xacto-stand.stl",
+    "xacto-stand~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

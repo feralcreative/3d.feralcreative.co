@@ -1,0 +1,16 @@
+{
+  "id": "03-pico-console-sketchup",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/03 - Pico Console Sketchup FInal.skp": "03 - Pico Console Sketchup FInal.skp"
+  },
+  "protected_assets": [
+    "03 - Pico Console Sketchup FInal.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

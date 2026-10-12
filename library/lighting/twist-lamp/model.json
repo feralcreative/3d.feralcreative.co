@@ -1,0 +1,30 @@
+{
+  "id": "twist-lamp",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/Base.skp": "Base.skp",
+    "_originals/lighting/Level.skp": "Level.skp",
+    "_originals/lighting/twist-lamp-base.3mf": "twist-lamp-base.3mf",
+    "_originals/lighting/twist-lamp-base.stl": "twist-lamp-base.stl",
+    "_originals/lighting/twist-lamp-level.stl": "twist-lamp-level.stl",
+    "_originals/lighting/twist-lamp.skp": "twist-lamp.skp",
+    "_originals/lighting/twist-lamp.stl": "twist-lamp.stl",
+    "_originals/lighting/twist-lamp~.skp": "twist-lamp~.skp"
+  },
+  "protected_assets": [
+    "Base.skp",
+    "Level.skp",
+    "twist-lamp-base.3mf",
+    "twist-lamp-base.stl",
+    "twist-lamp-level.stl",
+    "twist-lamp.skp",
+    "twist-lamp.stl",
+    "twist-lamp~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "cat-portal-door",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-portal-door.stl": "cat-portal-door.stl"
+  },
+  "protected_assets": [
+    "cat-portal-door.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

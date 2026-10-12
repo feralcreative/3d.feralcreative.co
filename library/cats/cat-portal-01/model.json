@@ -1,0 +1,18 @@
+{
+  "id": "cat-portal-01",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-portal-01.stl": "cat-portal-01.stl",
+    "_originals/cats/cat-portal-01_fixed.stl": "cat-portal-01_fixed.stl"
+  },
+  "protected_assets": [
+    "cat-portal-01.stl",
+    "cat-portal-01_fixed.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

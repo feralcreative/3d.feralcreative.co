@@ -1,0 +1,16 @@
+{
+  "id": "glasses-stand-larger-slot",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bedroom/Glasses Stand Larger Slot.STL": "Glasses Stand Larger Slot.STL"
+  },
+  "protected_assets": [
+    "Glasses Stand Larger Slot.STL"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

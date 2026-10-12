@@ -1,0 +1,31 @@
+{
+  "id": "bin-stacking-clip",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "bin-stacking-clip.scad",
+  "scad_files": [
+    "bin-stacking-clip.scad"
+  ],
+  "exports": [
+    "bin-stacking-clip"
+  ],
+  "aliases": {
+    "parts/bin-stacking-clip.scad": "bin-stacking-clip.scad",
+    "_originals/bin-stacking-clip.ai": "originals/bin-stacking-clip.ai",
+    "_originals/bin-stacking-clip.skp": "originals/bin-stacking-clip.skp",
+    "_originals/bin-stacking-clip.stl": "originals/bin-stacking-clip.stl",
+    "_originals/bin-stacking-clip~.skp": "originals/bin-stacking-clip~.skp",
+    "stl/bin-stacking-clip.stl": "bin-stacking-clip.stl"
+  },
+  "publish_exports": [
+    "bin-stacking-clip"
+  ],
+  "protected_assets": [
+    "originals/bin-stacking-clip.ai",
+    "originals/bin-stacking-clip.skp",
+    "originals/bin-stacking-clip.stl",
+    "originals/bin-stacking-clip~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

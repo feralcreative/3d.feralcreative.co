@@ -1,0 +1,16 @@
+{
+  "id": "lable-cradle",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lable-cradle.stl": "lable-cradle.stl"
+  },
+  "protected_assets": [
+    "lable-cradle.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

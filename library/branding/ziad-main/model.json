@@ -1,0 +1,16 @@
+{
+  "id": "ziad-main",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/ziad-main.stl": "ziad-main.stl"
+  },
+  "protected_assets": [
+    "ziad-main.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

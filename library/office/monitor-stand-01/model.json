@@ -1,0 +1,16 @@
+{
+  "id": "monitor-stand-01",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/monitor-stand-01.stl": "monitor-stand-01.stl"
+  },
+  "protected_assets": [
+    "monitor-stand-01.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

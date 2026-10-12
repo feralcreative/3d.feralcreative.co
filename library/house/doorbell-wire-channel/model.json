@@ -1,0 +1,44 @@
+{
+  "id": "doorbell-wire-channel",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "doorbell-wire-channel.scad",
+  "scad_files": [
+    "doorbell-wire-channel.scad"
+  ],
+  "exports": [
+    "doorbell-wire-channel-cap",
+    "doorbell-wire-channel"
+  ],
+  "aliases": {
+    "parts/doorbell-wire-channel.scad": "doorbell-wire-channel.scad",
+    "_originals/house/doorbell-wire-channel-sample.stl": "originals/house/doorbell-wire-channel-sample.stl",
+    "_originals/house/doorbell-wire-channel.skp": "originals/house/doorbell-wire-channel.skp",
+    "_originals/house/doorbell-wire-channel.stl": "originals/house/doorbell-wire-channel.stl",
+    "_originals/house/doorbell-wire-channel~.skp": "originals/house/doorbell-wire-channel~.skp",
+    "stl/house/doorbell-wire-channel-cap.stl": "doorbell-wire-channel-cap.stl",
+    "stl/doorbell-wire-channel-cap.stl": "doorbell-wire-channel-cap.stl",
+    "stl/house/doorbell-wire-channel.stl": "doorbell-wire-channel.stl",
+    "stl/doorbell-wire-channel.stl": "doorbell-wire-channel.stl",
+    "3mf/doorbell-wire-channel.3mf": "saved-jobs/doorbell-wire-channel.3mf",
+    "slice/doorbell-wire-channel/out.gcode.3mf": "_work/slice/doorbell-wire-channel/out.gcode.3mf",
+    "slice/doorbell-wire-channel/plate_1.gcode": "_work/slice/doorbell-wire-channel/plate_1.gcode",
+    "slice/doorbell-wire-channel/profiles/filament.json": "_work/slice/doorbell-wire-channel/profiles/filament.json",
+    "slice/doorbell-wire-channel/profiles/machine.json": "_work/slice/doorbell-wire-channel/profiles/machine.json",
+    "slice/doorbell-wire-channel/profiles/process.json": "_work/slice/doorbell-wire-channel/profiles/process.json",
+    "slice/doorbell-wire-channel/resolved.json": "_work/slice/doorbell-wire-channel/resolved.json",
+    "slice/doorbell-wire-channel/slice.log": "_work/slice/doorbell-wire-channel/slice.log"
+  },
+  "publish_exports": [
+    "doorbell-wire-channel-cap",
+    "doorbell-wire-channel"
+  ],
+  "protected_assets": [
+    "originals/house/doorbell-wire-channel-sample.stl",
+    "originals/house/doorbell-wire-channel.skp",
+    "originals/house/doorbell-wire-channel.stl",
+    "originals/house/doorbell-wire-channel~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

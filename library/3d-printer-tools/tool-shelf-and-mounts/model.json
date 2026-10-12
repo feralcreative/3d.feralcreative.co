@@ -1,0 +1,20 @@
+{
+  "id": "tool-shelf-and-mounts",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/tool-shelf-and-mounts.3mf": "tool-shelf-and-mounts.3mf",
+    "_originals/printer-tools/tool-shelf-and-mounts.stl": "tool-shelf-and-mounts.stl",
+    "_originals/tool-shelf-and-mounts.stl": "originals/tool-shelf-and-mounts.stl"
+  },
+  "protected_assets": [
+    "originals/tool-shelf-and-mounts.stl",
+    "tool-shelf-and-mounts.3mf",
+    "tool-shelf-and-mounts.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

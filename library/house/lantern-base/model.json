@@ -1,0 +1,32 @@
+{
+  "id": "lantern-base",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/deck/lantern-base-20mm.3mf": "lantern-base-20mm.3mf",
+    "_originals/deck/lantern-base-20mm.stl": "lantern-base-20mm.stl",
+    "_originals/deck/lantern-base-30mm.stl": "lantern-base-30mm.stl",
+    "_originals/deck/lantern-base.3mf": "lantern-base.3mf",
+    "_originals/deck/lantern-base.skp": "lantern-base.skp",
+    "_originals/deck/lantern-base~.skp": "lantern-base~.skp",
+    "_originals/lantern-base-20mm.stl": "originals/lantern-base-20mm.stl",
+    "_originals/lantern-base-30mm.stl": "originals/lantern-base-30mm.stl",
+    "_originals/lantern-base.stl": "lantern-base.stl"
+  },
+  "protected_assets": [
+    "lantern-base-20mm.3mf",
+    "lantern-base-20mm.stl",
+    "lantern-base-30mm.stl",
+    "lantern-base.3mf",
+    "lantern-base.skp",
+    "lantern-base.stl",
+    "lantern-base~.skp",
+    "originals/lantern-base-20mm.stl",
+    "originals/lantern-base-30mm.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

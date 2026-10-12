@@ -1,0 +1,32 @@
+{
+  "id": "check-frame",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/check-frame-back.stl": "check-frame-back.stl",
+    "_originals/check-frame.stl": "check-frame.stl",
+    "_originals/check-mat.stl": "check-mat.stl",
+    "_originals/frames/check-frame-back.stl": "originals/frames/check-frame-back.stl",
+    "_originals/frames/check-frame.skp": "check-frame.skp",
+    "_originals/frames/check-frame.stl": "originals/frames/check-frame.stl",
+    "_originals/frames/check-frame~.skp": "check-frame~.skp",
+    "_originals/frames/check-mat.3mf": "check-mat.3mf",
+    "_originals/frames/check-mat.stl": "originals/frames/check-mat.stl"
+  },
+  "protected_assets": [
+    "check-frame-back.stl",
+    "check-frame.skp",
+    "check-frame.stl",
+    "check-frame~.skp",
+    "check-mat.3mf",
+    "check-mat.stl",
+    "originals/frames/check-frame-back.stl",
+    "originals/frames/check-frame.stl",
+    "originals/frames/check-mat.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

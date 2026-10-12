@@ -1,0 +1,18 @@
+{
+  "id": "portal-cat-portal",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/portal-cat-portal.skp": "portal-cat-portal.skp",
+    "_originals/cats/portal-cat-portal~.skp": "portal-cat-portal~.skp"
+  },
+  "protected_assets": [
+    "portal-cat-portal.skp",
+    "portal-cat-portal~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,36 @@
+{
+  "id": "toofstation",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bathroom/Sonicare+Holder_stls/holder-top-v4.stl": "holder-top-v4.stl",
+    "_originals/bathroom/Sonicare+Holder_stls/obj_1_Sonicare Holder V10 Longer Magnet After Subtract.STEP.stl": "obj_1_Sonicare Holder V10 Longer Magnet After Subtract.STEP.stl",
+    "_originals/bathroom/Sonicare+Holder_stls/obj_2_Sonicare Holder V10 Bottom Body.STEP.stl": "obj_2_Sonicare Holder V10 Bottom Body.STEP.stl",
+    "_originals/bathroom/Sonicare+Holder_stls/toofstation-9000-before.stl": "toofstation-9000-before.stl",
+    "_originals/bathroom/Sonicare+Holder_stls.zip": "originals/bathroom/Sonicare+Holder_stls.zip",
+    "_originals/bathroom/toofstation-9000-rough.stl": "toofstation-9000-rough.stl",
+    "_originals/bathroom/toofstation-9000.3mf": "toofstation-9000.3mf",
+    "_originals/bathroom/toofstation-9000.skp": "toofstation-9000.skp",
+    "_originals/bathroom/toofstation-9000.stl": "toofstation-9000.stl",
+    "_originals/bathroom/toofstation-9000~.skp": "toofstation-9000~.skp",
+    "_originals/toofstation-9000.stl": "originals/toofstation-9000.stl"
+  },
+  "protected_assets": [
+    "holder-top-v4.stl",
+    "obj_1_Sonicare Holder V10 Longer Magnet After Subtract.STEP.stl",
+    "obj_2_Sonicare Holder V10 Bottom Body.STEP.stl",
+    "originals/bathroom/Sonicare+Holder_stls.zip",
+    "originals/toofstation-9000.stl",
+    "toofstation-9000-before.stl",
+    "toofstation-9000-rough.stl",
+    "toofstation-9000.3mf",
+    "toofstation-9000.skp",
+    "toofstation-9000.stl",
+    "toofstation-9000~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

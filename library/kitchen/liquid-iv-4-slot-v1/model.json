@@ -1,0 +1,16 @@
+{
+  "id": "liquid-iv-4-slot-v1",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/liquid+iv+4+slot+v1.3mf": "liquid+iv+4+slot+v1.3mf"
+  },
+  "protected_assets": [
+    "liquid+iv+4+slot+v1.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

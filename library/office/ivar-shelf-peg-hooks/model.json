@@ -1,0 +1,18 @@
+{
+  "id": "ivar-shelf-peg-hooks",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/ivar-shelf-peg-hooks.skp": "ivar-shelf-peg-hooks.skp",
+    "_originals/office/ivar-shelf-peg-hooks~.skp": "ivar-shelf-peg-hooks~.skp"
+  },
+  "protected_assets": [
+    "ivar-shelf-peg-hooks.skp",
+    "ivar-shelf-peg-hooks~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

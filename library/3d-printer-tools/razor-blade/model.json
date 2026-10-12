@@ -1,0 +1,18 @@
+{
+  "id": "razor-blade",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/razor-blade.stl": "razor-blade.stl",
+    "_originals/razor-blade.stl": "originals/razor-blade.stl"
+  },
+  "protected_assets": [
+    "originals/razor-blade.stl",
+    "razor-blade.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

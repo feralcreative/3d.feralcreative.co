@@ -1,0 +1,14 @@
+{
+  "id": "bottom-track-dimensions",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "stl/bottom-track-dimensions.png": "bottom-track-dimensions.png"
+  },
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

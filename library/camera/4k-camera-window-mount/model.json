@@ -1,0 +1,29 @@
+{
+  "id": "4k-camera-window-mount",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "4k-camera-window-mount.scad",
+  "scad_files": [
+    "4k-camera-window-mount.scad"
+  ],
+  "exports": [
+    "4k-camera-window-mount"
+  ],
+  "aliases": {
+    "parts/4k-camera-window-mount.scad": "4k-camera-window-mount.scad",
+    "stl/camera/4k-camera-window-mount.stl": "4k-camera-window-mount.stl",
+    "stl/4k-camera-window-mount.stl": "4k-camera-window-mount.stl",
+    "slice/4k-camera-window-mount/plate_1.gcode": "_work/slice/4k-camera-window-mount/plate_1.gcode",
+    "slice/4k-camera-window-mount/profiles/filament.json": "_work/slice/4k-camera-window-mount/profiles/filament.json",
+    "slice/4k-camera-window-mount/profiles/machine.json": "_work/slice/4k-camera-window-mount/profiles/machine.json",
+    "slice/4k-camera-window-mount/profiles/process.json": "_work/slice/4k-camera-window-mount/profiles/process.json",
+    "slice/4k-camera-window-mount/resolved.json": "_work/slice/4k-camera-window-mount/resolved.json",
+    "slice/4k-camera-window-mount/slice.log": "_work/slice/4k-camera-window-mount/slice.log"
+  },
+  "publish_exports": [
+    "4k-camera-window-mount"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

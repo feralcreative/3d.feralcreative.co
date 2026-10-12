@@ -1,0 +1,26 @@
+{
+  "id": "yamaha-ag06-riser",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/yamaha-ag06-riser-repaired.stl": "yamaha-ag06-riser-repaired.stl",
+    "_originals/desk/yamaha-ag06-riser.skp": "yamaha-ag06-riser.skp",
+    "_originals/desk/yamaha-ag06-riser.stl": "yamaha-ag06-riser.stl",
+    "_originals/desk/yamaha-ag06-riser_fixed.stl": "yamaha-ag06-riser_fixed.stl",
+    "_originals/desk/yamaha-ag06-riser~.skp": "yamaha-ag06-riser~.skp",
+    "_originals/yamaha-ag06-riser-repaired.stl": "originals/yamaha-ag06-riser-repaired.stl"
+  },
+  "protected_assets": [
+    "originals/yamaha-ag06-riser-repaired.stl",
+    "yamaha-ag06-riser-repaired.stl",
+    "yamaha-ag06-riser.skp",
+    "yamaha-ag06-riser.stl",
+    "yamaha-ag06-riser_fixed.stl",
+    "yamaha-ag06-riser~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

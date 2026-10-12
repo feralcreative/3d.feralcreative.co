@@ -1,0 +1,26 @@
+{
+  "id": "bottle-caddy",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bottle-caddy.stl": "bottle-caddy.stl",
+    "_originals/kitchen/bottle-caddy-test-01.stl": "bottle-caddy-test-01.stl",
+    "_originals/kitchen/bottle-caddy.3mf": "bottle-caddy.3mf",
+    "_originals/kitchen/bottle-caddy.skp": "bottle-caddy.skp",
+    "_originals/kitchen/bottle-caddy.stl": "originals/kitchen/bottle-caddy.stl",
+    "_originals/kitchen/bottle-caddy~.skp": "bottle-caddy~.skp"
+  },
+  "protected_assets": [
+    "bottle-caddy-test-01.stl",
+    "bottle-caddy.3mf",
+    "bottle-caddy.skp",
+    "bottle-caddy.stl",
+    "bottle-caddy~.skp",
+    "originals/kitchen/bottle-caddy.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

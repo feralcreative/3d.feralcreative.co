@@ -1,0 +1,17 @@
+{
+  "id": "toothpick-dispenser",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "stl/toothpick-dispenser.stl": "toothpick-dispenser.stl"
+  },
+  "publish_exports": [
+    "toothpick-dispenser"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

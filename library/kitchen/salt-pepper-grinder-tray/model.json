@@ -1,0 +1,23 @@
+{
+  "id": "salt-pepper-grinder-tray",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "salt-pepper-grinder-tray.scad",
+  "scad_files": [
+    "salt-pepper-grinder-tray.scad"
+  ],
+  "exports": [
+    "salt-pepper-grinder-tray"
+  ],
+  "aliases": {
+    "parts/salt-pepper-grinder-tray.scad": "salt-pepper-grinder-tray.scad",
+    "stl/salt-pepper-grinder-tray.stl": "salt-pepper-grinder-tray.stl",
+    "3mf/salt-pepper-grinder-tray.3mf": "saved-jobs/salt-pepper-grinder-tray.3mf"
+  },
+  "publish_exports": [
+    "salt-pepper-grinder-tray"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,36 @@
+{
+  "id": "compost-frame",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/1.2gal-compost-frame/1_2gal-compost-frame-bottom.stl": "1_2gal-compost-frame-bottom.stl",
+    "_originals/1.2gal-compost-frame/1_2gal-compost-frame-strut.stl": "1_2gal-compost-frame-strut.stl",
+    "_originals/1.2gal-compost-frame/1_2gal-compost-frame-test-01.stl": "1_2gal-compost-frame-test-01.stl",
+    "_originals/1.2gal-compost-frame/1_2gal-compost-frame-top.stl": "1_2gal-compost-frame-top.stl",
+    "_originals/1.2gal-compost-frame/1_2gal-compost-frame.3mf": "1_2gal-compost-frame.3mf",
+    "_originals/1.2gal-compost-frame/1_2gal-compost-frame.skp": "1_2gal-compost-frame.skp",
+    "_originals/1.2gal-compost-frame/1_2gal-compost-frame~.skp": "1_2gal-compost-frame~.skp",
+    "_originals/1.2gal-compost-frame/compost-bottom.stl": "compost-bottom.stl",
+    "_originals/1.2gal-compost-frame/compost-pillar.stl": "compost-pillar.stl",
+    "_originals/1.2gal-compost-frame/compost-top.3mf": "compost-top.3mf",
+    "_originals/1.2gal-compost-frame/compost-top.stl": "compost-top.stl"
+  },
+  "protected_assets": [
+    "1_2gal-compost-frame-bottom.stl",
+    "1_2gal-compost-frame-strut.stl",
+    "1_2gal-compost-frame-test-01.stl",
+    "1_2gal-compost-frame-top.stl",
+    "1_2gal-compost-frame.3mf",
+    "1_2gal-compost-frame.skp",
+    "1_2gal-compost-frame~.skp",
+    "compost-bottom.stl",
+    "compost-pillar.stl",
+    "compost-top.3mf",
+    "compost-top.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

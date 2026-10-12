@@ -1,0 +1,42 @@
+{
+  "id": "hobbs-painters-pyramid",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "hobbs-painters-pyramid.scad",
+  "scad_files": [
+    "hobbs-painters-pyramid.scad"
+  ],
+  "exports": [
+    "hobbs-painters-pyramid",
+    "hobbs-pyramid-box"
+  ],
+  "aliases": {
+    "parts/hobbs-painters-pyramid.scad": "hobbs-painters-pyramid.scad",
+    "_originals/hobbs-painters-pyramid.stl": "originals/hobbs-painters-pyramid.stl",
+    "_originals/pyramid.skp": "originals/pyramid.skp",
+    "_originals/pyramid.stl": "originals/pyramid.stl",
+    "_originals/woodworking-tools/hobbs-painters-pyramid.3mf": "originals/woodworking-tools/hobbs-painters-pyramid.3mf",
+    "_originals/woodworking-tools/hobbs-painters-pyramid.skp": "originals/woodworking-tools/hobbs-painters-pyramid.skp",
+    "_originals/woodworking-tools/hobbs-painters-pyramid.stl": "originals/woodworking-tools/hobbs-painters-pyramid.stl",
+    "_originals/woodworking-tools/painters-pyramid-v2.stl": "originals/woodworking-tools/painters-pyramid-v2.stl",
+    "stl/hand-tools/woodworking/hobbs-painters-pyramid.stl": "hobbs-painters-pyramid.stl",
+    "stl/hobbs-painters-pyramid.stl": "hobbs-painters-pyramid.stl",
+    "stl/hand-tools/woodworking/hobbs-pyramid-box.stl": "hobbs-pyramid-box.stl",
+    "stl/hobbs-pyramid-box.stl": "hobbs-pyramid-box.stl"
+  },
+  "publish_exports": [
+    "hobbs-painters-pyramid",
+    "hobbs-pyramid-box"
+  ],
+  "protected_assets": [
+    "originals/hobbs-painters-pyramid.stl",
+    "originals/pyramid.skp",
+    "originals/pyramid.stl",
+    "originals/woodworking-tools/hobbs-painters-pyramid.3mf",
+    "originals/woodworking-tools/hobbs-painters-pyramid.skp",
+    "originals/woodworking-tools/hobbs-painters-pyramid.stl",
+    "originals/woodworking-tools/painters-pyramid-v2.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

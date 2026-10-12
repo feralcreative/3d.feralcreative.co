@@ -1,0 +1,20 @@
+{
+  "id": "filament-clip",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/filament-clip.stl": "filament-clip.stl",
+    "_originals/printer-tools/filament-clip.3mf": "filament-clip.3mf",
+    "_originals/printer-tools/filament-clip.stl": "originals/printer-tools/filament-clip.stl"
+  },
+  "protected_assets": [
+    "filament-clip.3mf",
+    "filament-clip.stl",
+    "originals/printer-tools/filament-clip.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "hobbs-makers-mark-vertical",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bx/Hobbs Makers Mark Vertical.skp": "Hobbs Makers Mark Vertical.skp"
+  },
+  "protected_assets": [
+    "Hobbs Makers Mark Vertical.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

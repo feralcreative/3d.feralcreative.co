@@ -1,0 +1,18 @@
+{
+  "id": "pole-base-grommet",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/deck/pole-base-grommet.3mf": "pole-base-grommet.3mf",
+    "_originals/deck/pole-base-grommet.stl": "pole-base-grommet.stl"
+  },
+  "protected_assets": [
+    "pole-base-grommet.3mf",
+    "pole-base-grommet.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

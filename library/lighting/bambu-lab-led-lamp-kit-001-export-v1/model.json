@@ -1,0 +1,16 @@
+{
+  "id": "bambu-lab-led-lamp-kit-001-export-v1",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/Bambu+Lab+LED+Lamp+Kit-001+-+export+v1.f3d": "Bambu+Lab+LED+Lamp+Kit-001+-+export+v1.f3d"
+  },
+  "protected_assets": [
+    "Bambu+Lab+LED+Lamp+Kit-001+-+export+v1.f3d"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

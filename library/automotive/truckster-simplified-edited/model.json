@@ -1,0 +1,16 @@
+{
+  "id": "truckster-simplified-edited",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/Truckster_Simplified_Edited.stl": "Truckster_Simplified_Edited.stl"
+  },
+  "protected_assets": [
+    "Truckster_Simplified_Edited.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

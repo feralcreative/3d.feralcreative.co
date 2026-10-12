@@ -1,0 +1,22 @@
+{
+  "id": "plate-holder",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/plate-holder/Build+Plate+Holder(3)_stls.zip": "originals/printer-tools/plate-holder/Build+Plate+Holder(3)_stls.zip",
+    "_originals/printer-tools/plate-holder/obj_1_5 Plates v2.stl_B_B_A_A_A_A.stl": "obj_1_5 Plates v2.stl_B_B_A_A_A_A.stl",
+    "_originals/printer-tools/plate-holder/plate-holder.skp": "plate-holder.skp",
+    "_originals/printer-tools/plate-holder/plate-holder~.skp": "plate-holder~.skp"
+  },
+  "protected_assets": [
+    "obj_1_5 Plates v2.stl_B_B_A_A_A_A.stl",
+    "originals/printer-tools/plate-holder/Build+Plate+Holder(3)_stls.zip",
+    "plate-holder.skp",
+    "plate-holder~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

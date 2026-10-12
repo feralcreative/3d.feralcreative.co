@@ -1,0 +1,22 @@
+{
+  "id": "grillo-bucket-funnel",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/grillo-bucket-funnel.3mf": "grillo-bucket-funnel.3mf",
+    "_originals/grillo-bucket-funnel.skp": "grillo-bucket-funnel.skp",
+    "_originals/grillo-bucket-funnel.stl": "grillo-bucket-funnel.stl",
+    "_originals/grillo-bucket-funnel~.skp": "grillo-bucket-funnel~.skp"
+  },
+  "protected_assets": [
+    "grillo-bucket-funnel.3mf",
+    "grillo-bucket-funnel.skp",
+    "grillo-bucket-funnel.stl",
+    "grillo-bucket-funnel~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

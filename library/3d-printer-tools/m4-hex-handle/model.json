@@ -1,0 +1,16 @@
+{
+  "id": "m4-hex-handle",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/m4-hex-handle.stl": "m4-hex-handle.stl"
+  },
+  "protected_assets": [
+    "m4-hex-handle.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

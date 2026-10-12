@@ -1,0 +1,45 @@
+{
+  "id": "deck-door-stop",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "deck-door-stop.scad",
+  "scad_files": [
+    "deck-door-stop-truss.scad",
+    "deck-door-stop.scad"
+  ],
+  "exports": [
+    "deck-door-stop-truss",
+    "deck-door-stop"
+  ],
+  "aliases": {
+    "parts/deck-door-stop-truss.scad": "deck-door-stop-truss.scad",
+    "parts/deck-door-stop.scad": "deck-door-stop.scad",
+    "stl/house/deck-door-stop-coupon.stl": "_work/stl/deck-door-stop-coupon.stl",
+    "stl/deck-door-stop-coupon.stl": "_work/stl/deck-door-stop-coupon.stl",
+    "stl/house/deck-door-stop-truss.stl": "deck-door-stop-truss.stl",
+    "stl/deck-door-stop-truss.stl": "deck-door-stop-truss.stl",
+    "stl/house/deck-door-stop.stl": "deck-door-stop.stl",
+    "stl/deck-door-stop.stl": "deck-door-stop.stl",
+    "slice/deck-door-stop/out.gcode.3mf": "_work/slice/deck-door-stop/out.gcode.3mf",
+    "slice/deck-door-stop/plate_1.gcode": "_work/slice/deck-door-stop/plate_1.gcode",
+    "slice/deck-door-stop/profiles/filament.json": "_work/slice/deck-door-stop/profiles/filament.json",
+    "slice/deck-door-stop/profiles/machine.json": "_work/slice/deck-door-stop/profiles/machine.json",
+    "slice/deck-door-stop/profiles/process.json": "_work/slice/deck-door-stop/profiles/process.json",
+    "slice/deck-door-stop/resolved.json": "_work/slice/deck-door-stop/resolved.json",
+    "slice/deck-door-stop/slice.log": "_work/slice/deck-door-stop/slice.log",
+    "slice/deck-door-stop-coupon/out.gcode.3mf": "_work/slice/deck-door-stop-coupon/out.gcode.3mf",
+    "slice/deck-door-stop-coupon/plate_1.gcode": "_work/slice/deck-door-stop-coupon/plate_1.gcode",
+    "slice/deck-door-stop-coupon/profiles/filament.json": "_work/slice/deck-door-stop-coupon/profiles/filament.json",
+    "slice/deck-door-stop-coupon/profiles/machine.json": "_work/slice/deck-door-stop-coupon/profiles/machine.json",
+    "slice/deck-door-stop-coupon/profiles/process.json": "_work/slice/deck-door-stop-coupon/profiles/process.json",
+    "slice/deck-door-stop-coupon/resolved.json": "_work/slice/deck-door-stop-coupon/resolved.json",
+    "slice/deck-door-stop-coupon/slice.log": "_work/slice/deck-door-stop-coupon/slice.log"
+  },
+  "publish_exports": [
+    "deck-door-stop-truss",
+    "deck-door-stop"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

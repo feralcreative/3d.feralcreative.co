@@ -1,0 +1,16 @@
+{
+  "id": "nuzzle-max",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/nuzzle MAX.stl": "nuzzle MAX.stl"
+  },
+  "protected_assets": [
+    "nuzzle MAX.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

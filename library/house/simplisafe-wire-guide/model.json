@@ -1,0 +1,34 @@
+{
+  "id": "simplisafe-wire-guide",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "simplisafe-wire-guide.scad",
+  "scad_files": [
+    "simplisafe-wire-guide.scad"
+  ],
+  "exports": [
+    "simplisafe-wire-guide"
+  ],
+  "aliases": {
+    "parts/simplisafe-wire-guide.scad": "simplisafe-wire-guide.scad",
+    "parts/simplisafe-wire-guide.json": "simplisafe-wire-guide.json",
+    "stl/simplisafe-wire-guide-v01.stl": "_work/stl/simplisafe-wire-guide-v01.stl",
+    "stl/simplisafe-wire-guide-v02.stl": "_work/stl/simplisafe-wire-guide-v02.stl",
+    "stl/simplisafe-wire-guide-v03.stl": "_work/stl/simplisafe-wire-guide-v03.stl",
+    "stl/simplisafe-wire-guide.stl": "_work/stl/simplisafe-wire-guide.stl",
+    "renders/simplisafe-wire-guide-iso.png": "_work/renders/simplisafe-wire-guide-iso.png",
+    "renders/simplisafe-wire-guide-xminus.png": "_work/renders/simplisafe-wire-guide-xminus.png",
+    "renders/simplisafe-wire-guide-xplus.png": "_work/renders/simplisafe-wire-guide-xplus.png",
+    "renders/simplisafe-wire-guide-yminus.png": "_work/renders/simplisafe-wire-guide-yminus.png",
+    "renders/simplisafe-wire-guide-yplus.png": "_work/renders/simplisafe-wire-guide-yplus.png",
+    "renders/simplisafe-wire-guide-zminus.png": "_work/renders/simplisafe-wire-guide-zminus.png",
+    "renders/simplisafe-wire-guide-zplus.png": "_work/renders/simplisafe-wire-guide-zplus.png"
+  },
+  "publish_exports": [],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": [],
+  "draft_exports": [
+    "simplisafe-wire-guide"
+  ]
+}

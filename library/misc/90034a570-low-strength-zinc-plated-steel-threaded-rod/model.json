@@ -1,0 +1,18 @@
+{
+  "id": "90034a570-low-strength-zinc-plated-steel-threaded-rod",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/90034A570_Low-Strength Zinc-Plated Steel Threaded Rod.SLDPRT": "90034A570_Low-Strength Zinc-Plated Steel Threaded Rod.SLDPRT",
+    "_originals/90034A570_Low-Strength Zinc-Plated Steel Threaded Rod.STEP": "90034A570_Low-Strength Zinc-Plated Steel Threaded Rod.STEP"
+  },
+  "protected_assets": [
+    "90034A570_Low-Strength Zinc-Plated Steel Threaded Rod.SLDPRT",
+    "90034A570_Low-Strength Zinc-Plated Steel Threaded Rod.STEP"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

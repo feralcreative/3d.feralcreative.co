@@ -1,0 +1,39 @@
+{
+  "id": "bed-scraper",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bed-scraper/LICENSE.txt": "docs/bed-scraper/LICENSE.txt",
+    "_originals/bed-scraper/README.txt": "docs/bed-scraper/README.txt",
+    "_originals/bed-scraper/bed-scraper.3mf": "bed-scraper.3mf",
+    "_originals/bed-scraper/bed-scraper.zip": "originals/bed-scraper/bed-scraper.zip",
+    "_originals/bed-scraper/files/Scraper_no_words.stl": "Scraper_no_words.stl",
+    "_originals/bed-scraper/files/THE_Scraper.stl": "THE_Scraper.stl",
+    "_originals/bed-scraper/images/4401df4f-c73c-49c6-88c5-9a0c0f0364a3.png": "originals/bed-scraper/images/4401df4f-c73c-49c6-88c5-9a0c0f0364a3.png",
+    "_originals/bed-scraper/images/ace303e6-4fcc-40d9-ad7b-53032133cd75.jpeg": "originals/bed-scraper/images/ace303e6-4fcc-40d9-ad7b-53032133cd75.jpeg",
+    "_originals/bed-scraper/images/b4835c15-2a80-430d-b241-ca753c1b2345.jpeg": "originals/bed-scraper/images/b4835c15-2a80-430d-b241-ca753c1b2345.jpeg",
+    "_originals/bed-scraper/images/e27b53cb-9846-488d-9cd0-67e764dba488.jpeg": "originals/bed-scraper/images/e27b53cb-9846-488d-9cd0-67e764dba488.jpeg",
+    "_originals/bed-scraper/images/eb26880c-7056-408c-9818-84a94a3f1064.png": "originals/bed-scraper/images/eb26880c-7056-408c-9818-84a94a3f1064.png"
+  },
+  "source_url": "https://www.thingiverse.com/thing:6657413",
+  "licenses": [
+    "docs/bed-scraper/LICENSE.txt"
+  ],
+  "protected_assets": [
+    "Scraper_no_words.stl",
+    "THE_Scraper.stl",
+    "bed-scraper.3mf",
+    "docs/bed-scraper/LICENSE.txt",
+    "docs/bed-scraper/README.txt",
+    "originals/bed-scraper/bed-scraper.zip",
+    "originals/bed-scraper/images/4401df4f-c73c-49c6-88c5-9a0c0f0364a3.png",
+    "originals/bed-scraper/images/ace303e6-4fcc-40d9-ad7b-53032133cd75.jpeg",
+    "originals/bed-scraper/images/b4835c15-2a80-430d-b241-ca753c1b2345.jpeg",
+    "originals/bed-scraper/images/e27b53cb-9846-488d-9cd0-67e764dba488.jpeg",
+    "originals/bed-scraper/images/eb26880c-7056-408c-9818-84a94a3f1064.png"
+  ],
+  "additional_scad_files": []
+}

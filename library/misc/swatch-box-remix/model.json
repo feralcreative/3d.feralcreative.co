@@ -1,0 +1,23 @@
+{
+  "id": "swatch-box-remix",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": "swatch_box_remix_v5.scad",
+  "scad_files": [
+    "swatch_box_remix_v5.scad"
+  ],
+  "exports": [],
+  "aliases": {
+    "_originals/swatch_box_remix_v5.scad": "swatch_box_remix_v5.scad"
+  },
+  "protected_assets": [
+    "swatch_box_remix_v5.scad"
+  ],
+  "additional_scad_files": [
+    "swatch_box_remix_v5.scad"
+  ],
+  "output_names": {
+    "swatch_box_remix_v5.scad": "swatch-box-remix"
+  },
+  "licenses": []
+}

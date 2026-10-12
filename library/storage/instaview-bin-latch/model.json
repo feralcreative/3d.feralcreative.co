@@ -1,0 +1,16 @@
+{
+  "id": "instaview-bin-latch",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/storage/Instaview+Bin+Latch.stl": "Instaview+Bin+Latch.stl"
+  },
+  "protected_assets": [
+    "Instaview+Bin+Latch.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

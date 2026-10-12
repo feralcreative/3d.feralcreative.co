@@ -1,0 +1,16 @@
+{
+  "id": "soldering-iron",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/feral-creative/soldering-iron-test_fixed.stl": "soldering-iron-test_fixed.stl"
+  },
+  "protected_assets": [
+    "soldering-iron-test_fixed.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

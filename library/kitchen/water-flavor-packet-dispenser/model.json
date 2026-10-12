@@ -1,0 +1,32 @@
+{
+  "id": "water-flavor-packet-dispenser",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/LICENSE.txt": "docs/kitchen/Water Flavor Packet Dispenser - 7331760/LICENSE.txt",
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/README.txt": "docs/kitchen/Water Flavor Packet Dispenser - 7331760/README.txt",
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/files/Drink_flavor_packet_dispenser_lid.stl": "Drink_flavor_packet_dispenser_lid.stl",
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/files/drink-flavor-packet-dispenser.stl": "drink-flavor-packet-dispenser.stl",
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/Drink_flavor_packet_dispenser.png": "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/Drink_flavor_packet_dispenser.png",
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/Drink_flavor_packet_dispenser_lid.png": "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/Drink_flavor_packet_dispenser_lid.png",
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/IMG_9534.jpg": "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/IMG_9534.jpg",
+    "_originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/flavor_packet_dispenser.jpg": "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/flavor_packet_dispenser.jpg"
+  },
+  "protected_assets": [
+    "Drink_flavor_packet_dispenser_lid.stl",
+    "docs/kitchen/Water Flavor Packet Dispenser - 7331760/LICENSE.txt",
+    "docs/kitchen/Water Flavor Packet Dispenser - 7331760/README.txt",
+    "drink-flavor-packet-dispenser.stl",
+    "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/Drink_flavor_packet_dispenser.png",
+    "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/Drink_flavor_packet_dispenser_lid.png",
+    "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/IMG_9534.jpg",
+    "originals/kitchen/Water Flavor Packet Dispenser - 7331760/images/flavor_packet_dispenser.jpg"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/kitchen/Water Flavor Packet Dispenser - 7331760/LICENSE.txt"
+  ]
+}

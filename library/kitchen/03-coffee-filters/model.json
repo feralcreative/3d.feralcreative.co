@@ -1,0 +1,16 @@
+{
+  "id": "03-coffee-filters",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/03-coffee-filters.stl": "03-coffee-filters.stl"
+  },
+  "protected_assets": [
+    "03-coffee-filters.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

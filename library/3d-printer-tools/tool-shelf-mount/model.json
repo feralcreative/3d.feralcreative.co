@@ -1,0 +1,18 @@
+{
+  "id": "tool-shelf-mount",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/tool-shelf-mount.skp": "tool-shelf-mount.skp",
+    "_originals/printer-tools/tool-shelf-mount.stl": "tool-shelf-mount.stl"
+  },
+  "protected_assets": [
+    "tool-shelf-mount.skp",
+    "tool-shelf-mount.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

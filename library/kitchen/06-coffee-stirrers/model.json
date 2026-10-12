@@ -1,0 +1,16 @@
+{
+  "id": "06-coffee-stirrers",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/06-coffee-stirrers.stl": "06-coffee-stirrers.stl"
+  },
+  "protected_assets": [
+    "06-coffee-stirrers.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

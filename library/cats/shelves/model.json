@@ -1,0 +1,36 @@
+{
+  "id": "shelves",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/shelves/3597N17_Torx Flat Head Screws for Wood.STEP": "3597N17_Torx Flat Head Screws for Wood.STEP",
+    "_originals/cats/shelves/90031A576_Phillips Flat Head Screws for Wood.STEP": "90031A576_Phillips Flat Head Screws for Wood.STEP",
+    "_originals/cats/shelves/90031A583_Phillips Flat Head Screws for Wood.FCStd": "90031A583_Phillips Flat Head Screws for Wood.FCStd",
+    "_originals/cats/shelves/90031A583_Phillips Flat Head Screws for Wood.STEP": "90031A583_Phillips Flat Head Screws for Wood.STEP",
+    "_originals/cats/shelves/97121A013_Toggle Bolt Anchors for Drywall.STEP": "97121A013_Toggle Bolt Anchors for Drywall.STEP",
+    "_originals/cats/shelves/97121A019_Toggle Bolt Anchors for Drywall.STEP": "97121A019_Toggle Bolt Anchors for Drywall.STEP",
+    "_originals/cats/shelves/Unnamed-3597N17_Torx Flat Head Screws for Wood.stl": "Unnamed-3597N17_Torx Flat Head Screws for Wood.stl",
+    "_originals/cats/shelves/Unnamed-90031A576_Phillips Flat Head Screws for Wood.stl": "Unnamed-90031A576_Phillips Flat Head Screws for Wood.stl",
+    "_originals/cats/shelves/Unnamed-90031A583_Phillips Flat Head Screws for Wood.stl": "Unnamed-90031A583_Phillips Flat Head Screws for Wood.stl",
+    "_originals/cats/shelves/Unnamed-97121A013_Toggle Bolt Anchors for Drywall004.stl": "Unnamed-97121A013_Toggle Bolt Anchors for Drywall004.stl",
+    "_originals/cats/shelves/Unnamed1-97121A019_Toggle Bolt Anchors for Drywall004.stl": "Unnamed1-97121A019_Toggle Bolt Anchors for Drywall004.stl"
+  },
+  "protected_assets": [
+    "3597N17_Torx Flat Head Screws for Wood.STEP",
+    "90031A576_Phillips Flat Head Screws for Wood.STEP",
+    "90031A583_Phillips Flat Head Screws for Wood.FCStd",
+    "90031A583_Phillips Flat Head Screws for Wood.STEP",
+    "97121A013_Toggle Bolt Anchors for Drywall.STEP",
+    "97121A019_Toggle Bolt Anchors for Drywall.STEP",
+    "Unnamed-3597N17_Torx Flat Head Screws for Wood.stl",
+    "Unnamed-90031A576_Phillips Flat Head Screws for Wood.stl",
+    "Unnamed-90031A583_Phillips Flat Head Screws for Wood.stl",
+    "Unnamed-97121A013_Toggle Bolt Anchors for Drywall004.stl",
+    "Unnamed1-97121A019_Toggle Bolt Anchors for Drywall004.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

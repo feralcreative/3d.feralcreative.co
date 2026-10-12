@@ -1,0 +1,18 @@
+{
+  "id": "build-plate-caddy",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/build-plate-caddy.skp": "build-plate-caddy.skp",
+    "_originals/printer-tools/build-plate-caddy~.skp": "build-plate-caddy~.skp"
+  },
+  "protected_assets": [
+    "build-plate-caddy.skp",
+    "build-plate-caddy~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

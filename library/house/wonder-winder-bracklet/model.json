@@ -1,0 +1,18 @@
+{
+  "id": "wonder-winder-bracklet",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/garage/wonder-winder-bracklet.skp": "wonder-winder-bracklet.skp",
+    "_originals/garage/wonder-winder-bracklet~.skp": "wonder-winder-bracklet~.skp"
+  },
+  "protected_assets": [
+    "wonder-winder-bracklet.skp",
+    "wonder-winder-bracklet~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

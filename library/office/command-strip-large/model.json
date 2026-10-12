@@ -1,0 +1,18 @@
+{
+  "id": "command-strip-large",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/Command+strip+Large.3mf": "Command+strip+Large.3mf",
+    "_originals/office/Command+strip+Large.stl": "Command+strip+Large.stl"
+  },
+  "protected_assets": [
+    "Command+strip+Large.3mf",
+    "Command+strip+Large.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

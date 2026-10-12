@@ -1,0 +1,16 @@
+{
+  "id": "orca-setup",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/orca-setup.3mf": "orca-setup.3mf"
+  },
+  "protected_assets": [
+    "orca-setup.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

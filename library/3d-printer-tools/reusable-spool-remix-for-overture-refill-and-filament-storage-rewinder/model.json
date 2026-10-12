@@ -1,0 +1,22 @@
+{
+  "id": "reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-model_files/1702127-reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-8a4226fa-f3da-460f-807f-a71d191ee467.pdf": "docs/printer-tools/reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-model_files/1702127-reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-8a4226fa-f3da-460f-807f-a71d191ee467.pdf",
+    "_originals/printer-tools/reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-model_files/spool-female.stl": "spool-female.stl",
+    "_originals/printer-tools/reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-model_files/spool-male-300in-shoulder.stl": "spool-male-300in-shoulder.stl",
+    "_originals/printer-tools/reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-model_files/spool-male.stl": "spool-male.stl"
+  },
+  "protected_assets": [
+    "docs/printer-tools/reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-model_files/1702127-reusable-spool-remix-for-overture-refill-and-filament-storage-rewinder-8a4226fa-f3da-460f-807f-a71d191ee467.pdf",
+    "spool-female.stl",
+    "spool-male-300in-shoulder.stl",
+    "spool-male.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

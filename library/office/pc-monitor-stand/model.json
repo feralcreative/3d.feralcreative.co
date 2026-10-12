@@ -1,0 +1,22 @@
+{
+  "id": "pc-monitor-stand",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/pc-monitor-stand.3mf": "pc-monitor-stand.3mf",
+    "_originals/desk/pc-monitor-stand.skp": "pc-monitor-stand.skp",
+    "_originals/desk/pc-monitor-stand.stl": "pc-monitor-stand.stl",
+    "_originals/lighting/pc-monitor-stand.stl": "originals/lighting/pc-monitor-stand.stl"
+  },
+  "protected_assets": [
+    "originals/lighting/pc-monitor-stand.stl",
+    "pc-monitor-stand.3mf",
+    "pc-monitor-stand.skp",
+    "pc-monitor-stand.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

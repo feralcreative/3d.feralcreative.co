@@ -1,0 +1,18 @@
+{
+  "id": "dining-room-window-shelf",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/dining-room-window-shelf.skp": "dining-room-window-shelf.skp",
+    "_originals/cats/dining-room-window-shelf~.skp": "dining-room-window-shelf~.skp"
+  },
+  "protected_assets": [
+    "dining-room-window-shelf.skp",
+    "dining-room-window-shelf~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

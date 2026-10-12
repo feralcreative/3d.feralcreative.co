@@ -1,0 +1,22 @@
+{
+  "id": "hat-rack-holder",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/command-hooks/hat-rack-holder.3mf": "hat-rack-holder.3mf",
+    "_originals/command-hooks/hat-rack-holder.skp": "hat-rack-holder.skp",
+    "_originals/command-hooks/hat-rack-holder.stl": "hat-rack-holder.stl",
+    "_originals/command-hooks/hat-rack-holder~.skp": "hat-rack-holder~.skp"
+  },
+  "protected_assets": [
+    "hat-rack-holder.3mf",
+    "hat-rack-holder.skp",
+    "hat-rack-holder.stl",
+    "hat-rack-holder~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

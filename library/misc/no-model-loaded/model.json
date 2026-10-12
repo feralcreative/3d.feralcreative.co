@@ -1,0 +1,16 @@
+{
+  "id": "no-model-loaded",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/no-model-loaded.stl": "no-model-loaded.stl"
+  },
+  "protected_assets": [
+    "no-model-loaded.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

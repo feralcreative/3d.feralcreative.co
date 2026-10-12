@@ -1,0 +1,16 @@
+{
+  "id": "cosco-greenmade-instaview-latch",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/cosco_greenmade_instaview_latch.stl": "cosco_greenmade_instaview_latch.stl"
+  },
+  "protected_assets": [
+    "cosco_greenmade_instaview_latch.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,22 @@
+{
+  "id": "flashforge-tool-tray",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/flashforge tool tray.stl": "flashforge tool tray.stl",
+    "_originals/flashforge-tool-tray.3mf": "flashforge-tool-tray.3mf",
+    "_originals/flashforge-tool-tray.stl": "flashforge-tool-tray.stl",
+    "_originals/printer-tools/flashforge-tool-tray.stl": "originals/printer-tools/flashforge-tool-tray.stl"
+  },
+  "protected_assets": [
+    "flashforge tool tray.stl",
+    "flashforge-tool-tray.3mf",
+    "flashforge-tool-tray.stl",
+    "originals/printer-tools/flashforge-tool-tray.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

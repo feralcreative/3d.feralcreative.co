@@ -1,0 +1,23 @@
+{
+  "id": "lid-with-knrul",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": "lid_with_knrul.scad",
+  "scad_files": [
+    "lid_with_knrul.scad"
+  ],
+  "exports": [],
+  "aliases": {
+    "_originals/lid_with_knrul.scad": "lid_with_knrul.scad"
+  },
+  "protected_assets": [
+    "lid_with_knrul.scad"
+  ],
+  "additional_scad_files": [
+    "lid_with_knrul.scad"
+  ],
+  "output_names": {
+    "lid_with_knrul.scad": "lid-with-knrul"
+  },
+  "licenses": []
+}

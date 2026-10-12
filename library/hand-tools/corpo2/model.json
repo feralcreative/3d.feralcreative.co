@@ -1,0 +1,16 @@
+{
+  "id": "corpo2",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/Corpo2.stl": "Corpo2.stl"
+  },
+  "protected_assets": [
+    "Corpo2.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

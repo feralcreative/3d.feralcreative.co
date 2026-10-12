@@ -6,30 +6,31 @@ How the pieces fit. Read before changing a script or adding a stage to the loop.
 
 | Path | Role |
 | --- | --- |
-| `parts/` | One `.scad` per design. The only source of truth. `example-spacer.scad` is the house-style template. |
-| `logos/` | SVG artwork plus `marks.scad`, the library that places it. Parts call the library, never `import()`. |
-| `lib/BOSL2` | Git submodule, v2.0.747. Rounding, chamfering, threading, attachment. |
-| `docs/` | References, status, deep dives, and `profiles/` (the durable copy of slicer presets). |
-| `docs/_PLANS/` | Round-by-round record of in-flight work. Gitignored by the blanket `_PLANS` rule, so local-only. |
-| `utils/` | Every script. Never `scripts/`. |
-| `renders/`, `stl/`, `slice/`, `3mf/` | Generated, gitignored, reproducible. |
-| `_incoming/` | Legacy SketchUp-era STLs, downloaded scans, and SVG traces, gitignored. Reference geometry to measure against, not authored source. A scan that arrives as several shells is split here by `utils/stl-shells.py` into `<name>-shells/`, beside the original, and the part imports the pieces. |
-| `MODELS` | Symlink into `~/www/feral/3d.feralcreative.co/public/models`. Gitignored. |
+| `library/<category>/<model-id>/` | Model sources, retained print files, model notes, and `model.json`. SCAD availability and provenance are separate metadata. |
+| `library/**/originals/` | Upstream and earlier assets, including measured meshes and their original companion files. |
+| `library/**/docs/` | Model instructions, licenses, PDFs, and design notes. |
+| `library/**/saved-jobs/` | Pre-existing slicer projects preserved during migration. |
+| `library/**/_work/` | Regenerable STL drafts, seven-view renders, slice diagnostics, and generated 3MF jobs. Gitignored. |
+| `logos/` | Shared artwork and `marks.scad`. Parts call the modules rather than importing SVGs. |
+| `lib/BOSL2` | Shared Git submodule. |
+| `docs/` | Global references, status, version ledger, print history, and durable slicer presets. |
+| `utils/` | Utility entrypoints and `library.py`, which resolves model IDs and former paths. |
+| `parts/`, `renders/`, `stl/`, `slice/`, `3mf/` | Legacy paths still accepted by the tools through aliases or fallback handling. New model work belongs in the library. |
+| `_originals/`, `_incoming/` | Unmigrated non-model material and temporary incoming assets. Retained model dependencies belong with their model. |
+| `MODELS` | Existing local symlink into the printer-site repo. Gitignored. |
+
+See [the library workflow](library.md) for commands and metadata conventions.
 
 ## The four-stage loop
 
-Each stage produces an artifact that proves something the previous stage could not.
+1. **Source**—the selected SCAD entrypoint in a model folder. Imported models can instead start from retained STL or 3MF files.
+2. **See it**—`utils/render.sh <model-id>` writes seven PNGs into the model's `_work/renders/`. Read the iso view and all six orthographic elevations.
+3. **Mesh it**—`utils/build.sh <model-id>` writes a binary numbered STL plus its current plain-name copy into `_work/stl/`. The global version ledger remains keyed by output name. OpenSCAD's summary and independent mesh checks verify topology; imported meshes may retain pre-existing defects.
+4. **Slice it**—`utils/slice.sh <source-or-mesh>` uses `ffprofile.py` to resolve presets, slices locally into `_work/slice/<job>/`, probes the G-code, and copies a successfully exported job into `_work/3mf/<job>.3mf`. SCAD inputs use the mesh just built; `--with` and `--enforcer` also resolve indexed former paths.
 
-1. **Source** — `parts/<part>.scad`.
-2. **See it** — `utils/render.sh` → four PNGs in `renders/`. Elevations render orthographic so they read as true drawings; iso stays perspective as an overview. Proves shape.
-3. **Mesh it** — `utils/build.sh` → binary STL in `stl/`, plus OpenSCAD's summary. `Status: NoError` means manifold; `Genus` counts through-holes topologically. Proves topology. Output should be manifold by construction—unlike SketchUp exports it needs no mesh repair, so a part that fails the printer site's PyMeshLab step is a real signal.
-4. **Slice it** — `utils/slice.sh` → `slice/<part>/`. Proves settings. Three sub-steps:
-   - `ffprofile.py` walks each `inherits` chain, merges child over parent, applies `--set` overrides, and writes flat profiles with `inherits` stripped. It searches `docs/profiles/` before the app bundle, so repo presets resolve by name without being installed.
-   - Flash Studio slices headless into `plate_1.gcode`, `out.gcode.3mf`, `resolved.json`, `slice.log`.
-   - The job is copied to `3mf/<part>.3mf`, the printer-bound file with the part's name on it.
-   - `gcode-probe.py` reads the G-code back: layer count, max Z, commanded temperatures, real retraction distances, and per-layer extrusion cliffs.
+`utils/finalize.sh <model-id-or-export>` promotes selected plain STL and 3MF outputs into the model folder and removes obsolete drafts. It preserves the version ledger and refuses to overwrite protected source assets. Cleanup traverses only `_work/` inside the library. Sources and licenses remain safe before they have been staged in Git. See `utils/test-library.py` for isolated routing and preservation checks.
 
-Nothing in this loop touches the printer.
+Nothing in this loop sends a job to the printer. Migration preserves slicer projects and profiles without changing their settings.
 
 ## Slicer presets live in two places
 
@@ -56,6 +57,6 @@ NAS: /volume1/web/3d-printer-stream/public/models/*.stl
 3d.feralcreative.co       viewer serves them at /models
 ```
 
-Two consequences: STLs are build artifacts and travel by rsync, not by commit (both repos gitignore them); and because the models directory is a bind mount, a pushed STL appears in the viewer immediately with no rebuild and no deploy.
+Retained STL deliverables are committed with their model here. Publication still uses rsync to the NAS: the publisher selects declared retained exports, or current workspace outputs with `--all`, and refuses duplicate filenames because the NAS directory is flat. A published STL appears in the viewer without a site rebuild because that directory is a bind mount.
 
 `--push` writes to a live production host. It is opt-in, and only on Ziad's explicit request.

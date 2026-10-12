@@ -1,0 +1,16 @@
+{
+  "id": "screen-gap-lock",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/screen-gap-lock.stl": "screen-gap-lock.stl"
+  },
+  "protected_assets": [
+    "screen-gap-lock.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

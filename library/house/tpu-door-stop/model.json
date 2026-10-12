@@ -1,0 +1,29 @@
+{
+  "id": "tpu-door-stop",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "tpu-door-stop.scad",
+  "scad_files": [
+    "tpu-door-stop.scad"
+  ],
+  "exports": [
+    "tpu-door-stop"
+  ],
+  "aliases": {
+    "parts/tpu-door-stop.scad": "tpu-door-stop.scad",
+    "_originals/tpu-door-stop-model_files/880487-tpu-door-stop-423d2974-2b1b-410f-999c-ed0a6490668a.pdf": "docs/tpu-door-stop-model_files/880487-tpu-door-stop-423d2974-2b1b-410f-999c-ed0a6490668a.pdf",
+    "_originals/tpu-door-stop-model_files/tpu_door_stop.stl": "originals/tpu-door-stop-model_files/tpu_door_stop.stl",
+    "_originals/tpu-door-stop-model_files.zip": "originals/tpu-door-stop-model_files.zip",
+    "stl/tpu-door-stop.stl": "tpu-door-stop.stl"
+  },
+  "publish_exports": [
+    "tpu-door-stop"
+  ],
+  "protected_assets": [
+    "docs/tpu-door-stop-model_files/880487-tpu-door-stop-423d2974-2b1b-410f-999c-ed0a6490668a.pdf",
+    "originals/tpu-door-stop-model_files.zip",
+    "originals/tpu-door-stop-model_files/tpu_door_stop.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "hotend-mount",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/hotend mount.stl": "hotend mount.stl"
+  },
+  "protected_assets": [
+    "hotend mount.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

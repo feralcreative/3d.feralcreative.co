@@ -1,0 +1,16 @@
+{
+  "id": "ikea-ivar-collection",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/ikea.ivar-collection.skp": "ikea.ivar-collection.skp"
+  },
+  "protected_assets": [
+    "ikea.ivar-collection.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

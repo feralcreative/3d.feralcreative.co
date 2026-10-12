@@ -1,0 +1,18 @@
+{
+  "id": "ikea-skadis-coffee-filter-holder",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/ikea-skadis-coffee-filter-holder-model_files/76687-ikea-skadis-coffee-filter-holder-60de1651-1f6a-4128-af49-5eaf6d793cfd.pdf": "docs/kitchen/ikea-skadis-coffee-filter-holder-model_files/76687-ikea-skadis-coffee-filter-holder-60de1651-1f6a-4128-af49-5eaf6d793cfd.pdf",
+    "_originals/kitchen/ikea-skadis-coffee-filter-holder-model_files/kaffeefilter.stl": "kaffeefilter.stl"
+  },
+  "protected_assets": [
+    "docs/kitchen/ikea-skadis-coffee-filter-holder-model_files/76687-ikea-skadis-coffee-filter-holder-60de1651-1f6a-4128-af49-5eaf6d793cfd.pdf",
+    "kaffeefilter.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "rocker-plate-3-gang",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/house/Rocker Plate 3 Gang v6.stl": "Rocker Plate 3 Gang v6.stl"
+  },
+  "protected_assets": [
+    "Rocker Plate 3 Gang v6.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

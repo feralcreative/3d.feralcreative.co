@@ -1,0 +1,45 @@
+{
+  "id": "batleth",
+  "origin": "adapted",
+  "status": "unreviewed",
+  "scad": "batleth.scad",
+  "scad_files": [
+    "batleth.scad"
+  ],
+  "exports": [
+    "batleth-ORIGINAL",
+    "batleth"
+  ],
+  "aliases": {
+    "parts/batleth.scad": "batleth.scad",
+    "_originals/Klingon Bat'Leth - 55100/LICENSE.txt": "docs/Klingon Bat'Leth - 55100/LICENSE.txt",
+    "_originals/Klingon Bat'Leth - 55100/README.txt": "docs/Klingon Bat'Leth - 55100/README.txt",
+    "_originals/Klingon Bat'Leth - 55100/files/batleth-ORIGINAL.stl": "originals/Klingon Bat'Leth - 55100/files/batleth-ORIGINAL.stl",
+    "_originals/Klingon Bat'Leth - 55100/images/Batleth.jpg": "originals/Klingon Bat'Leth - 55100/images/Batleth.jpg",
+    "_originals/Klingon Bat'Leth - 55100/images/batlethepoxy1.jpg": "originals/Klingon Bat'Leth - 55100/images/batlethepoxy1.jpg",
+    "_originals/Klingon Bat'Leth - 55100/images/batlethepoxy2.jpg": "originals/Klingon Bat'Leth - 55100/images/batlethepoxy2.jpg",
+    "_originals/Klingon Bat'Leth - 55100/images/batlethepoxypainted.jpg": "originals/Klingon Bat'Leth - 55100/images/batlethepoxypainted.jpg",
+    "stl/misc/batleth-ORIGINAL.stl": "batleth-ORIGINAL.stl",
+    "stl/batleth-ORIGINAL.stl": "batleth-ORIGINAL.stl",
+    "stl/misc/batleth.stl": "batleth.stl",
+    "stl/batleth.stl": "batleth.stl",
+    "3mf/batleth.3mf": "saved-jobs/batleth.3mf"
+  },
+  "publish_exports": [
+    "batleth-ORIGINAL",
+    "batleth"
+  ],
+  "protected_assets": [
+    "docs/Klingon Bat'Leth - 55100/LICENSE.txt",
+    "docs/Klingon Bat'Leth - 55100/README.txt",
+    "originals/Klingon Bat'Leth - 55100/files/batleth-ORIGINAL.stl",
+    "originals/Klingon Bat'Leth - 55100/images/Batleth.jpg",
+    "originals/Klingon Bat'Leth - 55100/images/batlethepoxy1.jpg",
+    "originals/Klingon Bat'Leth - 55100/images/batlethepoxy2.jpg",
+    "originals/Klingon Bat'Leth - 55100/images/batlethepoxypainted.jpg"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/Klingon Bat'Leth - 55100/LICENSE.txt"
+  ]
+}

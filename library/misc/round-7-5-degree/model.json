@@ -1,0 +1,16 @@
+{
+  "id": "round-7-5-degree",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/round-7-5-degree.stl": "round-7-5-degree.stl"
+  },
+  "protected_assets": [
+    "round-7-5-degree.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

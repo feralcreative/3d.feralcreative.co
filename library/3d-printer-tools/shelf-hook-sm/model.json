@@ -1,0 +1,16 @@
+{
+  "id": "shelf-hook-sm",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/shelf-hook-sm.stl": "shelf-hook-sm.stl"
+  },
+  "protected_assets": [
+    "shelf-hook-sm.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

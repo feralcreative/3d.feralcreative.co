@@ -1,0 +1,16 @@
+{
+  "id": "scraperite",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/Scraperite.3mf": "Scraperite.3mf"
+  },
+  "protected_assets": [
+    "Scraperite.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,26 @@
+{
+  "id": "apple-watch-stand",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bedroom/apple-watch-nightstand-model_files/86742-apple-watch-nightstand-c5480f3b-8635-4eee-9642-3731bd057e2d.pdf": "docs/bedroom/apple-watch-nightstand-model_files/86742-apple-watch-nightstand-c5480f3b-8635-4eee-9642-3731bd057e2d.pdf",
+    "_originals/bedroom/apple-watch-nightstand-model_files/AW_nightstand.stl": "AW_nightstand.stl",
+    "_originals/bedroom/apple-watch-nightstand-model_files.zip": "originals/bedroom/apple-watch-nightstand-model_files.zip",
+    "_originals/bedroom/apple-watch.stl": "apple-watch.stl",
+    "_originals/bedroom/obj_1_applewatch_simle v6.step.stl": "obj_1_applewatch_simle v6.step.stl",
+    "_originals/bedroom/obj_1_applewatch_simle v6.step_fixed.stl": "obj_1_applewatch_simle v6.step_fixed.stl"
+  },
+  "protected_assets": [
+    "AW_nightstand.stl",
+    "apple-watch.stl",
+    "docs/bedroom/apple-watch-nightstand-model_files/86742-apple-watch-nightstand-c5480f3b-8635-4eee-9642-3731bd057e2d.pdf",
+    "obj_1_applewatch_simle v6.step.stl",
+    "obj_1_applewatch_simle v6.step_fixed.stl",
+    "originals/bedroom/apple-watch-nightstand-model_files.zip"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

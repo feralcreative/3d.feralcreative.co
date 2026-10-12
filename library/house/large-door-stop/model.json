@@ -1,0 +1,30 @@
+{
+  "id": "large-door-stop",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "large-door-stop.scad",
+  "scad_files": [
+    "large-door-stop.scad"
+  ],
+  "exports": [
+    "large-door-stop"
+  ],
+  "aliases": {
+    "parts/large-door-stop.scad": "large-door-stop.scad",
+    "_originals/Large+Door+Stop.stl": "originals/Large+Door+Stop.stl",
+    "_originals/deck/Large+Door+Stop.stl": "originals/deck/Large+Door+Stop.stl",
+    "stl/house/large-door-stop-coupon.stl": "_work/stl/large-door-stop-coupon.stl",
+    "stl/large-door-stop-coupon.stl": "_work/stl/large-door-stop-coupon.stl",
+    "stl/house/large-door-stop.stl": "large-door-stop.stl",
+    "stl/large-door-stop.stl": "large-door-stop.stl"
+  },
+  "publish_exports": [
+    "large-door-stop"
+  ],
+  "protected_assets": [
+    "originals/Large+Door+Stop.stl",
+    "originals/deck/Large+Door+Stop.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

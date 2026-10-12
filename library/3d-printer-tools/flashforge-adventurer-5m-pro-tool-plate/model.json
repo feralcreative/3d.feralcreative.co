@@ -1,0 +1,34 @@
+{
+  "id": "flashforge-adventurer-5m-pro-tool-plate",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/LICENSE.txt": "docs/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/LICENSE.txt",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/README.txt": "docs/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/README.txt",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/files/Stand_Arm.stl": "Stand_Arm.stl",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/files/tool_plate.stl": "tool_plate.stl",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/0e62ce82-8814-4dfb-ac55-e23d24d9199f.png": "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/0e62ce82-8814-4dfb-ac55-e23d24d9199f.png",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/16da9760-4bf9-4b1b-8cd2-79e33e09897a.png": "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/16da9760-4bf9-4b1b-8cd2-79e33e09897a.png",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/b385c64d-de99-4e49-b15c-64999a68caa6.png": "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/b385c64d-de99-4e49-b15c-64999a68caa6.png",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/bf54cbc0-40f7-40b5-9dc9-a88d6ecb5ef5.jpg": "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/bf54cbc0-40f7-40b5-9dc9-a88d6ecb5ef5.jpg",
+    "_originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/eacfe155-2d21-4083-85d7-a1c7bf2bdba7.png": "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/eacfe155-2d21-4083-85d7-a1c7bf2bdba7.png"
+  },
+  "protected_assets": [
+    "Stand_Arm.stl",
+    "docs/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/LICENSE.txt",
+    "docs/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/README.txt",
+    "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/0e62ce82-8814-4dfb-ac55-e23d24d9199f.png",
+    "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/16da9760-4bf9-4b1b-8cd2-79e33e09897a.png",
+    "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/b385c64d-de99-4e49-b15c-64999a68caa6.png",
+    "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/bf54cbc0-40f7-40b5-9dc9-a88d6ecb5ef5.jpg",
+    "originals/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/images/eacfe155-2d21-4083-85d7-a1c7bf2bdba7.png",
+    "tool_plate.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/printer-tools/FlashForge Adventurer 5M Pro Tool Plate - 6406882/LICENSE.txt"
+  ]
+}

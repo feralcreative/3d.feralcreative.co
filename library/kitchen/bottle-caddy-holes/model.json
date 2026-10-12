@@ -1,0 +1,16 @@
+{
+  "id": "bottle-caddy-holes",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/bottle-caddy-holes.stl": "bottle-caddy-holes.stl"
+  },
+  "protected_assets": [
+    "bottle-caddy-holes.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,55 @@
+{
+  "id": "overture-spool",
+  "origin": "adapted",
+  "status": "unreviewed",
+  "scad": "overture-spool-main-body-ribbed.scad",
+  "scad_files": [
+    "overture-spool-main-body-ribbed.scad",
+    "overture-spool-screwtop-ribbed.scad"
+  ],
+  "exports": [
+    "overture-spool-main-body-ribbed",
+    "overture-spool-screwtop-ribbed"
+  ],
+  "aliases": {
+    "parts/overture-spool-main-body-ribbed.scad": "overture-spool-main-body-ribbed.scad",
+    "parts/overture-spool-screwtop-ribbed.scad": "overture-spool-screwtop-ribbed.scad",
+    "_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/1651629-reusable-spool-for-overture-cardboard-spools-ff4ec13c-06fa-45b5-b3cc-2ff4fa57bc66.pdf": "docs/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/1651629-reusable-spool-for-overture-cardboard-spools-ff4ec13c-06fa-45b5-b3cc-2ff4fa57bc66.pdf",
+    "_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblymain-body.stl": "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblymain-body.stl",
+    "_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl": "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl",
+    "_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyspacer-body.stl": "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyspacer-body.stl",
+    "_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2.fcstd": "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2.fcstd",
+    "_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files.zip": "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files.zip",
+    "stl/3d-printer-tools/overture-spool-main-body-ribbed.stl": "overture-spool-main-body-ribbed.stl",
+    "stl/overture-spool-main-body-ribbed.stl": "overture-spool-main-body-ribbed.stl",
+    "stl/3d-printer-tools/overture-spool-screwtop-ribbed.stl": "overture-spool-screwtop-ribbed.stl",
+    "stl/overture-spool-screwtop-ribbed.stl": "overture-spool-screwtop-ribbed.stl",
+    "renders/overture-spool-main-body-ribbed-iso.png": "_work/renders/overture-spool-main-body-ribbed-iso.png",
+    "renders/overture-spool-main-body-ribbed-xminus.png": "_work/renders/overture-spool-main-body-ribbed-xminus.png",
+    "renders/overture-spool-main-body-ribbed-xplus.png": "_work/renders/overture-spool-main-body-ribbed-xplus.png",
+    "renders/overture-spool-main-body-ribbed-yminus.png": "_work/renders/overture-spool-main-body-ribbed-yminus.png",
+    "renders/overture-spool-main-body-ribbed-yplus.png": "_work/renders/overture-spool-main-body-ribbed-yplus.png",
+    "renders/overture-spool-main-body-ribbed-zminus.png": "_work/renders/overture-spool-main-body-ribbed-zminus.png",
+    "renders/overture-spool-main-body-ribbed-zplus.png": "_work/renders/overture-spool-main-body-ribbed-zplus.png",
+    "renders/overture-spool-screwtop-ribbed-iso.png": "_work/renders/overture-spool-screwtop-ribbed-iso.png",
+    "renders/overture-spool-screwtop-ribbed-xminus.png": "_work/renders/overture-spool-screwtop-ribbed-xminus.png",
+    "renders/overture-spool-screwtop-ribbed-xplus.png": "_work/renders/overture-spool-screwtop-ribbed-xplus.png",
+    "renders/overture-spool-screwtop-ribbed-yminus.png": "_work/renders/overture-spool-screwtop-ribbed-yminus.png",
+    "renders/overture-spool-screwtop-ribbed-yplus.png": "_work/renders/overture-spool-screwtop-ribbed-yplus.png",
+    "renders/overture-spool-screwtop-ribbed-zminus.png": "_work/renders/overture-spool-screwtop-ribbed-zminus.png",
+    "renders/overture-spool-screwtop-ribbed-zplus.png": "_work/renders/overture-spool-screwtop-ribbed-zplus.png"
+  },
+  "openscad_args": [
+    "--enable=textmetrics"
+  ],
+  "licenses": [],
+  "protected_assets": [
+    "docs/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/1651629-reusable-spool-for-overture-cardboard-spools-ff4ec13c-06fa-45b5-b3cc-2ff4fa57bc66.pdf",
+    "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files.zip",
+    "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblymain-body.stl",
+    "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl",
+    "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyspacer-body.stl",
+    "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2.fcstd"
+  ],
+  "additional_scad_files": []
+}

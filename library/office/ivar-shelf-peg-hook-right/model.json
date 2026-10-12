@@ -1,0 +1,18 @@
+{
+  "id": "ivar-shelf-peg-hook-right",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/ivar-shelf-peg-hook-RIGHT.stl": "ivar-shelf-peg-hook-RIGHT.stl",
+    "_originals/office/ivar-shelf-peg-hook-RIGHT.stl": "originals/office/ivar-shelf-peg-hook-RIGHT.stl"
+  },
+  "protected_assets": [
+    "ivar-shelf-peg-hook-RIGHT.stl",
+    "originals/office/ivar-shelf-peg-hook-RIGHT.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "quick-change-sanding-blocks",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/quick-change-sanding-blocks-model_files/98187-quick-change-sanding-blocks-298ff374-221f-4c6b-b9d2-782fb49301b9.pdf": "docs/woodworking-tools/quick-change-sanding-blocks-model_files/98187-quick-change-sanding-blocks-298ff374-221f-4c6b-b9d2-782fb49301b9.pdf"
+  },
+  "protected_assets": [
+    "docs/woodworking-tools/quick-change-sanding-blocks-model_files/98187-quick-change-sanding-blocks-298ff374-221f-4c6b-b9d2-782fb49301b9.pdf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

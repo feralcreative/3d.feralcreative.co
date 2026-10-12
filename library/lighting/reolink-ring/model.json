@@ -1,0 +1,24 @@
+{
+  "id": "reolink-ring",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/reolink-ring-TEST.stl": "reolink-ring-TEST.stl",
+    "_originals/lighting/reolink-ring.3mf": "reolink-ring.3mf",
+    "_originals/lighting/reolink-ring.skp": "reolink-ring.skp",
+    "_originals/lighting/reolink-ring.stl": "reolink-ring.stl",
+    "_originals/lighting/reolink-ring~.skp": "reolink-ring~.skp"
+  },
+  "protected_assets": [
+    "reolink-ring-TEST.stl",
+    "reolink-ring.3mf",
+    "reolink-ring.skp",
+    "reolink-ring.stl",
+    "reolink-ring~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

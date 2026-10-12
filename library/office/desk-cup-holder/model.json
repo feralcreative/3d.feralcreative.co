@@ -1,0 +1,30 @@
+{
+  "id": "desk-cup-holder",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "desk-cup-holder.scad",
+  "scad_files": [
+    "desk-cup-holder-starbucks.scad",
+    "desk-cup-holder.scad"
+  ],
+  "exports": [
+    "desk-cup-holder-starbucks",
+    "desk-cup-holder"
+  ],
+  "aliases": {
+    "parts/desk-cup-holder-starbucks.scad": "desk-cup-holder-starbucks.scad",
+    "parts/desk-cup-holder.scad": "desk-cup-holder.scad",
+    "stl/office/desk-cup-holder-starbucks.stl": "desk-cup-holder-starbucks.stl",
+    "stl/desk-cup-holder-starbucks.stl": "desk-cup-holder-starbucks.stl",
+    "stl/office/desk-cup-holder.stl": "desk-cup-holder.stl",
+    "stl/desk-cup-holder.stl": "desk-cup-holder.stl",
+    "3mf/desk-cup-holder-starbucks.3mf": "saved-jobs/desk-cup-holder-starbucks.3mf"
+  },
+  "publish_exports": [
+    "desk-cup-holder-starbucks",
+    "desk-cup-holder"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,49 @@
+{
+  "id": "diy-command-hook",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/command-hooks/DIY Command Hook - 2105744/LICENSE.txt": "docs/command-hooks/DIY Command Hook - 2105744/LICENSE.txt",
+    "_originals/command-hooks/DIY Command Hook - 2105744/README.txt": "docs/command-hooks/DIY Command Hook - 2105744/README.txt",
+    "_originals/command-hooks/DIY Command Hook - 2105744/files/Cammand_Hook.amf": "Cammand_Hook.amf",
+    "_originals/command-hooks/DIY Command Hook - 2105744/files/Hookv2_Simplified.stl": "Hookv2_Simplified.stl",
+    "_originals/command-hooks/DIY Command Hook - 2105744/images/46b1dd4ccd690c2ad932dc5973cc14c1.png": "originals/command-hooks/DIY Command Hook - 2105744/images/46b1dd4ccd690c2ad932dc5973cc14c1.png",
+    "_originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172930.jpg": "originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172930.jpg",
+    "_originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172939.jpg": "originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172939.jpg",
+    "_originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172944.jpg": "originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172944.jpg",
+    "_originals/storage/DIY Command Hook - 2105744/LICENSE.txt": "docs/storage/DIY Command Hook - 2105744/LICENSE.txt",
+    "_originals/storage/DIY Command Hook - 2105744/README.txt": "docs/storage/DIY Command Hook - 2105744/README.txt",
+    "_originals/storage/DIY Command Hook - 2105744/files/Cammand_Hook.amf": "originals/storage/DIY Command Hook - 2105744/files/Cammand_Hook.amf",
+    "_originals/storage/DIY Command Hook - 2105744/files/Hookv2_Simplified.stl": "originals/storage/DIY Command Hook - 2105744/files/Hookv2_Simplified.stl",
+    "_originals/storage/DIY Command Hook - 2105744/images/46b1dd4ccd690c2ad932dc5973cc14c1.png": "originals/storage/DIY Command Hook - 2105744/images/46b1dd4ccd690c2ad932dc5973cc14c1.png",
+    "_originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172930.jpg": "originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172930.jpg",
+    "_originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172939.jpg": "originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172939.jpg",
+    "_originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172944.jpg": "originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172944.jpg"
+  },
+  "protected_assets": [
+    "Cammand_Hook.amf",
+    "Hookv2_Simplified.stl",
+    "docs/command-hooks/DIY Command Hook - 2105744/LICENSE.txt",
+    "docs/command-hooks/DIY Command Hook - 2105744/README.txt",
+    "docs/storage/DIY Command Hook - 2105744/LICENSE.txt",
+    "docs/storage/DIY Command Hook - 2105744/README.txt",
+    "originals/command-hooks/DIY Command Hook - 2105744/images/46b1dd4ccd690c2ad932dc5973cc14c1.png",
+    "originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172930.jpg",
+    "originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172939.jpg",
+    "originals/command-hooks/DIY Command Hook - 2105744/images/IMG_20170212_172944.jpg",
+    "originals/storage/DIY Command Hook - 2105744/files/Cammand_Hook.amf",
+    "originals/storage/DIY Command Hook - 2105744/files/Hookv2_Simplified.stl",
+    "originals/storage/DIY Command Hook - 2105744/images/46b1dd4ccd690c2ad932dc5973cc14c1.png",
+    "originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172930.jpg",
+    "originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172939.jpg",
+    "originals/storage/DIY Command Hook - 2105744/images/IMG_20170212_172944.jpg"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/command-hooks/DIY Command Hook - 2105744/LICENSE.txt",
+    "docs/storage/DIY Command Hook - 2105744/LICENSE.txt"
+  ]
+}

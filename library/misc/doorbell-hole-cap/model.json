@@ -1,0 +1,20 @@
+{
+  "id": "doorbell-hole-cap",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/doorbell-hole-cap.stl": "doorbell-hole-cap.stl",
+    "_originals/house/doorbell-hole-cap.3mf": "doorbell-hole-cap.3mf",
+    "_originals/house/doorbell-hole-cap.stl": "originals/house/doorbell-hole-cap.stl"
+  },
+  "protected_assets": [
+    "doorbell-hole-cap.3mf",
+    "doorbell-hole-cap.stl",
+    "originals/house/doorbell-hole-cap.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

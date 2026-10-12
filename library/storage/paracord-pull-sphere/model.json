@@ -1,0 +1,20 @@
+{
+  "id": "paracord-pull-sphere",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/paracord-pull-sphere/para-pull-sphere.3mf": "para-pull-sphere.3mf",
+    "_originals/paracord-pull-sphere/para-pull-sphere.skp": "para-pull-sphere.skp",
+    "_originals/paracord-pull-sphere/para-pull-sphere.stl": "para-pull-sphere.stl"
+  },
+  "protected_assets": [
+    "para-pull-sphere.3mf",
+    "para-pull-sphere.skp",
+    "para-pull-sphere.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

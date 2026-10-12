@@ -1,0 +1,18 @@
+{
+  "id": "bigger-edc-shelf",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/bigger+edc+shelf_stls/obj_1_Assembly_A.stl": "obj_1_Assembly_A.stl",
+    "_originals/office/bigger+edc+shelf_stls/obj_2_Assembly_B.stl": "obj_2_Assembly_B.stl"
+  },
+  "protected_assets": [
+    "obj_1_Assembly_A.stl",
+    "obj_2_Assembly_B.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

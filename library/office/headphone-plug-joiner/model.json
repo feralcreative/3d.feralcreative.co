@@ -1,0 +1,16 @@
+{
+  "id": "headphone-plug-joiner",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/headphone-plug-joiner.skp": "headphone-plug-joiner.skp"
+  },
+  "protected_assets": [
+    "headphone-plug-joiner.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

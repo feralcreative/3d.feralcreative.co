@@ -1,0 +1,18 @@
+{
+  "id": "shelf-peg",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/storage/shelf-peg.skp": "shelf-peg.skp",
+    "_originals/storage/shelf-peg.stl": "shelf-peg.stl"
+  },
+  "protected_assets": [
+    "shelf-peg.skp",
+    "shelf-peg.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

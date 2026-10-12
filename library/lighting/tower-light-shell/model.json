@@ -1,0 +1,22 @@
+{
+  "id": "tower-light-shell",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/tower-light-shell.3mf": "tower-light-shell.3mf",
+    "_originals/lighting/tower-light-shell.skp": "tower-light-shell.skp",
+    "_originals/lighting/tower-light-shell.stl": "tower-light-shell.stl",
+    "_originals/lighting/tower-light-shell~.skp": "tower-light-shell~.skp"
+  },
+  "protected_assets": [
+    "tower-light-shell.3mf",
+    "tower-light-shell.skp",
+    "tower-light-shell.stl",
+    "tower-light-shell~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

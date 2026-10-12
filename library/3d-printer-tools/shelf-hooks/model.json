@@ -1,0 +1,16 @@
+{
+  "id": "shelf-hooks",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/shelf-hooks.stl": "shelf-hooks.stl"
+  },
+  "protected_assets": [
+    "shelf-hooks.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

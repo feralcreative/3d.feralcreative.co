@@ -1,0 +1,16 @@
+{
+  "id": "bambu-lab-led-lamp-kit-001-v2",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/Bambu+Lab+-+LED+Lamp+Kit-001+v2.step": "Bambu+Lab+-+LED+Lamp+Kit-001+v2.step"
+  },
+  "protected_assets": [
+    "Bambu+Lab+-+LED+Lamp+Kit-001+v2.step"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "conestand",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/ConeStand.stl": "ConeStand.stl"
+  },
+  "protected_assets": [
+    "ConeStand.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

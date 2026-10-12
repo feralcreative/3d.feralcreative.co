@@ -1,0 +1,16 @@
+{
+  "id": "cupholder-bottle-adapter-bridge",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/tesla/Cupholder bottle adapter bridge.stl": "Cupholder bottle adapter bridge.stl"
+  },
+  "protected_assets": [
+    "Cupholder bottle adapter bridge.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

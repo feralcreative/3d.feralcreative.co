@@ -1,0 +1,20 @@
+{
+  "id": "net-topper",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/net-topper.3mf": "net-topper.3mf",
+    "_originals/cats/net-topper.skp": "net-topper.skp",
+    "_originals/cats/net-topper.stl": "net-topper.stl"
+  },
+  "protected_assets": [
+    "net-topper.3mf",
+    "net-topper.skp",
+    "net-topper.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "tool-shelf-02",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/tool-shelf-02.stl": "tool-shelf-02.stl"
+  },
+  "protected_assets": [
+    "tool-shelf-02.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

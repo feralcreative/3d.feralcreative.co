@@ -1,0 +1,16 @@
+{
+  "id": "coffee-filter-stand",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/Coffee Filter Stand.stl": "Coffee Filter Stand.stl"
+  },
+  "protected_assets": [
+    "Coffee Filter Stand.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

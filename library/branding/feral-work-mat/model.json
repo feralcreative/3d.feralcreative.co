@@ -1,0 +1,24 @@
+{
+  "id": "feral-work-mat",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/feral-creative/feral-work-mat copy.stl": "feral-work-mat copy.stl",
+    "_originals/feral-creative/feral-work-mat-negative-space-depth-fix.3mf": "feral-work-mat-negative-space-depth-fix.3mf",
+    "_originals/feral-creative/feral-work-mat-negative-space.stl": "feral-work-mat-negative-space.stl",
+    "_originals/feral-creative/feral-work-mat.3mf": "feral-work-mat.3mf",
+    "_originals/feral-creative/feral-work-mat.stl": "feral-work-mat.stl"
+  },
+  "protected_assets": [
+    "feral-work-mat copy.stl",
+    "feral-work-mat-negative-space-depth-fix.3mf",
+    "feral-work-mat-negative-space.stl",
+    "feral-work-mat.3mf",
+    "feral-work-mat.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

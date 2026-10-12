@@ -1,0 +1,22 @@
+{
+  "id": "725-54th-st",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/725-54th-St.skp": "725-54th-St.skp",
+    "_originals/725-54th-St~.skp": "725-54th-St~.skp",
+    "_originals/_projects/725-54th-St.skp": "originals/_projects/725-54th-St.skp",
+    "_originals/_projects/725-54th-St~.skp": "originals/_projects/725-54th-St~.skp"
+  },
+  "protected_assets": [
+    "725-54th-St.skp",
+    "725-54th-St~.skp",
+    "originals/_projects/725-54th-St.skp",
+    "originals/_projects/725-54th-St~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

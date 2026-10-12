@@ -1,0 +1,16 @@
+{
+  "id": "printer-tool-box",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/printer-tool-box.stl": "printer-tool-box.stl"
+  },
+  "protected_assets": [
+    "printer-tool-box.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

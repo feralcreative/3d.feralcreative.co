@@ -1,0 +1,22 @@
+{
+  "id": "thermostat-mount",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/command-hooks/thermostat-mount.3mf": "thermostat-mount.3mf",
+    "_originals/command-hooks/thermostat-mount.skp": "thermostat-mount.skp",
+    "_originals/command-hooks/thermostat-mount.stl": "thermostat-mount.stl",
+    "_originals/command-hooks/thermostat-mount~.skp": "thermostat-mount~.skp"
+  },
+  "protected_assets": [
+    "thermostat-mount.3mf",
+    "thermostat-mount.skp",
+    "thermostat-mount.stl",
+    "thermostat-mount~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

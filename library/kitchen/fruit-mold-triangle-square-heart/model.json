@@ -1,0 +1,26 @@
+{
+  "id": "fruit-mold-triangle-square-heart",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/fruit-molds/fruit-mold-triangle-square-heart-model_files/236530-fruit-mold-triangle-square-heart-ede47ddd-f554-4a12-8688-f06c4e12ad99.pdf": "docs/fruit-molds/fruit-mold-triangle-square-heart-model_files/236530-fruit-mold-triangle-square-heart-ede47ddd-f554-4a12-8688-f06c4e12ad99.pdf",
+    "_originals/fruit-molds/fruit-mold-triangle-square-heart-model_files/2x2_kvadratas.stl": "2x2_kvadratas.stl",
+    "_originals/fruit-molds/fruit-mold-triangle-square-heart-model_files/keturkampis_3x3.stl": "keturkampis_3x3.stl",
+    "_originals/fruit-molds/fruit-mold-triangle-square-heart-model_files/sirdis_maza_1d.stl": "sirdis_maza_1d.stl",
+    "_originals/fruit-molds/fruit-mold-triangle-square-heart-model_files/sirdis_maza_2d.stl": "sirdis_maza_2d.stl",
+    "_originals/fruit-molds/fruit-mold-triangle-square-heart-model_files/trikampis.stl": "trikampis.stl"
+  },
+  "protected_assets": [
+    "2x2_kvadratas.stl",
+    "docs/fruit-molds/fruit-mold-triangle-square-heart-model_files/236530-fruit-mold-triangle-square-heart-ede47ddd-f554-4a12-8688-f06c4e12ad99.pdf",
+    "keturkampis_3x3.stl",
+    "sirdis_maza_1d.stl",
+    "sirdis_maza_2d.stl",
+    "trikampis.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "key-shelf",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/key-shelf.skp": "key-shelf.skp"
+  },
+  "protected_assets": [
+    "key-shelf.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

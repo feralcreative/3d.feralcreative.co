@@ -1,0 +1,16 @@
+{
+  "id": "cat-portal-new",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-portal-new.skp": "cat-portal-new.skp"
+  },
+  "protected_assets": [
+    "cat-portal-new.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

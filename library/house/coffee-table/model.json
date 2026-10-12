@@ -1,0 +1,18 @@
+{
+  "id": "coffee-table",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/Coffee Table.skp": "Coffee Table.skp",
+    "_originals/Coffee Table~.skp": "Coffee Table~.skp"
+  },
+  "protected_assets": [
+    "Coffee Table.skp",
+    "Coffee Table~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "stream-deck-plus-face",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/stream-deck-plus-face.skp": "stream-deck-plus-face.skp",
+    "_originals/desk/stream-deck-plus-face.stl": "stream-deck-plus-face.stl"
+  },
+  "protected_assets": [
+    "stream-deck-plus-face.skp",
+    "stream-deck-plus-face.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

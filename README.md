@@ -1,33 +1,33 @@
-# Feral SCAD Parts
+# Feral Model Library
 
-Parametric 3D-printed parts, designed in OpenSCAD.
+3D-print models, including OpenSCAD designs, adapted models, and earlier SketchUp or mesh-only projects.
 
-Source of truth is `parts/*.scad`. Everything in `renders/` and `stl/` is generated and gitignored—if you need it, rebuild it.
+Each model lives in `library/<category>/<model-id>/`, with its SCAD, STL, 3MF, SKP, instructions, and licenses together. `model.json` records its origin and SCAD entrypoint; `_work/` holds regenerable builds and previews. Browse [the model catalog](library/README.md) or read [the library workflow](docs/library.md).
 
 ## Usage
 
 Render a part to multi-angle PNGs for review:
 
 ```bash
-utils/render.sh parts/example-spacer.scad
+utils/render.sh awl-sheath
 ```
 
 Build an STL:
 
 ```bash
-utils/build.sh parts/example-spacer.scad
+utils/build.sh awl-sheath
 ```
 
 Override any top-level parameter without editing the file:
 
 ```bash
-utils/render.sh parts/example-spacer.scad -D 'outer_d=30'
+utils/render.sh awl-sheath -D 'outer_d=30'
 ```
 
 Push a finished STL to the printer site's models directory on the NAS, where it becomes visible in the web viewer at <https://3d.feralcreative.co>:
 
 ```bash
-utils/build.sh parts/example-spacer.scad --push
+utils/build.sh awl-sheath --push
 ```
 
 ## Setup
@@ -43,7 +43,7 @@ utils/build.sh parts/example-spacer.scad --push
 2. Install OpenSCAD—see your platform below.
 3. In the OpenSCAD GUI, turn on **Design → Automatic Reload and Preview** so it re-renders whenever a file is saved from an external editor.
 
-Both scripts export `OPENSCADPATH` themselves, so `include <BOSL2/std.scad>` resolves no matter which directory you run from. Invoking the `openscad` binary directly, outside the scripts, will not find it.
+Both scripts resolve model IDs and former source paths, supply model-specific OpenSCAD feature flags, and export `OPENSCADPATH`. Migrated sources use relative references to shared libraries so they also open in the GUI.
 
 ### macOS
 
