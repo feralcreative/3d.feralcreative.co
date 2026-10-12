@@ -7,7 +7,9 @@
     "pumpkin-body.scad"
   ],
   "exports": [
-    "pumpkin-body"
+    "pumpkin-body",
+    "pumpkin-body-supported",
+    "pumpkin-body-support-coupon"
   ],
   "aliases": {
     "parts/pumpkin-body.scad": "pumpkin-body.scad",

@@ -22,7 +22,41 @@
 // dome still does, as the original's did.
 
 /* [View] */
-show = "body"; // [body, section, assembly]
+show = "body"; // [body, section, assembly, supported, support-section, supports, support-coupon, support-rake, support-tower, support-removal-check, support-tower-removal-check, support-neighbor-check]
+
+/* [Custom breakaway supports] */
+support_gap = 0.20; // mm of air between support and part; test with the coupon
+support_layer = 0.20; // mm; these supports are designed for this layer height
+support_groups = 9; // body symmetry; the radial fins remove individually
+support_foot_r = 22; // mm, feet stay inside the LED opening
+support_foot_d = 2.10; // mm, square feet beneath the individual radial fins
+support_foot_h = 0.40; // mm, two layers
+support_post_w = 2.10; // mm, root post
+support_contact_w = 0.84; // mm, narrow radial contact rails
+support_contact_h = 0.60; // mm, three layers at the contact
+support_fan_z = 27; // mm, fins spread outward above their straight posts
+support_rail_step = 1; // mm, follow the curved roof between branch tips
+support_roof_inner_r = 16; // mm, inner end of the roof fins
+support_roof_outer_r = 44; // mm, outer end of the roof fins
+support_tower_inner_r = 10.8; // mm
+support_tower_wall = 0.84; // mm
+support_tower_flare_h = 6; // mm, gentle flare to the stem-seat interface
+support_index = 0; // section selected; -1 checks all removal paths
+support_remove_drop = 14; // mm, lower each freed fin below the stem seat first
+support_remove_in = 29; // mm, then move the fin toward the centre
+support_remove_exit = 100; // mm, final downward extraction
+
+/* [Support coupon] */
+coupon_base_z = 56; // mm, height of the crown patch in the full pumpkin
+coupon_crop_x = 25; // mm
+coupon_crop_y = -1.5; // mm
+coupon_crop_w = 17; // mm
+coupon_crop_d = 8; // mm
+coupon_crop_h = 30; // mm
+coupon_rail_count = 2;
+coupon_first_post_r = 26; // mm
+coupon_post_pitch = 5; // mm
+coupon_post_count = 4;
 
 /* [Size] */
 size = 1.0; // uniform scale of the measured form; 0.75 still takes a tealight, per the designer
@@ -64,6 +98,7 @@ socket_fn = 96;
 /* [Colors] */
 body_color = "#E9B489"; // the original's own colour
 puck_color = "#C8C8C8"; // assembly view only; not printed
+support_color = "#35BFC5"; // sacrificial supports; separately identifiable in previews
 
 eps = 0.01;
 
@@ -331,7 +366,198 @@ module pumpkin_body() {
     }
 }
 
+// Each roof groove lies on a meridian of the INNER grid. Intersect that actual
+// polygonal meridian with a vertical ray rather than assuming a spherical roof.
+// Only the inward-going, upper half is eligible; the lower belly is not a roof.
+function support_inner_r(p) = norm([p[0], p[1]]);
+function support_roof_hits(k, r) =
+    let (j = k * (groove_pts + rib_pts + groove_pts - 1))
+    [for (i = [0:ring_count - 2])
+        let (a = INNER[i][j], b = INNER[i + 1][j], ra = support_inner_r(a), rb = support_inner_r(b))
+        if (ring_s(i) >= MER_WAIST && ra > rb && r <= ra && r >= rb)
+            a[2] + (b[2] - a[2]) * (r - ra) / (rb - ra)];
+function support_roof_z(k, r) =
+    let (hits = support_roof_hits(k, r))
+    assert(len(hits) > 0, str("No roof under groove ", k, " at radius ", r)) min(hits);
+// Intersect a vertical ray with the actual triangular inner skin. Checking the
+// four corners avoids contact heads entering a seam beside its centre meridian.
+function support_cross(a, b) = a[0] * b[1] - a[1] * b[0];
+function support_triangle_z(p, a, b, c) =
+    let (u = [b[0]-a[0], b[1]-a[1]], v = [c[0]-a[0], c[1]-a[1]],
+         q = p - [a[0], a[1]], det = support_cross(u, v),
+         x = abs(det) < 1e-9 ? -1 : support_cross(q, v) / det,
+         y = abs(det) < 1e-9 ? -1 : support_cross(u, q) / det)
+    x >= -1e-6 && y >= -1e-6 && x+y <= 1+1e-6
+        ? a[2] + x*(b[2]-a[2]) + y*(c[2]-a[2]) : undef;
+function support_surface_z(k, p) =
+    let (j0 = k * (groove_pts + rib_pts + groove_pts - 1),
+         hits = [for (i = [0:ring_count-2], dj = [-2:1])
+            if (ring_s(i) >= MER_WAIST)
+                let (j = (j0+dj+RING_W)%RING_W, j1 = (j+1)%RING_W,
+                     a = INNER[i][j], b = INNER[i+1][j],
+                     c = INNER[i+1][j1], d = INNER[i][j1])
+                for (z = [support_triangle_z(p,a,c,b), support_triangle_z(p,a,d,c)])
+                    if (!is_undef(z)) z])
+    assert(len(hits)>0, str("No triangular roof under ", p)) min(hits);
+function support_top_raw(k, r) =
+    let (hw = support_contact_w / 2, a = k * rib_pitch,
+         z = min(support_roof_z(k,r-hw), support_roof_z(k,r+hw),
+             min([for (dx = [-hw, hw], dy = [-hw, hw])
+             support_surface_z(k, [(r+dx)*cos(a)-dy*sin(a), (r+dx)*sin(a)+dy*cos(a)])])))
+    floor((z - support_gap) / support_layer) * support_layer;
+SUPPORT_TOPS = (show == "body" || show == "section" || show == "assembly") ? [] :
+    [for (k = [0:rib_n-1])
+    [for (r = [support_roof_inner_r:support_rail_step:support_roof_outer_r]) support_top_raw(k,r)]];
+function support_top(k,r) = SUPPORT_TOPS[k][round((r-support_roof_inner_r)/support_rail_step)];
+function support_angle(k) = k * rib_pitch;
+function support_group_angle(i) = (i * rib_n / support_groups + (rib_n / support_groups - 1) / 2) * rib_pitch;
+function support_xy(r, a, z) = [r * cos(a), r * sin(a), z];
+
+module support_cap(k, r, sweep = [0, 0, 0]) {
+    hull() for (d = [[0, 0, 0], sweep])
+        translate(support_xy(r, support_angle(k), support_top(k, r) - support_contact_h / 2) + d)
+            rotate([0, 0, support_angle(k)])
+                cube([support_contact_w, support_contact_w, support_contact_h], center = true);
+}
+
+module support_rail(k, r0, r1, sweep = [0, 0, 0]) {
+    // This is a short bridge between two supported contact heads, not a long
+    // unsupported canopy. Its radial span is at most five millimetres.
+    for (r = [r0:support_rail_step:r1-support_rail_step])
+        hull() { support_cap(k, r, sweep); support_cap(k, r+support_rail_step, sweep); }
+}
+
+// Thin radial fins print as continuous passes. The sweep uses an exact convex
+// decomposition: a hull of the entire curved fin would invent roof collisions.
+module support_web(k, sweep = [0,0,0]) {
+    a = support_angle(k);
+    rs = [for (r=[support_roof_inner_r:support_rail_step:support_roof_outer_r]) r];
+    assert(max(abs(support_roof_inner_r-support_foot_r),abs(support_roof_outer_r-support_foot_r))
+           <= min([for (r=rs) support_top(k,r)])-support_fan_z,
+           "A roof fin exceeds 45 degrees");
+    // One simple extruded polygon avoids tiny triangulation artifacts from
+    // unioning many almost-coplanar hulls. Roof sampling is the same as the coupon.
+    if (norm(sweep) == 0)
+        rotate([0,0,a]) rotate([90,0,0])
+            linear_extrude(height=support_contact_w,center=true,convexity=10)
+                polygon(concat([[support_foot_r,support_fan_z]],
+                               [for (r=rs) [r,support_top(k,r)]]));
+    else
+        for (n=[0:len(rs)-2]) hull()
+            for (d=[[0,0,0],sweep]) translate(d)
+                rotate([0,0,a]) rotate([90,0,0])
+                    linear_extrude(height=support_contact_w,center=true,convexity=10)
+                        polygon([[support_foot_r,support_fan_z],
+                                 [rs[n],support_top(k,rs[n])],
+                                 [rs[n+1],support_top(k,rs[n+1])]]);
+}
+
+module support_piece(k, sweep=[0,0,0]) {
+    a = support_angle(k);
+    color(support_color) {
+        hull() for (d=[[0,0,0],sweep]) translate(support_xy(support_foot_r,a,0)+d)
+            rotate([0,0,a]) translate([-support_foot_d/2,-support_foot_d/2,0])
+                cube([support_foot_d,support_foot_d,support_foot_h]);
+        hull() for (d=[[0,0,0],sweep])
+            translate(support_xy(support_foot_r,a,support_foot_h-eps)+d)
+                rotate([0,0,a]) translate([-support_post_w/2,-support_post_w/2,0])
+                    cube([support_post_w,support_post_w,support_fan_z-support_foot_h+support_contact_w+eps]);
+        support_web(k,sweep);
+    }
+}
+
+module support_rake(i) {
+    per=rib_n/support_groups;
+    for (k=[i*per:(i+1)*per-1]) support_piece(k);
+}
+
+module support_tower() {
+    top = floor((size * (ledge_top_z - ledge_t) - support_gap) / support_layer) * support_layer;
+    outer = support_tower_inner_r + support_tower_wall;
+    color(support_color) difference() {
+        union() {
+            cylinder(r = outer, h = top - support_tower_flare_h + eps, $fn = socket_fn);
+            translate([0, 0, top - support_tower_flare_h])
+                cylinder(r1 = outer, r2 = size * socket_od / 2 - support_gap, h = support_tower_flare_h, $fn = socket_fn);
+        }
+        translate([0, 0, -eps]) cylinder(r = support_tower_inner_r, h = top - support_tower_flare_h + 2 * eps, $fn = socket_fn);
+        translate([0, 0, top - support_tower_flare_h - eps])
+            cylinder(r1 = support_tower_inner_r, r2 = size * ledge_id / 2 + support_gap, h = support_tower_flare_h + 2 * eps, $fn = socket_fn);
+    }
+}
+
+module custom_supports() {
+    assert(size == 1 && wall == 1 && lobes == 9 && ribs_per_lobe == 6,
+           "Recheck support layout and removal paths after changing the pumpkin dimensions");
+    assert(rib_n % support_groups == 0, "Support groups must divide the groove count");
+    color(support_color) {
+        support_tower();
+        for (i = [0:support_groups - 1]) support_rake(i);
+    }
+}
+
+module support_removal_sweep(k) {
+    a = support_angle(k);
+    drop = [0,0,-support_remove_drop];
+    inward = [-support_remove_in*cos(a),-support_remove_in*sin(a),0];
+    support_piece(k,drop);
+    translate(drop) support_piece(k,inward);
+    translate(drop+inward) support_piece(k,[0,0,-support_remove_exit]);
+}
+
+module support_coupon() {
+    // Actual crown geometry over two neighbouring support rails. Short straight
+    // posts make this a quick PETG release / bridging test, not a fit surrogate.
+    base_z = coupon_base_z;
+    translate([-coupon_crop_x, 0, -base_z]) {
+        color(body_color) intersection() {
+            pumpkin_body();
+            translate([coupon_crop_x, coupon_crop_y, base_z]) cube([coupon_crop_w, coupon_crop_d, coupon_crop_h]);
+        }
+        color(support_color) translate([coupon_crop_x, coupon_crop_y, base_z]) cube([coupon_crop_w, coupon_crop_d, support_foot_h]);
+        color(support_color) for (k = [0:coupon_rail_count-1]) {
+            for (r = [coupon_first_post_r:coupon_post_pitch:coupon_first_post_r+(coupon_post_count-1)*coupon_post_pitch])
+                translate(support_xy(r, support_angle(k), base_z))
+                    translate([-support_contact_w / 2, -support_contact_w / 2, 0])
+                        cube([support_contact_w, support_contact_w, support_top(k, r) - base_z]);
+            for (n = [0:coupon_post_count-2])
+                support_rail(k, coupon_first_post_r+n*coupon_post_pitch, coupon_first_post_r+(n+1)*coupon_post_pitch);
+        }
+    }
+}
+
 if (show == "body") pumpkin_body();
+else if (show == "supported") { pumpkin_body(); custom_supports(); }
+else if (show == "supports") custom_supports();
+else if (show == "support-rake") color(support_color) support_rake(support_index);
+else if (show == "support-tower") support_tower();
+else if (show == "support-coupon") support_coupon();
+else if (show == "support-removal-check") intersection() {
+    pumpkin_body();
+    union() {
+        for (i = support_index < 0 ? [0:rib_n-1] : [support_index])
+            support_removal_sweep(i);
+        if (support_index < 0)
+            hull() { support_tower(); translate([0,0,-support_remove_exit]) support_tower(); }
+    }
+}
+else if (show == "support-neighbor-check") {
+    // Six groove positions cover one repeating 40-degree lobe. The tower is
+    // removed first; all other fins remain obstacles during this check.
+    for (i = support_index < 0 ? [0:rib_n/support_groups-1] : [support_index])
+        intersection() {
+            support_removal_sweep(i);
+            union() for (k=[0:rib_n-1]) if (k!=i) support_piece(k);
+        }
+}
+else if (show == "support-tower-removal-check") intersection() {
+    pumpkin_body();
+    hull() { support_tower(); translate([0,0,-support_remove_exit]) support_tower(); }
+}
+else if (show == "support-section") difference() {
+    union() { pumpkin_body(); custom_supports(); }
+    rotate([0, 0, support_group_angle(0)]) translate([-150, 0, -1]) cube([300, 300, 200]);
+}
 else if (show == "section" || show == "assembly") difference() {
     union() {
         pumpkin_body();
