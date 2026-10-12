@@ -180,7 +180,7 @@ fi
 # Every name in stl/ that has at least one -vNN.stl beside it. Uses the same
 # two-digit-minimum shape build.sh stamps, so a v100 series is still found.
 all_names() {
-  find "$OUTDIR" -type d -name originals -prune -o -name '*-v[0-9][0-9]*.stl' -print \
+  find "$OUTDIR" -name '*-v[0-9][0-9]*.stl' -print \
     | sed 's|.*/||; s|-v[0-9][0-9]*\.stl$||' \
     | sort -u
 }
@@ -199,16 +199,16 @@ LEDGER="${REPO_ROOT}/docs/stl-versions.txt"
 # how the wrong file gets deleted.
 dirs_for() {
   local name="$1"
-  find "$OUTDIR" -type d -name originals -prune -o -type f \
+  find "$OUTDIR" -type f \
     \( -name "${name}.stl" -o -name "${name}-v[0-9][0-9]*.stl" \) \
-    -print 2>/dev/null | sed 's|/[^/]*$||' | sort -u
+    2>/dev/null | sed 's|/[^/]*$||' | sort -u
 }
 
 # Every output name with a mesh in stl/, plain or versioned. What a pattern is
 # matched against when finalizing: the ledger knows more names, but one with
 # no mesh left has nothing to finalize and would only SKIP.
 stl_names() {
-  find "$OUTDIR" -type d -name originals -prune -o -name '*.stl' -print \
+  find "$OUTDIR" -name '*.stl' -print \
     | sed 's|.*/||; s|\.stl$||; s|-v[0-9][0-9][0-9]*$||' \
     | sort -u
 }
@@ -450,7 +450,7 @@ shitcan_one() {
   done
   while IFS= read -r p; do
     [[ -n "$p" ]] && paths[${#paths[@]}]="$p"
-  done < <(find "$OUTDIR" -type d -name originals -prune -o -type f \( -name "${name}.stl" -o -name "${name}-v[0-9][0-9]*.stl" -o -name "${name}-*coupon*.stl" \) -print 2>/dev/null | sort)
+  done < <(find "$OUTDIR" -type f \( -name "${name}.stl" -o -name "${name}-v[0-9][0-9]*.stl" -o -name "${name}-*coupon*.stl" \) 2>/dev/null | sort)
   if [[ -d "${REPO_ROOT}/renders" ]]; then
     while IFS= read -r p; do
       [[ -n "$p" ]] && paths[${#paths[@]}]="$p"

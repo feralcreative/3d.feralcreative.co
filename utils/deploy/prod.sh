@@ -37,8 +37,6 @@
 # directory — so two subfolders holding the same filename would overwrite each
 # other there. That is refused rather than resolved, since which one wins would
 # come down to rsync argument order.
-# Imported source meshes under category/originals/ are archives, excluded
-# even with --all; they were outside stl/ before the repository reorganization.
 #
 # Nothing is deleted on the far side. A part removed here stays on the site until
 # someone removes it there deliberately — the models directory also holds
@@ -86,7 +84,7 @@ while IFS= read -r f; do
     continue
   fi
   FILES+=("$f")
-done < <(find "$STL_DIR" -type d -name originals -prune -o -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl' -print | sort)
+done < <(find "$STL_DIR" -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl' | sort)
 
 # One flat destination: a repeated basename would land on itself over there.
 DUPES="$(for f in ${FILES[@]+"${FILES[@]}"}; do basename "$f"; done | sort | uniq -d)"

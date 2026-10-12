@@ -2,9 +2,7 @@
 
 Parametric 3D-printed parts, designed in OpenSCAD.
 
-Authored designs live in `parts/*.scad`. Finished STL exports are committed; numbered build drafts, renders, and slice jobs are generated and gitignored.
-
-STLs imported from the old `_originals/` tree live in `stl/<category>/originals/`, grouped by use (for example, `3d-printer-tools`, `hand-tools`, `house`, and `kitchen`). Original model folders and filenames are preserved; files formerly loose in `_originals/` are under each category's `originals/loose/`. These are committed source meshes, including original versioned files. Cleanup, finalization, and bulk publishing skip these archive folders. Non-STL source assets and accompanying licenses remain in `_originals/`.
+Source of truth is `parts/*.scad`. Everything in `renders/` and `stl/` is generated and gitignored—if you need it, rebuild it.
 
 ## Usage
 

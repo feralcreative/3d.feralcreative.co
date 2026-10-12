@@ -320,13 +320,6 @@ stl/*/*-v[0-9][0-9]*.stl
 # as worth committing; until it has been run, list the name here.
 stl/gridfinity/wire-shelf-gridfinity-4x2*.stl
 
-# Imported source meshes, moved from _originals into their STL categories.
-# Preserve model subfolders and original version names at any depth.
-!stl/*/originals/
-!stl/*/originals/**/
-!stl/*/originals/**/*.stl
-!stl/*/originals/**/*.STL
-
 slice/
 _incoming
 MODELS

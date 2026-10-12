@@ -1,8 +1,7 @@
 // overture-spool-main-body-ribbed.scad
 //
 // The main body from "Reusable Spool for Overture Cardboard Spools"
-// (stl/3d-printer-tools/originals/printer-tools/
-// reusable-spool-for-overture-cardboard-spools-
+// (_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-
 // model_files/), with its plain 80 mm flange given the same ribbed grip edge
 // as overture-spool-screwtop-ribbed.scad, so the two ends of the spool match
 // and there is something to hold on to while the screw-top goes on.
@@ -34,7 +33,7 @@
 use <overture-spool-screwtop-ribbed.scad>
 
 /* [Source] */
-body_src = "../stl/3d-printer-tools/originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblymain-body.stl";
+body_src = "../_originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblymain-body.stl";
 body_h   = 76;          // mm, overall height of the original
 flange_h = 2;           // mm, flange thickness of the original
 bore_r   = 24.5;        // mm, bore radius at the original's base
