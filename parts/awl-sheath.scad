@@ -15,18 +15,17 @@
 // bore runs free so the blade slides in without dragging the point.
 // ⚠️ The bore allowance is from the slicing reference, where a PETG bore
 // came out 0.55–0.65 under on diameter. Print the coupon before the
-// full sheath: it is the mouth and the tip pocket, the two places that
-// fit.
+// full sheath: the 10 mm mouth coupon tests insertion and grip.
 //
 // Axes: print orientation. Z=0 is the mouth, flat on the bed; the
 // rounded end is at the top. The point of a fully inserted blade sits
 // at Z = blade_l.
 //
-// COUPON-COMPONENTS: mouth=coupon-mouth tip=coupon-tip
+// COUPON-COMPONENTS: mouth=coupon-mouth
 // COUPON-PLATE: coupon
 
 /* [View] */
-show = "sheath"; // [sheath, section, coupon, coupon-mouth, coupon-tip]
+show = "sheath"; // [sheath, section, coupon, coupon-mouth]
 
 /* [Blade, measured] */
 blade_l = 151; // mm, handle face to point
@@ -54,12 +53,10 @@ rib_start = 4; // mm above the mouth
 rib_l = 20; // mm, along the bore
 
 /* [Coupon] */
-coupon_mouth_h = rib_start + rib_l + 4; // mm
-coupon_tip_h = taper_l + 12; // mm of blade inside the tip coupon
+coupon_mouth_h = 10; // mm, mouth section only; includes 6 mm of the grip ribs
 
 /* [Colors] */
 sheath_color = "#d12b8a";
-tip_coupon_color = "#3a8fd1";
 
 /* [Hidden] */
 $fn = 96;
@@ -140,29 +137,10 @@ module coupon_mouth() {
   }
 }
 
-// The closed end, cut face on the bed as in the full sheath: tests that
-// the point seats on the taper with tip_gap to spare.
-module coupon_tip() {
-  cut_z = point_z - coupon_tip_h;
-  color(tip_coupon_color)
-    translate([0, 0, -cut_z])
-          intersection() {
-            difference() {
-              body();
-              bore();
-            }
-            translate([-outer_d, -outer_d, cut_z]) cube([2 * outer_d, 2 * outer_d, top_z - cut_z + eps]);
-          }
-}
-
 if (show == "sheath") sheath();
 else if (show == "section") difference() {
     sheath();
     translate([0, -outer_d, -1]) cube([outer_d, 2 * outer_d, top_z + 2]);
   }
 else if (show == "coupon-mouth") coupon_mouth();
-else if (show == "coupon-tip") coupon_tip();
-else if (show == "coupon") {
-  coupon_mouth();
-  translate([outer_d + 8, 0, 0]) coupon_tip();
-}
+else if (show == "coupon") coupon_mouth();
