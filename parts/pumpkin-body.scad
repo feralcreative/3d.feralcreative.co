@@ -2,8 +2,7 @@
 // socket for a separate stem. The puck presses up into a pocket in the floor.
 // Remade from Sabre Design's "Halloween Pumpkin (tealight compatible)", Printables
 // model 1003177, pumpkin-body.3mf (CC BY-NC-ND 4.0, personal use only). The original
-// sits in 3mf/holiday/originals/holiday/halloween/
-// halloween-pumpkin-tealight-compatible-model_files/.
+// sits in _originals/halloween-pumpkin-tealight-compatible-model_files/.
 //
 // Measured, not authored. The surface was read back from the 1.27M-triangle mesh:
 // a revolved meridian (column r, z), with every lobe notched toward its seam and
@@ -15,7 +14,7 @@
 // The original was open underneath for a loose tealight. This one closes the rim with
 // a floor holding the puck from below, lens up, its back flush with the table, and
 // the cable leaving through a groove in the underside. Puck numbers are Bambu's own
-// drawing and dummy model (3mf/lighting/originals/lighting/Dummy+LED+Lamp+Kit-001.3mf); Ziad's
+// drawing and dummy model (_originals/lighting/Dummy+LED+Lamp+Kit-001.3mf); Ziad's
 // circular and twist lamp bases pocket the same puck at Ø60.0.
 //
 // Axes: Z up, floor on the bed at Z=0, a lobe seam centred on +X+20°, a lobe centred
