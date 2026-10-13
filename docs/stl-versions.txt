@@ -62,6 +62,12 @@ gridfinity-remote-holder 16
 gridfinity-remote-holder-coupon 4
 gridfinity-watch-charger-base 7
 gridfinity_baseplate 3
+haunted-tree-diffuser-led 3
+haunted-tree-grin-led 6
+haunted-tree-oh-led 2
+haunted-tree-sad-led 2
+haunted-tree-teeth-flat-led 4
+haunted-tree-teeth-led 3
 hobbs-chalk-holder-coupon 5
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom 4
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-coupon-bottom 3

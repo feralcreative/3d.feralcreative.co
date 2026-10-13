@@ -132,6 +132,7 @@ Generate this index with `python3 utils/library.py catalog`. Filter the inventor
 | [soldering-iron-stand](hand-tools/soldering-iron-stand/) | hand-tools | legacy | — | 3MF, OBJ, SKP, STL | unreviewed |
 | [supporto-carta-vetrata](hand-tools/supporto-carta-vetrata/) | hand-tools | legacy | — | 3MF | unreviewed |
 | [halloween](holiday/halloween/) | holiday | imported | — | 3MF, PDF, STL | unreviewed |
+| [haunted-tree-family](holiday/haunted-tree-family/) | holiday | adapted | [SCAD](holiday/haunted-tree-family/haunted-tree-family.scad) (1) | SCAD, STL | draft |
 | [pumpkin-body](holiday/pumpkin-body/) | holiday | authored | [SCAD](holiday/pumpkin-body/pumpkin-body.scad) (1) | 3MF, SCAD, STL | unreviewed |
 | [725-54th-st](house/725-54th-st/) | house | legacy | — | SKP | unreviewed |
 | [baseboard-thermostat-trim](house/baseboard-thermostat-trim/) | house | legacy | — | 3MF, SKP, STL | unreviewed |
