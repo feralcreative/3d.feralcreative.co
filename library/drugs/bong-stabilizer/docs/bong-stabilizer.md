@@ -6,6 +6,8 @@ Source: [bong-stabilizer.scad](../bong-stabilizer.scad). First design for a 95 m
 
 A 195 mm-wide foot has a 96.5 mm seat and a solid plastic shoulder. Two 6.3 mm-thick collar halves sit on that shoulder at Z=25.4 mm. Their 86 mm opening overlaps the glass rim by 4.5 mm radially. Four coarse, custom printed wing screws hold the collar to the shoulder; tightening seats plastic against plastic rather than clamping the glass. These are 10 mm-diameter, 2 mm-pitch trapezoidal threads, not standard M10 hardware threads. Each 4.2 mm-thick head has two rounded paddles spanning 36 mm and a 16 mm circular bearing hub. The shafts and collar holes are unchanged, so the existing printed collar can be reused.
 
+The raised base has 4.2 mm rounds on its upper outside and seat-opening edges. A 1.68 mm solid wall remains around every threaded mouth. Both retaining plates have full-height 6.3 mm rounds on their outer, inner and straight split top edges, with 16.2 mm-diameter flat bearing areas under the screw heads. The wing grips have 2.1 mm rounds on their exposed top edges and retain their flat bearing undersides. Lower glass-seat geometry, plate undersides, screw shafts and the LED pocket are unchanged by these upper rounds.
+
 The seat allows 0.75 mm radial clearance. With a 1 mm liner ring, the glass bottom sits at Z=10.6 mm and its measured flare ends at Z=24.6 mm, leaving 0.8 mm below the collar. The centre seat is raised 6.4 mm to accommodate the light; the outer foot remains 4.2 mm thick, with a full-height 4.2 mm-radius roundover on its top outside edge and a flat underside. The six nonslip-pad recesses have been removed; only the LED pocket and cable groove interrupt the underside. Clearance above the lower outside rim is larger because the flare rises from 13 to 14 mm. The two installed collar halves have a 0.6 mm gap.
 
 The Bambu LED puck is 59.4 mm in diameter and 8 mm thick. Its underside pocket uses the pumpkin's proven 0.15 mm radial clearance and 0.1 mm extra depth: a 59.7 mm × 8.1 mm nominal pocket with the same 1.5 mm, 45-degree annular stop. The stop leaves the full 47.6 mm lens clear, and the seat has a through-opening above it. A 3.4 mm-wide underside groove carries the cable toward +Y. The puck back sits 0.1 mm above the base underside; the glass load is carried by the annular plastic seat and soft liner, rather than the puck.
@@ -14,11 +16,11 @@ The Bambu LED puck is 59.4 mm in diameter and 8 mm thick. Its underside pocket u
 
 | File | Contents | Orientation |
 | --- | --- | --- |
-| [bong-stabilizer-base.stl](../bong-stabilizer-base.stl) | One 195 mm foot with no pad recesses, flat bottom and 4.2 mm top edge radius, LED pocket and open light path, v07 | Flat underside on bed |
-| [bong-stabilizer-collar-set.stl](../bong-stabilizer-collar-set.stl) | Both collar halves, spaced apart | Flat faces on bed, as exported |
-| [bong-stabilizer-screw-set.stl](../bong-stabilizer-screw-set.stl) | Four printed wing screws, v03; 78 × 58 mm layout | Heads on bed, as exported |
-| [bong-stabilizer-screw.stl](../bong-stabilizer-screw.stl) | One test/replacement wing screw, v03 | Head on bed, as exported |
-| `_work/stl/bong-stabilizer-coupon-base.stl` | 132 mm fit coupon, v03, with the production seat, LED pocket, shoulder and threads | Flat underside on bed |
+| [bong-stabilizer-base.stl](../bong-stabilizer-base.stl) | One 195 mm foot with rounded upper shoulder and no pad recesses, flat bottom and 4.2 mm top edge radius, LED pocket and open light path, v08 | Flat underside on bed |
+| [bong-stabilizer-collar-set.stl](../bong-stabilizer-collar-set.stl) | Both rounded-top collar halves, spaced apart, v02 | Flat undersides on bed, as exported |
+| [bong-stabilizer-screw-set.stl](../bong-stabilizer-screw-set.stl) | Four printed wing screws with rounded grip tops, v04; 78 × 58 mm layout | Heads on bed, as exported |
+| [bong-stabilizer-screw.stl](../bong-stabilizer-screw.stl) | One rounded-top test/replacement wing screw, v04 | Head on bed, as exported |
+| `_work/stl/bong-stabilizer-coupon-base.stl` | 132 mm fit coupon, v04, with the production rounded shoulder, seat, LED pocket and threads | Flat underside on bed |
 
 The wide foot and collar require separate plates. All exported layouts fit within the repo's documented 205 mm safe XY envelope. No profiles were changed and these files have not been sliced.
 
@@ -36,9 +38,11 @@ Remove all four screws and both collar halves to lift the glass out. Check reten
 
 ## Verification boundary
 
-All seven views of the revised base, wing screw, screw set, fit coupon, assembled reference and section were inspected. The new assembly previews shorten the reference tube to 65 mm only to frame the retention detail; the measured source height remains 419.1 mm. The section omits the glass reference to expose the puck and annular seat. Ziad's visual review is pending.
+All seven views of the revised base, collar set, wing screw, screw set, fit coupon, assembly and section were inspected. The preview reference tube is shortened to 65 mm only to frame the retention detail; the measured source height remains 419.1 mm. Evaluated-geometry renders of the base, collar, assembly and section avoid the noisy OpenCSG rounding previews and omit the background glass reference. Ziad's visual review is pending.
 
 The delivered binary meshes passed independent checks for collapsed triangles, edge incidence and winding: zero errors across all five exports. The foot, coupon and single screw each have one closed shell; the collar set has two; the screw set has four. OpenSCAD reported `NoError` for each.
+
+The rounded collar's first binary export contained collapsed triangles at the upper rounded cuts. Geometry-preserving STL re-import and intersection with a containing cube removed those defects; the volume difference was below 0.000000001 mm³. The retained collar and its v02 workspace copies are the cleaned mesh. Future collar rebuilds need an independent binary mesh check and the same cleanup if the defects recur.
 
 The modeled puck and cable have an empty seated intersection and an empty continuous bottom-entry swept-volume intersection from entirely below the base. The modeled glass has an empty seated intersection and an empty conservative continuous vertical insertion sweep with the collar removed. Both collar halves have empty conservative continuous side-entry sweeps, with the opposite half present. Their seated contact with the plastic shoulder is planar at Z=25.4 mm and has zero volume. The screw shaft clears the collar holes and the seated screws clear the female threads. Helical insertion uses matching translation and rotation to preserve thread phase; checks at 49 positions per screw from seated to entirely above the socket found only planar head contact at Z=31.7 mm. Each rotating wing head is contained within an 18 mm-radius disk centred 56.57 mm from the glass axis, leaving over 17 mm clearance to the measured chamber at every rotation; it stays above the glass flare throughout insertion.
 
