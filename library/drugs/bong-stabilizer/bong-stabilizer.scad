@@ -19,7 +19,7 @@ glass_filled_mass = 1020.6;  // g, 36 ounces; reference only
 /* [Foot and glass clearance] */
 foot_d = 195;               // mm, footprint before optional nonslip pads
 floor_h = 4.2;              // mm, outer foot thickness; centre rises for the puck
-foot_chamfer = 1.2;         // mm, upper outside edge bevel
+foot_edge_r = 1.2;          // mm, roundover on the foot's top outside edge
 seat_diameter_clearance = 1.5; // mm, 0.75 mm radial glass clearance
 glass_top_clearance = 0.8;  // mm above the highest measured flare
 liner_h = 1;               // mm, removable soft disk in the seat
@@ -104,7 +104,7 @@ assert(seat_floor_z > pad_recess && thread_bottom_z > floor_h,
 assert(collar_opening_d < glass_base_d && collar_opening_d > glass_neck_d,
        "collar must overlap the base and clear the chamber");
 assert(sqrt(2) * screw_xy - screw_clearance_d / 2 > seat_d / 2 &&
-       sqrt(2) * screw_xy + screw_head_d / 2 < collar_outer_d / 2 + foot_chamfer,
+       sqrt(2) * screw_xy + screw_head_d / 2 < collar_outer_d / 2 + foot_edge_r,
        "screws must clear glass and remain over the plastic shoulder");
 assert(foot_d <= 205 && collar_outer_d < foot_d,
        "foot must fit the documented safe printer envelope");
@@ -137,10 +137,7 @@ module screw_thread(internal = false, length = screw_shaft_h) {
 
 module foot_blank(diameter) {
     if (diameter > collar_outer_d) {
-        cylinder(d = diameter, h = floor_h - foot_chamfer);
-        translate([0, 0, floor_h - foot_chamfer])
-            cylinder(d1 = diameter, d2 = diameter - 2 * foot_chamfer,
-                     h = foot_chamfer);
+        cyl(d = diameter, h = floor_h, rounding2 = foot_edge_r, anchor = BOT);
     }
     cylinder(d = collar_outer_d, h = collar_z);
 }
