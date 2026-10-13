@@ -24,11 +24,7 @@
     "originals/haunted-tree-sad.stl",
     "face-openings.scad"
   ],
-  "publish_exports": [],
-  "licenses": [
-    "docs/source-and-print-notes.md"
-  ],
-  "draft_exports": [
+  "publish_exports": [
     "haunted-tree-grin-led",
     "haunted-tree-teeth-led",
     "haunted-tree-teeth-flat-led",
@@ -36,6 +32,10 @@
     "haunted-tree-oh-led",
     "haunted-tree-sad-led"
   ],
+  "licenses": [
+    "docs/source-and-print-notes.md"
+  ],
+  "draft_exports": [],
   "source_url": "https://www.printables.com/model/1016779-cute-haunted-tree-family-halloween-candle-lights",
   "additional_scad_files": [
     "face-openings.scad"
