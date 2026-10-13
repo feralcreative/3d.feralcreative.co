@@ -6,7 +6,7 @@ Source: [bong-stabilizer.scad](../bong-stabilizer.scad). First design for a 95 m
 
 A 195 mm-wide foot has a 96.5 mm seat and a solid plastic shoulder. Two 6.3 mm-thick collar halves sit on that shoulder at Z=25.4 mm. Their 86 mm opening overlaps the glass rim by 4.5 mm radially. Four coarse, custom printed wing screws hold the collar to the shoulder; tightening seats plastic against plastic rather than clamping the glass. These are 10 mm-diameter, 2 mm-pitch trapezoidal threads, not standard M10 hardware threads. Each 4.2 mm-thick head has two rounded paddles spanning 36 mm and a 16 mm circular bearing hub. The shafts and collar holes are unchanged, so the existing printed collar can be reused.
 
-The seat allows 0.75 mm radial clearance. With a 1 mm liner ring, the glass bottom sits at Z=10.6 mm and its measured flare ends at Z=24.6 mm, leaving 0.8 mm below the collar. The centre seat is raised 6.4 mm to accommodate the light; the outer foot remains 4.2 mm thick, with a 1.2 mm-radius roundover around its top outside edge. Clearance above the lower outside rim is larger because the flare rises from 13 to 14 mm. The two installed collar halves have a 0.6 mm gap.
+The seat allows 0.75 mm radial clearance. With a 1 mm liner ring, the glass bottom sits at Z=10.6 mm and its measured flare ends at Z=24.6 mm, leaving 0.8 mm below the collar. The centre seat is raised 6.4 mm to accommodate the light; the outer foot remains 4.2 mm thick, with a fully rounded semicircular outer rim of radius 2.1 mm. The flat underside extends to radius 95.4 mm, and all six pad pocket roofs remain flat at their existing height. Clearance above the lower outside rim is larger because the flare rises from 13 to 14 mm. The two installed collar halves have a 0.6 mm gap.
 
 The Bambu LED puck is 59.4 mm in diameter and 8 mm thick. Its underside pocket uses the pumpkin's proven 0.15 mm radial clearance and 0.1 mm extra depth: a 59.7 mm × 8.1 mm nominal pocket with the same 1.5 mm, 45-degree annular stop. The stop leaves the full 47.6 mm lens clear, and the seat has a through-opening above it. A 3.4 mm-wide underside groove carries the cable toward +Y between two pad pockets. The puck back sits 0.1 mm above the base underside; the glass load is carried by the annular plastic seat and soft liner, rather than the puck.
 
@@ -14,7 +14,7 @@ The Bambu LED puck is 59.4 mm in diameter and 8 mm thick. Its underside pocket u
 
 | File | Contents | Orientation |
 | --- | --- | --- |
-| [bong-stabilizer-base.stl](../bong-stabilizer-base.stl) | One 195 mm foot with rounded top outside edge, LED pocket and open light path, v04 | Flat underside on bed |
+| [bong-stabilizer-base.stl](../bong-stabilizer-base.stl) | One 195 mm foot with fully rounded outer rim, LED pocket and open light path, v05 | Flat underside on bed |
 | [bong-stabilizer-collar-set.stl](../bong-stabilizer-collar-set.stl) | Both collar halves, spaced apart | Flat faces on bed, as exported |
 | [bong-stabilizer-screw-set.stl](../bong-stabilizer-screw-set.stl) | Four printed wing screws, v03; 78 × 58 mm layout | Heads on bed, as exported |
 | [bong-stabilizer-screw.stl](../bong-stabilizer-screw.stl) | One test/replacement wing screw, v03 | Head on bed, as exported |
