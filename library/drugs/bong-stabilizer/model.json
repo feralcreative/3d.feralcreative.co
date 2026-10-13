@@ -11,7 +11,8 @@
     "bong-stabilizer-collar-set",
     "bong-stabilizer-screw-set",
     "bong-stabilizer-screw",
-    "bong-stabilizer"
+    "bong-stabilizer",
+    "bong-stabilizer-coupon-base"
   ],
   "aliases": {
     "parts/bong-stabilizer.scad": "bong-stabilizer.scad",
