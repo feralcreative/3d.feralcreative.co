@@ -1,7 +1,7 @@
 // Wide foot and split retaining collar for a 95 mm glass bong base.
 // Print the foot upright, both collar halves flat, and four wing screws head-down.
 // All fasteners are printed. The collar seats on the plastic shoulder, not glass.
-// Fit a 1 mm soft liner RING in the seat and six 1 mm nonslip pads underneath.
+// Fit a 1 mm soft liner RING in the seat. The foot underside has no pad recesses.
 // The Bambu LED puck enters from underneath; its lens shines through the seat.
 // Test coupon-base with the production collar and one screw before the wide foot.
 
@@ -17,16 +17,12 @@ glass_total_h = 419.1;       // mm, 16.5 inches; reference only
 glass_filled_mass = 1020.6;  // g, 36 ounces; reference only
 
 /* [Foot and glass clearance] */
-foot_d = 195;               // mm, footprint before optional nonslip pads
+foot_d = 195;               // mm, footprint diameter
 floor_h = 4.2;              // mm, outer foot thickness; centre rises for the puck
 foot_edge_r = floor_h;      // mm, full-height top roundover; underside stays flat
 seat_diameter_clearance = 1.5; // mm, 0.75 mm radial glass clearance
 glass_top_clearance = 0.8;  // mm above the highest measured flare
 liner_h = 1;               // mm, removable soft disk in the seat
-pad_d = 18;                // mm, adhesive nonslip pad pockets
-pad_circle_r = 87;          // mm, radius to pad centres
-pad_count = 6;              // evenly distributed nonslip pads
-pad_recess = 0.6;           // mm, leaves a 1 mm pad 0.4 mm proud
 
 /* [LED puck] */
 puck_d = 59.4;             // mm, same Bambu puck as pumpkin and haunted trees
@@ -37,7 +33,7 @@ puck_lens_d = 47.6;        // mm, lit window must remain fully clear
 puck_roof = 1.5;           // mm, proven 45-degree annular pocket stop
 cable_d = 2.8;             // mm, puck cable diameter
 cable_clear = 0.3;         // mm per side, underside cable groove clearance
-cable_angle = 90;          // degrees, exits between the nonslip pad pockets
+cable_angle = 90;          // degrees, cable exits along +Y
 liner_opening_d = 60;      // mm, soft ring opening keeps the light path clear
 puck_entry_travel = 30;    // mm, verification starts entirely below the base
 
@@ -99,7 +95,7 @@ bore_factor = 1 / cos(180 / $fn);
 
 assert(glass_neck_z > glass_edge_h && glass_base_d > glass_neck_d,
        "glass flare measurements are inconsistent");
-assert(seat_floor_z > pad_recess && thread_bottom_z > floor_h,
+assert(seat_floor_z > 0 && thread_bottom_z > floor_h,
        "floor or blind screw hole is too thin");
 assert(collar_opening_d < glass_base_d && collar_opening_d > glass_neck_d,
        "collar must overlap the base and clear the chamber");
@@ -150,10 +146,6 @@ module stabilizer_base(coupon = false) {
         screw_positions() translate([0, 0, thread_bottom_z])
             screw_thread(internal = true, length = thread_cut_h);
         puck_cutouts();
-        if (!coupon)
-            for (a = [0 : 360 / pad_count : 360 - 360 / pad_count])
-                rotate([0, 0, a]) translate([pad_circle_r, 0, -eps])
-                    cylinder(d = pad_d * bore_factor, h = pad_recess + eps);
     }
 }
 

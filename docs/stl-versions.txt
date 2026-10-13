@@ -12,7 +12,7 @@ bin-stacking-clip 19
 bong-liftout-cradle 6
 bong-liftout-cradle-coupon 6
 bong-liftout-cradle-ring-coupon 1
-bong-stabilizer-base 6
+bong-stabilizer-base 7
 bong-stabilizer-collar-set 1
 bong-stabilizer-coupon-base 3
 bong-stabilizer-screw 3
