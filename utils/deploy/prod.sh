@@ -12,6 +12,9 @@
 #   utils/deploy/prod.sh --dry-run    # show what would move, send nothing
 #   utils/deploy/prod.sh --all        # every plain-named mesh, moving or not
 #
+# Library exports are selected from model.json; the legacy stl/ scan is
+# optional now that migrated repositories no longer have that directory.
+#
 # WHERE IT GOES is read from .vscode/sftp.json rather than repeated here, so the
 # SFTP extension and this script cannot disagree about the host. That file is
 # the one place the destination lives; if it moves, change it there.
@@ -91,7 +94,9 @@ while IFS= read -r f; do
   FILES+=("$f")
 done < <(
   {
-    find "$STL_DIR" -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl'
+    if [[ -d "$STL_DIR" ]]; then
+      find "$STL_DIR" -type f -name '*.stl' ! -name '*-v[0-9][0-9]*.stl'
+    fi
     printf '%s\n' "$LIBRARY_FILES"
   } | sort
 )
@@ -112,7 +117,7 @@ if [[ "${#SKIPPED[@]}" -gt 0 ]]; then
 fi
 
 if [[ "${#FILES[@]}" -eq 0 ]]; then
-  echo "nothing to sync: no unversioned .stl in stl/"
+  echo "nothing to sync: no selected STL exports in library/ or stl/"
   exit 0
 fi
 

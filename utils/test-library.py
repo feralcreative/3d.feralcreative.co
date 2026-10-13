@@ -129,6 +129,30 @@ class LibraryWorkflow(unittest.TestCase):
         (self.model/'model.json').write_text(json.dumps(self.metadata))
         self.assertEqual(self.run_tool('library','publish-files','--all').stdout,'')
 
+    def test_prod_publishes_library_exports_with_or_without_legacy_directory(self):
+        deploy=self.root/'utils/deploy';deploy.mkdir()
+        shutil.copy2(REPO/'utils/deploy/prod.sh',deploy/'prod.sh')
+        config=self.root/'.vscode';config.mkdir()
+        (config/'sftp.json').write_text(json.dumps({'host':'example.invalid','port':22,'username':'test','remotePath':'/web/models'}))
+        bin_dir=self.root/'bin'
+        (bin_dir/'jq').write_text("#!/usr/bin/env python3\nimport json,sys\nprint(json.load(open(sys.argv[3]))[sys.argv[2][1:]])\n")
+        calls=self.root/'rsync-calls.json'
+        (bin_dir/'rsync').write_text("#!/usr/bin/env python3\nimport json,pathlib,sys\npathlib.Path("+repr(str(calls))+").write_text(json.dumps(sys.argv[1:]))\n")
+        for name in ['jq','rsync']:(bin_dir/name).chmod(0o755)
+        (self.model/'sample.stl').write_bytes(b'approved')
+        (self.root/'stl').rmdir()
+        for legacy in [False,True]:
+            with self.subTest(legacy=legacy):
+                if legacy:
+                    (self.root/'stl').mkdir()
+                    (self.root/'stl/legacy.stl').write_bytes(b'legacy approved')
+                result=self.run_tool('deploy/prod','--dry-run')
+                self.assertEqual(result.stderr,'')
+                args=json.loads(calls.read_text())
+                self.assertIn(str(self.model/'sample.stl'),args)
+                self.assertIn('--dry-run',args)
+                if legacy:self.assertIn(str(self.root/'stl/legacy.stl'),args)
+
     def test_finalize_accepts_a_legacy_mesh_path(self):
         self.run_tool('build','sample')
         self.run_tool('finalize','stl/sample-v08.stl')
