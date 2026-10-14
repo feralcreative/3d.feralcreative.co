@@ -1,5 +1,5 @@
 // Wide foot and split retaining collar for a 95 mm glass bong base.
-// Print the foot upright, both collar halves flat, and four wing screws head-down.
+// Print the foot upright, both collar halves flat, and four hex-head bolts head-down.
 // All fasteners are printed. The collar seats on the plastic shoulder, not glass.
 // Fit a 1 mm soft liner RING in the seat. The foot underside has no pad recesses.
 // The Bambu LED puck enters from underneath; its lens shines through the seat.
@@ -20,7 +20,6 @@ glass_filled_mass = 1020.6;  // g, 36 ounces; reference only
 foot_d = 195;               // mm, footprint diameter
 floor_h = 4.2;              // mm, outer foot thickness; centre rises for the puck
 foot_edge_r = floor_h;      // mm, full-height top roundover; underside stays flat
-shoulder_edge_r = 4.2;      // mm, exposed top edges of the raised base
 seat_diameter_clearance = 1.5; // mm, 0.75 mm radial glass clearance
 glass_top_clearance = 0.8;  // mm above the highest measured flare
 liner_h = 1;               // mm, removable soft disk in the seat
@@ -42,29 +41,23 @@ puck_entry_travel = 30;    // mm, verification starts entirely below the base
 collar_outer_d = 132;       // mm, plastic support shoulder and collar diameter
 collar_opening_d = 86;      // mm, overlaps the 95 mm glass rim radially
 collar_h = 6.3;             // mm, each retaining half's thickness
-collar_split_gap = 0.6;     // mm between the installed halves
-collar_edge_chamfer = 0.6;  // mm, retained lower opening edge only
+collar_split_gap = 0;       // mm, flat ends meet flush when the halves are installed
 collar_top_r = collar_h;    // mm, full-height top rounds on the retaining plates
 collar_plate_gap = 4;       // mm, spacing between separately printed halves
 
-/* [Printed wing screws] */
+/* [Printed hex-head bolts] */
 screw_d = 10;               // mm, coarse printed screw major diameter
 screw_pitch = 2;            // mm per turn; custom thread, not an M10 hardware fit
 screw_shaft_h = 16;         // mm, below the head
 screw_clearance_d = 11.2;   // mm, unthreaded collar holes
 thread_diameter_clearance = 0.6; // mm, allowance for printing the internal thread
 screw_xy = 40;             // mm, four screw centres at (+/-40, +/-40)
-screw_head_d = 16;          // mm, circular bearing hub under the two wings
-screw_head_h = 4.2;         // mm, head-down print orientation
-screw_wing_span = 36;       // mm, complete two-wing grip length
-screw_wing_width = 12;      // mm, rounded outer paddle width
-screw_wing_neck = 6.3;      // mm, wing root width at the bearing hub
-screw_top_r = 2.1;          // mm, exposed wing-head top edges
+screw_head_d = 20;          // mm, original hexagonal head diameter across corners
+screw_head_h = 6.3;         // mm, head-down print orientation
 bearing_flat_extra = 0.1;  // mm per side, flat contact margin around screw head
-socket_wall = 1.68;         // mm, solid wall protected around each threaded mouth
 screw_tip_chamfer = 0.8;    // mm, shaft insertion lead-in
 thread_bottom_extra = 2;    // mm, one extra pitch below the seated screw tip
-screw_plate_pitch = 42;    // mm, four-wing-screw plate layout
+screw_plate_pitch = 25;    // mm, original four-bolt plate layout
 thread_fn = 64;            // thread facets, independent of large circles
 
 /* [Colors] */
@@ -77,7 +70,7 @@ liner_color = "DimGray";
 puck_color = "Silver";
 
 /* [Output] */
-show = "exploded"; // [base, collar-set, screw, screw-set, coupon-base, assembly, exploded, section, glass-fit, glass-insertion, collar-fit, collar-insertion, screw-fit, screw-insertion, screw-path, puck-fit, puck-insertion]
+show = "exploded"; // [base, collar-set, screw, screw-set, coupon-base, assembly, exploded, section, glass-fit, glass-insertion, collar-fit, collar-insertion, plate-end-fit, screw-fit, screw-insertion, screw-path, puck-fit, puck-insertion]
 insertion_side = 1;        // [1, -1]
 exploded_gap = 25;         // mm, illustration spacing
 collar_entry_travel = 140; // mm, clears the complete support shoulder
@@ -115,12 +108,11 @@ assert(pocket_d - 2 * (puck_roof + 2 * eps) > puck_lens_d &&
        liner_opening_d >= pocket_d && liner_opening_d < glass_base_d,
        "puck stop and liner must clear the lens and support the glass rim");
 assert(screw_head_d > screw_clearance_d &&
-       sqrt(2) * screw_xy - screw_wing_span / 2 > glass_neck_d / 2 &&
-       screw_plate_pitch > screw_wing_span,
-       "wing screws must bear on the collar, turn clear of glass, and print apart");
-assert(collar_top_r <= collar_h && shoulder_edge_r < collar_z - seat_floor_z &&
-       2 * screw_top_r < min(screw_head_d, screw_wing_neck, screw_wing_width),
-       "top rounds must leave connected material below and between the edges");
+       sqrt(2) * screw_xy - screw_head_d / 2 > glass_neck_d / 2 &&
+       screw_plate_pitch > screw_head_d,
+       "bolts must bear on the collar, turn clear of glass, and print apart");
+assert(collar_top_r <= collar_h,
+       "plate top rounds must leave connected material below the edges");
 
 module screw_positions() {
     for (x = [-screw_xy, screw_xy], y = [-screw_xy, screw_xy])
@@ -143,11 +135,8 @@ module foot_blank(diameter) {
     if (diameter > collar_outer_d) {
         cyl(d = diameter, h = floor_h, rounding2 = foot_edge_r, anchor = BOT);
     }
-    cyl(d = collar_outer_d, h = collar_z, rounding2 = shoulder_edge_r, anchor = BOT);
-    // Keep the threaded mouths surrounded by the original solid shoulder.
-    screw_positions() translate([0, 0, collar_z - shoulder_edge_r])
-        cylinder(d = screw_d + thread_diameter_clearance + 2 * socket_wall,
-                 h = shoulder_edge_r);
+    // This entire top annulus is the mating face for the flat plate undersides.
+    cylinder(d = collar_outer_d, h = collar_z);
 }
 
 module stabilizer_base(coupon = false) {
@@ -155,12 +144,6 @@ module stabilizer_base(coupon = false) {
         foot_blank(coupon ? collar_outer_d : foot_d);
         translate([0, 0, seat_floor_z])
             cylinder(d = seat_d * bore_factor, h = collar_z - seat_floor_z + eps);
-        difference() {
-            inner_top_round_cut(seat_d * bore_factor / 2, shoulder_edge_r, collar_z);
-            screw_positions() translate([0, 0, collar_z - shoulder_edge_r - eps])
-                cylinder(d = screw_d + thread_diameter_clearance + 2 * socket_wall,
-                         h = shoulder_edge_r + 2 * eps);
-        }
         screw_positions() translate([0, 0, thread_bottom_z])
             screw_thread(internal = true, length = thread_cut_h);
         puck_cutouts();
@@ -175,16 +158,6 @@ module inner_top_round_cut(radius, round_r, top_z) {
             square([round_r, round_r + eps]);
             translate([round_r, 0]) circle(r = round_r);
         }
-}
-
-// Same quarter-circle section along each plate's straight split edge.
-module split_top_round_cut(side) {
-    scale([side, 1, 1]) rotate([90, 0, 0])
-        linear_extrude(height = 2 * collar_outer_d, center = true, convexity = 10)
-            translate([collar_split_gap / 2, collar_h - collar_top_r]) difference() {
-                square([collar_top_r, collar_top_r + eps]);
-                translate([collar_top_r, 0]) circle(r = collar_top_r);
-            }
 }
 
 // Copy the proven open-bottom pocket and 45-degree stop, then open its roof
@@ -232,23 +205,21 @@ module liner_ring() {
 
 module collar_blank() {
     difference() {
-        union() {
-            cyl(d = collar_outer_d, h = collar_h, rounding2 = collar_top_r, anchor = BOT);
-            // Preserve a complete flat bearing face beneath every screw head.
-            screw_positions()
-                cylinder(d = screw_head_d + 2 * bearing_flat_extra, h = collar_h);
+        intersection() {
+            // Keep the outer footprint aligned with the base's 132 mm shoulder.
+            cylinder(d = collar_outer_d, h = collar_h);
+            union() {
+                cyl(d = collar_outer_d, h = collar_h, rounding2 = collar_top_r, anchor = BOT);
+                // Keep flat bearing areas within that original footprint.
+                screw_positions()
+                    cylinder(d = screw_head_d + 2 * bearing_flat_extra, h = collar_h);
+            }
         }
         translate([0, 0, -eps])
             cylinder(d = collar_opening_d * bore_factor, h = collar_h + 2 * eps);
-        translate([0, 0, -eps])
-            cylinder(d1 = (collar_opening_d + 2 * collar_edge_chamfer + 2 * eps) * bore_factor,
-                     d2 = collar_opening_d * bore_factor, h = collar_edge_chamfer + eps);
         difference() {
-            union() {
-                inner_top_round_cut(collar_opening_d * bore_factor / 2,
-                                    collar_top_r, collar_h);
-                for (side = [-1, 1]) split_top_round_cut(side);
-            }
+            inner_top_round_cut(collar_opening_d * bore_factor / 2,
+                                collar_top_r, collar_h);
             screw_positions() translate([0, 0, -eps])
                 cylinder(d = screw_head_d + 2 * bearing_flat_extra,
                          h = collar_h + 2 * eps);
@@ -281,23 +252,8 @@ module thumbscrew() {
                     cylinder(d = screw_d, h = screw_shaft_h - screw_tip_chamfer + eps);
             }
         }
-        translate([0, 0, screw_shaft_h]) wing_head();
-    }
-}
-
-// Two rounded paddles and a bearing hub with a flat underside. The exposed
-// top edges are softened; the head-down export keeps the shaft upright.
-module wing_head() {
-    union() {
-        cyl(d = screw_head_d, h = screw_head_h, rounding2 = screw_top_r, anchor = BOT);
-        for (side = [-1, 1]) hull() {
-            translate([side * (screw_head_d / 2 - screw_wing_neck / 2), 0, 0])
-                cyl(d = screw_wing_neck, h = screw_head_h,
-                    rounding2 = screw_top_r, anchor = BOT);
-            translate([side * (screw_wing_span - screw_wing_width) / 2, 0, 0])
-                cyl(d = screw_wing_width, h = screw_head_h,
-                    rounding2 = screw_top_r, anchor = BOT);
-        }
+        translate([0, 0, screw_shaft_h])
+            cylinder(d = screw_head_d, h = screw_head_h, $fn = 6);
     }
 }
 
@@ -403,6 +359,10 @@ else if (show == "collar-insertion") intersection() {
         translate([0, 0, glass_bottom_z]) glass_envelope();
         translate([0, 0, collar_z]) collar_half(-insertion_side);
     }
+}
+else if (show == "plate-end-fit") intersection() {
+    collar_half(1);
+    collar_half(-1);
 }
 else if (show == "screw-fit") intersection() {
     stabilizer_base();

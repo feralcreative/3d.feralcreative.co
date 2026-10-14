@@ -12,11 +12,11 @@ bin-stacking-clip 19
 bong-liftout-cradle 6
 bong-liftout-cradle-coupon 6
 bong-liftout-cradle-ring-coupon 1
-bong-stabilizer-base 8
-bong-stabilizer-collar-set 2
-bong-stabilizer-coupon-base 4
-bong-stabilizer-screw 4
-bong-stabilizer-screw-set 4
+bong-stabilizer-base 9
+bong-stabilizer-collar-set 4
+bong-stabilizer-coupon-base 5
+bong-stabilizer-screw 6
+bong-stabilizer-screw-set 6
 can-light-lens 1
 can-light-trim 1
 cat-gap-wedge 12
