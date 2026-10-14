@@ -17,7 +17,7 @@ glass_total_h = 419.1;       // mm, 16.5 inches; reference only
 glass_filled_mass = 1020.6;  // g, 36 ounces; reference only
 
 /* [Foot and glass clearance] */
-foot_d = 195;               // mm, footprint diameter
+foot_d = 172;               // mm, footprint diameter
 floor_h = 4.2;              // mm, outer foot thickness; centre rises for the puck
 foot_edge_r = floor_h;      // mm, full-height top roundover; underside stays flat
 seat_diameter_clearance = 1.5; // mm, 0.75 mm radial glass clearance

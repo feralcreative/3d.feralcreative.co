@@ -4,7 +4,7 @@ Source: [bong-stabilizer.scad](../bong-stabilizer.scad). First design for a 95 m
 
 ## Construction
 
-A 195 mm-wide foot has a 96.5 mm seat and a solid plastic shoulder. Two 6.3 mm-thick collar halves sit on that shoulder at Z=25.4 mm. Their 86 mm opening overlaps the glass rim by 4.5 mm radially. Four coarse, custom printed hex-head bolts hold the collar to the shoulder; tightening seats plastic against plastic rather than clamping the glass. These are 10 mm-diameter, 2 mm-pitch trapezoidal threads, not standard M10 hardware threads. The hex heads are 20 mm across corners (17.32 mm across flats) and 6.3 mm thick, with flat upper and bearing faces. The shafts and collar hole dimensions remain unchanged. Use the updated plates for the flush end joints.
+A 172 mm-wide foot (20 mm beyond the 132 mm shoulder on each side) has a 96.5 mm seat and a solid plastic shoulder. Two 6.3 mm-thick collar halves sit on that shoulder at Z=25.4 mm. Their 86 mm opening overlaps the glass rim by 4.5 mm radially. Four coarse, custom printed hex-head bolts hold the collar to the shoulder; tightening seats plastic against plastic rather than clamping the glass. These are 10 mm-diameter, 2 mm-pitch trapezoidal threads, not standard M10 hardware threads. The hex heads are 20 mm across corners (17.32 mm across flats) and 6.3 mm thick, with flat upper and bearing faces. The shafts and collar hole dimensions remain unchanged. Use the updated plates for the flush end joints.
 
 The raised base's complete mating annulus is flat at Z=25.4 mm, from the 96.5 mm seat opening to its 132 mm outside diameter, apart from the threaded sockets and front stem relief. Both plate undersides are flat, without a bevel around their 86 mm opening. Their outside edges align with the base shoulder so the halves seat flush across the mating area. The two rails now split along Y=0: each +X end is shortened by 12.5 mm to form the 25 mm stem gap. The opposite ends meet flush on Y=0, with no nominal gap or rounded recess. Each rail stays one connected printed piece with two bolt holes. The plates keep full-height 6.3 mm rounds on their exposed outer and inner top edges. Flat bearing areas beneath the bolt heads are clipped to the original 132 mm outer footprint. The wide foot's 4.2 mm top outside round, glass-seat dimensions, threaded shafts and LED pocket remain unchanged.
 
@@ -18,7 +18,7 @@ The Bambu LED puck is 59.4 mm in diameter and 8 mm thick. Its underside pocket u
 
 | File | Contents | Orientation |
 | --- | --- | --- |
-| [bong-stabilizer-base.stl](../bong-stabilizer-base.stl) | One 195 mm foot with flat mating shoulder and no pad recesses, flat bottom and 4.2 mm top edge radius, LED pocket and open light path and stem relief, v10 | Flat underside on bed |
+| [bong-stabilizer-base.stl](../bong-stabilizer-base.stl) | One 172 mm foot with flat mating shoulder and no pad recesses, flat bottom and 4.2 mm top edge radius, LED pocket and open light path and stem relief, v11 | Flat underside on bed |
 | [bong-stabilizer-collar-set.stl](../bong-stabilizer-collar-set.stl) | Both rounded-top collar halves with fully flat undersides and rear end faces and 25 mm front gap, spaced apart, v06 | Flat undersides on bed, as exported |
 | [bong-stabilizer-screw-set.stl](../bong-stabilizer-screw-set.stl) | Four printed hex-head bolts, v06; 45 × 42.3 mm layout | Flat heads on bed, as exported |
 | [bong-stabilizer-screw.stl](../bong-stabilizer-screw.stl) | One hex-head test/replacement bolt, v06 | Flat head on bed, as exported |
