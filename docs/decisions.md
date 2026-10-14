@@ -11,6 +11,8 @@
 - Preserve the `MjpegStream` fetch-and-decode implementation from `stream.js`.
 - The recorded reason for rejecting a direct multipart image source is failed rendering over the HTTP/2 paths used by the site and reverse proxy.
 - Preserve aborts, bounded buffering, reconnect backoff, JPEG blob URL revocation, and stalled-frame recovery.
+- The private production proxy must send the unchanged multipart body as `application/octet-stream`, retain its `boundary` parameter, and set `X-Content-Type-Options: nosniff`. WebKit cancels `multipart/x-mixed-replace` subresource loads that are not image requests, including the client's fetch path; see [WebKit's subresource loader](https://github.com/WebKit/WebKit/blob/main/Source/WebCore/loader/SubresourceLoader.cpp).
+- An isolated local fixture on 2026-10-13 reproduced `Load failed` in desktop Safari with the original multipart response header; changing only the outer MIME type displayed JPEG frames and passed restart checks. Chrome with a mobile viewport also displayed frames. Physical iPhone and production verification remain pending.
 - Live browser/proxy reproduction of the recorded HTTP/2 issue: TBD.
 
 ## Send notifications independently of the browser

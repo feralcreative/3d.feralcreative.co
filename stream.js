@@ -10,7 +10,9 @@
  *
  * The stream is fetched from our own proxy (see /stream in
  * printer-proxy-server.js) so that the Surveillance Station StmKey stays on the
- * server instead of shipping to every visitor in config.js.
+ * server instead of shipping to every visitor in config.js. The proxy sends
+ * application/octet-stream with the multipart boundary parameter: WebKit
+ * cancels multipart/x-mixed-replace fetches unless they are image requests.
  */
 
 const RECONNECT_BASE_MS = 1000;

@@ -179,6 +179,7 @@ Run commands from the repository root. Read the verification limits below before
 ### Streaming, models, and repair
 
 - Preserve `MjpegStream` multipart parsing, blob URL cleanup, abort behavior, reconnect backoff, and stalled-frame checks.
+- Keep the proxy stream response as `application/octet-stream` with its multipart `boundary` parameter and `X-Content-Type-Options: nosniff`; WebKit cancels multipart fetches that are not image requests.
 - Do not replace the streaming implementation with a raw MJPEG image URL without validating the recorded HTTP/2 behavior.
 - Register `/stream` before the production proxy catch-all; preserve Nginx buffering and timeout settings for long responses.
 - The `ModelViewer` methods named `setHash` and `getHashFileName` operate on the `model` query parameter, not a URL fragment.
