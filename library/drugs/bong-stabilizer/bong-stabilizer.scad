@@ -45,6 +45,11 @@ collar_split_gap = 0;       // mm, flat ends meet flush when the halves are inst
 collar_top_r = collar_h;    // mm, full-height top rounds on the retaining plates
 collar_plate_gap = 4;       // mm, spacing between separately printed halves
 
+/* [Stem cutout] */
+stem_cutout_w = 25;        // mm, proven +X opening from bong-liftout-cradle
+stem_cutout_from_glass = 12.8; // mm, cradle cutout bottom 17 minus glass seat 4.2
+stem_cutout_top_r = 3;     // mm, same upper corner rounds as the printed cradle
+
 /* [Printed hex-head bolts] */
 screw_d = 10;               // mm, coarse printed screw major diameter
 screw_pitch = 2;            // mm per turn; custom thread, not an M10 hardware fit
@@ -87,6 +92,8 @@ glass_bottom_z = seat_floor_z + liner_h;
 collar_z = glass_bottom_z + glass_neck_z + glass_top_clearance;
 screw_head_z = collar_z + collar_h;
 screw_tip_z = screw_head_z - screw_shaft_h;
+stem_cutout_bottom_z = glass_bottom_z + stem_cutout_from_glass;
+stem_corner_segments = $fn / 4; // matches the proven quarter-circle cutter
 thread_bottom_z = screw_tip_z - thread_bottom_extra;
 thread_cut_h = screw_shaft_h + 2 * thread_bottom_extra;
 bore_factor = 1 / cos(180 / $fn);
@@ -113,6 +120,12 @@ assert(screw_head_d > screw_clearance_d &&
        "bolts must bear on the collar, turn clear of glass, and print apart");
 assert(collar_top_r <= collar_h,
        "plate top rounds must leave connected material below the edges");
+
+assert(stem_cutout_w > 0 && stem_cutout_w < collar_opening_d &&
+       stem_cutout_bottom_z > seat_floor_z && stem_cutout_bottom_z < collar_z &&
+       stem_cutout_top_r > 0 && stem_cutout_top_r < collar_h &&
+       stem_cutout_w / 2 + stem_cutout_top_r < screw_xy - screw_head_d / 2,
+       "stem opening must preserve the glass seat, plate and bolt bearing areas");
 
 module screw_positions() {
     for (x = [-screw_xy, screw_xy], y = [-screw_xy, screw_xy])
@@ -147,7 +160,30 @@ module stabilizer_base(coupon = false) {
         screw_positions() translate([0, 0, thread_bottom_z])
             screw_thread(internal = true, length = thread_cut_h);
         puck_cutouts();
+        stem_cutout();
     }
+}
+
+// Copy the cradle's +X slot relative to the glass seat, through base and plate.
+// The bottom and straight width stay fixed; only the two top corners are rounded.
+module stem_cutout() {
+    translate([0, -stem_cutout_w / 2, stem_cutout_bottom_z])
+        cube([foot_d / 2 + eps, stem_cutout_w,
+              screw_head_z - stem_cutout_bottom_z + eps]);
+    for (side = [-1, 1]) scale([1, side, 1])
+        rotate([90, 0, 90])
+        linear_extrude(height = foot_d / 2 + eps, convexity = 10)
+        polygon(concat(
+            [[stem_cutout_w / 2 - eps, screw_head_z - stem_cutout_top_r]],
+            [for (i = [0:stem_corner_segments])
+                i == 0 ? [stem_cutout_w / 2, screw_head_z - stem_cutout_top_r] :
+                i == stem_corner_segments ? [stem_cutout_w / 2 + stem_cutout_top_r, screw_head_z] :
+                [stem_cutout_w / 2 + stem_cutout_top_r +
+                    stem_cutout_top_r * cos(180 - 90 * i / stem_corner_segments),
+                 screw_head_z - stem_cutout_top_r +
+                    stem_cutout_top_r * sin(180 - 90 * i / stem_corner_segments)]],
+            [[stem_cutout_w / 2 + stem_cutout_top_r, screw_head_z + eps],
+             [stem_cutout_w / 2 - eps, screw_head_z + eps]]));
 }
 
 // Local tangent-circle mask: opens an inner top edge without changing its
@@ -155,7 +191,7 @@ module stabilizer_base(coupon = false) {
 module inner_top_round_cut(radius, round_r, top_z) {
     rotate_extrude(convexity = 10)
         translate([radius, top_z - round_r]) difference() {
-            square([round_r, round_r + eps]);
+            translate([-eps, 0]) square([round_r + eps, round_r + eps]);
             translate([round_r, 0]) circle(r = round_r);
         }
 }
@@ -226,6 +262,7 @@ module collar_blank() {
         }
         screw_positions() translate([0, 0, -eps])
             cylinder(d = screw_clearance_d * bore_factor, h = collar_h + 2 * eps);
+        translate([0, 0, -collar_z]) stem_cutout();
     }
 }
 
@@ -233,10 +270,11 @@ module collar_half(side = 1) {
     color(side > 0 ? right_collar_color : left_collar_color)
     intersection() {
         collar_blank();
-        translate([side > 0 ? collar_split_gap / 2 : -collar_outer_d,
-                   -collar_outer_d, -eps])
-            cube([collar_outer_d - collar_split_gap / 2,
-                  2 * collar_outer_d, collar_h + 2 * eps]);
+        // Split along Y so the +X stem gap trims the end of each rail.
+        translate([-collar_outer_d,
+                   side > 0 ? collar_split_gap / 2 : -collar_outer_d, -eps])
+            cube([2 * collar_outer_d,
+                  collar_outer_d - collar_split_gap / 2, collar_h + 2 * eps]);
     }
 }
 
@@ -264,7 +302,7 @@ module screw_print() {
 
 module collar_print_set() {
     for (side = [-1, 1])
-        translate([side * collar_plate_gap / 2, 0, 0]) collar_half(side);
+        translate([0, side * collar_plate_gap / 2, 0]) collar_half(side);
 }
 
 module screws_print_set() {
@@ -288,7 +326,7 @@ module glass_envelope(height = glass_total_h) {
 module assembly(explode = false) {
     stabilizer_base();
     for (side = [-1, 1])
-        translate([side * (explode ? exploded_gap : 0), 0,
+        translate([0, side * (explode ? exploded_gap : 0),
                    collar_z + (explode ? exploded_gap : 0)]) collar_half(side);
     screw_positions() translate([0, 0, screw_tip_z + (explode ? 2 * exploded_gap : 0)])
         thumbscrew();
@@ -306,8 +344,8 @@ module collar_sweep(side) {
         linear_extrude(height = collar_h, convexity = 10)
             minkowski() {
                 projection() collar_half(side);
-                translate([side > 0 ? 0 : -collar_entry_travel, -eps / 2])
-                    square([collar_entry_travel, eps]);
+                translate([-eps / 2, side > 0 ? 0 : -collar_entry_travel])
+                    square([eps, collar_entry_travel]);
             }
 }
 
