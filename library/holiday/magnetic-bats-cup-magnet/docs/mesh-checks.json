@@ -1,0 +1,212 @@
+[
+  {
+    "file": "halloween-bat-body14-cup52.stl",
+    "triangles": 3240,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 30323.408105527837,
+    "bounds_mm": [
+      [
+        -145.38548278808594,
+        -56.65602111816406,
+        0.0
+      ],
+      [
+        54.58079147338867,
+        143.30796813964844,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body15-cup52.stl",
+    "triangles": 3410,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 23894.408186608227,
+    "bounds_mm": [
+      [
+        -37.08980178833008,
+        -35.88908004760742,
+        0.0
+      ],
+      [
+        162.1183319091797,
+        164.0902557373047,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body16-cup52.stl",
+    "triangles": 2886,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 25349.439202079742,
+    "bounds_mm": [
+      [
+        -80.67083740234375,
+        -129.0750274658203,
+        0.0
+      ],
+      [
+        118.974365234375,
+        70.91050720214844,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body17-cup52.stl",
+    "triangles": 3642,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 20928.599367315026,
+    "bounds_mm": [
+      [
+        -116.40807342529297,
+        -75.95699310302734,
+        0.0
+      ],
+      [
+        83.5579605102539,
+        122.41465759277344,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body19-cup52.stl",
+    "triangles": 3210,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 33376.47491681528,
+    "bounds_mm": [
+      [
+        -120.46882629394531,
+        -71.7713394165039,
+        0.0
+      ],
+      [
+        78.99642944335938,
+        128.1453857421875,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body21-cup52.stl",
+    "triangles": 3064,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 32151.353667260915,
+    "bounds_mm": [
+      [
+        -135.81117248535156,
+        -74.75650787353516,
+        0.0
+      ],
+      [
+        63.322837829589844,
+        125.18250274658203,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body22-cup52.stl",
+    "triangles": 2822,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 26732.714566346625,
+    "bounds_mm": [
+      [
+        -97.7373046875,
+        -81.96461486816406,
+        0.0
+      ],
+      [
+        82.2371826171875,
+        98.2121353149414,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body23-cup52.stl",
+    "triangles": 3894,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 27177.80356332658,
+    "bounds_mm": [
+      [
+        -98.33131408691406,
+        -102.0352783203125,
+        0.0
+      ],
+      [
+        100.66715240478516,
+        97.85562896728516,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body25-cup52.stl",
+    "triangles": 3844,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 33642.38479060164,
+    "bounds_mm": [
+      [
+        -166.5446014404297,
+        -43.040924072265625,
+        0.0
+      ],
+      [
+        32.46067810058594,
+        156.85398864746094,
+        13.979999542236328
+      ]
+    ]
+  },
+  {
+    "file": "halloween-bat-body26-cup52.stl",
+    "triangles": 3120,
+    "shells": 2,
+    "degenerate": 0,
+    "bad_edges": 0,
+    "winding_errors": 0,
+    "volume_mm3": 31215.79648472936,
+    "bounds_mm": [
+      [
+        -86.66792297363281,
+        -141.51560974121094,
+        0.0
+      ],
+      [
+        112.14757537841797,
+        58.46868896484375,
+        13.979999542236328
+      ]
+    ]
+  }
+]
