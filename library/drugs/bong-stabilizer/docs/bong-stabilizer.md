@@ -19,6 +19,7 @@ The Bambu LED puck is 59.4 mm in diameter and 8 mm thick. Its underside pocket u
 | File | Contents | Orientation |
 | --- | --- | --- |
 | [bong-stabilizer-base.stl](../bong-stabilizer-base.stl) | One 172 mm foot with flat mating shoulder and no pad recesses, flat bottom and 4.2 mm top edge radius, LED pocket and open light path and stem relief, v11 | Flat underside on bed |
+| `_work/stl/bong-stabilizer-lens.stl` | Orange PETG gel lens: 95 mm disk, 3 mm rim, 60 mm window 0.42 mm thick (0.30 first layer + one 0.12 layer), v01 | Window on bed, as exported |
 | [bong-stabilizer-collar-set.stl](../bong-stabilizer-collar-set.stl) | Both rounded-top collar halves with fully flat undersides and rear end faces and 25 mm front gap, spaced apart, v06 | Flat undersides on bed, as exported |
 | [bong-stabilizer-screw-set.stl](../bong-stabilizer-screw-set.stl) | Four printed hex-head bolts, v06; 45 × 42.3 mm layout | Flat heads on bed, as exported |
 | [bong-stabilizer-screw.stl](../bong-stabilizer-screw.stl) | One hex-head test/replacement bolt, v06 | Flat head on bed, as exported |
@@ -31,7 +32,7 @@ Before printing the wide foot, print the coupon base, both production collar hal
 ## Assembly
 
 1. Insert the LED puck from underneath, lens facing up, and route its cable in the open underside groove. The proven snug pocket is the retention method; verify that this print holds it before lifting the assembly.
-2. Put a 1 mm-thick soft liner ring, approximately 95 mm outside diameter with a 60 mm centre opening, into the seat. A solid disk would block the light. The ring raises the glass to the design's seating height and cushions the bottom.
+2. Drop the orange PETG lens into the seat, window down. Its 3 mm rim replaces the old 1 mm liner ring and takes up the roughly 3 mm of vertical glass play Ziad measured on the printed part; the 0.42 mm window spans the light opening and tints the light. The modelled flare says a 3 mm rim would meet the collar 1.2 mm early, so the measured play, not the model, is what makes this fit.
 3. Lower the glass straight into the seat with both collar halves removed.
 4. Move the rails in from opposite Y sides above the flare. Bring their rear ends together, align the 25 mm front gap with the +X stem, and align their holes with the four threaded sockets.
 5. Turn the printed hex-head bolts in by hand until their heads hold the collar against the plastic shoulder. Stop if a bolt binds or the collar contacts the glass before reaching the shoulder.

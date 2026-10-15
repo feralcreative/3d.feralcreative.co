@@ -1,7 +1,8 @@
 // Wide foot and split retaining collar for a 95 mm glass bong base.
 // Print the foot upright, both collar halves flat, and four hex-head bolts head-down.
 // All fasteners are printed. The collar seats on the plastic shoulder, not glass.
-// Fit a 1 mm soft liner RING in the seat. The foot underside has no pad recesses.
+// An orange PETG lens sits in the seat: its 3 mm rim carries the glass and takes
+// up the measured play; its thin window covers the light. No underside pad recesses.
 // The Bambu LED puck enters from underneath; its lens shines through the seat.
 // Test coupon-base with the production collar and one screw before the wide foot.
 
@@ -22,7 +23,13 @@ floor_h = 4.2;              // mm, outer foot thickness; centre rises for the pu
 foot_edge_r = floor_h;      // mm, full-height top roundover; underside stays flat
 seat_diameter_clearance = 1.5; // mm, 0.75 mm radial glass clearance
 glass_top_clearance = 0.8;  // mm above the highest measured flare
-liner_h = 1;               // mm, removable soft disk in the seat
+liner_h = 1;               // mm, design glass lift that the seat heights are keyed to
+
+/* [Lens] */
+lens_rim_h = 3;            // mm, rim under the glass; takes up the measured ~3 mm play
+lens_window_t = 0.42;      // mm, 0.30 first layer + one 0.12 layer, the thinnest reliable sheet
+lens_d = glass_base_d;     // mm, outside diameter, 0.75 mm radial clearance in the seat
+lens_window_d = 60;        // mm, rim opening, wider than the seat's light hole
 
 /* [LED puck] */
 puck_d = 59.4;             // mm, same Bambu puck as pumpkin and haunted trees
@@ -71,11 +78,11 @@ right_collar_color = "DarkOrange";
 left_collar_color = "Goldenrod";
 screw_color = "MediumSeaGreen";
 glass_color = [0.6, 0.85, 1, 0.25];
-liner_color = "DimGray";
+lens_color = "DarkOrange";
 puck_color = "Silver";
 
 /* [Output] */
-show = "exploded"; // [base, collar-set, screw, screw-set, coupon-base, assembly, exploded, section, glass-fit, glass-insertion, collar-fit, collar-insertion, plate-end-fit, screw-fit, screw-insertion, screw-path, puck-fit, puck-insertion]
+show = "exploded"; // [base, lens, collar-set, screw, screw-set, coupon-base, assembly, exploded, section, glass-fit, glass-insertion, collar-fit, collar-insertion, plate-end-fit, screw-fit, screw-insertion, screw-path, puck-fit, puck-insertion]
 insertion_side = 1;        // [1, -1]
 exploded_gap = 25;         // mm, illustration spacing
 collar_entry_travel = 140; // mm, clears the complete support shoulder
@@ -118,6 +125,9 @@ assert(screw_head_d > screw_clearance_d &&
        sqrt(2) * screw_xy - screw_head_d / 2 > glass_neck_d / 2 &&
        screw_plate_pitch > screw_head_d,
        "bolts must bear on the collar, turn clear of glass, and print apart");
+assert(lens_d < seat_d && lens_window_t < lens_rim_h &&
+       lens_window_d > pocket_d - 2 * puck_roof && lens_window_d < lens_d,
+       "lens must drop into the seat, span the light hole and keep a rim");
 assert(collar_top_r <= collar_h,
        "plate top rounds must leave connected material below the edges");
 
@@ -231,11 +241,12 @@ module puck_entry_sweep() {
     }
 }
 
-module liner_ring() {
-    color(liner_color) difference() {
-        cylinder(d = glass_base_d, h = liner_h);
-        translate([0, 0, -eps])
-            cylinder(d = liner_opening_d * bore_factor, h = liner_h + 2 * eps);
+// Printed window-down: the thin window is the first layers on the bed.
+module gel_lens() {
+    color(lens_color) difference() {
+        cylinder(d = lens_d, h = lens_rim_h);
+        translate([0, 0, lens_window_t])
+            cylinder(d = lens_window_d * bore_factor, h = lens_rim_h);
     }
 }
 
@@ -330,10 +341,10 @@ module assembly(explode = false) {
                    collar_z + (explode ? exploded_gap : 0)]) collar_half(side);
     screw_positions() translate([0, 0, screw_tip_z + (explode ? 2 * exploded_gap : 0)])
         thumbscrew();
-    translate([0, 0, seat_floor_z]) liner_ring();
+    translate([0, 0, seat_floor_z]) gel_lens();
     translate([0, 0, puck_depth_extra - (explode ? exploded_gap : 0)]) puck_dummy();
     if (show != "section")
-        %color(glass_color) translate([0, 0, glass_bottom_z]) glass_envelope();
+        %color(glass_color) translate([0, 0, seat_floor_z + lens_rim_h]) glass_envelope();
 }
 
 // Exact continuous translation sweeps along the specified assembly route.
@@ -350,6 +361,7 @@ module collar_sweep(side) {
 }
 
 if (show == "base") stabilizer_base();
+else if (show == "lens") gel_lens();
 else if (show == "coupon-base") stabilizer_base(coupon = true);
 else if (show == "collar-set") collar_print_set();
 else if (show == "screw") screw_print();

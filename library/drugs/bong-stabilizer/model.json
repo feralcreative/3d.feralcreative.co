@@ -8,6 +8,7 @@
   ],
   "exports": [
     "bong-stabilizer-base",
+    "bong-stabilizer-lens",
     "bong-stabilizer-collar-set",
     "bong-stabilizer-screw-set",
     "bong-stabilizer-screw",
@@ -70,6 +71,7 @@
   },
   "publish_exports": [
     "bong-stabilizer-base",
+    "bong-stabilizer-lens",
     "bong-stabilizer-collar-set",
     "bong-stabilizer-screw-set",
     "bong-stabilizer-screw"
