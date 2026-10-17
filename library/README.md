@@ -106,6 +106,7 @@ Generate this index with `python3 utils/library.py catalog`. Filter the inventor
 | [shelves](cats/shelves/) | cats | legacy | — | FCSTD, STEP, STL | unreviewed |
 | [sleeping-cat](cats/sleeping-cat/) | cats | imported | — | 3MF, OBJ, PDF, SKP, STL | unreviewed |
 | [spring-maker](cats/spring-maker/) | cats | legacy | — | 3MF, STL | unreviewed |
+| [elfa](closet/elfa/) | closet | imported | — | 3MF, PDF, STL | unreviewed |
 | [bong-liftout-cradle](drugs/bong-liftout-cradle/) | drugs | authored | [SCAD](drugs/bong-liftout-cradle/bong-liftout-cradle.scad) (1) | SCAD, STL | unreviewed |
 | [bong-stabilizer](drugs/bong-stabilizer/) | drugs | authored | [SCAD](drugs/bong-stabilizer/bong-stabilizer.scad) (1) | SCAD, STL | unreviewed |
 | [esp32-case](electronics/esp32-case/) | electronics | imported | — | 3MF, PDF, STL | unreviewed |
