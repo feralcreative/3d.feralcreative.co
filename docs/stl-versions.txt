@@ -102,7 +102,7 @@ magnet-polarity-tool-10x2-shaft-c 1
 magnet-polarity-tool-10x2-shaft-d 1
 middle-finger-emboss 14
 middle-finger-wrist-emboss 1
-nacs-plug-holder 1
+nacs-plug-holder 2
 nacs-plug-holder-fit-coupon 1
 nightlight-floor-hood 16
 overture-spool-main-body-ribbed 10

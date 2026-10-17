@@ -30,7 +30,7 @@ Print the fit coupon first: `utils/build.sh library/automotive/tesla-charger-hol
 
 ## Mounting
 
-Two #8 / 4 mm countersunk wood screws, above and below the body, driven straight in from the front.
+Two #8 / 4 mm countersunk wood screws, sunk inside the body and side by side, 18 mm apart, in the bottom of the plug stop. With the plug out, drive them straight in through the bore, down 10 mm channels; 6 mm of plastic is clamped under each head. They sit at the upper end of the body, where they best resist the hanging handle trying to peel the holder off the wall.
 
 ## Not verified
 

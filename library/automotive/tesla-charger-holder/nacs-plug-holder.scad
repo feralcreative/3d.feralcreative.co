@@ -34,10 +34,13 @@ body_front = 56;           // mm, body depth from the wall
 body_back_w = 50;          // mm, body length along the plug axis from the stop
 
 /* [Mounting] */
-plate_t = 5;               // mm, wall plate
+plate_t = 5;               // mm, solid base under the body
 screw_d = 4.5;             // mm, clearance for a #8 / 4 mm wood screw
 screw_head_d = 9;          // mm, 90-degree countersink
-ear_gap = 7;               // mm, screw centre beyond the body
+screw_seat_z = 6;          // mm, countersink top above the wall: plastic clamped under the head
+screw_channel_d = 10;      // mm, driver and head access from the front, through the bore
+screw_x = 9;               // mm, either side of centre, clear of the latch slot
+screw_y = -15.5;           // mm, below the stop's centre, so the channel clears the bore's top lip
 
 /* [Coupon] */
 coupon_h = 10;             // mm, fit-test sleeve length
@@ -68,9 +71,6 @@ tooth_b = latch_hold_w + latch_engage / tan(hold_angle);
 tooth_c = tooth_b + tooth_top;
 tooth_d = tooth_c + (tooth_v - arm_top) / tan(ramp_angle);
 arm_free_w = tooth_a - 0.5;
-// Body extremes on the wall, for the screw ears.
-body_top_y = (half_h + wall) * cos(tilt) + end_wall * sin(tilt);
-body_bot_y = (low_v - body_back_w) * sin(tilt);
 
 assert(tooth_d < arm_root_w - 5, "tooth must sit on the free part of the arm");
 assert(arm_free_w - arm_end_gap > 0, "latch slot must stay in front of the stop");
@@ -103,20 +103,13 @@ module sleeve() {
     }
 }
 
-module plate() {
-    linear_extrude(plate_t) difference() {
-        hull() {
-            projection() sleeve();
-            translate([0, body_top_y + ear_gap]) circle(d = screw_head_d + 2 * wall);
-            translate([0, body_bot_y - ear_gap]) circle(d = screw_head_d + 2 * wall);
-        }
-    }
-}
-
+// Sunk into the body: the driver reaches the head down a channel from the bore,
+// with the plug out. The channels open into the bottom of the stop.
 module screw_hole() {
-    translate([0, 0, -eps]) cylinder(d = screw_d, h = plate_t + 2 * eps);
-    translate([0, 0, plate_t - screw_head_d / 2 + eps])
-        cylinder(d1 = 0, d2 = screw_head_d, h = screw_head_d / 2);
+    translate([0, 0, -eps]) cylinder(d = screw_d, h = screw_seat_z + 2 * eps);
+    translate([0, 0, screw_seat_z - screw_head_d / 2])
+        cylinder(d1 = 0, d2 = screw_head_d, h = screw_head_d / 2 + eps);
+    translate([0, 0, screw_seat_z]) cylinder(d = screw_channel_d, h = 200);
 }
 
 module bore_cut() {
@@ -158,17 +151,13 @@ module latch() {
 module holder() {
     color(holder_color) {
         difference() {
-            union() {
-                hull() {
-                    sleeve();
-                    linear_extrude(plate_t) projection() sleeve();
-                }
-                plate();
+            hull() {
+                sleeve();
+                linear_extrude(plate_t) projection() sleeve();
             }
             bore_cut();
             latch_slot();
-            translate([0, body_top_y + ear_gap, 0]) screw_hole();
-            translate([0, body_bot_y - ear_gap, 0]) screw_hole();
+            for (sx = [-screw_x, screw_x]) translate([sx, screw_y, 0]) screw_hole();
         }
         latch();
     }
