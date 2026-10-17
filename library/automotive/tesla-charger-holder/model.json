@@ -2,9 +2,14 @@
   "id": "tesla-charger-holder",
   "origin": "imported",
   "status": "unreviewed",
-  "scad": null,
-  "scad_files": [],
-  "exports": [],
+  "scad": "nacs-plug-holder.scad",
+  "scad_files": [
+    "nacs-plug-holder.scad"
+  ],
+  "exports": [
+    "nacs-plug-holder",
+    "nacs-plug-holder-fit-coupon"
+  ],
   "aliases": {
     "_originals/tesla/Tesla Charger Holder - 6223537/LICENSE.txt": "docs/tesla/Tesla Charger Holder - 6223537/LICENSE.txt",
     "_originals/tesla/Tesla Charger Holder - 6223537/README.txt": "docs/tesla/Tesla Charger Holder - 6223537/README.txt",
