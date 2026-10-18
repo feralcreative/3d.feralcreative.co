@@ -21,7 +21,7 @@ The lid drops into the shell's top opening on a stepped plate and rests on the r
 
 ## Stem
 
-The stem is cut off at Z=31.5 and printed separately in green. That is the lowest height at which a cylinder around it misses the lid's dish rim: below it, the rim comes closer to the stem's centre than the stem's widest point. A 0.75 mm orange stub stays under it, the same outline as the stem's base, so the glued stem covers it. A 5 mm peg, 3 mm tall, on the stub locates the stem; the socket in its base has 0.15 mm per side for glue. The stem prints standing on its cut face with no supports; its only overhang is the 5.3 mm socket roof, a short bridge. OpenSCAD's preview colours a ring of the dish green around the stem in the assembled view; the true geometry does not.
+The stem is cut off at Z=31.5 and printed separately in green. That is the lowest height at which a cylinder around it misses the lid's dish rim: below it, the rim comes closer to the stem's centre than the stem's widest point. A 0.75 mm orange stub stays under it, the same outline as the stem's base, so the glued stem covers it. A 5 mm peg, 3 mm tall, on the stub locates the stem; the socket in its base has 0.15 mm per side for glue. The stem prints standing on its cut face with no supports; its only overhang is the 5.3 mm socket roof, a short bridge. The stem is wrapped in `render()` because OpenSCAD's preview otherwise drew the lid's whole dish green in the assembled view.
 
 ## Walls and face
 

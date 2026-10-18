@@ -133,7 +133,9 @@ module stem_selector() translate([stem_centre[0], stem_centre[1], 0]) {
 
 module peg() translate([stem_centre[0], stem_centre[1], stem_cut_z - eps]) cylinder(d = peg_d, h = peg_h + eps);
 
-module stem() color(stem_color) difference() {
+// render() so the preview shows the real piece: OpenCSG draws this intersection
+// with the lid's whole dish in green.
+module stem() color(stem_color) render(convexity = 4) difference() {
     intersection() { lid(); stem_selector(); }
     translate([stem_centre[0], stem_centre[1], stem_cut_z - eps])
         cylinder(d = peg_d + 2 * peg_clearance, h = peg_h + peg_clearance + eps);
