@@ -624,13 +624,25 @@ module tile() color(tile_color)
 // A tile seated in every pocket, back on the floor. The turns map the tile's
 // (x, y, z) onto the barrel's (y, z, x): width round it, height along it,
 // thickness outward.
-module tiles_seated() {
+// out pushes every tile that far radially clear of its pocket, for an
+// exploded view.
+module tiles_seated(out = 0) {
     for (i = [0 : sign_count - 1])
         rotate([0, 0, i * 360 / sign_count])
-            translate([floor_r, 0, pocket_z])
+            translate([floor_r + out, 0, pocket_z])
                 rotate([0, 90, 0]) rotate([0, 0, 90])
                     tile();
 }
+
+// Entry points for can-holder-12oz-standard-set.scad, which `use`s this file
+// alongside both rings. Every part file in the set defines ribs(),
+// fit_coupon() and the rest, so the viewer only ever calls these, whose names
+// are unique across the set; inside them, names resolve in this file.
+module holder_part() can_holder();
+module holder_tiles(out = 0) tiles_seated(out);
+function holder_floor_z() = floor_t;
+function holder_top_z()   = total_h;
+function holder_od()      = outer_d;
 
 echo(str("outside ", outer_d, "  bore ", bore_d,
          "  across ribs ", bore_d - 2 * rib_h,

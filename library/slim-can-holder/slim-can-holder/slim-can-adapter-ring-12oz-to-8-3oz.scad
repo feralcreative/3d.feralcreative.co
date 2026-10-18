@@ -326,6 +326,13 @@ module fit_coupon() {
         }
 }
 
+// Entry points for can-holder-12oz-standard-set.scad, which `use`s this file.
+// Unique names, because every ring in the set defines adapter_ring(). Drawn as
+// used, lip up, z = 0 at the open bottom.
+module ring_to_8_3oz() adapter_ring();
+function ring_to_8_3oz_h()       = total_h;
+function ring_to_8_3oz_sleeve_h() = sleeve_h;
+
 // Printed orientation: lip on the bed. A rotate, not a mirror, so the ribs
 // keep their handedness (not that it matters on a symmetric part).
 module oriented(h) {

@@ -4,6 +4,7 @@
   "status": "unreviewed",
   "scad": "slim-can-holder-12oz.scad",
   "scad_files": [
+    "can-holder-12oz-standard-set.scad",
     "can-holder-12oz-standard.scad",
     "middle-finger-emboss.scad",
     "middle-finger-wrist-emboss.scad",
