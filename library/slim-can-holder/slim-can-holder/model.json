@@ -4,10 +4,11 @@
   "status": "unreviewed",
   "scad": "slim-can-holder-12oz.scad",
   "scad_files": [
-    "can-holder-12oz-standard-wagon-queen.scad",
+    "can-holder-12oz-standard.scad",
     "middle-finger-emboss.scad",
     "middle-finger-wrist-emboss.scad",
     "slim-can-adapter-ring-12oz-standard-to-slim.scad",
+    "slim-can-adapter-ring-12oz-to-8-3oz-nested.scad",
     "slim-can-adapter-ring-12oz-to-8-3oz.scad",
     "slim-can-adapter-ring-fish-12oz-to-8-3oz.scad",
     "slim-can-adapter.scad",
@@ -33,10 +34,13 @@
     "slim-can-screwdriver-tall",
     "slim-can-holder-3in-12oz-middle-finger-02",
     "slim-can-holder-8-3oz",
-    "can-holder-12oz-standard-wagon-queen",
+    "can-holder-12oz-standard",
     "slim-can-adapter-ring-12oz-standard-to-slim",
     "slim-can-adapter-ring-12oz-standard-to-slim-coupon",
-    "can-holder-12oz-standard-wagon-queen-coupon"
+    "can-holder-12oz-standard-coupon",
+    "can-holder-12oz-standard-tile",
+    "slim-can-adapter-ring-12oz-to-8-3oz-nested",
+    "slim-can-adapter-ring-12oz-to-8-3oz-nested-coupon"
   ],
   "aliases": {
     "parts/middle-finger-emboss.scad": "middle-finger-emboss.scad",
@@ -242,8 +246,9 @@
     "slim-can-holder-explicit-8-3oz",
     "slim-can-screwdriver-stubby",
     "slim-can-screwdriver-tall",
-    "can-holder-12oz-standard-wagon-queen",
-    "slim-can-adapter-ring-12oz-standard-to-slim"
+    "can-holder-12oz-standard",
+    "slim-can-adapter-ring-12oz-standard-to-slim",
+    "slim-can-adapter-ring-12oz-to-8-3oz-nested"
   ],
   "protected_assets": [
     "docs/bumper-dumper/snap-on-lid-for-lowes-mini-5-gallon-bucket-slim-fit-model_files/1442396-snap-on-lid-for-lowes-mini-5-gallon-bucket-slim-fit-90952f27-fea1-4435-aebc-6d75c7041dff.pdf",

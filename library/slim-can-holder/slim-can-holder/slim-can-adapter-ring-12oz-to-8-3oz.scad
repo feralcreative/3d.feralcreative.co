@@ -203,6 +203,11 @@ rib_foot = 2.0;
 // on it to fake a tight reading.
 coupon_h = 20.00;
 
+/* [Colors] */
+
+// Preview only. STLs carry no colour.
+ring_color = "Coral";
+
 /* [Quality] */
 
 // Chord error target (mm). 0.02 is the 0.4-nozzle figure.
@@ -299,7 +304,7 @@ module ribs() {
 // sleeve's outer face before it goes in — inside, not at it, so no face of
 // the clip is coincident with the sleeve.
 module adapter_ring() {
-    union() {
+    color(ring_color) union() {
         ring_solid();
         if (rib_count > 0 && rib_h > 0)
             intersection() {

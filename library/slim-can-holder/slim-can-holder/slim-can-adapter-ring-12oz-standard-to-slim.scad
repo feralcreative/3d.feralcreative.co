@@ -1,4 +1,4 @@
-// Adapter ring — drops into can-holder-12oz-standard-wagon-queen.scad and
+// Adapter ring — drops into can-holder-12oz-standard.scad and
 // holds a 355 ml / 12 oz SLIM can instead of a standard one.
 //
 // A copy of slim-can-adapter-ring-12oz-to-8-3oz.scad with the numbers moved
@@ -79,7 +79,7 @@ bore_comp = 0.60;
 
 /* [Host — the holder this drops into] */
 
-// These are read off can-holder-12oz-standard-wagon-queen.scad. Change them
+// These are read off can-holder-12oz-standard.scad. Change them
 // only if the holder changes; nothing here is a choice.
 
 // The holder's bore as drawn (mm): can 66.04 + slop 0.40 + comp 0.60.
@@ -177,6 +177,11 @@ rib_foot = 2.0;
 // on it to fake a tight reading.
 coupon_h = 20.00;
 
+/* [Colors] */
+
+// Preview only. STLs carry no colour.
+ring_color = "Teal";
+
 /* [Quality] */
 
 // Chord error target (mm). 0.02 is the 0.4-nozzle figure.
@@ -273,7 +278,7 @@ module ribs() {
 // sleeve's outer face before it goes in — inside, not at it, so no face of
 // the clip is coincident with the sleeve.
 module adapter_ring() {
-    union() {
+    color(ring_color) union() {
         ring_solid();
         if (rib_count > 0 && rib_h > 0)
             intersection() {
