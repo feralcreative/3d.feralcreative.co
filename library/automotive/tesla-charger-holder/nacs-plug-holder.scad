@@ -23,14 +23,15 @@ tooth_top = 0.6;           // mm, flat on the tooth crest
 arm_width = 9;             // mm, spring arm width
 arm_thick = 2.2;           // mm, spring arm thickness
 arm_recess = 1.0;          // mm, arm top below the bore floor so the plug rests on the floor, not the arm
-arm_root_w = 44;           // mm, from the stop to where the arm joins the body
+arm_root_w = -4;           // mm, arm root, behind the stop: printed wall-down, the arm grows up
+                           // from here, so its free end toward the mouth never starts in mid-air
 arm_side_gap = 0.6;        // mm, slit each side of the arm
 arm_end_gap = 0.8;         // mm, gap at the arm's free end
 arm_travel_extra = 0.8;    // mm, free travel under the arm beyond the tooth height
 
 /* [Body] */
 wall = 3;                  // mm, around the bore and under the latch slot
-body_front = 56;           // mm, body depth from the wall
+body_front = 60;           // mm, body depth from the wall
 body_back_w = 50;          // mm, body length along the plug axis from the stop
 
 /* [Mounting] */
@@ -39,7 +40,7 @@ screw_d = 4.5;             // mm, clearance for a #8 / 4 mm wood screw
 screw_head_d = 9;          // mm, 90-degree countersink
 screw_seat_z = 6;          // mm, countersink top above the wall: plastic clamped under the head
 screw_channel_d = 10;      // mm, driver and head access from the front, through the bore
-screw_x = 9;               // mm, either side of centre, clear of the latch slot
+screw_x = 11;              // mm, either side of centre; the channel clears the latch slot
 screw_y = -15.5;           // mm, below the stop's centre, so the channel clears the bore's top lip
 
 /* [Coupon] */
@@ -64,16 +65,17 @@ arm_top = floor_v - arm_recess;
 arm_bot = arm_top - arm_thick;
 slot_bot = arm_bot - (latch_engage + arm_travel_extra);
 low_v = slot_bot - wall;
-pivot_z = -low_v * sin(tilt) + end_wall * cos(tilt);
+sleeve_back = max(end_wall, 2 - arm_root_w + wall);
+pivot_z = -low_v * sin(tilt) + sleeve_back * cos(tilt);
 tooth_v = floor_v + latch_engage;
 tooth_a = latch_hold_w - arm_recess / tan(hold_angle);
 tooth_b = latch_hold_w + latch_engage / tan(hold_angle);
 tooth_c = tooth_b + tooth_top;
 tooth_d = tooth_c + (tooth_v - arm_top) / tan(ramp_angle);
-arm_free_w = tooth_a - 0.5;
+arm_free_w = tooth_d + 0.5;
 
-assert(tooth_d < arm_root_w - 5, "tooth must sit on the free part of the arm");
-assert(arm_free_w - arm_end_gap > 0, "latch slot must stay in front of the stop");
+assert(tooth_a > arm_root_w + 15, "the arm needs length behind the tooth to flex");
+assert(arm_free_w + arm_end_gap < bore_depth, "latch slot must end inside the full bore");
 
 // Local frame: x across the plug, y toward its top, z out of the bore.
 module plug_frame() {
@@ -94,8 +96,8 @@ module above_floor_2d(keep) {
 module sleeve() {
     intersection() {
         translate([-100, -200, 0]) cube([200, 400, body_front]);
-        plug_frame() translate([0, 0, -end_wall])
-            linear_extrude(end_wall + body_back_w, convexity = 4) hull() {
+        plug_frame() translate([0, 0, -sleeve_back])
+            linear_extrude(sleeve_back + body_back_w, convexity = 4) hull() {
                 bore_2d(wall);
                 translate([-(arm_width / 2 + arm_side_gap + wall), low_v])
                     square([arm_width + 2 * (arm_side_gap + wall), -low_v]);
@@ -131,15 +133,15 @@ module bore_cut() {
 
 module latch_slot() {
     plug_frame()
-        translate([-(arm_width / 2 + arm_side_gap), slot_bot, arm_free_w - arm_end_gap])
+        translate([-(arm_width / 2 + arm_side_gap), slot_bot, arm_root_w])
             cube([arm_width + 2 * arm_side_gap, floor_v - slot_bot + 1,
-                  arm_root_w - arm_free_w + arm_end_gap]);
+                  arm_free_w + arm_end_gap - arm_root_w]);
 }
 
 module latch() {
     plug_frame() {
-        translate([-arm_width / 2, arm_bot, arm_free_w])
-            cube([arm_width, arm_thick, arm_root_w + 2 - arm_free_w]);
+        translate([-arm_width / 2, arm_bot, arm_root_w - 2])
+            cube([arm_width, arm_thick, arm_free_w - arm_root_w + 2]);
         // Profile drawn as [v, w]: holding face toward the stop, lead-in toward the mouth.
         translate([-tooth_width / 2, 0, 0]) rotate([90, 0, 90])
             linear_extrude(tooth_width) polygon([

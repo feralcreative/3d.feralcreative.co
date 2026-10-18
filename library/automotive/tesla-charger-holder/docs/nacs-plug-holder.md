@@ -16,7 +16,7 @@ The bore is snug, 0.4 mm per side, and the hold comes from a printed cantilever 
 | Latch pocket | 9.71 wide, 6.2 long, 4 deep, ±0.2 | Tesla NACS Technical Specification TS-0023666 (2022), pp. 24–25 |
 | Pocket position | 20.2 mm behind the plug face (spec); 21.0 mm (STEP latch window) | Both; the tooth is self-locating, so either works |
 | Tooth | 2.2 mm engagement, 60° holding face, 35° lead-in, 8 mm wide | Design |
-| Arm | 9 × 2.2 mm, about 24 mm from root to tooth, 1.2% strain at full deflection | Design |
+| Arm | 9 × 2.2 mm, rooted 4 mm behind the stop, about 24 mm from root to tooth, 1.2% strain at full deflection | Design |
 
 Estimated release force, from beam theory with E ≈ 2000 MPa and μ 0.3–0.4, is 30–45 N, about a firm one-handed tug. The insertion force is about 8 N. These are estimates; `hold_angle` is the knob if it holds too hard or too loosely. Steeper holds harder and becomes self-locking near 60° with high friction.
 
@@ -24,13 +24,13 @@ The top of the bore is relieved past 36 mm and the floor past 48 mm, where the N
 
 ## Printing
 
-Print with the wall face on the bed. No supports: every downward-facing surface is at 45° or steeper. The arm prints as a 45° slab, so its bending runs diagonally across layers. PETG is the intended material.
+Print with the wall face on the bed. No supports: every downward-facing surface is at 45° or steeper, and nothing starts in mid-air. The arm is rooted at its low end, behind the stop, so it grows up from the body; the first version was rooted toward the mouth, its free end began as an island, and the slicer asked for supports inside the latch slot. The arm prints as a 45° slab, so its bending runs diagonally across layers. PETG is the intended material.
 
 Print the fit coupon first: `utils/build.sh library/automotive/tesla-charger-holder/nacs-plug-holder.scad -D 'show="coupon"' --name nacs-plug-holder-fit-coupon`. It is a 10 mm sleeve of the bore, with a tab on the latch side. The plug nose should slide through it with no force and almost no wobble. Adjust `plug_clearance` before printing the holder.
 
 ## Mounting
 
-Two #8 / 4 mm countersunk wood screws, sunk inside the body and side by side, 18 mm apart, in the bottom of the plug stop. With the plug out, drive them straight in through the bore, down 10 mm channels; 6 mm of plastic is clamped under each head. They sit at the upper end of the body, where they best resist the hanging handle trying to peel the holder off the wall.
+Two #8 / 4 mm countersunk wood screws, sunk inside the body and side by side, 22 mm apart, in the bottom of the plug stop. With the plug out, drive them straight in through the bore, down 10 mm channels; 6 mm of plastic is clamped under each head. They sit at the upper end of the body, where they best resist the hanging handle trying to peel the holder off the wall.
 
 ## Not verified
 
