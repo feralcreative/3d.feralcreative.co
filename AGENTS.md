@@ -32,6 +32,7 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Record that the last coupon was printed                                     | `utils/coupon.sh <source.scad> --printed`                                                                     |
 | Turn a one-path SVG trace into a BOSL2 bezpath to paste into a part        | `utils/svg2bez.py "_incoming/<trace>.svg" --height 80` (or `--width`)                                          |
 | Split a scanned STL into its overlapping shells so a part can union them   | `utils/stl-shells.py "_incoming/<thing>/mesh.stl"` (then `import()` each shell; see Gotchas)                    |
+| Fill a hollow mesh's section into a solid outline, for a flat wall or door  | `utils/section-outline.py "<mesh>.stl" --axis y --at 25 --name back_outline -o back-outline.scad` (`for (p = back_outline) polygon(p)`; needs numpy and shapely) |
 | Bend budget for the screen-fence clip's legs                                | `utils/legcheck.py`                                                                                               |
 | Compare leg section options                                                 | `utils/legcheck.py --sweep`                                                                                       |
 | Slice and verify the job                                                    | `utils/slice.sh <model-folder>/<output>.stl` or `utils/slice.sh <source.scad>`                                             |
