@@ -1,6 +1,7 @@
 // One-piece jack-o'-lantern: artwells' "LED tea light jack-o-lantern pumpkins"
 // (Printables 1835966, CC BY 4.0) traditional shell and stem lid, fused, with
 // the back quarter cut off and closed by a flat wall carrying a sliding door.
+// The stem is cut off and printed separately in green, glued onto a peg.
 // The door holds a solar cork light: its cork plugs into a collar on the door
 // like a bottle neck, the panel faces the sky from behind the pumpkin, its top
 // level with the pumpkin's so it hides from the front, and the light strand runs
@@ -32,6 +33,15 @@ include <back-outline.scad>
 /* [Seat] */
 lid_grow = 0.3;            // mm, lid edge pushed outward onto the rim so contact becomes overlap
 lid_edge_r = 23;           // mm, radius of the lid's top edge, to turn lid_grow into a scale
+
+/* [Stem] */
+stem_cut_z = 31.5;         // mm, lowest height where a cylinder separates the stem from the lid's dish rim
+stem_centre = [1.15, 2.36];// mm, stem's centroid at the cut
+stem_select_r = [11.6, 13.2]; // mm, selector radius up to stem_step_z, then above; stem reaches 11.3, rim starts 11.9
+stem_step_z = 32;          // mm, rim has fallen back to 13.7 by here; stem never reaches past 12.6
+peg_d = 5;                 // mm, locating peg on the pumpkin
+peg_h = 3;                 // mm
+peg_clearance = 0.15;      // mm per side, glue fit
 
 /* [Walls] */
 wall_add = 1.0;            // mm added inside the 1.7 mm wall at the widest point; must stay under 1.7
@@ -66,10 +76,11 @@ flange_h = 6;              // mm, UNMEASURED
 /* [Colors] */
 pumpkin_color = "DarkOrange"; // preview only
 door_color = "Peru";
+stem_color = "ForestGreen";
 light_color = "SaddleBrown";
 
 /* [Output] */
-show = "assembled"; // [assembled, body, door, print-body, print-door, section, pumpkin]
+show = "assembled"; // [assembled, body, door, stem, print-body, print-door, print-stem, section, pumpkin]
 
 /* [Hidden] */
 $fn = 96;
@@ -111,7 +122,24 @@ module face_membrane() intersection() {
     face_prism();
 }
 
-module pumpkin() {
+module lid() scale([1 + lid_grow / lid_edge_r, 1 + lid_grow / lid_edge_r, 1])
+    import(str(src, "stem-lid.stl"), convexity = 10);
+
+// Everything of the lid above the cut that belongs to the stem, not the dish rim.
+module stem_selector() translate([stem_centre[0], stem_centre[1], 0]) {
+    translate([0, 0, stem_cut_z]) cylinder(r = stem_select_r[0], h = stem_step_z - stem_cut_z + eps);
+    translate([0, 0, stem_step_z]) cylinder(r = stem_select_r[1], h = 40);
+}
+
+module peg() translate([stem_centre[0], stem_centre[1], stem_cut_z - eps]) cylinder(d = peg_d, h = peg_h + eps);
+
+module stem() color(stem_color) difference() {
+    intersection() { lid(); stem_selector(); }
+    translate([stem_centre[0], stem_centre[1], stem_cut_z - eps])
+        cylinder(d = peg_d + 2 * peg_clearance, h = peg_h + peg_clearance + eps);
+}
+
+module pumpkin(with_stem = true) {
     union() {
         shell();
         intersection() {
@@ -119,8 +147,8 @@ module pumpkin() {
             translate([-100, -100, -100]) cube([200, 200, 100 + thicken_top_z]);
         }
         face_membrane();
-        scale([1 + lid_grow / lid_edge_r, 1 + lid_grow / lid_edge_r, 1])
-            import(str(src, "stem-lid.stl"), convexity = 10);
+        if (with_stem) lid();
+        else { difference() { lid(); stem_selector(); } peg(); }
     }
 }
 
@@ -190,7 +218,7 @@ module body() {
     color(pumpkin_color) difference() {
         union() {
             intersection() {
-                pumpkin();
+                pumpkin(with_stem = false);
                 translate([-100, -100 + back_cut_y, -100]) cube(100 * [2, 1, 2]);
             }
             outline_slab();
@@ -206,14 +234,16 @@ module solar_light() {
     }
 }
 
-if (show == "assembled") { body(); door(); solar_light(); }
+if (show == "assembled") { body(); door(); stem(); solar_light(); }
 else if (show == "body") body();
 else if (show == "door") door();
+else if (show == "stem") stem();
+else if (show == "print-stem") translate([0, 0, -stem_cut_z]) stem();
 else if (show == "print-body") translate([0, 0, back_cut_y]) rotate([-90, 0, 0]) body();
 else if (show == "print-door") translate([0, 0, -wall_in_y]) rotate([90, 0, 0]) door();
 else if (show == "section") difference() {
-    union() { body(); door(); }
-    translate([0, -100, -100]) cube(200);
+    union() { body(); door(); stem(); }
+    translate([stem_centre[0], -100, -100]) cube(200);
 }
 else if (show == "pumpkin") color(pumpkin_color) pumpkin();
 else assert(false, str("unknown show: ", show));

@@ -9,7 +9,8 @@
   "exports": [
     "fence-pumpkin-traditional",
     "fence-pumpkin-traditional-body",
-    "fence-pumpkin-traditional-door"
+    "fence-pumpkin-traditional-door",
+    "fence-pumpkin-traditional-stem"
   ],
   "aliases": {},
   "protected_assets": [
