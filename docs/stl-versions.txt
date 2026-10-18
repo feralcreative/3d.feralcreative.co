@@ -18,6 +18,8 @@ bong-stabilizer-coupon-base 6
 bong-stabilizer-lens 1
 bong-stabilizer-screw 6
 bong-stabilizer-screw-set 6
+can-holder-12oz-standard-wagon-queen 1
+can-holder-12oz-standard-wagon-queen-coupon 1
 can-light-lens 1
 can-light-trim 1
 cat-gap-wedge 12
@@ -154,6 +156,8 @@ screen-fence-test-rail 4
 screen-fence-twin-coupon 1
 simplisafe-wire-guide 3
 slim-can-adapter 1
+slim-can-adapter-ring-12oz-standard-to-slim 1
+slim-can-adapter-ring-12oz-standard-to-slim-coupon 1
 slim-can-adapter-ring-12oz-to-8-3oz 2
 slim-can-adapter-ring-12oz-to-8-3oz-coupon 2
 slim-can-adapter-ring-fish-12oz-to-8-3oz 2
