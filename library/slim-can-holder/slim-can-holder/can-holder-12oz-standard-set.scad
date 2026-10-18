@@ -26,7 +26,7 @@ use <slim-can-adapter-ring-12oz-to-8-3oz-nested.scad>
 
 // Which can the holder is set up for: the holder alone, with ring 1, or with
 // both rings. "lineup" puts all three side by side.
-config = "8-3oz";   // [standard, slim-12oz, 8-3oz, lineup]
+config = "standard";   // [standard, slim-12oz, 8-3oz, lineup]
 // Seated, or pulled apart along the axis.
 exploded = false;
 // Gap between parts when exploded (mm). Tiles move out radially by half this.
@@ -35,6 +35,8 @@ explode_gap = 40;
 cut = false;
 show_cans  = true;
 show_tiles = true;
+// Logo on the tiles; the choices are the holder's.
+tile_logo = "wagon-queen";   // [none, wagon-queen]
 // Gap between stacks in the lineup (mm).
 lineup_gap = 30;
 
@@ -104,7 +106,7 @@ module stack(cfg, g) {
     spec  = rings == 0 ? can_std : rings == 1 ? can_slim : can_8oz;
 
     holder_part();
-    if (show_tiles) holder_tiles(g / 2);
+    if (show_tiles) holder_tiles(g / 2, tile_logo);
     if (rings >= 1) translate([0, 0, r1_z + lift1]) ring_standard_to_slim();
     if (rings >= 2) translate([0, 0, r2_z + lift2]) ring_to_8_3oz();
     if (show_cans)

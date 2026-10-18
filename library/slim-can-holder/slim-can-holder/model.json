@@ -41,7 +41,8 @@
     "can-holder-12oz-standard-coupon",
     "can-holder-12oz-standard-tile",
     "slim-can-adapter-ring-12oz-to-8-3oz-nested",
-    "slim-can-adapter-ring-12oz-to-8-3oz-nested-coupon"
+    "slim-can-adapter-ring-12oz-to-8-3oz-nested-coupon",
+    "can-holder-12oz-standard-tile-wagon-queen"
   ],
   "aliases": {
     "parts/middle-finger-emboss.scad": "middle-finger-emboss.scad",

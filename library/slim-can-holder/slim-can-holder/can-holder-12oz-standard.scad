@@ -57,6 +57,10 @@
 // COUPON-COMPONENTS: fit=coupon
 // COUPON-PLATE: coupon
 
+// Artwork for the logo tiles. marks.scad defines modules and calls none, so
+// including it puts nothing on the holder; only tile() draws from it.
+include <../../../logos/marks.scad>
+
 /* [Output] */
 
 // "cut" is a half-section for reading the double wall, the cavity and the ribs.
@@ -205,12 +209,44 @@ tile_t = 2.00;
 // face, so the chamfered ends get the same gap as the sides. It is the glue
 // gap; it is not a proven fit.
 tile_clear = 0.20;
+// Logo on the tile's face. "none" is a blank to glue your own artwork onto,
+// or to put your own logo on in another file.
+tile_logo = "wagon-queen";   // [none, wagon-queen]
+
+/* [Logo] */
+
+// Width of the Wagon Queen lockup, crest and lettering (mm). 27.00 is what the
+// barrel carried before the logos came off it, and it is near the ceiling: a
+// 1.00 relief stays inside the barrel only within ±13.96 of the tile's centre,
+// and there is an assert on that.
+logo_w = 27.00;
+// How far the logo stands proud of the tile's face (mm). 1.00 is 5 layers at
+// 0.20. It is not 2.00, as on the old moulded plaques, because 2.00 proud at
+// this width stands up to 0.85 outside the barrel at the lockup's edges — see
+// THE LOGO'S HEIGHT BUDGET in the header. Printed flat it is the top of the
+// print, so the relief costs nothing to print.
+logo_relief = 1.00;
+// Swell on the lettering (mm per side). The script's thin strokes are 1.94% of
+// the lockup's width, 0.52 here, which prints as a broken line; this takes
+// them to 0.90. Bounded above by the lettering's counters, which start to
+// close at 1.47% of the width. Both are asserted. Measured on the old part.
+logo_swell = 0.19;
+// Round on the top edge of the raised crest and of the lettering (mm). Each is
+// bounded by its own thinnest stroke: the top of the narrowest is kept over
+// 0.20 by assert.
+logo_bevel_crest = 0.35;
+logo_bevel_word  = 0.25;
+// Slab height in that roll (mm), half a 0.20 layer.
+bevel_step = 0.10;
 
 /* [Colors] */
 
 // Preview only. STLs carry no colour.
 holder_color = "MediumPurple";
 tile_color   = "Gold";
+// The logo is part of the tile's print. Its own colour is for telling them
+// apart here, or a reminder to swap filament at the logo's first layer.
+logo_color   = "Black";
 
 /* [Grip ribs] */
 
@@ -386,6 +422,14 @@ tile_hf = tile_hb + 2 * tile_t;                   // front face, logo side
 // Half-width of the tile over which a logo h proud stays inside the barrel.
 function logo_room(h) = sqrt(max(0, pow(out_r, 2) - pow(flat_r + h, 2)));
 
+// The Wagon Queen lockup's thinnest features and swell budget, as fractions of
+// its width, measured on the old part by eroding or swelling the artwork until
+// the mesh changed.
+script_thin_frac    = 2 * 7.25 / 746.806;                       // 1.94%
+crest_thin_frac     = (2 * 21.5 / 606.804) * (606.804 / 746.806);  // 5.76%
+counter_budget_frac = 11.0 / 746.806;                           // 1.47%
+logo_h = wagon_queen_height(logo_w);
+
 // Does a flute cutter centred at angle t eat into the plaque's flat? The cutter
 // is a circle of flute_cut_r at flute_off from the axis, so it reaches the
 // plane x = flat_r only when the plane passes through it, and the chord it cuts
@@ -442,6 +486,29 @@ assert(sign_count < 2 || sign_ang * sign_count < 180 - 8,
        "the pockets have run into each other: reduce pocket_w or sign_count");
 assert(sign_count < 2 || sign_back_ang * sign_count < 180 - 8,
        "the backing wedges have met: the cavity between the plaques is gone");
+assert(tile_logo != "wagon-queen" || logo_room(logo_relief) >= logo_w / 2,
+       str("the logo stands outside the barrel at its edges: at ", logo_relief,
+           " proud it fits ±", logo_room(logo_relief), " and it is ±", logo_w / 2,
+           ". Reduce logo_relief or logo_w"));
+assert(tile_logo != "wagon-queen"
+       || (logo_w <= tile_w - 2.0 && logo_h <= tile_hb - 2.0),
+       "the logo does not fit on the tile with a millimetre to spare");
+assert(tile_logo != "wagon-queen"
+       || logo_w * script_thin_frac + 2 * logo_swell >= 0.84,
+       str("the lettering's thin strokes come out ",
+           logo_w * script_thin_frac + 2 * logo_swell,
+           " mm, under two 0.42 lines: raise logo_swell"));
+assert(tile_logo != "wagon-queen" || logo_swell < logo_w * counter_budget_frac,
+       str("logo_swell has closed the lettering's counters: keep it under ",
+           logo_w * counter_budget_frac));
+assert(tile_logo != "wagon-queen" || logo_bevel_crest <= 0
+       || (logo_w * crest_thin_frac - 2 * logo_bevel_crest >= 0.20
+           && logo_bevel_crest < logo_relief),
+       "logo_bevel_crest knife-edges the crown's bars: reduce it");
+assert(tile_logo != "wagon-queen" || logo_bevel_word <= 0
+       || (logo_w * script_thin_frac + 2 * logo_swell - 2 * logo_bevel_word >= 0.20
+           && logo_bevel_word < logo_relief),
+       "logo_bevel_word knife-edges the script's thins: reduce it");
 assert(tile_clear >= 0 && tile_hb > 0,
        "the tile has no back face: reduce tile_clear or raise pocket_h");
 assert(sign_count == 0
@@ -610,28 +677,58 @@ module can_holder() color(holder_color) holder_body();
 // match the pocket's, which makes the tile wider at its face than at its back
 // — so the chamfers are 45-degree overhangs in print, and nothing worse.
 //
-// Put a logo on it by unioning onto the face at z = tile_t, centred on the
-// origin. See THE LOGO'S HEIGHT BUDGET in the header for how far it can
+// The logo sits on the face, centred, width along X and reading up +Y. Seated,
+// that puts it upright and unmirrored seen from outside the barrel — the same
+// turns the old moulded crest used. For another logo, union it onto the face
+// at z = tile_t; see THE LOGO'S HEIGHT BUDGET in the header for how far it can
 // stand proud, and where.
-module tile() color(tile_color)
-    hull() {
-        translate([-tile_w / 2, -tile_hb / 2, 0])
-            cube([tile_w, tile_hb, eps]);
-        translate([-tile_w / 2, -tile_hf / 2, tile_t - eps])
-            cube([tile_w, tile_hf, eps]);
+module tile(logo = tile_logo) {
+    color(tile_color)
+        hull() {
+            translate([-tile_w / 2, -tile_hb / 2, 0])
+                cube([tile_w, tile_hb, eps]);
+            translate([-tile_w / 2, -tile_hf / 2, tile_t - eps])
+                cube([tile_w, tile_hf, eps]);
+        }
+    if (logo == "wagon-queen")
+        color(logo_color)
+            translate([0, 0, tile_t - eps]) {
+                rolled_relief(logo_relief + eps, logo_bevel_crest)
+                    wagon_queen_crest(logo_w);
+                rolled_relief(logo_relief + eps, logo_bevel_word)
+                    offset(r = logo_swell) wagon_queen_word(logo_w);
+            }
+}
+
+// A 2D shape extruded h tall with its TOP edge rolled over by r: a core, then
+// slabs inset along a quarter circle. Only the top is rolled — rolling the
+// bottom would undercut the join to the face. Every slab starts from the
+// middle of the core, not its top, so no two slabs meet face to face; stacked
+// that way the union comes apart into separate shells (see cat_slab in
+// logos/marks.scad).
+module rolled_relief(h, r) {
+    n    = max(3, ceil(r / bevel_step));
+    core = h - r;
+    linear_extrude(height = core) children();
+    for (i = [1 : n]) {
+        z = core + r * sin(90 * i / n);
+        d = r * (1 - cos(90 * i / n));
+        translate([0, 0, core / 2])
+            linear_extrude(height = z - core / 2) offset(r = -d) children();
     }
+}
 
 // A tile seated in every pocket, back on the floor. The turns map the tile's
 // (x, y, z) onto the barrel's (y, z, x): width round it, height along it,
 // thickness outward.
 // out pushes every tile that far radially clear of its pocket, for an
 // exploded view.
-module tiles_seated(out = 0) {
+module tiles_seated(out = 0, logo = tile_logo) {
     for (i = [0 : sign_count - 1])
         rotate([0, 0, i * 360 / sign_count])
             translate([floor_r + out, 0, pocket_z])
                 rotate([0, 90, 0]) rotate([0, 0, 90])
-                    tile();
+                    tile(logo);
 }
 
 // Entry points for can-holder-12oz-standard-set.scad, which `use`s this file
@@ -639,7 +736,7 @@ module tiles_seated(out = 0) {
 // fit_coupon() and the rest, so the viewer only ever calls these, whose names
 // are unique across the set; inside them, names resolve in this file.
 module holder_part() can_holder();
-module holder_tiles(out = 0) tiles_seated(out);
+module holder_tiles(out = 0, logo = tile_logo) tiles_seated(out, logo);
 function holder_floor_z() = floor_t;
 function holder_top_z()   = total_h;
 function holder_od()      = outer_d;
@@ -657,6 +754,9 @@ echo(str("pocket ", sign_w, " x ", pocket_h,
          " at the edges  wall behind ", sign_t,
          "  z ", sign_z0, "..", sign_z1,
          "  overall with ends ", pocket_h + 2 * sign_bev));
+echo(str("logo ", tile_logo, " ", logo_w, " x ", logo_h, " at ", logo_relief,
+         " proud; thins ", logo_w * script_thin_frac + 2 * logo_swell,
+         ", crown bars ", logo_w * crest_thin_frac));
 echo(str("tile ", tile_w, " wide x ", tile_hb, " (back) / ", tile_hf,
          " (face) x ", tile_t, " thick; logo room at the centre ", sign_sag,
          "; 1.00 proud fits |x| <= ", logo_room(1.00),

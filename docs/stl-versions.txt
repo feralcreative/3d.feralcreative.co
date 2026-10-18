@@ -20,7 +20,8 @@ bong-stabilizer-screw 6
 bong-stabilizer-screw-set 6
 can-holder-12oz-standard 1
 can-holder-12oz-standard-coupon 1
-can-holder-12oz-standard-tile 1
+can-holder-12oz-standard-tile 2
+can-holder-12oz-standard-tile-wagon-queen 1
 can-light-lens 1
 can-light-trim 1
 cat-gap-wedge 12
