@@ -4,7 +4,8 @@
   "status": "unreviewed",
   "scad": "magnetic-bats-cup-magnet.scad",
   "scad_files": [
-    "magnetic-bats-cup-magnet.scad"
+    "magnetic-bats-cup-magnet.scad",
+    "bat-cat.scad"
   ],
   "exports": [
     "halloween-bat-body14-cup52",
@@ -17,7 +18,15 @@
     "halloween-bat-body23-cup52",
     "halloween-bat-body25-cup52",
     "halloween-bat-body26-cup52",
-    "halloween-bat-cup52-fit-coupon"
+    "halloween-bat-cup52-fit-coupon",
+    "halloween-cat-tail",
+    "halloween-cat-hind-leg",
+    "halloween-cat-rump",
+    "halloween-cat-belly",
+    "halloween-cat-chest",
+    "halloween-cat-head",
+    "halloween-cat-forelegs",
+    "halloween-cat-joint-coupon"
   ],
   "aliases": {},
   "protected_assets": [
@@ -46,6 +55,13 @@
     "halloween-bat-body22-cup52",
     "halloween-bat-body23-cup52",
     "halloween-bat-body25-cup52",
-    "halloween-bat-body26-cup52"
+    "halloween-bat-body26-cup52",
+    "halloween-cat-tail",
+    "halloween-cat-hind-leg",
+    "halloween-cat-rump",
+    "halloween-cat-belly",
+    "halloween-cat-chest",
+    "halloween-cat-head",
+    "halloween-cat-forelegs"
   ]
 }

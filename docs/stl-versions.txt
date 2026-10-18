@@ -76,6 +76,14 @@ halloween-bat-body24-cup52 1
 halloween-bat-body25-cup52 1
 halloween-bat-body26-cup52 1
 halloween-bat-cup52-fit-coupon 1
+halloween-cat-belly 3
+halloween-cat-chest 3
+halloween-cat-forelegs 3
+halloween-cat-head 3
+halloween-cat-hind-leg 3
+halloween-cat-joint-coupon 2
+halloween-cat-rump 3
+halloween-cat-tail 3
 haunted-tree-diffuser-led 3
 haunted-tree-grin-led 6
 haunted-tree-oh-led 2
