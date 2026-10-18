@@ -119,6 +119,25 @@ name_ink = textmetrics(name_text, size = 100, font = name_font);
 name_size = name_arc * 100 / name_ink.size[0];
 name_span = name_arc + 2 * name_swell + 1;
 
+// The baseline arcs with the rim of the mouth below it. The rim is where the face
+// meets the front cap, and that sits farther down the face wherever the face is
+// lower, so the baseline drops by the same amount and keeps a constant gap to it.
+// Laid out in face coordinates: u around the curve, w along the plug axis.
+function name_drop(u) = name_at(name_s0)[0][1] - name_at(name_s0 + u)[0][1];
+function name_slope(u) = (name_drop(u + 0.25) - name_drop(u - 0.25)) / 0.5;
+name_umax = name_span / 2 + 2;
+name_du = 0.25;
+name_k = 2 * ceil(name_umax / name_du);
+name_us = [for (k = [0 : name_k]) -name_k / 2 * name_du + k * name_du];
+// Baseline length from the left end, so glyph x is measured along the arc.
+name_len = [for (k = 0, a = 0; k <= name_k;
+                 a = a + (k < name_k ? norm([name_du, name_drop(name_us[k + 1]) - name_drop(name_us[k])]) : 0),
+                 k = k + 1) a];
+// u at baseline distance g from the middle of the name.
+function name_u(g) = let(L = name_len[name_k / 2] + g,
+                         k = max([0, for (i = [0 : name_k - 1]) if (name_len[i] <= L) i]))
+    name_us[k] + (L - name_len[k]) / (name_len[k + 1] - name_len[k]) * name_du;
+
 assert(name_s0 - name_span / 2 > 0 && name_s0 + name_span / 2 < name_cum[name_last],
        "the name runs off the top of the sleeve");
 assert(wall - name_depth >= 1.2, "not enough wall left behind the name");
@@ -240,19 +259,24 @@ module name_cut() {
             // Strips overlap 0.1 each side, so where neighbours tilt apart no sliver of
             // face is left standing between them.
             for (j = [0 : n - 1]) {
-                u = -name_span / 2 + (j + 0.5) * name_strip;
+                g = -name_span / 2 + (j + 0.5) * name_strip;
+                u = name_u(g);
                 at = name_at(name_s0 + u);
                 p = at[0];
                 nn = at[1];
                 t = [nn[1], -nn[0]];
-                // Glyph x around the face, glyph y up toward the stop, extrusion outward.
-                multmatrix([[t[0], 0, nn[0], p[0] - u * t[0]],
-                            [t[1], 0, nn[1], p[1] - u * t[1]],
-                            [0, -1, 0, name_w],
+                // Along the baseline, and square to it toward the stop, in face [u, w].
+                m = name_slope(u);
+                bu = 1 / sqrt(1 + m * m);
+                bw = m / sqrt(1 + m * m);
+                // Glyph x along the arc, glyph y up toward the stop, extrusion outward.
+                multmatrix([[bu * t[0], bw * t[0], nn[0], p[0] - g * bu * t[0]],
+                            [bu * t[1], bw * t[1], nn[1], p[1] - g * bu * t[1]],
+                            [bw, -bu, 0, name_w + name_drop(u) - g * bw],
                             [0, 0, 0, 1]])
                     translate([0, 0, -(name_depth + 0.5)]) linear_extrude(name_depth + 1)
                         intersection() {
-                            translate([u - name_strip / 2 - 0.1, -50]) square([name_strip + 0.2, 100]);
+                            translate([g - name_strip / 2 - 0.1, -50]) square([name_strip + 0.2, 100]);
                             name_glyph(erode);
                         }
             }
@@ -275,7 +299,9 @@ module holder() {
             bore_cut();
             latch_slot();
             for (sx = [-screw_x, screw_x]) translate([sx, screw_y, 0]) screw_hole();
-            if (name_text != "") name_cut();
+            // render(): hundreds of strip intersections overflow preview's CSG
+            // normalization, which then gives up and draws nothing at all.
+            if (name_text != "") render() name_cut();
         }
         latch();
     }
