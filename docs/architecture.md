@@ -6,7 +6,7 @@ How the pieces fit. Read before changing a script or adding a stage to the loop.
 
 | Path | Role |
 | --- | --- |
-| `library/<category>/<model-id>/` | Model sources, retained print files, model notes, and `model.json`. SCAD availability and provenance are separate metadata. |
+| `library/<category>/[<subcategory>/]<model-id>/` | Model sources, retained print files, model notes, and `model.json`. SCAD availability and provenance are separate metadata. |
 | `library/**/originals/` | Upstream and earlier assets, including measured meshes and their original companion files. |
 | `library/**/docs/` | Model instructions, licenses, PDFs, and design notes. |
 | `library/**/saved-jobs/` | Pre-existing slicer projects preserved during migration. |

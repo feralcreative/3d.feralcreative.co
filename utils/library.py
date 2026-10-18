@@ -20,7 +20,11 @@ def models():
     result = []
     ids = set()
     owners = {}
-    for path in sorted(LIBRARY.glob("*/*/model.json")):
+    # Any depth: library/<category>/<model>/ and library/holiday/halloween/<model>/
+    # alike. A model folder may sit inside another one; lookup() picks the deepest.
+    for path in sorted(LIBRARY.rglob("model.json")):
+        if any(part in ("_work", "originals") for part in path.relative_to(LIBRARY).parts):
+            continue
         if not path.parent.resolve().is_relative_to(LIBRARY.resolve()):
             raise ValueError(f"Model folder leaves the library: {path.parent}")
         data = json.loads(path.read_text())
@@ -41,6 +45,10 @@ def models():
     return result
 
 
+def category(model):
+    return model["directory"].parent.relative_to(LIBRARY).as_posix()
+
+
 def asset(model, relative):
     path = model["directory"] / relative
     if not path.resolve().is_relative_to(model["directory"].resolve()):
@@ -57,6 +65,10 @@ def lookup(value, collection=None):
     given = Path(value)
     absolute = given.absolute()
     matches = []
+    # A path inside a nested model folder is also inside its parent's; the
+    # deepest model folder containing the path owns it.
+    containing = [m for m in collection if absolute.is_relative_to(m["directory"]) and absolute != m["directory"]]
+    owner = max(containing, key=lambda m: len(m["directory"].parts), default=None)
     for model in collection:
         directory = model["directory"]
         if value == model["id"] or absolute == directory:
@@ -64,7 +76,7 @@ def lookup(value, collection=None):
             if not source:
                 raise ValueError(f"{model['id']} has no configured SCAD entrypoint; name an STL or 3MF to slice")
             matches.append((model, asset(model, source)))
-        elif absolute.is_relative_to(directory):
+        elif model is owner:
             matches.append((model, asset(model, absolute.relative_to(directory))))
         else:
             key = os.path.relpath(absolute, REPO)
@@ -113,7 +125,14 @@ def selected(names, collection):
             names_to_match = [model["id"], str(model["directory"]), str(model["directory"].relative_to(REPO))]
             names_to_match += model.get("exports", [])
             if any(fnmatch.fnmatchcase(n, name) for n in names_to_match):
-                outputs = model.get("exports", []) if name in names_to_match[:3] or any(c in name for c in "*?[") else [name]
+                exports = model.get("exports", [])
+                if any(fnmatch.fnmatchcase(n, name) for n in names_to_match[:3]):
+                    outputs = exports
+                elif any(c in name for c in "*?["):
+                    # The pattern matched exports, so take only those, not the whole model.
+                    outputs = [e for e in exports if fnmatch.fnmatchcase(e, name)]
+                else:
+                    outputs = [name]
                 found.append((model, outputs))
         if not found:
             raise ValueError(f"No library model or export matches: {name}")
@@ -266,7 +285,7 @@ def catalog(args):
                 continue
             if args.origin and m["origin"] != args.origin:
                 continue
-            if args.category and m["directory"].parent.name != args.category:
+            if args.category and args.category not in (category(m), *category(m).split("/")):
                 continue
             print(f"{m['id']}\t{m['origin']}\t{m.get('status', 'unreviewed')}\t{m['directory'].relative_to(REPO)}")
         return
@@ -275,8 +294,9 @@ def catalog(args):
         relative = m["directory"].relative_to(LIBRARY).as_posix()
         source = m.get("scad") or next(iter(m.get("scad_files", [])), None)
         scad = f"[SCAD]({quote(relative + '/' + source)}) ({len(m.get('scad_files', []))})" if source else "—"
-        formats = sorted({p.suffix[1:].upper() for p in m["directory"].rglob("*") if p.is_file() and "_work" not in p.relative_to(m["directory"]).parts and p.suffix.lower() in {".scad", ".stl", ".3mf", ".skp", ".pdf", ".step", ".fcstd", ".f3d", ".obj"}})
-        lines.append(f"| [{m['id']}]({quote(relative)}/) | {m['directory'].parent.name} | {m['origin']} | {scad} | {', '.join(formats)} | {m.get('status', 'unreviewed')} |")
+        nested = [o["directory"] for o in collection if o is not m and o["directory"].is_relative_to(m["directory"])]
+        formats = sorted({p.suffix[1:].upper() for p in m["directory"].rglob("*") if p.is_file() and "_work" not in p.relative_to(m["directory"]).parts and not any(p.is_relative_to(d) for d in nested) and p.suffix.lower() in {".scad", ".stl", ".3mf", ".skp", ".pdf", ".step", ".fcstd", ".f3d", ".obj"}})
+        lines.append(f"| [{m['id']}]({quote(relative)}/) | {category(m)} | {m['origin']} | {scad} | {', '.join(formats)} | {m.get('status', 'unreviewed')} |")
     LIBRARY.mkdir(exist_ok=True)
     (LIBRARY / "README.md").write_text("\n".join(lines) + "\n")
     print(f"Indexed {len(collection)} models in library/README.md")

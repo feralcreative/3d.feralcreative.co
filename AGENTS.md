@@ -83,7 +83,7 @@ Not required: nothing here needs a full print to be considered done by you. Prin
 
 ## 4. Architecture
 
-There is no runtime. Every model or assembly lives in `library/<category>/<model-id>/`; its `model.json` records origin, configured SCAD entrypoint, sources, export names, and old-path aliases. Read [docs/library.md](docs/library.md) and browse [library/README.md](library/README.md).
+There is no runtime. Every model or assembly lives in `library/<category>/<model-id>/`, with optional subcategories such as `library/holiday/halloween/<model-id>/`; its `model.json` records origin, configured SCAD entrypoint, sources, export names, and old-path aliases. Read [docs/library.md](docs/library.md) and browse [library/README.md](library/README.md).
 
 1. Retained source: the model's SCAD files, original meshes, SketchUp files, and companion assets. Shared BOSL2 and artwork remain at the repository root. An imported mesh can be the only source; never assume an STL is disposable.
 2. `utils/render.sh <model-id-or-source>` → model-local `_work/renders/<source>-{iso,zplus,zminus,yminus,yplus,xplus,xminus}.png`. Camera names identify axis positions, not the part's own front/back vocabulary. Read all seven views.

@@ -1,6 +1,6 @@
 # Model library workflow
 
-Every model or assembly lives in `library/<category>/<model-id>/`. Its source files, retained printable files, instructions, and licenses stay together. Shared BOSL2, logo modules, utilities, and printer profiles remain at the repository root.
+Every model or assembly lives in `library/<category>/<model-id>/`, and a category may have subcategories: `library/holiday/halloween/<model-id>/`. A folder is a model because it holds a `model.json`, at any depth; a path inside a model nested in another model's folder belongs to the deeper one. Its source files, retained printable files, instructions, and licenses stay together. Shared BOSL2, logo modules, utilities, and printer profiles remain at the repository root.
 
 ## Folder roles
 
