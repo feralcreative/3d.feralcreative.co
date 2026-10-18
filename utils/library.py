@@ -67,8 +67,11 @@ def lookup(value, collection=None):
     matches = []
     # A path inside a nested model folder is also inside its parent's; the
     # deepest model folder containing the path owns it.
-    containing = [m for m in collection if absolute.is_relative_to(m["directory"]) and absolute != m["directory"]]
+    # A path that is itself a model folder belongs to that model alone.
+    containing = [m for m in collection if absolute.is_relative_to(m["directory"])]
     owner = max(containing, key=lambda m: len(m["directory"].parts), default=None)
+    if owner is not None and owner["directory"] == absolute:
+        owner = None
     for model in collection:
         directory = model["directory"]
         if value == model["id"] or absolute == directory:
@@ -118,15 +121,22 @@ def selected(names, collection):
     for name in names:
         if Path(name).suffix in {".stl", ".3mf"}:
             name = re.sub(r"-v\d{2,}$", "", Path(name).stem)
-        elif "/" in name and any(c in name for c in "*?["):
-            name = Path(name).name
+        scope, exports_only = collection, False
+        if Path(name).suffix not in {".stl", ".3mf"} and "/" in name and any(c in name for c in "*?["):
+            # A path glob names outputs, never models: library/x/y/* is y's
+            # exports, not every model in the library that "*" would match.
+            parent = Path(name).parent.absolute()
+            owners = [m for m in collection if parent.is_relative_to(m["directory"])]
+            if owners:
+                scope = [max(owners, key=lambda m: len(m["directory"].parts))]
+            name, exports_only = Path(name).name, True
         found = []
-        for model in collection:
-            names_to_match = [model["id"], str(model["directory"]), str(model["directory"].relative_to(REPO))]
-            names_to_match += model.get("exports", [])
+        for model in scope:
+            ids = [] if exports_only else [model["id"], str(model["directory"]), str(model["directory"].relative_to(REPO))]
+            names_to_match = ids + model.get("exports", [])
             if any(fnmatch.fnmatchcase(n, name) for n in names_to_match):
                 exports = model.get("exports", [])
-                if any(fnmatch.fnmatchcase(n, name) for n in names_to_match[:3]):
+                if any(fnmatch.fnmatchcase(n, name) for n in ids):
                     outputs = exports
                 elif any(c in name for c in "*?["):
                     # The pattern matched exports, so take only those, not the whole model.
