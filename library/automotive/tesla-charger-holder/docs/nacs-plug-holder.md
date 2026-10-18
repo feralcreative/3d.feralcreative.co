@@ -16,7 +16,9 @@ The bore is snug, 0.4 mm per side, and the hold comes from a printed cantilever 
 | Latch pocket | 9.71 wide, 6.2 long, 4 deep, ±0.2 | Tesla NACS Technical Specification TS-0023666 (2022), pp. 24–25 |
 | Pocket position | 20.2 mm behind the plug face (spec); 21.0 mm (STEP latch window) | Both; the tooth is self-locating, so either works |
 | Tooth | 2.2 mm engagement, 60° holding face, 35° lead-in, 8 mm wide | Design |
-| Arm | 9 × 2.2 mm, rooted 4 mm behind the stop, about 24 mm from root to tooth, 1.2% strain at full deflection | Design |
+| Arm | 9 mm wide, tapering from 2.6 mm at the root to 1.4 mm at the tooth, 1.5 mm fillets in both root corners, rooted 4 mm behind the stop, about 24 mm from root to tooth, 1.0% nominal root strain at full deflection | Design |
+
+The arm is deflection-controlled: the tooth always moves 2.2 mm, so root strain depends on how the bend is spread along the arm, not on how stiff the arm is. A thicker root on its own only raises the force. The taper thins the outer arm so it takes more of the bend, which cuts the root strain from 1.38% to 0.98% at the same 8.7 N tooth force, and the fillets remove the square inside corners that roughly doubled or tripled the peak. The thinner tip also leaves 0.65 mm under the free end at full deflection; the uniform 2.2 mm arm had 0.03 mm and all but bottomed out.
 
 Estimated release force, from beam theory with E ≈ 2000 MPa and μ 0.3–0.4, is 30–45 N, about a firm one-handed tug. The insertion force is about 8 N. These are estimates; `hold_angle` is the knob if it holds too hard or too loosely. Steeper holds harder and becomes self-locking near 60° with high friction.
 

@@ -21,13 +21,16 @@ ramp_angle = 35;           // deg, lead-in face to the axis
 tooth_width = 8;           // mm, across the pocket, which is 9.71 mm at its base
 tooth_top = 0.6;           // mm, flat on the tooth crest
 arm_width = 9;             // mm, spring arm width
-arm_thick = 2.2;           // mm, spring arm thickness
+arm_root_thick = 2.6;      // mm, spring arm thickness at the root
+arm_tip_thick = 1.4;       // mm, thickness from the tooth outward; the taper between spreads the
+                           // bend along the arm, so root strain falls at the same tooth force
+arm_root_fillet = 1.5;     // mm, radius in both corners where the arm leaves the slot's end wall
 arm_recess = 1.0;          // mm, arm top below the bore floor so the plug rests on the floor, not the arm
 arm_root_w = -4;           // mm, arm root, behind the stop: printed wall-down, the arm grows up
                            // from here, so its free end toward the mouth never starts in mid-air
 arm_side_gap = 0.6;        // mm, slit each side of the arm
 arm_end_gap = 0.8;         // mm, gap at the arm's free end
-arm_travel_extra = 0.8;    // mm, free travel under the arm beyond the tooth height
+arm_travel_extra = 0.4;    // mm, free travel under the arm's root beyond the tooth height
 
 /* [Body] */
 wall = 3;                  // mm, around the bore and under the latch slot
@@ -62,8 +65,9 @@ inlet_cavity = [[14.442, -13.186], [12.885, -14.276], [11.986, -14.825], [10.309
 half_h = 18.05 + plug_clearance;
 floor_v = -half_h;
 arm_top = floor_v - arm_recess;
-arm_bot = arm_top - arm_thick;
-slot_bot = arm_bot - (latch_engage + arm_travel_extra);
+arm_root_bot = arm_top - arm_root_thick;
+arm_tip_bot = arm_top - arm_tip_thick;
+slot_bot = arm_root_bot - (latch_engage + arm_travel_extra);
 low_v = slot_bot - wall;
 sleeve_back = max(end_wall, 2 - arm_root_w + wall);
 pivot_z = -low_v * sin(tilt) + sleeve_back * cos(tilt);
@@ -76,6 +80,7 @@ arm_free_w = tooth_d + 0.5;
 
 assert(tooth_a > arm_root_w + 15, "the arm needs length behind the tooth to flex");
 assert(arm_free_w + arm_end_gap < bore_depth, "latch slot must end inside the full bore");
+assert(arm_root_fillet < floor_v + 1 - arm_top, "top root fillet must fit under the slot roof");
 
 // Local frame: x across the plug, y toward its top, z out of the bore.
 module plug_frame() {
@@ -138,15 +143,32 @@ module latch_slot() {
                   arm_free_w + arm_end_gap - arm_root_w]);
 }
 
+// Concave fillet in the corner at [v, w], opening toward [sv, +w].
+module root_fillet_2d(v, sv) {
+    r = arm_root_fillet;
+    difference() {
+        translate([sv > 0 ? v - 0.2 : v - r, arm_root_w - eps]) square([r + 0.2, r + eps]);
+        translate([v + sv * r, arm_root_w + r]) circle(r = r);
+    }
+}
+
 module latch() {
+    // Profiles drawn as [v, w], extruded across the arm.
     plug_frame() {
-        translate([-arm_width / 2, arm_bot, arm_root_w - 2])
-            cube([arm_width, arm_thick, arm_free_w - arm_root_w + 2]);
-        // Profile drawn as [v, w]: holding face toward the stop, lead-in toward the mouth.
+        translate([-arm_width / 2, 0, 0]) rotate([90, 0, 90])
+            linear_extrude(arm_width) {
+                polygon([
+                    [arm_top, arm_root_w - 2], [arm_top, arm_free_w],
+                    [arm_tip_bot, arm_free_w], [arm_tip_bot, tooth_a],
+                    [arm_root_bot, arm_root_w], [arm_root_bot, arm_root_w - 2]]);
+                root_fillet_2d(arm_top, 1);
+                root_fillet_2d(arm_root_bot, -1);
+            }
+        // Holding face toward the stop, lead-in toward the mouth.
         translate([-tooth_width / 2, 0, 0]) rotate([90, 0, 90])
             linear_extrude(tooth_width) polygon([
-                [arm_top - arm_thick / 2, tooth_a], [arm_top, tooth_a], [tooth_v, tooth_b],
-                [tooth_v, tooth_c], [arm_top, tooth_d], [arm_top - arm_thick / 2, tooth_d]]);
+                [arm_top - arm_tip_thick / 2, tooth_a], [arm_top, tooth_a], [tooth_v, tooth_b],
+                [tooth_v, tooth_c], [arm_top, tooth_d], [arm_top - arm_tip_thick / 2, tooth_d]]);
     }
 }
 
