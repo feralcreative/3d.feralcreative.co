@@ -1,0 +1,29 @@
+{
+  "id": "fence-pumpkins",
+  "origin": "adapted",
+  "status": "unreviewed",
+  "scad": "fence-pumpkin.scad",
+  "scad_files": [
+    "fence-pumpkin.scad"
+  ],
+  "exports": [
+    "fence-pumpkin-traditional",
+    "fence-pumpkin-traditional-body",
+    "fence-pumpkin-traditional-door"
+  ],
+  "aliases": {},
+  "protected_assets": [
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/blank-shell.3mf",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/blank-shell.stl",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/boo-shell.3mf",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/boo-shell.stl",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/ghost-shell.3mf",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/ghost-shell.stl",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/stem-lid.3mf",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/stem-lid.stl",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/traditional-shell.3mf",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files/traditional-shell.stl",
+    "led-tea-light-jack-o-lantern-pumpkins-model_files.zip"
+  ],
+  "licenses": []
+}
