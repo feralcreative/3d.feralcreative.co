@@ -39,8 +39,9 @@ These are model STLs, not sliced jobs: **the STL does not contain a print pause*
 2. Put a bat's flat decorative face on the bed, with the circular housing up, in its exported rotation. Centre the complete mesh, not only the magnet housing.
 3. Keep supports out of the magnet cavity. Place a pause **before the first layer that closes the cavity roof at model Z=13.14 mm**. Select this from the actual sliced layer preview and verify the pause in G-code before printing. For a 0.30 mm first layer and 0.12 mm subsequent layers, the expected first roof layer is layer 109 at Z=13.26 mm; this is a calculated guide, not verified G-code, and changes with layer settings. The repo's `--magnet-pause` option is specific to 10×2 mm Gridfinity magnets and must not be used for these bats.
 4. At the pause, insert one cup magnet with its working face up toward the roof. Seat it completely; its top must stay below the open housing rim. Keep it in the pocket rather than allowing it to move toward the printer hardware.
-5. Resume to print the rear cover. The magnet occupies most of the otherwise large bridge beneath the roof; reliable sealing across the remaining gap has not been physically tested.
-6. After cooling, check that the enclosure is intact and test its hold on the intended steel surface before installing the bat.
+5. Cover the magnet's top face with one smooth, non-overlapping piece of blue painter's tape. In Ziad's prints the magnet sits flush with the layer boundary, so the first roof layer lands on it like a first layer. On the bare steel and ceramic face, PETG lifted, hardened, and was struck by the nozzle, increasingly often, until a print failed outright on 2026-10-17. The next print, with painter's tape on the face, sealed perfectly. The tape is about 0.13–0.15 mm thick, which leaves little room under a 0.20 mm layer; do not substitute duct tape or anything thicker.
+6. Resume to print the rear cover.
+7. After cooling, check that the enclosure is intact and test its hold on the intended steel surface before installing the bat.
 
 No printer settings have been changed, no job has been sent, and no claim of physical cup fit, pause/resume reliability, cap quality or holding strength is made. Ziad performs the print and final visual review.
 
