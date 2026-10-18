@@ -24,6 +24,12 @@ Estimated release force, from beam theory with E ≈ 2000 MPa and μ 0.3–0.4, 
 
 The top of the bore is relieved past 36 mm and the floor past 48 mm, where the NACS spec's section A-A shows the handle starting to flare. Those depths are read off a drawing, not measured.
 
+## Name
+
+"Charlotte" in Gwendolyn Bold is debossed 0.8 mm into the sloping top face and reads from in front of the wall. It wraps around the curve of the face rather than being projected onto it, 46 mm of arc, and is tapered at 70° in five bands like the chalk holder's wordmark, so nothing in the cut needs support. Gwendolyn's hairlines would be about 0.4 mm at this size, too thin for a 0.4 nozzle to cut, so every stroke is swelled 0.15 mm (`name_swell`); the thinnest joins still go shallow as the taper narrows them. Change `name_text` to rename it, or set it to `""` to leave the face plain.
+
+The font is vendored at `logos/fonts/Gwendolyn-Bold.ttf` and loaded with `use <>`, so the build does not depend on installed fonts. Gwendolyn is by The Gwendolyn Project Authors, SIL Open Font License 1.1, from Google Fonts.
+
 ## Printing
 
 Print with the wall face on the bed. No supports: every downward-facing surface is at 45° or steeper, and nothing starts in mid-air. The arm is rooted at its low end, behind the stop, so it grows up from the body; the first version was rooted toward the mouth, its free end began as an island, and the slicer asked for supports inside the latch slot. The arm prints as a 45° slab, so its bending runs diagonally across layers. PETG is the intended material.
