@@ -73,16 +73,16 @@ screw_plate_pitch = 25;    // mm, original four-bolt plate layout
 thread_fn = 64;            // thread facets, independent of large circles
 
 /* [Colors] */
-foot_color = "SlateGray";
-right_collar_color = "DarkOrange";
-left_collar_color = "Goldenrod";
-screw_color = "MediumSeaGreen";
+foot_color = "White";
+right_collar_color = "SIlver";
+left_collar_color = "SIlver";
+screw_color = "SIlver";
 glass_color = [0.6, 0.85, 1, 0.25];
 lens_color = "DarkOrange";
 puck_color = "Silver";
 
 /* [Output] */
-show = "exploded"; // [base, lens, collar-set, screw, screw-set, coupon-base, assembly, exploded, section, glass-fit, glass-insertion, collar-fit, collar-insertion, plate-end-fit, screw-fit, screw-insertion, screw-path, puck-fit, puck-insertion]
+show = "assembly"; // [base, lens, collar-set, screw, screw-set, coupon-base, assembly, exploded, section, glass-fit, glass-insertion, collar-fit, collar-insertion, plate-end-fit, screw-fit, screw-insertion, screw-path, puck-fit, puck-insertion]
 insertion_side = 1;        // [1, -1]
 exploded_gap = 25;         // mm, illustration spacing
 collar_entry_travel = 140; // mm, clears the complete support shoulder
