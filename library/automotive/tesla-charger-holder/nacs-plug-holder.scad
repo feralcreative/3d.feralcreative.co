@@ -23,12 +23,13 @@ ramp_angle = 35;           // deg, lead-in face to the axis
 tooth_width = 8;           // mm, across the pocket, which is 9.71 mm at its base
 tooth_top = 0.6;           // mm, flat on the tooth crest
 arm_width = 9;             // mm, spring arm width
-arm_root_thick = 2.6;      // mm, spring arm thickness at the root
-arm_tip_thick = 1.4;       // mm, thickness from the tooth outward; the taper between spreads the
-                           // bend along the arm, so root strain falls at the same tooth force
+arm_root_thick = 5.0;      // mm, spring arm thickness at the root
+arm_tip_thick = 3.0;       // mm, thickness from the tooth outward; the taper between spreads the
+                           // bend along the arm. About 34 N at the tooth and 1.3% root strain;
+                           // 2.6 to 1.4 on a 4 mm root gave 8.7 N and printed far too flimsy
 arm_root_fillet = 1.5;     // mm, radius in both corners where the arm leaves the slot's end wall
 arm_recess = 1.0;          // mm, arm top below the bore floor so the plug rests on the floor, not the arm
-arm_root_w = -4;           // mm, arm root, behind the stop: printed wall-down, the arm grows up
+arm_root_w = -10;          // mm, arm root, behind the stop: printed wall-down, the arm grows up
                            // from here, so its free end toward the mouth never starts in mid-air
 arm_side_gap = 0.6;        // mm, slit each side of the arm
 arm_end_gap = 0.8;         // mm, gap at the arm's free end
