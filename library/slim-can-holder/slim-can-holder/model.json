@@ -250,7 +250,9 @@
     "slim-can-screwdriver-tall",
     "can-holder-12oz-standard",
     "slim-can-adapter-ring-12oz-standard-to-slim",
-    "slim-can-adapter-ring-12oz-to-8-3oz-nested"
+    "slim-can-adapter-ring-12oz-to-8-3oz-nested",
+    "can-holder-12oz-standard-tile",
+    "can-holder-12oz-standard-tile-wagon-queen"
   ],
   "protected_assets": [
     "docs/bumper-dumper/snap-on-lid-for-lowes-mini-5-gallon-bucket-slim-fit-model_files/1442396-snap-on-lid-for-lowes-mini-5-gallon-bucket-slim-fit-90952f27-fea1-4435-aebc-6d75c7041dff.pdf",
@@ -393,5 +395,6 @@
   },
   "publication_excluded_exports": [
     "slim-can-holder-3in-12oz-fish"
-  ]
+  ],
+  "draft_exports": []
 }
