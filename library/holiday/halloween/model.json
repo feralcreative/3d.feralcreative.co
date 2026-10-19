@@ -4,7 +4,9 @@
   "status": "unreviewed",
   "scad": null,
   "scad_files": [],
-  "exports": [],
+  "exports": [
+    "haunted-tree-lens"
+  ],
   "aliases": {
     "_originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files/593688-ghost-booh-body3d-bambu-led-lamp-kit-001-c94edaa4-f1ad-40d7-b85f-d3a789078468.pdf": "docs/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files/593688-ghost-booh-body3d-bambu-led-lamp-kit-001-c94edaa4-f1ad-40d7-b85f-d3a789078468.pdf",
     "_originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files/bambup1s-ghost-booh-led-light-001_whiteblackgcode.3mf": "bambup1s-ghost-booh-led-light-001_whiteblackgcode.3mf",
@@ -12,12 +14,12 @@
     "_originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files/ghost-booh-bambu-led-light-v4.3mf": "ghost-booh-bambu-led-light-v4.3mf",
     "_originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files/ghost-booh-bambu-led-light-v4.stl": "ghost-booh-bambu-led-light-v4.stl",
     "_originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files/led-lamp-kit-001-base.stl": "led-lamp-kit-001-base.stl",
-    "_originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files.zip": "originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files.zip",
+    "_originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files.zip": "originals/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files.zip",
     "_originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/1003177-halloween-pumpkin-tealight-compatible-dccdd94e-ad4c-47d5-a484-e5b51ea696c0.pdf": "docs/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/1003177-halloween-pumpkin-tealight-compatible-dccdd94e-ad4c-47d5-a484-e5b51ea696c0.pdf",
     "_originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/pumpkin-60-scale-thicker-walls-for-printing.3mf": "pumpkin-60-scale-thicker-walls-for-printing.3mf",
     "_originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/pumpkin-stem.3mf": "pumpkin-stem.3mf",
     "_originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/pumpkin.3mf": "pumpkin.3mf",
-    "_originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files.zip": "originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files.zip"
+    "_originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files.zip": "originals/halloween-pumpkin-tealight-compatible-model_files.zip"
   },
   "protected_assets": [
     "bambup1s-ghost-booh-led-light-001_whiteblackgcode.3mf",
@@ -27,8 +29,8 @@
     "ghost-booh-bambu-led-light-v4.3mf",
     "ghost-booh-bambu-led-light-v4.stl",
     "led-lamp-kit-001-base.stl",
-    "originals/holiday/halloween/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files.zip",
-    "originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files.zip",
+    "originals/ghost-booh-body3d-bambu-led-lamp-kit-001-model_files.zip",
+    "originals/halloween-pumpkin-tealight-compatible-model_files.zip",
     "pumpkin-60-scale-thicker-walls-for-printing.3mf",
     "pumpkin-stem.3mf",
     "pumpkin.3mf"

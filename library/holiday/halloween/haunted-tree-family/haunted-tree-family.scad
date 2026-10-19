@@ -7,7 +7,7 @@
 include <face-openings.scad>
 
 /* [View] */
-show = "grin"; // [grin, oh, sad, teeth, teeth-flat, diffuser, assembly, section, channel, fitcheck, insertioncheck]
+show = "grin"; // [grin, oh, sad, teeth, teeth-flat, lens, diffuser, assembly, section, channel, fitcheck, insertioncheck]
 tree = "grin"; // [grin, oh, sad, teeth, teeth-flat]
 interior = "cone"; // [cone, hollow]
 
@@ -37,6 +37,11 @@ cable_clear = 0.3; // mm per side
 cable_angle = 180; // degrees, cable exits behind the face, along -X
 cable_length = 120; // mm, exceeds the root footprint
 
+/* [Gel lens] */
+lens_fit = 0.15; // mm per side, same as the puck pocket
+lens_window_t = 0.42; // mm, 0.30 first layer + one 0.12 layer, the thinnest reliable sheet
+lens_window_d = 50; // mm, rim opening, clears the 47.6 mm puck lens
+
 /* [Diffuser] */
 diffuser_xy_scale = 1.28; // radial scale; passes through the pocket roof
 diffuser_z_scale = 1.4; // shortened to clear the lowest tree cavity roof
@@ -52,6 +57,7 @@ diffuser_start = -100; // mm, diffuser fully outside the tree
 /* [Colors] */
 tree_color = "#805335";
 diffuser_color = "#E9E5D4";
+lens_color = "DarkOrange";
 puck_color = "#C8C8C8";
 
 /* [Resolution] */
@@ -169,6 +175,20 @@ module diffuser_upright() {
     }
 }
 
+// Fills the empty 45-degree pocket stop above the puck, so no tree changes.
+// Printed window-down; assembled bottom is Z=pocket_h, resting on the puck.
+module gel_lens() {
+    d1 = pocket_d - 2 * lens_fit;
+    assert(lens_window_d > puck_lens_d && lens_window_d < d1 - 2 * puck_roof &&
+           lens_window_t < puck_roof,
+           "lens must clear the puck lens and keep a rim inside the stop");
+    color(lens_color) difference() {
+        cylinder(d1 = d1, d2 = d1 - 2 * puck_roof, h = puck_roof);
+        translate([0, 0, lens_window_t])
+            cylinder(d = circumscribed(lens_window_d), h = puck_roof);
+    }
+}
+
 module diffuser_print() {
     translate([0, 0, diffuser_height]) rotate([180, 0, 0]) diffuser_upright();
 }
@@ -201,6 +221,7 @@ module fitcheck(t) {
         union() {
             translate([0, 0, puck_depth_extra]) puck_dummy();
             if (interior == "hollow") translate([0, 0, pocket_h]) diffuser_upright();
+            else translate([0, 0, pocket_h]) gel_lens();
         }
     }
 }
@@ -219,9 +240,11 @@ module assembly(t) {
     tree_body(t);
     translate([0, 0, puck_depth_extra]) puck_dummy();
     if (interior == "hollow") translate([0, 0, pocket_h]) diffuser_upright();
+    else translate([0, 0, pocket_h]) gel_lens();
 }
 
 if (show == "grin" || show == "teeth" || show == "teeth-flat" || show == "oh" || show == "sad") tree_body(show);
+else if (show == "lens") gel_lens();
 else if (show == "diffuser") diffuser_print();
 else if (show == "assembly") assembly(tree);
 else if (show == "channel") intersection() {
