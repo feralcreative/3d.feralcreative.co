@@ -94,6 +94,7 @@ halloween-cat-rump 3
 halloween-cat-tail 3
 haunted-tree-diffuser-led 3
 haunted-tree-grin-led 6
+haunted-tree-lens 1
 haunted-tree-oh-led 2
 haunted-tree-sad-led 2
 haunted-tree-teeth-flat-led 4
@@ -118,7 +119,7 @@ magnet-polarity-tool-10x2-shaft-c 1
 magnet-polarity-tool-10x2-shaft-d 1
 middle-finger-emboss 14
 middle-finger-wrist-emboss 1
-nacs-plug-holder 3
+nacs-plug-holder 7
 nacs-plug-holder-fit-coupon 1
 nightlight-floor-hood 16
 overture-spool-main-body-ribbed 10
@@ -160,6 +161,11 @@ screen-fence-rail-nokey-coupon 1
 screen-fence-rigid 1
 screen-fence-test-rail 4
 screen-fence-twin-coupon 1
+seedling-tray-1x1 1
+seedling-tray-2x2 1
+seedling-tray-2x2-shared 1
+shade-drive-pocket-coupon 2
+shade-drive-sprocket 2
 simplisafe-wire-guide 3
 slim-can-adapter 1
 slim-can-adapter-ring-12oz-standard-to-slim 2
