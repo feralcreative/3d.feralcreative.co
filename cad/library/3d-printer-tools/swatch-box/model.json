@@ -1,0 +1,30 @@
+{
+  "id": "swatch-box",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "swatch-box.scad",
+  "scad_files": [
+    "swatch-box.scad"
+  ],
+  "exports": [
+    "swatch-box-bot",
+    "swatch-box-top",
+    "swatch-box"
+  ],
+  "aliases": {
+    "parts/swatch-box.scad": "swatch-box.scad",
+    "stl/swatch-box-bot.stl": "swatch-box-bot.stl",
+    "stl/swatch-box-top.stl": "swatch-box-top.stl",
+    "renders/swatch-box-front.png": "_work/renders/swatch-box-front.png",
+    "renders/swatch-box-iso.png": "_work/renders/swatch-box-iso.png",
+    "renders/swatch-box-right.png": "_work/renders/swatch-box-right.png",
+    "renders/swatch-box-top.png": "_work/renders/swatch-box-top.png"
+  },
+  "publish_exports": [
+    "swatch-box-bot",
+    "swatch-box-top"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

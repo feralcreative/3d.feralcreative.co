@@ -1,0 +1,18 @@
+{
+  "id": "shade-drive",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "shade-drive.scad",
+  "scad_files": [
+    "shade-drive.scad"
+  ],
+  "exports": [
+    "shade-drive-sprocket",
+    "shade-drive-pocket-coupon"
+  ],
+  "aliases": {},
+  "publish_exports": [],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

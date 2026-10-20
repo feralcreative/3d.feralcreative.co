@@ -1,0 +1,18 @@
+{
+  "id": "plate-holder-with-mount",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/plate-holder-with-mount.stl": "plate-holder-with-mount.stl",
+    "_originals/printer-tools/plate-holder-with-mount.skp": "plate-holder-with-mount.skp"
+  },
+  "protected_assets": [
+    "plate-holder-with-mount.skp",
+    "plate-holder-with-mount.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

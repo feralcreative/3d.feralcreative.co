@@ -1,0 +1,16 @@
+{
+    "enable_support": "1",
+    "from": "User",
+    "inherits": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle",
+    "initial_layer_speed": "10",
+    "initial_layer_travel_speed": "60",
+    "is_custom_defined": "0",
+    "name": "0.20mm Standard @Flashforge AD5M Pro 0.4 SLOW",
+    "print_settings_id": "0.20mm Standard @Flashforge AD5M Pro 0.4 SLOW",
+    "slow_down_layers": "2",
+    "support_interface_spacing": "0.6",
+    "support_object_xy_distance": "0.08",
+    "support_top_z_distance": "0.28",
+    "support_type": "tree(auto)",
+    "version": "2.1.1.0"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "ikea-ivar-shelves",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/ikea-ivar-shelves.skp": "ikea-ivar-shelves.skp",
+    "_originals/office/ikea-ivar-shelves~.skp": "ikea-ivar-shelves~.skp"
+  },
+  "protected_assets": [
+    "ikea-ivar-shelves.skp",
+    "ikea-ivar-shelves~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "cat-portal-ring",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-portal-ring.ai": "originals/cats/cat-portal-ring.ai",
+    "_originals/cats/cat-portal-ring.dxf": "cat-portal-ring.dxf"
+  },
+  "protected_assets": [
+    "cat-portal-ring.dxf",
+    "originals/cats/cat-portal-ring.ai"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

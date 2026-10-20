@@ -1,0 +1,18 @@
+{
+  "id": "shower-phone-caddy",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/Shower Phone Caddy.f3d": "Shower Phone Caddy.f3d",
+    "_originals/bathroom/Shower Phone Caddy.f3d": "originals/bathroom/Shower Phone Caddy.f3d"
+  },
+  "protected_assets": [
+    "Shower Phone Caddy.f3d",
+    "originals/bathroom/Shower Phone Caddy.f3d"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

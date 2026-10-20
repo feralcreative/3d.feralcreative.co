@@ -1,0 +1,25 @@
+{
+  "id": "zr-monogram-stamp-2026",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "zr-monogram-stamp-2026.scad",
+  "scad_files": [
+    "zr-monogram-stamp-2026.scad"
+  ],
+  "exports": [
+    "zr-monogram-stamp-2026"
+  ],
+  "aliases": {
+    "parts/zr-monogram-stamp-2026.scad": "zr-monogram-stamp-2026.scad",
+    "stl/zr-monogram-stamp-2026.stl": "zr-monogram-stamp-2026.stl"
+  },
+  "publish_exports": [
+    "zr-monogram-stamp-2026"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "openscad_args": [
+    "--enable=textmetrics"
+  ],
+  "licenses": []
+}

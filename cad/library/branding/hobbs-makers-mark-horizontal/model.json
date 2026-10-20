@@ -1,0 +1,16 @@
+{
+  "id": "hobbs-makers-mark-horizontal",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bx/Hobbs Makers Mark Horizontal.skp": "Hobbs Makers Mark Horizontal.skp"
+  },
+  "protected_assets": [
+    "Hobbs Makers Mark Horizontal.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

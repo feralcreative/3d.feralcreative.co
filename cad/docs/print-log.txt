@@ -1,0 +1,15 @@
+# part component built_v built_sha printed_v printed_sha on_last_plate
+# Written by utils/coupon.sh. The printed columns move only when you pass
+# --printed, because printing is a thing that happens off this machine.
+# Seeded 2026-08-12 from the v3 coupon, which Ziad printed along with v2.
+awl-sheath mouth 5 0748ae44b1cc03aad603e345291ba951d491248b0da81be39cbca73a36028f43 - - included
+door-closer-casing-plate fit 1 b156bbd22c0aec4e7440ec109e17879da691134b98d218c2707f331f6bbe81a5 - - included
+hobbs-chalk-holder handle 5 66ee0cacceb958d25a0fbb21480a0144ae26ca15059253a8c768ec83b590abdd 3 3f024abd4e58a205a60b8f4aa5b89462ea1dabdca02cd597e65c38de6e787924 included
+hobbs-chalk-holder ring 3 3131f870dc490098613c0d2c4d330e07038431d595c0f2a9dfecb5348931eccc 3 3131f870dc490098613c0d2c4d330e07038431d595c0f2a9dfecb5348931eccc omitted
+phone-shower-holder fit 3 88adc20552acae54a7746967abb5fe102ece32034cef0fa0b0a10a2829fc2b58 2 5df111275f333c938e02c4946a8cad78813aa5d01c16703dd8e0fc34672f4776 included
+plant-screen fit 2 76766e032225e1a094d2f19462d15492fe9cd4307a73c33484ce9a4300bea609 - - included
+slim-can-adapter-ring-12oz-to-8-3oz fit 2 671b97f558978a265dd2c056410ea266e310ec2b1c58d58182e175b6825446e6 - - included
+slim-can-adapter-ring-fish-12oz-to-8-3oz fit 1 b483f243038348fc273901f160ab1cecfebfb05510d46741c531b31bf2c1570f - - included
+slim-can-holder-3in fit 1 adc53bc0163d520cf948dfc1eb1a3b3320fb194030271023e7896c710396ac14 1 adc53bc0163d520cf948dfc1eb1a3b3320fb194030271023e7896c710396ac14 included
+slim-can-holder-3in-12oz-fish fit 3 2ef73b39e8546122da0c77bf84abcaf6b49fcd547511e15b5410d29e3ff033da - - included
+wire-shelf-box-platform box-fit 1 3b726d303dbff1c78b499172fd2a43272667f2b247f8ed52594ef7cee23bd442 - - included

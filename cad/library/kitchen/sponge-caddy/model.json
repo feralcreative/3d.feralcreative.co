@@ -1,0 +1,20 @@
+{
+  "id": "sponge-caddy",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/sponge-caddy.3mf": "sponge-caddy.3mf",
+    "_originals/kitchen/sponge-caddy.skp": "sponge-caddy.skp",
+    "_originals/kitchen/sponge-caddy.stl": "sponge-caddy.stl"
+  },
+  "protected_assets": [
+    "sponge-caddy.3mf",
+    "sponge-caddy.skp",
+    "sponge-caddy.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

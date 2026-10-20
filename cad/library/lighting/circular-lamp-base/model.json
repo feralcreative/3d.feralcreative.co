@@ -1,0 +1,20 @@
+{
+  "id": "circular-lamp-base",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/circular-lamp-base.stl": "circular-lamp-base.stl",
+    "_originals/lighting/circular-lamp-base.3mf": "circular-lamp-base.3mf",
+    "_originals/lighting/circular-lamp-base.stl": "originals/lighting/circular-lamp-base.stl"
+  },
+  "protected_assets": [
+    "circular-lamp-base.3mf",
+    "circular-lamp-base.stl",
+    "originals/lighting/circular-lamp-base.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

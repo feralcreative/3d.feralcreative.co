@@ -1,0 +1,23 @@
+{
+  "id": "seedling-tray-2x2",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "seedling-tray-2x2.scad",
+  "scad_files": [
+    "seedling-tray-2x2.scad"
+  ],
+  "exports": [
+    "seedling-tray-2x2",
+    "seedling-tray-2x2-shared",
+    "seedling-tray-1x1"
+  ],
+  "aliases": {},
+  "publish_exports": [
+    "seedling-tray-2x2",
+    "seedling-tray-2x2-shared",
+    "seedling-tray-1x1"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

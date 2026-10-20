@@ -1,0 +1,31 @@
+{
+  "id": "door-closer-casing-plate",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "door-closer-casing-plate.scad",
+  "scad_files": [
+    "door-closer-casing-plate.scad"
+  ],
+  "exports": [
+    "door-closer-casing-plate"
+  ],
+  "aliases": {
+    "parts/door-closer-casing-plate.scad": "door-closer-casing-plate.scad",
+    "stl/house/door-closer-casing-plate.stl": "door-closer-casing-plate.stl",
+    "stl/door-closer-casing-plate.stl": "door-closer-casing-plate.stl",
+    "3mf/door-closer-casing-plate.3mf": "saved-jobs/door-closer-casing-plate.3mf",
+    "renders/door-closer-casing-plate-coupon-overlay.png": "_work/renders/door-closer-casing-plate-coupon-overlay.png",
+    "slice/door-closer-casing-plate/plate_1.gcode": "_work/slice/door-closer-casing-plate/plate_1.gcode",
+    "slice/door-closer-casing-plate/profiles/filament.json": "_work/slice/door-closer-casing-plate/profiles/filament.json",
+    "slice/door-closer-casing-plate/profiles/machine.json": "_work/slice/door-closer-casing-plate/profiles/machine.json",
+    "slice/door-closer-casing-plate/profiles/process.json": "_work/slice/door-closer-casing-plate/profiles/process.json",
+    "slice/door-closer-casing-plate/resolved.json": "_work/slice/door-closer-casing-plate/resolved.json",
+    "slice/door-closer-casing-plate/slice.log": "_work/slice/door-closer-casing-plate/slice.log"
+  },
+  "publish_exports": [
+    "door-closer-casing-plate"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

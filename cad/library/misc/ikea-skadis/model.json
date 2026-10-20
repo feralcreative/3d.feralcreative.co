@@ -1,0 +1,16 @@
+{
+  "id": "ikea-skadis",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/ikea-skadis.stl": "ikea-skadis.stl"
+  },
+  "protected_assets": [
+    "ikea-skadis.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

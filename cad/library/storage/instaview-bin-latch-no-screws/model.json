@@ -1,0 +1,16 @@
+{
+  "id": "instaview-bin-latch-no-screws",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/storage/Instaview+Bin+Latch+No+Screws.stl": "Instaview+Bin+Latch+No+Screws.stl"
+  },
+  "protected_assets": [
+    "Instaview+Bin+Latch+No+Screws.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

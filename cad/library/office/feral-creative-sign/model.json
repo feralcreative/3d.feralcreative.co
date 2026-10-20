@@ -1,0 +1,36 @@
+{
+  "id": "feral-creative-sign",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/Feral Creative Desk.skp": "Feral Creative Desk.skp",
+    "_originals/desk/Feral Creative Desk~.skp": "Feral Creative Desk~.skp",
+    "_originals/feral-creative/feral-creative-base.3mf": "feral-creative-base.3mf",
+    "_originals/feral-creative/feral-creative-base.stl": "feral-creative-base.stl",
+    "_originals/feral-creative/feral-creative-logo-CLEAN.skp": "feral-creative-logo-CLEAN.skp",
+    "_originals/feral-creative/feral-creative-logo-CLEAN.stl": "feral-creative-logo-CLEAN.stl",
+    "_originals/feral-creative/feral-creative-logo.3mf": "feral-creative-logo.3mf",
+    "_originals/feral-creative/feral-creative-logo.stl": "feral-creative-logo.stl",
+    "_originals/feral-creative/feral-creative-sign.skp": "feral-creative-sign.skp",
+    "_originals/feral-creative/feral-creative-sign~.skp": "feral-creative-sign~.skp",
+    "_originals/feral-creative/feral-creative.stl": "feral-creative.stl"
+  },
+  "protected_assets": [
+    "Feral Creative Desk.skp",
+    "Feral Creative Desk~.skp",
+    "feral-creative-base.3mf",
+    "feral-creative-base.stl",
+    "feral-creative-logo-CLEAN.skp",
+    "feral-creative-logo-CLEAN.stl",
+    "feral-creative-logo.3mf",
+    "feral-creative-logo.stl",
+    "feral-creative-sign.skp",
+    "feral-creative-sign~.skp",
+    "feral-creative.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

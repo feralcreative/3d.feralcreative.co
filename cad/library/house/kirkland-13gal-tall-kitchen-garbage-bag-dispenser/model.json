@@ -1,0 +1,29 @@
+{
+  "id": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser.scad",
+  "scad_files": [
+    "kirkland-13gal-tall-kitchen-garbage-bag-dispenser.scad"
+  ],
+  "exports": [
+    "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom",
+    "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top",
+    "kirkland-13gal-tall-kitchen-garbage-bag-dispenser"
+  ],
+  "aliases": {
+    "parts/kirkland-13gal-tall-kitchen-garbage-bag-dispenser.scad": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser.scad",
+    "stl/house/kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom.stl": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom.stl",
+    "stl/kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom.stl": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom.stl",
+    "stl/house/kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top.stl": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top.stl",
+    "stl/kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top.stl": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top.stl",
+    "docs/kirkland-13gal-tall-kitchen-garbage-bag-dispenser.md": "docs/kirkland-13gal-tall-kitchen-garbage-bag-dispenser.md"
+  },
+  "publish_exports": [
+    "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom",
+    "kirkland-13gal-tall-kitchen-garbage-bag-dispenser-top"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

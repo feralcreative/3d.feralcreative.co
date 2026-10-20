@@ -1,0 +1,22 @@
+{
+  "id": "cat-portal-02",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-portal-02.skp": "cat-portal-02.skp",
+    "_originals/cats/cat-portal-02.stl": "cat-portal-02.stl",
+    "_originals/cats/cat-portal-02_fixed.stl": "cat-portal-02_fixed.stl",
+    "_originals/cats/cat-portal-02~.skp": "cat-portal-02~.skp"
+  },
+  "protected_assets": [
+    "cat-portal-02.skp",
+    "cat-portal-02.stl",
+    "cat-portal-02_fixed.stl",
+    "cat-portal-02~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

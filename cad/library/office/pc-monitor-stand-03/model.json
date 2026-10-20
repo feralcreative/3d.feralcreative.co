@@ -1,0 +1,18 @@
+{
+  "id": "pc-monitor-stand-03",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/pc-monitor-stand-03.skp": "pc-monitor-stand-03.skp",
+    "_originals/desk/pc-monitor-stand-03~.skp": "pc-monitor-stand-03~.skp"
+  },
+  "protected_assets": [
+    "pc-monitor-stand-03.skp",
+    "pc-monitor-stand-03~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

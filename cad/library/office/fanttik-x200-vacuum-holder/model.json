@@ -1,0 +1,16 @@
+{
+  "id": "fanttik-x200-vacuum-holder",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/fanttik-x200-vacuum-holder.stl": "fanttik-x200-vacuum-holder.stl"
+  },
+  "protected_assets": [
+    "fanttik-x200-vacuum-holder.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

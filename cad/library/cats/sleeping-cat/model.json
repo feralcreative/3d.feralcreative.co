@@ -1,0 +1,38 @@
+{
+  "id": "sleeping-cat",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/sleeping-cat-model_files/1444364-sleeping-cat-41fe549c-9455-44d2-bb7c-b8f9f39977d1.pdf": "docs/cats/sleeping-cat-model_files/1444364-sleeping-cat-41fe549c-9455-44d2-bb7c-b8f9f39977d1.pdf",
+    "_originals/cats/sleeping-cat-model_files/gracie-and-max.skp": "gracie-and-max.skp",
+    "_originals/cats/sleeping-cat-model_files/gracie-and-max~.skp": "gracie-and-max~.skp",
+    "_originals/cats/sleeping-cat-model_files/gracie.stl": "gracie.stl",
+    "_originals/cats/sleeping-cat-model_files/max-02.stl": "max-02.stl",
+    "_originals/cats/sleeping-cat-model_files/max.stl": "max.stl",
+    "_originals/cats/sleeping-cat-model_files/sleeping-cat-simplified.stl": "sleeping-cat-simplified.stl",
+    "_originals/cats/sleeping-cat-model_files/sleeping-cat.obj": "originals/cats/sleeping-cat-model_files/sleeping-cat.obj",
+    "_originals/cats/sleeping-cat-model_files/sleeping-cat.obj(1).stl": "sleeping-cat.obj(1).stl",
+    "_originals/cats/sleeping-cat-model_files/sleeping-cat.obj.stl": "sleeping-cat.obj.stl",
+    "_originals/cats/sleeping-cat-model_files/sleeping-cat.stl": "sleeping-cat.stl",
+    "_originals/cats/sleeping-cat-model_files/sleeping-cats.3mf": "sleeping-cats.3mf"
+  },
+  "protected_assets": [
+    "docs/cats/sleeping-cat-model_files/1444364-sleeping-cat-41fe549c-9455-44d2-bb7c-b8f9f39977d1.pdf",
+    "gracie-and-max.skp",
+    "gracie-and-max~.skp",
+    "gracie.stl",
+    "max-02.stl",
+    "max.stl",
+    "originals/cats/sleeping-cat-model_files/sleeping-cat.obj",
+    "sleeping-cat-simplified.stl",
+    "sleeping-cat.obj(1).stl",
+    "sleeping-cat.obj.stl",
+    "sleeping-cat.stl",
+    "sleeping-cats.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

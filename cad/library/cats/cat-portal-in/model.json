@@ -1,0 +1,16 @@
+{
+  "id": "cat-portal-in",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-portal-in.stl": "cat-portal-in.stl"
+  },
+  "protected_assets": [
+    "cat-portal-in.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

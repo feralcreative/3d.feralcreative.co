@@ -1,0 +1,14 @@
+{
+  "id": "door-closer-casing-plate-gcode",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "3mf/door-closer-casing-plate.gcode.3mf": "saved-jobs/door-closer-casing-plate.gcode.3mf"
+  },
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

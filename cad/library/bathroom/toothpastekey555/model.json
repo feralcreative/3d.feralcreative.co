@@ -1,0 +1,18 @@
+{
+  "id": "toothpastekey555",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bathroom/toothpastekey555.3mf": "toothpastekey555.3mf",
+    "_originals/bathroom/toothpastekey555.stl": "toothpastekey555.stl"
+  },
+  "protected_assets": [
+    "toothpastekey555.3mf",
+    "toothpastekey555.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

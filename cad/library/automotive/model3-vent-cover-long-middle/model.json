@@ -1,0 +1,16 @@
+{
+  "id": "model3-vent-cover-long-middle",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/tesla/model3_vent_cover_long_middle_v2.stl": "model3_vent_cover_long_middle_v2.stl"
+  },
+  "protected_assets": [
+    "model3_vent_cover_long_middle_v2.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

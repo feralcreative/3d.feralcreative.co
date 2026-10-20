@@ -1,0 +1,38 @@
+{
+  "id": "cpap-accessories",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bedroom/cpap-hose-bracket-model_files/309236-cpap-hose-bracket-6b669b19-b77e-4397-9d2a-439d04ea0833.pdf": "docs/bedroom/cpap-hose-bracket-model_files/309236-cpap-hose-bracket-6b669b19-b77e-4397-9d2a-439d04ea0833.pdf",
+    "_originals/bedroom/cpap-hose-bracket-model_files/CPAP Hose Bracket no inner ridge.stl": "CPAP Hose Bracket no inner ridge.stl",
+    "_originals/bedroom/cpap-hose-bracket-model_files/CPAP Hose Bracket.stl": "CPAP Hose Bracket.stl",
+    "_originals/bedroom/cpap-hose-bracket-model_files/CPAP Hose Bracket_fixed.stl": "CPAP Hose Bracket_fixed.stl",
+    "_originals/bedroom/cpap-hose-bracket-model_files/cpap-hose-bracket.3mf": "cpap-hose-bracket.3mf",
+    "_originals/bedroom/cpap-hose-bracket-model_files/cpap-hose-bracket.skp": "cpap-hose-bracket.skp",
+    "_originals/bedroom/cpap-hose-bracket-model_files/cpap-hose-bracket.stl": "cpap-hose-bracket.stl",
+    "_originals/bedroom/cpap-hose-bracket-model_files/cpap-hose-bracket~.skp": "cpap-hose-bracket~.skp",
+    "_originals/bedroom/cpap-hose-bracket-model_files.zip": "originals/bedroom/cpap-hose-bracket-model_files.zip",
+    "_originals/cpap-cover.skp": "cpap-cover.skp",
+    "_originals/resmed-airsense-11.skp": "resmed-airsense-11.skp",
+    "_originals/resmed-airsense-11~.skp": "resmed-airsense-11~.skp"
+  },
+  "protected_assets": [
+    "CPAP Hose Bracket no inner ridge.stl",
+    "CPAP Hose Bracket.stl",
+    "CPAP Hose Bracket_fixed.stl",
+    "cpap-cover.skp",
+    "cpap-hose-bracket.3mf",
+    "cpap-hose-bracket.skp",
+    "cpap-hose-bracket.stl",
+    "cpap-hose-bracket~.skp",
+    "docs/bedroom/cpap-hose-bracket-model_files/309236-cpap-hose-bracket-6b669b19-b77e-4397-9d2a-439d04ea0833.pdf",
+    "originals/bedroom/cpap-hose-bracket-model_files.zip",
+    "resmed-airsense-11.skp",
+    "resmed-airsense-11~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

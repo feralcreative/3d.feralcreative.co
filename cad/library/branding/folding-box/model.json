@@ -1,0 +1,16 @@
+{
+  "id": "folding-box",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bx/folding_box_v2.stl": "folding_box_v2.stl"
+  },
+  "protected_assets": [
+    "folding_box_v2.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

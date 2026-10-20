@@ -1,0 +1,32 @@
+{
+  "id": "tool-shelf",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/tool-shelf-repaired.stl": "tool-shelf-repaired.stl",
+    "_originals/printer-tools/tool-shelf-test-01.3mf": "tool-shelf-test-01.3mf",
+    "_originals/printer-tools/tool-shelf-test-01.stl": "tool-shelf-test-01.stl",
+    "_originals/printer-tools/tool-shelf-test-02.stl": "tool-shelf-test-02.stl",
+    "_originals/printer-tools/tool-shelf-test-03.stl": "tool-shelf-test-03.stl",
+    "_originals/printer-tools/tool-shelf.3mf": "tool-shelf.3mf",
+    "_originals/printer-tools/tool-shelf.skp": "tool-shelf.skp",
+    "_originals/printer-tools/tool-shelf.stl": "tool-shelf.stl",
+    "_originals/printer-tools/tool-shelf~.skp": "tool-shelf~.skp"
+  },
+  "protected_assets": [
+    "tool-shelf-repaired.stl",
+    "tool-shelf-test-01.3mf",
+    "tool-shelf-test-01.stl",
+    "tool-shelf-test-02.stl",
+    "tool-shelf-test-03.stl",
+    "tool-shelf.3mf",
+    "tool-shelf.skp",
+    "tool-shelf.stl",
+    "tool-shelf~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

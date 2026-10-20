@@ -1,0 +1,16 @@
+{
+  "id": "window-stop-family-room",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/window-stop-family-room.stl": "window-stop-family-room.stl"
+  },
+  "protected_assets": [
+    "window-stop-family-room.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "01-drink-packets",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/01-drink-packets.stl": "01-drink-packets.stl"
+  },
+  "protected_assets": [
+    "01-drink-packets.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

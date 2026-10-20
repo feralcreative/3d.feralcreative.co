@@ -1,0 +1,16 @@
+{
+  "id": "chalkmarkerholder-9-45id",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/ChalkMarkerHolder_9.45ID.3mf": "ChalkMarkerHolder_9.45ID.3mf"
+  },
+  "protected_assets": [
+    "ChalkMarkerHolder_9.45ID.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

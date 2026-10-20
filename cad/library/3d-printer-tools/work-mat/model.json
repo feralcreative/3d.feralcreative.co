@@ -1,0 +1,22 @@
+{
+  "id": "work-mat",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/work-mat.3mf": "work-mat.3mf",
+    "_originals/printer-tools/work-mat.skp": "work-mat.skp",
+    "_originals/printer-tools/work-mat.stl": "work-mat.stl",
+    "_originals/printer-tools/work-mat~.skp": "work-mat~.skp"
+  },
+  "protected_assets": [
+    "work-mat.3mf",
+    "work-mat.skp",
+    "work-mat.stl",
+    "work-mat~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

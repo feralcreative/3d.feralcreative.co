@@ -1,0 +1,20 @@
+{
+  "id": "trellis",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/_projects/trellis/_models/free-garden.skp": "free-garden.skp",
+    "_originals/_projects/trellis/_models/trellis.skp": "trellis.skp",
+    "_originals/_projects/trellis/_models/trellis~.skp": "trellis~.skp"
+  },
+  "protected_assets": [
+    "free-garden.skp",
+    "trellis.skp",
+    "trellis~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

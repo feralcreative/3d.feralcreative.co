@@ -1,0 +1,16 @@
+{
+  "id": "cat-lane",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-lane.stl": "cat-lane.stl"
+  },
+  "protected_assets": [
+    "cat-lane.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

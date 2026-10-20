@@ -1,0 +1,16 @@
+{
+  "id": "openscad-model",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/OpenSCAD Model.stl": "OpenSCAD Model.stl"
+  },
+  "protected_assets": [
+    "OpenSCAD Model.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

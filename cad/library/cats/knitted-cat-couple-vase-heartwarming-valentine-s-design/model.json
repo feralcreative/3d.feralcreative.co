@@ -1,0 +1,24 @@
+{
+  "id": "knitted-cat-couple-vase-heartwarming-valentine-s-design",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/Knitted Cat Couple Vase  Heartwarming Valentine s Design/Knitted cats_Body_1.stl": "Knitted cats_Body_1.stl",
+    "_originals/cats/Knitted Cat Couple Vase  Heartwarming Valentine s Design/Knitted cats_Heart.stl": "Knitted cats_Heart.stl",
+    "_originals/cats/Knitted Cat Couple Vase  Heartwarming Valentine s Design/Knitted cats_body_2.stl": "Knitted cats_body_2.stl",
+    "_originals/cats/Knitted Cat Couple Vase  Heartwarming Valentine s Design/Knitted cats_nose_1.stl": "Knitted cats_nose_1.stl",
+    "_originals/cats/Knitted Cat Couple Vase  Heartwarming Valentine s Design/Knitted cats_nose_2.stl": "Knitted cats_nose_2.stl"
+  },
+  "protected_assets": [
+    "Knitted cats_Body_1.stl",
+    "Knitted cats_Heart.stl",
+    "Knitted cats_body_2.stl",
+    "Knitted cats_nose_1.stl",
+    "Knitted cats_nose_2.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

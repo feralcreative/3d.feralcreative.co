@@ -1,0 +1,16 @@
+{
+  "id": "infinite-lightweight-skadis-200mm-plate-1",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/infinite-lightweight-skadis-200mm_plate_1.stl": "infinite-lightweight-skadis-200mm_plate_1.stl"
+  },
+  "protected_assets": [
+    "infinite-lightweight-skadis-200mm_plate_1.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

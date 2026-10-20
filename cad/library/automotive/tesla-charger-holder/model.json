@@ -1,0 +1,35 @@
+{
+  "id": "tesla-charger-holder",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": "nacs-plug-holder.scad",
+  "scad_files": [
+    "nacs-plug-holder.scad"
+  ],
+  "exports": [
+    "nacs-plug-holder",
+    "nacs-plug-holder-fit-coupon"
+  ],
+  "aliases": {
+    "_originals/tesla/Tesla Charger Holder - 6223537/LICENSE.txt": "docs/tesla/Tesla Charger Holder - 6223537/LICENSE.txt",
+    "_originals/tesla/Tesla Charger Holder - 6223537/README.txt": "docs/tesla/Tesla Charger Holder - 6223537/README.txt",
+    "_originals/tesla/Tesla Charger Holder - 6223537/files/Tesla_Charger_Holder.stl": "Tesla_Charger_Holder.stl",
+    "_originals/tesla/Tesla Charger Holder - 6223537/files/tesla-charger-holder.3mf": "tesla-charger-holder.3mf",
+    "_originals/tesla/Tesla Charger Holder - 6223537/files/tesla-charger-holder.stl": "tesla-charger-holder.stl",
+    "_originals/tesla/Tesla Charger Holder - 6223537/images/d0ee0e3b-a59e-451b-881e-566db0d162eb.png": "originals/tesla/Tesla Charger Holder - 6223537/images/d0ee0e3b-a59e-451b-881e-566db0d162eb.png",
+    "_originals/tesla-charger-holder.stl": "originals/tesla-charger-holder.stl"
+  },
+  "protected_assets": [
+    "Tesla_Charger_Holder.stl",
+    "docs/tesla/Tesla Charger Holder - 6223537/LICENSE.txt",
+    "docs/tesla/Tesla Charger Holder - 6223537/README.txt",
+    "originals/tesla-charger-holder.stl",
+    "originals/tesla/Tesla Charger Holder - 6223537/images/d0ee0e3b-a59e-451b-881e-566db0d162eb.png",
+    "tesla-charger-holder.3mf",
+    "tesla-charger-holder.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/tesla/Tesla Charger Holder - 6223537/LICENSE.txt"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "tesla-model-3-vent-cover",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/LICENSE.txt": "docs/tesla/Tesla Model 3 Vent Cover - 4369251/LICENSE.txt",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/README.txt": "docs/tesla/Tesla Model 3 Vent Cover - 4369251/README.txt",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1618.jpeg": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1618.jpeg",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1619.jpeg": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1619.jpeg",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1620.jpeg": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1620.jpeg",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_left_fixed.png": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_left_fixed.png",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_long_end_cap_v2.png": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_long_end_cap_v2.png",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_long_middle_v2.png": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_long_middle_v2.png",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_middle.png": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_middle.png",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_right.png": "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_right.png",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/model3_vent_cover_left_fixed.stl": "model3_vent_cover_left_fixed.stl",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/model3_vent_cover_long_end_cap_v2.stl": "model3_vent_cover_long_end_cap_v2.stl",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/model3_vent_cover_long_middle_v2.stl": "model3_vent_cover_long_middle_v2.stl",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/model3_vent_cover_middle.stl": "model3_vent_cover_middle.stl",
+    "_originals/tesla/Tesla Model 3 Vent Cover - 4369251/model3_vent_cover_right.stl": "model3_vent_cover_right.stl"
+  },
+  "protected_assets": [
+    "docs/tesla/Tesla Model 3 Vent Cover - 4369251/LICENSE.txt",
+    "docs/tesla/Tesla Model 3 Vent Cover - 4369251/README.txt",
+    "model3_vent_cover_left_fixed.stl",
+    "model3_vent_cover_long_end_cap_v2.stl",
+    "model3_vent_cover_long_middle_v2.stl",
+    "model3_vent_cover_middle.stl",
+    "model3_vent_cover_right.stl",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1618.jpeg",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1619.jpeg",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/IMG_1620.jpeg",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_left_fixed.png",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_long_end_cap_v2.png",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_long_middle_v2.png",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_middle.png",
+    "originals/tesla/Tesla Model 3 Vent Cover - 4369251/images/model3_vent_cover_right.png"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/tesla/Tesla Model 3 Vent Cover - 4369251/LICENSE.txt"
+  ]
+}

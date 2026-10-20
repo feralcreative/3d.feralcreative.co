@@ -1,0 +1,23 @@
+{
+  "id": "cat-gap-wedge",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "cat-gap-wedge.scad",
+  "scad_files": [
+    "cat-gap-wedge.scad"
+  ],
+  "exports": [
+    "cat-gap-wedge"
+  ],
+  "aliases": {
+    "parts/cat-gap-wedge.scad": "cat-gap-wedge.scad",
+    "stl/house/cat-gap-wedge.stl": "cat-gap-wedge.stl",
+    "stl/cat-gap-wedge.stl": "cat-gap-wedge.stl"
+  },
+  "publish_exports": [
+    "cat-gap-wedge"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

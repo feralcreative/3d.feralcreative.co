@@ -1,0 +1,23 @@
+{
+  "id": "roma-tomato-slicing-guide",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "roma-tomato-slicing-guide.scad",
+  "scad_files": [
+    "roma-tomato-slicing-guide.scad"
+  ],
+  "exports": [
+    "roma-tomato-slicing-guide"
+  ],
+  "aliases": {
+    "parts/roma-tomato-slicing-guide.scad": "roma-tomato-slicing-guide.scad",
+    "stl/roma-tomato-slicing-guide-coupon.stl": "_work/stl/roma-tomato-slicing-guide-coupon.stl",
+    "stl/roma-tomato-slicing-guide.stl": "roma-tomato-slicing-guide.stl"
+  },
+  "publish_exports": [
+    "roma-tomato-slicing-guide"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

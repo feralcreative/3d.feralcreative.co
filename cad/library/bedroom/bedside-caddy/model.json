@@ -1,0 +1,40 @@
+{
+  "id": "bedside-caddy",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bedroom/bedside-caddy-bottom-left.3mf": "bedside-caddy-bottom-left.3mf",
+    "_originals/bedroom/bedside-caddy-bottom-left.stl": "bedside-caddy-bottom-left.stl",
+    "_originals/bedroom/bedside-caddy-bottom-right.stl": "bedside-caddy-bottom-right.stl",
+    "_originals/bedroom/bedside-caddy-left.3mf": "bedside-caddy-left.3mf",
+    "_originals/bedroom/bedside-caddy-left.stl": "bedside-caddy-left.stl",
+    "_originals/bedroom/bedside-caddy-round-bottom.stl": "bedside-caddy-round-bottom.stl",
+    "_originals/bedroom/bedside-caddy-square.stl": "bedside-caddy-square.stl",
+    "_originals/bedroom/bedside-caddy-test-01.stl": "bedside-caddy-test-01.stl",
+    "_originals/bedroom/bedside-caddy-test-02.stl": "bedside-caddy-test-02.stl",
+    "_originals/bedroom/bedside-caddy-test-03.stl": "bedside-caddy-test-03.stl",
+    "_originals/bedroom/bedside-caddy.skp": "bedside-caddy.skp",
+    "_originals/bedroom/bedside-caddy~.skp": "bedside-caddy~.skp",
+    "_originals/bedside-caddy-round-bottom.stl": "originals/bedside-caddy-round-bottom.stl"
+  },
+  "protected_assets": [
+    "bedside-caddy-bottom-left.3mf",
+    "bedside-caddy-bottom-left.stl",
+    "bedside-caddy-bottom-right.stl",
+    "bedside-caddy-left.3mf",
+    "bedside-caddy-left.stl",
+    "bedside-caddy-round-bottom.stl",
+    "bedside-caddy-square.stl",
+    "bedside-caddy-test-01.stl",
+    "bedside-caddy-test-02.stl",
+    "bedside-caddy-test-03.stl",
+    "bedside-caddy.skp",
+    "bedside-caddy~.skp",
+    "originals/bedside-caddy-round-bottom.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

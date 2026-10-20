@@ -1,0 +1,34 @@
+{
+  "id": "can-light-trim",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "can-light-trim.scad",
+  "scad_files": [
+    "can-light-trim.scad"
+  ],
+  "exports": [
+    "can-light-lens",
+    "can-light-trim"
+  ],
+  "aliases": {
+    "parts/can-light-trim.scad": "can-light-trim.scad",
+    "stl/lighting/can-light-lens.stl": "can-light-lens.stl",
+    "stl/can-light-lens.stl": "can-light-lens.stl",
+    "stl/lighting/can-light-trim.stl": "can-light-trim.stl",
+    "stl/can-light-trim.stl": "can-light-trim.stl",
+    "renders/can-light-trim-section/can-light-trim-iso.png": "_work/renders/can-light-trim-section/can-light-trim-iso.png",
+    "renders/can-light-trim-section/can-light-trim-xminus.png": "_work/renders/can-light-trim-section/can-light-trim-xminus.png",
+    "renders/can-light-trim-section/can-light-trim-xplus.png": "_work/renders/can-light-trim-section/can-light-trim-xplus.png",
+    "renders/can-light-trim-section/can-light-trim-yminus.png": "_work/renders/can-light-trim-section/can-light-trim-yminus.png",
+    "renders/can-light-trim-section/can-light-trim-yplus.png": "_work/renders/can-light-trim-section/can-light-trim-yplus.png",
+    "renders/can-light-trim-section/can-light-trim-zminus.png": "_work/renders/can-light-trim-section/can-light-trim-zminus.png",
+    "renders/can-light-trim-section/can-light-trim-zplus.png": "_work/renders/can-light-trim-section/can-light-trim-zplus.png"
+  },
+  "publish_exports": [
+    "can-light-lens",
+    "can-light-trim"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,24 @@
+{
+  "id": "screen-lock",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/screen-lock.3mf": "screen-lock.3mf",
+    "_originals/cats/screen-lock.skp": "screen-lock.skp",
+    "_originals/cats/screen-lock.stl": "screen-lock.stl",
+    "_originals/cats/screen-lock~.skp": "screen-lock~.skp",
+    "_originals/screen-lock.stl": "originals/screen-lock.stl"
+  },
+  "protected_assets": [
+    "originals/screen-lock.stl",
+    "screen-lock.3mf",
+    "screen-lock.skp",
+    "screen-lock.stl",
+    "screen-lock~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

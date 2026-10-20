@@ -1,0 +1,17 @@
+{
+  "id": "patio-leg-foot",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "stl/patio-leg-foot.stl": "patio-leg-foot.stl"
+  },
+  "publish_exports": [
+    "patio-leg-foot"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

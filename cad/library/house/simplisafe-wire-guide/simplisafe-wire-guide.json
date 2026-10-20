@@ -1,0 +1,21 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "New set 1": {
+            "back_r": "0.40000000000000002",
+            "clip_color": "SlateGray",
+            "clip_len": "12",
+            "clip_w": "18",
+            "count": "1",
+            "cover_t": "1.3999999999999999",
+            "front_r": "2.4000000000000004",
+            "groove_depth": "3.5",
+            "groove_w": "3.7999999999999998",
+            "plate_cols": "4",
+            "plate_gap": "4",
+            "shelf_w": "21",
+            "show": "set",
+            "wire_d": "3.5"
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "corpo4-1",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/Corpo4(1).stl": "Corpo4(1).stl"
+  },
+  "protected_assets": [
+    "Corpo4(1).stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

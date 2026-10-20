@@ -1,0 +1,47 @@
+{
+  "id": "pumpkin-body",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "pumpkin-body.scad",
+  "scad_files": [
+    "pumpkin-body.scad"
+  ],
+  "exports": [
+    "pumpkin-body"
+  ],
+  "aliases": {
+    "parts/pumpkin-body.scad": "pumpkin-body.scad",
+    "_originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/pumpkin-body.3mf": "originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/pumpkin-body.3mf",
+    "stl/pumpkin-body.stl": "pumpkin-body.stl",
+    "3mf/pumpkin-body.3mf": "saved-jobs/pumpkin-body.3mf",
+    "renders/pumpkin-body-assembly/pumpkin-body-iso.png": "_work/renders/pumpkin-body-assembly/pumpkin-body-iso.png",
+    "renders/pumpkin-body-assembly/pumpkin-body-xminus.png": "_work/renders/pumpkin-body-assembly/pumpkin-body-xminus.png",
+    "renders/pumpkin-body-assembly/pumpkin-body-xplus.png": "_work/renders/pumpkin-body-assembly/pumpkin-body-xplus.png",
+    "renders/pumpkin-body-assembly/pumpkin-body-yminus.png": "_work/renders/pumpkin-body-assembly/pumpkin-body-yminus.png",
+    "renders/pumpkin-body-assembly/pumpkin-body-yplus.png": "_work/renders/pumpkin-body-assembly/pumpkin-body-yplus.png",
+    "renders/pumpkin-body-assembly/pumpkin-body-zminus.png": "_work/renders/pumpkin-body-assembly/pumpkin-body-zminus.png",
+    "renders/pumpkin-body-assembly/pumpkin-body-zplus.png": "_work/renders/pumpkin-body-assembly/pumpkin-body-zplus.png",
+    "renders/pumpkin-body-iso.png": "_work/renders/pumpkin-body-iso.png",
+    "renders/pumpkin-body-section/pumpkin-body-iso.png": "_work/renders/pumpkin-body-section/pumpkin-body-iso.png",
+    "renders/pumpkin-body-section/pumpkin-body-xminus.png": "_work/renders/pumpkin-body-section/pumpkin-body-xminus.png",
+    "renders/pumpkin-body-section/pumpkin-body-xplus.png": "_work/renders/pumpkin-body-section/pumpkin-body-xplus.png",
+    "renders/pumpkin-body-section/pumpkin-body-yminus.png": "_work/renders/pumpkin-body-section/pumpkin-body-yminus.png",
+    "renders/pumpkin-body-section/pumpkin-body-yplus.png": "_work/renders/pumpkin-body-section/pumpkin-body-yplus.png",
+    "renders/pumpkin-body-section/pumpkin-body-zminus.png": "_work/renders/pumpkin-body-section/pumpkin-body-zminus.png",
+    "renders/pumpkin-body-section/pumpkin-body-zplus.png": "_work/renders/pumpkin-body-section/pumpkin-body-zplus.png",
+    "renders/pumpkin-body-xminus.png": "_work/renders/pumpkin-body-xminus.png",
+    "renders/pumpkin-body-xplus.png": "_work/renders/pumpkin-body-xplus.png",
+    "renders/pumpkin-body-yminus.png": "_work/renders/pumpkin-body-yminus.png",
+    "renders/pumpkin-body-yplus.png": "_work/renders/pumpkin-body-yplus.png",
+    "renders/pumpkin-body-zminus.png": "_work/renders/pumpkin-body-zminus.png",
+    "renders/pumpkin-body-zplus.png": "_work/renders/pumpkin-body-zplus.png"
+  },
+  "publish_exports": [
+    "pumpkin-body"
+  ],
+  "protected_assets": [
+    "originals/holiday/halloween/halloween-pumpkin-tealight-compatible-model_files/pumpkin-body.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

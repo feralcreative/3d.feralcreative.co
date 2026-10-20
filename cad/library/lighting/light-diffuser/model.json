@@ -1,0 +1,18 @@
+{
+  "id": "light-diffuser",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/light-diffuser.3mf": "light-diffuser.3mf",
+    "_originals/lighting/light-diffuser.stl": "light-diffuser.stl"
+  },
+  "protected_assets": [
+    "light-diffuser.3mf",
+    "light-diffuser.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

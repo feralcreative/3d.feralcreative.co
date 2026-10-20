@@ -1,0 +1,18 @@
+{
+  "id": "ivar-shelf-peg-hook-left",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/ivar-shelf-peg-hook-LEFT.stl": "ivar-shelf-peg-hook-LEFT.stl",
+    "_originals/office/ivar-shelf-peg-hook-LEFT.stl": "originals/office/ivar-shelf-peg-hook-LEFT.stl"
+  },
+  "protected_assets": [
+    "ivar-shelf-peg-hook-LEFT.stl",
+    "originals/office/ivar-shelf-peg-hook-LEFT.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

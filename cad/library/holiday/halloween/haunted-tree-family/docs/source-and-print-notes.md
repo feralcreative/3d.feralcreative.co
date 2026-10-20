@@ -1,0 +1,29 @@
+# Haunted tree LED puck adaptations
+
+The five tree outputs now default to `interior="cone"`: the unused candle cavity is filled for slicer infill, leaving a clear chamber from the LED lens to the eyes and mouth. The channel closes with a tapered ridge roof, and the face passages rise at 45° toward the openings. A pointed cone was too narrow at the upper eyes, so the ridge retains clearance across both eyes. The exterior, 160% scale, and proven Ø59.7 × 8.1 mm puck pocket remain unchanged. The rear cable groove remains 3.4 mm wide.
+
+Print the exported tree upright and install the puck from below, lens up, cable in the groove. The cone version uses the puck directly; the old diffuser does not fit this tapered interior. `interior="hollow"` retains the previous hollow-body design and its diffuser assembly for comparison. The retained diffuser STL belongs to that older hollow mode.
+
+| Retained tree output | Size X × Y × Z, mm | Current build |
+| --- | --- | --- |
+| [haunted-tree-grin-led.stl](../haunted-tree-grin-led.stl) | 155.011 × 148.298 × 118.273 | v06 |
+| [haunted-tree-teeth-led.stl](../haunted-tree-teeth-led.stl) | 155.085 × 149.123 × 135.217 | v03 |
+| [haunted-tree-teeth-flat-led.stl](../haunted-tree-teeth-flat-led.stl) | 151.790 × 145.061 × 132.037 | v04 |
+| [haunted-tree-oh-led.stl](../haunted-tree-oh-led.stl) | 155.085 × 149.116 × 125.558 | v02 |
+| [haunted-tree-sad-led.stl](../haunted-tree-sad-led.stl) | 155.085 × 149.488 × 118.913 | v02 |
+
+All five final meshes have zero collapsed triangles and zero bad edges. Each extracted light-channel volume has one connected component, including the eye and mouth passages. Seated puck intersections and complete bottom-entry swept-volume checks are empty for every tree. All seven render views of each tree, the assembled grin section, and the light-channel volume were reviewed. Final previews are under `../_work/renders/cone-<variant>/`, with seven-view sheets at `../_work/renders/cone-<variant>-views.jpg`.
+
+Triangle-normal checks inside the original candle bore confirm that the new roof and passages are at least 44.9° above horizontal (45° design target), apart from a 0.01 mm-wide closing ridge. These replace the broad flat interior ceiling. Automatic support slicing still flags some original face and bark features, so this task does not establish that the complete ornamental model prints successfully with every support disabled. A support-free print is a physical trial, not a verified result.
+
+A diagnostic grin slice used the stock 0.20 mm process, Flashforge HS PETG, normal automatic supports enabled, and `bridge_no_support=1`. These were diagnostic overrides only; no preset was changed or installed. Flash Studio emitted G-code, but its thumbnail/3MF export failed with the known OpenGL/GLFW error. No printable 3MF was delivered or sent to the printer. The diagnostic G-code remains in `../_work/slice/haunted-tree-grin-cone-final-support-audit/` and is not a filament recommendation. Brightness, physical retention, print finish, and unsupported ornamental details still need a print check.
+
+`face-openings.scad` retains normalized contours of enclosed holes projected from the original front-half meshes. Outer silhouettes and an unrelated low root pinhole were excluded. The contours are warped to the existing tapered bore boundary and extruded with a 1:1 rise along X, so the light passage roofs close at 45° without changing the original outside openings. Sources remain protected in `../originals/`.
+
+Rebuild with `utils/build.sh haunted-tree-family -D 'show="grin"' --name haunted-tree-grin-led`, substituting `teeth`, `teeth-flat`, `oh`, or `sad` and its matching output name. Check the raw STL independently and apply re-import/containing-cube cleanup when needed before replacing a retained file. Use `utils/render.sh haunted-tree-family -D 'show="section"' -D 'tree="grin"'` for the assembled section or `show="channel"` for the air path. The models remain drafts for Ziad's visual and print review and are excluded from publishing.
+
+The first supplied ZIP and its extracted copies contain damaged oh and sad meshes. On 13 October 2026, Ziad supplied a fresh Printables ZIP, extracted meshes, and individual STL downloads. All six new meshes are complete and passed exact-coordinate triangle/edge checks. Individual downloads match the corresponding new ZIP entries byte-for-byte. The four already usable original meshes have triangle streams identical to the fresh downloads; only their headers differ. Those existing sources and outputs remain unchanged. Complete oh and sad copies from the fresh extraction are protected in `../originals/haunted-tree-oh.stl` and `../originals/haunted-tree-sad.stl`.
+
+Sad’s candle bore has a slightly shifted axis, so its source is centred independently. One root extends 0.332 mm below its main base plane; that projection is trimmed to make the adapted base flat. All current exports were cleaned through STL re-import and intersection with an enclosing cube, then independently rechecked. The largest absolute volume change was less than 0.000001 mm³. Future rebuilds still require the independent mesh check and this cleanup if float32 defects recur. No geometry was invented to replace missing source surfaces.
+
+Source: DIY Wizard's [Cute haunted tree family—halloween candle lights](https://www.printables.com/model/1016779-cute-haunted-tree-family-halloween-candle-lights/files). The page lists a Standard Digital File License for personal, non-commercial use and prohibits redistribution, hosting, and remixes. Keep these working adaptations local; no source or output was published. The retained sources were copied from the folders Ziad supplied, preserving their original filenames and bytes. Both previously blocked variants are now adapted and validated.

@@ -1,0 +1,16 @@
+{
+  "id": "thermostat-nail",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/command-hooks/thermostat-nail.stl": "thermostat-nail.stl"
+  },
+  "protected_assets": [
+    "thermostat-nail.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

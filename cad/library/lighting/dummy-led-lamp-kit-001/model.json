@@ -1,0 +1,16 @@
+{
+  "id": "dummy-led-lamp-kit-001",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/Dummy+LED+Lamp+Kit-001.3mf": "Dummy+LED+Lamp+Kit-001.3mf"
+  },
+  "protected_assets": [
+    "Dummy+LED+Lamp+Kit-001.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

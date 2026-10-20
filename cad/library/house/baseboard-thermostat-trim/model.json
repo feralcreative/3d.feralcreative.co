@@ -1,0 +1,20 @@
+{
+  "id": "baseboard-thermostat-trim",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/house/baseboard-thermostat-trim.3mf": "baseboard-thermostat-trim.3mf",
+    "_originals/house/baseboard-thermostat-trim.skp": "baseboard-thermostat-trim.skp",
+    "_originals/house/baseboard-thermostat-trim.stl": "baseboard-thermostat-trim.stl"
+  },
+  "protected_assets": [
+    "baseboard-thermostat-trim.3mf",
+    "baseboard-thermostat-trim.skp",
+    "baseboard-thermostat-trim.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

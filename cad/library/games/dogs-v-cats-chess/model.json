@@ -1,0 +1,44 @@
+{
+  "id": "dogs-v-cats-chess",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/Dogs v Cats Chess Set - 7181220/LICENSE.txt": "docs/Dogs v Cats Chess Set - 7181220/LICENSE.txt",
+    "_originals/Dogs v Cats Chess Set - 7181220/README.txt": "docs/Dogs v Cats Chess Set - 7181220/README.txt",
+    "_originals/Dogs v Cats Chess Set - 7181220/files/Cats.stl": "Cats.stl",
+    "_originals/Dogs v Cats Chess Set - 7181220/files/Cats_Pawn.stl": "Cats_Pawn.stl",
+    "_originals/Dogs v Cats Chess Set - 7181220/files/Dogs.stl": "Dogs.stl",
+    "_originals/Dogs v Cats Chess Set - 7181220/files/Dogs_Pawn.stl": "Dogs_Pawn.stl",
+    "_originals/Dogs v Cats Chess Set - 7181220/files/Dogs_v_Cats.3mf": "Dogs_v_Cats.3mf",
+    "_originals/Dogs v Cats Chess Set - 7181220/images/Cats.png": "originals/Dogs v Cats Chess Set - 7181220/images/Cats.png",
+    "_originals/Dogs v Cats Chess Set - 7181220/images/Cats_Pawn.png": "originals/Dogs v Cats Chess Set - 7181220/images/Cats_Pawn.png",
+    "_originals/Dogs v Cats Chess Set - 7181220/images/DSC_0001.JPG": "originals/Dogs v Cats Chess Set - 7181220/images/DSC_0001.JPG",
+    "_originals/Dogs v Cats Chess Set - 7181220/images/DSC_0003.JPG": "originals/Dogs v Cats Chess Set - 7181220/images/DSC_0003.JPG",
+    "_originals/Dogs v Cats Chess Set - 7181220/images/Dogs.png": "originals/Dogs v Cats Chess Set - 7181220/images/Dogs.png",
+    "_originals/Dogs v Cats Chess Set - 7181220/images/Dogs_Pawn.png": "originals/Dogs v Cats Chess Set - 7181220/images/Dogs_Pawn.png",
+    "_originals/Dogs v Cats Chess Set - 7181220/images/Dogs_v_Cats_large.jpg": "originals/Dogs v Cats Chess Set - 7181220/images/Dogs_v_Cats_large.jpg"
+  },
+  "protected_assets": [
+    "Cats.stl",
+    "Cats_Pawn.stl",
+    "Dogs.stl",
+    "Dogs_Pawn.stl",
+    "Dogs_v_Cats.3mf",
+    "docs/Dogs v Cats Chess Set - 7181220/LICENSE.txt",
+    "docs/Dogs v Cats Chess Set - 7181220/README.txt",
+    "originals/Dogs v Cats Chess Set - 7181220/images/Cats.png",
+    "originals/Dogs v Cats Chess Set - 7181220/images/Cats_Pawn.png",
+    "originals/Dogs v Cats Chess Set - 7181220/images/DSC_0001.JPG",
+    "originals/Dogs v Cats Chess Set - 7181220/images/DSC_0003.JPG",
+    "originals/Dogs v Cats Chess Set - 7181220/images/Dogs.png",
+    "originals/Dogs v Cats Chess Set - 7181220/images/Dogs_Pawn.png",
+    "originals/Dogs v Cats Chess Set - 7181220/images/Dogs_v_Cats_large.jpg"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/Dogs v Cats Chess Set - 7181220/LICENSE.txt"
+  ]
+}

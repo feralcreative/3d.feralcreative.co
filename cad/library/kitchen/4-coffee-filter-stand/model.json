@@ -1,0 +1,20 @@
+{
+  "id": "4-coffee-filter-stand",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/4-coffee-filter-stand-model_files/778657-4-coffee-filter-stand-0c9c8b18-075f-4850-b216-9a7c07d8e708.pdf": "docs/kitchen/4-coffee-filter-stand-model_files/778657-4-coffee-filter-stand-0c9c8b18-075f-4850-b216-9a7c07d8e708.pdf",
+    "_originals/kitchen/4-coffee-filter-stand-model_files/Coffee Filter Stand.3mf": "Coffee Filter Stand.3mf",
+    "_originals/kitchen/4-coffee-filter-stand-model_files/Coffee Filter Stand_Debossed.3mf": "Coffee Filter Stand_Debossed.3mf"
+  },
+  "protected_assets": [
+    "Coffee Filter Stand.3mf",
+    "Coffee Filter Stand_Debossed.3mf",
+    "docs/kitchen/4-coffee-filter-stand-model_files/778657-4-coffee-filter-stand-0c9c8b18-075f-4850-b216-9a7c07d8e708.pdf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

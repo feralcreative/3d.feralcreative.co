@@ -1,0 +1,22 @@
+{
+  "id": "tbd-back-deck",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/_projects/TBD-back-deck/Giant Back Deck.skp": "Giant Back Deck.skp",
+    "_originals/_projects/TBD-back-deck/Giant Back Deck~.skp": "Giant Back Deck~.skp",
+    "_originals/_projects/TBD-back-deck/landing.skp": "landing.skp",
+    "_originals/_projects/TBD-back-deck/landing~.skp": "landing~.skp"
+  },
+  "protected_assets": [
+    "Giant Back Deck.skp",
+    "Giant Back Deck~.skp",
+    "landing.skp",
+    "landing~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

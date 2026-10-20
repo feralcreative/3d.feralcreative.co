@@ -1,0 +1,18 @@
+{
+  "id": "hobbs-makers-mark",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bx/hobbs-makers-mark.skp": "hobbs-makers-mark.skp",
+    "_originals/bx/hobbs-makers-mark~.skp": "hobbs-makers-mark~.skp"
+  },
+  "protected_assets": [
+    "hobbs-makers-mark.skp",
+    "hobbs-makers-mark~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "miter-clamp-jig",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/miter-clamp-jig.skp": "miter-clamp-jig.skp",
+    "_originals/miter-clamp-jig~.skp": "miter-clamp-jig~.skp"
+  },
+  "protected_assets": [
+    "miter-clamp-jig.skp",
+    "miter-clamp-jig~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

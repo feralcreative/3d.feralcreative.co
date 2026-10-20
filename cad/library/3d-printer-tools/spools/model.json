@@ -1,0 +1,24 @@
+{
+  "id": "spools",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/spools/Bambu+Lab+Spool+PETG_stls/obj_1_bambu_spool_p1.STL.stl": "obj_1_bambu_spool_p1.STL.stl",
+    "_originals/printer-tools/spools/Bambu+Lab+Spool+PETG_stls/obj_2_bambu_spool_p2.3mf": "obj_2_bambu_spool_p2.3mf",
+    "_originals/printer-tools/spools/Bambu+Lab+Spool+PETG_stls/obj_2_bambu_spool_p2.STL.stl": "obj_2_bambu_spool_p2.STL.stl",
+    "_originals/printer-tools/spools/Bambu+Lab+Spool+PETG_stls/obj_3_bambu lock.stl": "obj_3_bambu lock.stl",
+    "_originals/printer-tools/spools/Bambu+Lab+Spool+PETG_stls.zip": "originals/printer-tools/spools/Bambu+Lab+Spool+PETG_stls.zip"
+  },
+  "protected_assets": [
+    "obj_1_bambu_spool_p1.STL.stl",
+    "obj_2_bambu_spool_p2.3mf",
+    "obj_2_bambu_spool_p2.STL.stl",
+    "obj_3_bambu lock.stl",
+    "originals/printer-tools/spools/Bambu+Lab+Spool+PETG_stls.zip"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

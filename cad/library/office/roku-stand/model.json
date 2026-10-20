@@ -1,0 +1,90 @@
+{
+  "id": "roku-stand",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "roku-stand.scad",
+  "scad_files": [
+    "roku-stand.scad"
+  ],
+  "exports": [
+    "roku-stand-r",
+    "roku-stand-z",
+    "roku-stand"
+  ],
+  "aliases": {
+    "parts/roku-stand.scad": "roku-stand.scad",
+    "_originals/Roku Stand Universal.stl": "originals/Roku Stand Universal.stl",
+    "_originals/roku/4660 Roku Mount.stl": "originals/roku/4660 Roku Mount.stl",
+    "_originals/roku/Roku Stand Universal.stl": "originals/roku/Roku Stand Universal.stl",
+    "_originals/roku/roku-ultra-mount.3mf": "originals/roku/roku-ultra-mount.3mf",
+    "_originals/roku/roku-ultra-mount.skp": "originals/roku/roku-ultra-mount.skp",
+    "_originals/roku/roku-ultra-mount.stl": "originals/roku/roku-ultra-mount.stl",
+    "_originals/roku/roku-ultra-mount~.skp": "originals/roku/roku-ultra-mount~.skp",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308/LICENSE.txt": "docs/roku-remote-holder/Roku Remote Holder - 5955308/LICENSE.txt",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308/README.txt": "docs/roku-remote-holder/Roku Remote Holder - 5955308/README.txt",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308/files/Remote_Holder.stl": "originals/roku-remote-holder/Roku Remote Holder - 5955308/files/Remote_Holder.stl",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308/images/4ed5148d-3bd4-4d17-9526-d8f40a909cdf.jpeg": "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/4ed5148d-3bd4-4d17-9526-d8f40a909cdf.jpeg",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308/images/965a95a9-cf30-4869-894d-8cc0c88f4615.jpeg": "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/965a95a9-cf30-4869-894d-8cc0c88f4615.jpeg",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308/images/cfbbf21c-a34b-4f8a-a359-4b965f79a04e.png": "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/cfbbf21c-a34b-4f8a-a359-4b965f79a04e.png",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308/images/f154a078-6885-46f1-a839-479219aeabad.png": "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/f154a078-6885-46f1-a839-479219aeabad.png",
+    "_originals/roku-remote-holder/Roku Remote Holder - 5955308.zip": "originals/roku-remote-holder/Roku Remote Holder - 5955308.zip",
+    "_originals/roku_remote_b_command.3mf": "originals/roku_remote_b_command.3mf",
+    "stl/roku-stand-r.stl": "roku-stand-r.stl",
+    "stl/roku-stand-z.stl": "roku-stand-z.stl",
+    "stl/roku-stand.stl": "roku-stand.stl",
+    "3mf/roku-stand-r.3mf": "saved-jobs/roku-stand-r.3mf",
+    "3mf/roku-stand-z.3mf": "saved-jobs/roku-stand-z.3mf",
+    "3mf/roku-stand.3mf": "saved-jobs/roku-stand.3mf",
+    "slice/roku-stand/out.gcode.3mf": "_work/slice/roku-stand/out.gcode.3mf",
+    "slice/roku-stand/plate_1.gcode": "_work/slice/roku-stand/plate_1.gcode",
+    "slice/roku-stand/profiles/filament.json": "_work/slice/roku-stand/profiles/filament.json",
+    "slice/roku-stand/profiles/machine.json": "_work/slice/roku-stand/profiles/machine.json",
+    "slice/roku-stand/profiles/process.json": "_work/slice/roku-stand/profiles/process.json",
+    "slice/roku-stand/resolved.json": "_work/slice/roku-stand/resolved.json",
+    "slice/roku-stand/slice.log": "_work/slice/roku-stand/slice.log",
+    "slice/roku-stand-r/out.gcode.3mf": "_work/slice/roku-stand-r/out.gcode.3mf",
+    "slice/roku-stand-r/plate_1.gcode": "_work/slice/roku-stand-r/plate_1.gcode",
+    "slice/roku-stand-r/profiles/filament.json": "_work/slice/roku-stand-r/profiles/filament.json",
+    "slice/roku-stand-r/profiles/machine.json": "_work/slice/roku-stand-r/profiles/machine.json",
+    "slice/roku-stand-r/profiles/process.json": "_work/slice/roku-stand-r/profiles/process.json",
+    "slice/roku-stand-r/resolved.json": "_work/slice/roku-stand-r/resolved.json",
+    "slice/roku-stand-r/slice.log": "_work/slice/roku-stand-r/slice.log",
+    "slice/roku-stand-z/out.gcode.3mf": "_work/slice/roku-stand-z/out.gcode.3mf",
+    "slice/roku-stand-z/plate_1.gcode": "_work/slice/roku-stand-z/plate_1.gcode",
+    "slice/roku-stand-z/profiles/filament.json": "_work/slice/roku-stand-z/profiles/filament.json",
+    "slice/roku-stand-z/profiles/machine.json": "_work/slice/roku-stand-z/profiles/machine.json",
+    "slice/roku-stand-z/profiles/process.json": "_work/slice/roku-stand-z/profiles/process.json",
+    "slice/roku-stand-z/resolved.json": "_work/slice/roku-stand-z/resolved.json",
+    "slice/roku-stand-z/slice.log": "_work/slice/roku-stand-z/slice.log"
+  },
+  "publish_exports": [
+    "roku-stand-r",
+    "roku-stand-z",
+    "roku-stand"
+  ],
+  "protected_assets": [
+    "docs/roku-remote-holder/Roku Remote Holder - 5955308/LICENSE.txt",
+    "docs/roku-remote-holder/Roku Remote Holder - 5955308/README.txt",
+    "originals/Roku Stand Universal.stl",
+    "originals/roku-remote-holder/Roku Remote Holder - 5955308.zip",
+    "originals/roku-remote-holder/Roku Remote Holder - 5955308/files/Remote_Holder.stl",
+    "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/4ed5148d-3bd4-4d17-9526-d8f40a909cdf.jpeg",
+    "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/965a95a9-cf30-4869-894d-8cc0c88f4615.jpeg",
+    "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/cfbbf21c-a34b-4f8a-a359-4b965f79a04e.png",
+    "originals/roku-remote-holder/Roku Remote Holder - 5955308/images/f154a078-6885-46f1-a839-479219aeabad.png",
+    "originals/roku/4660 Roku Mount.stl",
+    "originals/roku/Roku Stand Universal.stl",
+    "originals/roku/roku-ultra-mount.3mf",
+    "originals/roku/roku-ultra-mount.skp",
+    "originals/roku/roku-ultra-mount.stl",
+    "originals/roku/roku-ultra-mount~.skp",
+    "originals/roku_remote_b_command.3mf"
+  ],
+  "additional_scad_files": [],
+  "openscad_args": [
+    "--enable=textmetrics"
+  ],
+  "licenses": [
+    "docs/roku-remote-holder/Roku Remote Holder - 5955308/LICENSE.txt"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+    "curr_bed_type": "Textured PEI Plate",
+    "from": "User",
+    "gap_infill_speed": "40",
+    "inherits": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle",
+    "is_custom_defined": "0",
+    "name": "0.20mm Standard @Flashforge AD5M Pro 0.4 - TPU",
+    "print_settings_id": "0.20mm Standard @Flashforge AD5M Pro 0.4 - TPU",
+    "version": "2.1.1.0"
+}

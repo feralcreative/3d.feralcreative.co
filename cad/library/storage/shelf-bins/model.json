@@ -1,0 +1,22 @@
+{
+  "id": "shelf-bins",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/storage/shelf-bins/fabric-bin-tag.3mf": "fabric-bin-tag.3mf",
+    "_originals/storage/shelf-bins/fabric-bin-tag.skp": "fabric-bin-tag.skp",
+    "_originals/storage/shelf-bins/fabric-bin-tag.stl": "fabric-bin-tag.stl",
+    "_originals/storage/shelf-bins/fabric-bin-tag~.skp": "fabric-bin-tag~.skp"
+  },
+  "protected_assets": [
+    "fabric-bin-tag.3mf",
+    "fabric-bin-tag.skp",
+    "fabric-bin-tag.stl",
+    "fabric-bin-tag~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

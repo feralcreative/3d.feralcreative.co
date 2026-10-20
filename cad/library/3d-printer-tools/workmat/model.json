@@ -1,0 +1,16 @@
+{
+  "id": "workmat",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/workmat.stl": "workmat.stl"
+  },
+  "protected_assets": [
+    "workmat.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

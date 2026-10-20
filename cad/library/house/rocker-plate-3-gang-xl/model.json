@@ -1,0 +1,22 @@
+{
+  "id": "rocker-plate-3-gang-xl",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/house/rocker-plate-3-gang-xl.3mf": "rocker-plate-3-gang-xl.3mf",
+    "_originals/house/rocker-plate-3-gang-xl.skp": "rocker-plate-3-gang-xl.skp",
+    "_originals/house/rocker-plate-3-gang-xl.stl": "rocker-plate-3-gang-xl.stl",
+    "_originals/house/rocker-plate-3-gang-xl~.skp": "rocker-plate-3-gang-xl~.skp"
+  },
+  "protected_assets": [
+    "rocker-plate-3-gang-xl.3mf",
+    "rocker-plate-3-gang-xl.skp",
+    "rocker-plate-3-gang-xl.stl",
+    "rocker-plate-3-gang-xl~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

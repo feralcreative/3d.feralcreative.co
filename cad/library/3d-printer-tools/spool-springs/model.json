@@ -1,0 +1,22 @@
+{
+  "id": "spool-springs",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/version+2+-+springs+profile+(a1+mini)_stls/obj_1_version 2 - springs.stl": "obj_1_version 2 - springs.stl",
+    "_originals/version+2+-+springs+profile+(a1+mini)_stls/obj_2_Assembly.stl": "obj_2_Assembly.stl",
+    "_originals/version+2+-+springs+profile+(a1+mini)_stls/obj_3_Assembly.stl": "obj_3_Assembly.stl",
+    "_originals/version+2+-+springs+profile+(a1+mini)_stls/toothpick-dispenser.3mf": "toothpick-dispenser.3mf"
+  },
+  "protected_assets": [
+    "obj_1_version 2 - springs.stl",
+    "obj_2_Assembly.stl",
+    "obj_3_Assembly.stl",
+    "toothpick-dispenser.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

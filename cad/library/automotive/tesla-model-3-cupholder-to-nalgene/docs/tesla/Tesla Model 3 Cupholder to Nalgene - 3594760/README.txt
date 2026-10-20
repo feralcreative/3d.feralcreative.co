@@ -1,0 +1,4 @@
+Tesla Model 3 Cupholder to Nalgene by swamosulak on Thingiverse: https://www.thingiverse.com/thing:3594760
+
+Summary:
+NOTE: If you wish to have the STEP file, it is posted here: https://www.printables.com/model/86381-tesla-model-3-cupholder-to-nalgeneInsert for Tesla Model 3 center console cup holder to hold a 32 oz. Nalgene bottle.The model is slightly tapered from the bottom to the top to fit snugly inside the cup holder and the Nalgene bottle is a snug (but not tight) fit.The bottom of the holder is open to save filament and to not create a suction or trap air while removing or putting the bottle into the holder.

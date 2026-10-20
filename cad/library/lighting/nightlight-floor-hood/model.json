@@ -1,0 +1,23 @@
+{
+  "id": "nightlight-floor-hood",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "nightlight-floor-hood.scad",
+  "scad_files": [
+    "nightlight-floor-hood.scad"
+  ],
+  "exports": [
+    "nightlight-floor-hood"
+  ],
+  "aliases": {
+    "parts/nightlight-floor-hood.scad": "nightlight-floor-hood.scad",
+    "stl/nightlight-floor-hood.stl": "nightlight-floor-hood.stl",
+    "renders/nightlight-floor-hood-verification.json": "_work/renders/nightlight-floor-hood-verification.json"
+  },
+  "publish_exports": [
+    "nightlight-floor-hood"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

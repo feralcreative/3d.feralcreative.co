@@ -1,0 +1,22 @@
+{
+  "id": "hobbs-sign",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bx/hobbs-sign.3mf": "hobbs-sign.3mf",
+    "_originals/bx/hobbs-sign.skp": "hobbs-sign.skp",
+    "_originals/bx/hobbs-sign.stl": "hobbs-sign.stl",
+    "_originals/bx/hobbs-sign~.skp": "hobbs-sign~.skp"
+  },
+  "protected_assets": [
+    "hobbs-sign.3mf",
+    "hobbs-sign.skp",
+    "hobbs-sign.stl",
+    "hobbs-sign~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

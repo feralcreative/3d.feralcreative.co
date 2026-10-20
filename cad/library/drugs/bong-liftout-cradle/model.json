@@ -1,0 +1,24 @@
+{
+  "id": "bong-liftout-cradle",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "bong-liftout-cradle.scad",
+  "scad_files": [
+    "bong-liftout-cradle.scad"
+  ],
+  "exports": [
+    "bong-liftout-cradle"
+  ],
+  "aliases": {
+    "parts/bong-liftout-cradle.scad": "bong-liftout-cradle.scad",
+    "stl/drugs/bong-liftout-cradle.stl": "bong-liftout-cradle.stl",
+    "stl/bong-liftout-cradle.stl": "bong-liftout-cradle.stl",
+    "docs/bong-liftout-cradle.md": "docs/bong-liftout-cradle.md"
+  },
+  "publish_exports": [
+    "bong-liftout-cradle"
+  ],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": []
+}

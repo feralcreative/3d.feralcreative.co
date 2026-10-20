@@ -1,0 +1,22 @@
+{
+  "id": "shelf-hook",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/shelf-hook.3mf": "shelf-hook.3mf",
+    "_originals/printer-tools/shelf-hook.skp": "shelf-hook.skp",
+    "_originals/printer-tools/shelf-hook.stl": "shelf-hook.stl",
+    "_originals/printer-tools/shelf-hook~.skp": "shelf-hook~.skp"
+  },
+  "protected_assets": [
+    "shelf-hook.3mf",
+    "shelf-hook.skp",
+    "shelf-hook.stl",
+    "shelf-hook~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

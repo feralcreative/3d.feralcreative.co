@@ -1,0 +1,58 @@
+{
+  "id": "fabric-cube-placard",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "fabric-cube-placard-60x40.scad",
+  "scad_files": [
+    "fabric-cube-placard-60x40.scad",
+    "fabric-cube-placard-6x4.scad"
+  ],
+  "exports": [
+    "fabric-cube-placard-60x40",
+    "fabric-cube-placard-6x4"
+  ],
+  "aliases": {
+    "parts/fabric-cube-placard-60x40.scad": "fabric-cube-placard-60x40.scad",
+    "parts/fabric-cube-placard-6x4.scad": "fabric-cube-placard-6x4.scad",
+    "_originals/office/bin-label-test-260723T1719Z.pdf": "docs/office/bin-label-test-260723T1719Z.pdf",
+    "_originals/office/bin-labels.indd": "originals/office/bin-labels.indd",
+    "_originals/office/bin-labels.pdf": "docs/office/bin-labels.pdf",
+    "_originals/office/new-fabric-bin-tag.stl": "originals/office/new-fabric-bin-tag.stl",
+    "stl/fabric-cube-placard-60x40-v01.stl": "_work/stl/fabric-cube-placard-60x40-v01.stl",
+    "stl/fabric-cube-placard-60x40.stl": "_work/stl/fabric-cube-placard-60x40.stl",
+    "stl/fabric-cube-placard-6x4-v01.stl": "_work/stl/fabric-cube-placard-6x4-v01.stl",
+    "stl/fabric-cube-placard-6x4-v02.stl": "_work/stl/fabric-cube-placard-6x4-v02.stl",
+    "stl/fabric-cube-placard-6x4-v03.stl": "_work/stl/fabric-cube-placard-6x4-v03.stl",
+    "stl/fabric-cube-placard-6x4-v04.stl": "_work/stl/fabric-cube-placard-6x4-v04.stl",
+    "stl/fabric-cube-placard-6x4.stl": "_work/stl/fabric-cube-placard-6x4.stl",
+    "renders/fabric-cube-placard-60x40-iso.png": "_work/renders/fabric-cube-placard-60x40-iso.png",
+    "renders/fabric-cube-placard-60x40-xminus.png": "_work/renders/fabric-cube-placard-60x40-xminus.png",
+    "renders/fabric-cube-placard-60x40-xplus.png": "_work/renders/fabric-cube-placard-60x40-xplus.png",
+    "renders/fabric-cube-placard-60x40-yminus.png": "_work/renders/fabric-cube-placard-60x40-yminus.png",
+    "renders/fabric-cube-placard-60x40-yplus.png": "_work/renders/fabric-cube-placard-60x40-yplus.png",
+    "renders/fabric-cube-placard-60x40-zminus.png": "_work/renders/fabric-cube-placard-60x40-zminus.png",
+    "renders/fabric-cube-placard-60x40-zplus.png": "_work/renders/fabric-cube-placard-60x40-zplus.png",
+    "renders/fabric-cube-placard-6x4-iso.png": "_work/renders/fabric-cube-placard-6x4-iso.png",
+    "renders/fabric-cube-placard-6x4-xminus.png": "_work/renders/fabric-cube-placard-6x4-xminus.png",
+    "renders/fabric-cube-placard-6x4-xplus.png": "_work/renders/fabric-cube-placard-6x4-xplus.png",
+    "renders/fabric-cube-placard-6x4-yminus.png": "_work/renders/fabric-cube-placard-6x4-yminus.png",
+    "renders/fabric-cube-placard-6x4-yplus.png": "_work/renders/fabric-cube-placard-6x4-yplus.png",
+    "renders/fabric-cube-placard-6x4-zminus.png": "_work/renders/fabric-cube-placard-6x4-zminus.png",
+    "renders/fabric-cube-placard-6x4-zplus.png": "_work/renders/fabric-cube-placard-6x4-zplus.png",
+    "docs/fabric-cube-placard-6x4.md": "docs/fabric-cube-placard-6x4.md",
+    "docs/fabric-cube-placard-60x40.md": "docs/fabric-cube-placard-60x40.md"
+  },
+  "publish_exports": [],
+  "protected_assets": [
+    "docs/office/bin-label-test-260723T1719Z.pdf",
+    "docs/office/bin-labels.pdf",
+    "originals/office/bin-labels.indd",
+    "originals/office/new-fabric-bin-tag.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": [],
+  "draft_exports": [
+    "fabric-cube-placard-60x40",
+    "fabric-cube-placard-6x4"
+  ]
+}

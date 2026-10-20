@@ -1,0 +1,20 @@
+{
+  "id": "scraperite-razor-blade",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/scraperite-razor-blade.3mf": "scraperite-razor-blade.3mf",
+    "_originals/printer-tools/scraperite-razor-blade.stl": "scraperite-razor-blade.stl",
+    "_originals/scraperite-razor-blade.stl": "originals/scraperite-razor-blade.stl"
+  },
+  "protected_assets": [
+    "originals/scraperite-razor-blade.stl",
+    "scraperite-razor-blade.3mf",
+    "scraperite-razor-blade.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

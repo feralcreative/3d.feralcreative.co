@@ -1,0 +1,22 @@
+{
+  "id": "bit-holder-test",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bit-holder-test/bit-hole-test.skp": "bit-hole-test.skp",
+    "_originals/bit-holder-test/bit-hole-test.stl": "bit-hole-test.stl",
+    "_originals/bit-holder-test/bit-hole-test.stl.nanodlp-repaired.stl": "bit-hole-test.stl.nanodlp-repaired.stl",
+    "_originals/bit-holder-test/bit-hole-test~.skp": "bit-hole-test~.skp"
+  },
+  "protected_assets": [
+    "bit-hole-test.skp",
+    "bit-hole-test.stl",
+    "bit-hole-test.stl.nanodlp-repaired.stl",
+    "bit-hole-test~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

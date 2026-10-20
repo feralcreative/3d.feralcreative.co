@@ -1,0 +1,16 @@
+{
+  "id": "tool-plate",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/tool plate.stl": "tool plate.stl"
+  },
+  "protected_assets": [
+    "tool plate.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

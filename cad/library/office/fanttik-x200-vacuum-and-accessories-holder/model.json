@@ -1,0 +1,32 @@
+{
+  "id": "fanttik-x200-vacuum-and-accessories-holder",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/LICENSE.txt": "docs/office/Fanttik X200 Vacuum and accessories holder - 7348355/LICENSE.txt",
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/README.txt": "docs/office/Fanttik X200 Vacuum and accessories holder - 7348355/README.txt",
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/files/fanttik-x200-vacuum-holder.3mf": "fanttik-x200-vacuum-holder.3mf",
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/files/fanttik-x200-vacuum-holder.stl": "fanttik-x200-vacuum-holder.stl",
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093359.jpg": "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093359.jpg",
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093443.jpg": "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093443.jpg",
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093523.jpg": "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093523.jpg",
+    "_originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/Fanttik_X200_vacuum_holder.png": "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/Fanttik_X200_vacuum_holder.png"
+  },
+  "protected_assets": [
+    "docs/office/Fanttik X200 Vacuum and accessories holder - 7348355/LICENSE.txt",
+    "docs/office/Fanttik X200 Vacuum and accessories holder - 7348355/README.txt",
+    "fanttik-x200-vacuum-holder.3mf",
+    "fanttik-x200-vacuum-holder.stl",
+    "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093359.jpg",
+    "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093443.jpg",
+    "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/20260506_093523.jpg",
+    "originals/office/Fanttik X200 Vacuum and accessories holder - 7348355/images/Fanttik_X200_vacuum_holder.png"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/office/Fanttik X200 Vacuum and accessories holder - 7348355/LICENSE.txt"
+  ]
+}

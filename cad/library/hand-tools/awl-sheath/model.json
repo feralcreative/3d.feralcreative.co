@@ -1,0 +1,52 @@
+{
+  "id": "awl-sheath",
+  "origin": "authored",
+  "status": "testing",
+  "scad": "awl-sheath.scad",
+  "scad_files": [
+    "awl-sheath.scad"
+  ],
+  "exports": [
+    "awl-sheath",
+    "awl-sheath-coupon"
+  ],
+  "aliases": {
+    "parts/awl-sheath.scad": "awl-sheath.scad",
+    "stl/hand-tools/awl-sheath-coupon-v04.stl": "_work/stl/awl-sheath-coupon-v04.stl",
+    "stl/awl-sheath-coupon-v04.stl": "_work/stl/awl-sheath-coupon-v04.stl",
+    "stl/hand-tools/awl-sheath-coupon.stl": "_work/stl/awl-sheath-coupon.stl",
+    "stl/awl-sheath-coupon.stl": "_work/stl/awl-sheath-coupon.stl",
+    "stl/hand-tools/awl-sheath-v03.stl": "_work/stl/awl-sheath-v03.stl",
+    "stl/awl-sheath-v03.stl": "_work/stl/awl-sheath-v03.stl",
+    "stl/hand-tools/awl-sheath.stl": "_work/stl/awl-sheath.stl",
+    "stl/awl-sheath.stl": "_work/stl/awl-sheath.stl",
+    "renders/awl-sheath-coupon/awl-sheath-iso.png": "_work/renders/awl-sheath-coupon/awl-sheath-iso.png",
+    "renders/awl-sheath-coupon/awl-sheath-xminus.png": "_work/renders/awl-sheath-coupon/awl-sheath-xminus.png",
+    "renders/awl-sheath-coupon/awl-sheath-xplus.png": "_work/renders/awl-sheath-coupon/awl-sheath-xplus.png",
+    "renders/awl-sheath-coupon/awl-sheath-yminus.png": "_work/renders/awl-sheath-coupon/awl-sheath-yminus.png",
+    "renders/awl-sheath-coupon/awl-sheath-yplus.png": "_work/renders/awl-sheath-coupon/awl-sheath-yplus.png",
+    "renders/awl-sheath-coupon/awl-sheath-zminus.png": "_work/renders/awl-sheath-coupon/awl-sheath-zminus.png",
+    "renders/awl-sheath-coupon/awl-sheath-zplus.png": "_work/renders/awl-sheath-coupon/awl-sheath-zplus.png",
+    "renders/awl-sheath-iso.png": "_work/renders/awl-sheath-iso.png",
+    "renders/awl-sheath-section/awl-sheath-iso.png": "_work/renders/awl-sheath-section/awl-sheath-iso.png",
+    "renders/awl-sheath-section/awl-sheath-xminus.png": "_work/renders/awl-sheath-section/awl-sheath-xminus.png",
+    "renders/awl-sheath-section/awl-sheath-xplus.png": "_work/renders/awl-sheath-section/awl-sheath-xplus.png",
+    "renders/awl-sheath-section/awl-sheath-yminus.png": "_work/renders/awl-sheath-section/awl-sheath-yminus.png",
+    "renders/awl-sheath-section/awl-sheath-yplus.png": "_work/renders/awl-sheath-section/awl-sheath-yplus.png",
+    "renders/awl-sheath-section/awl-sheath-zminus.png": "_work/renders/awl-sheath-section/awl-sheath-zminus.png",
+    "renders/awl-sheath-section/awl-sheath-zplus.png": "_work/renders/awl-sheath-section/awl-sheath-zplus.png",
+    "renders/awl-sheath-xminus.png": "_work/renders/awl-sheath-xminus.png",
+    "renders/awl-sheath-xplus.png": "_work/renders/awl-sheath-xplus.png",
+    "renders/awl-sheath-yminus.png": "_work/renders/awl-sheath-yminus.png",
+    "renders/awl-sheath-yplus.png": "_work/renders/awl-sheath-yplus.png",
+    "renders/awl-sheath-zminus.png": "_work/renders/awl-sheath-zminus.png",
+    "renders/awl-sheath-zplus.png": "_work/renders/awl-sheath-zplus.png"
+  },
+  "licenses": [],
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "publish_exports": [],
+  "draft_exports": [
+    "awl-sheath"
+  ]
+}

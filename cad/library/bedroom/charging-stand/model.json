@@ -1,0 +1,18 @@
+{
+  "id": "charging-stand",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bedroom/ChargingStand_Top.stl": "ChargingStand_Top.stl",
+    "_originals/bedroom/ChargingStand_VerticalSide.stl": "ChargingStand_VerticalSide.stl"
+  },
+  "protected_assets": [
+    "ChargingStand_Top.stl",
+    "ChargingStand_VerticalSide.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

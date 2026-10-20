@@ -1,0 +1,18 @@
+{
+  "id": "cat-portal-03",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-portal-03.skp": "cat-portal-03.skp",
+    "_originals/cats/cat-portal-03~.skp": "cat-portal-03~.skp"
+  },
+  "protected_assets": [
+    "cat-portal-03.skp",
+    "cat-portal-03~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

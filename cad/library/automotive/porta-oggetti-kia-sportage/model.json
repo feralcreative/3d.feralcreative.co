@@ -1,0 +1,16 @@
+{
+  "id": "porta-oggetti-kia-sportage",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kia-sportage/porta_oggetti_kia_sportage.3mf": "porta_oggetti_kia_sportage.3mf"
+  },
+  "protected_assets": [
+    "porta_oggetti_kia_sportage.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

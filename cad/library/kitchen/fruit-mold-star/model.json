@@ -1,0 +1,20 @@
+{
+  "id": "fruit-mold-star",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/fruit-molds/fruit-mold-star-model_files/236526-fruit-mold-star-7455d7bd-cc4a-4f41-935e-58a701d20da4.pdf": "docs/fruit-molds/fruit-mold-star-model_files/236526-fruit-mold-star-7455d7bd-cc4a-4f41-935e-58a701d20da4.pdf",
+    "_originals/fruit-molds/fruit-mold-star-model_files/zvaigzde_5dalis.stl": "zvaigzde_5dalis.stl",
+    "_originals/fruit-molds/fruit-mold-star-model_files/zvaigzde_puse.stl": "zvaigzde_puse.stl"
+  },
+  "protected_assets": [
+    "docs/fruit-molds/fruit-mold-star-model_files/236526-fruit-mold-star-7455d7bd-cc4a-4f41-935e-58a701d20da4.pdf",
+    "zvaigzde_5dalis.stl",
+    "zvaigzde_puse.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

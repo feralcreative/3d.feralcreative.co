@@ -1,0 +1,16 @@
+{
+  "id": "tool-holder-mount",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/tool_holder_mount.stl": "tool_holder_mount.stl"
+  },
+  "protected_assets": [
+    "tool_holder_mount.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

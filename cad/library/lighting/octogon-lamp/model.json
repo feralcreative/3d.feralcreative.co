@@ -1,0 +1,22 @@
+{
+  "id": "octogon-lamp",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/octogon-lamp-poc.3mf": "octogon-lamp-poc.3mf",
+    "_originals/lighting/octogon-lamp-poc.stl": "octogon-lamp-poc.stl",
+    "_originals/lighting/octogon-lamp.stl": "octogon-lamp.stl",
+    "_originals/octogon-lamp.stl": "originals/octogon-lamp.stl"
+  },
+  "protected_assets": [
+    "octogon-lamp-poc.3mf",
+    "octogon-lamp-poc.stl",
+    "octogon-lamp.stl",
+    "originals/octogon-lamp.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

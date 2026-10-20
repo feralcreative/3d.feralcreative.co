@@ -1,0 +1,16 @@
+{
+  "id": "supporto-carta-vetrata",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/Supporto carta vetrata.3mf": "Supporto carta vetrata.3mf"
+  },
+  "protected_assets": [
+    "Supporto carta vetrata.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

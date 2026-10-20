@@ -1,0 +1,22 @@
+{
+  "id": "sign-hook",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/feral-creative/feral-sign-hook.skp": "feral-sign-hook.skp",
+    "_originals/feral-creative/feral-sign-hook~.skp": "feral-sign-hook~.skp",
+    "_originals/feral-creative/sign-hook.stl": "sign-hook.stl",
+    "_originals/sign-hook.stl": "originals/sign-hook.stl"
+  },
+  "protected_assets": [
+    "feral-sign-hook.skp",
+    "feral-sign-hook~.skp",
+    "originals/sign-hook.stl",
+    "sign-hook.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

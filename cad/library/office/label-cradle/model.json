@@ -1,0 +1,20 @@
+{
+  "id": "label-cradle",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/office/label-cradle.3mf": "label-cradle.3mf",
+    "_originals/office/label-cradle.skp": "label-cradle.skp",
+    "_originals/office/label-cradle.stl": "label-cradle.stl"
+  },
+  "protected_assets": [
+    "label-cradle.3mf",
+    "label-cradle.skp",
+    "label-cradle.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

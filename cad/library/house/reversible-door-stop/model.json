@@ -1,0 +1,29 @@
+{
+  "id": "reversible-door-stop",
+  "origin": "authored",
+  "status": "unreviewed",
+  "scad": "reversible-door-stop.scad",
+  "scad_files": [
+    "reversible-door-stop.scad"
+  ],
+  "exports": [
+    "reversible-door-stop"
+  ],
+  "aliases": {
+    "parts/reversible-door-stop.scad": "reversible-door-stop.scad",
+    "_originals/Reversible TPU Door Stop.stl": "originals/Reversible TPU Door Stop.stl",
+    "_originals/reversible-tpu-door-stop-firm-or-flexible-model_files/587553-reversible-tpu-door-stop-firm-or-flexible-e70a0ef0-badf-42cc-86ba-270af79f83ac.pdf": "docs/reversible-tpu-door-stop-firm-or-flexible-model_files/587553-reversible-tpu-door-stop-firm-or-flexible-e70a0ef0-badf-42cc-86ba-270af79f83ac.pdf",
+    "_originals/reversible-tpu-door-stop-firm-or-flexible-model_files.zip": "originals/reversible-tpu-door-stop-firm-or-flexible-model_files.zip",
+    "stl/reversible-door-stop.stl": "reversible-door-stop.stl"
+  },
+  "publish_exports": [
+    "reversible-door-stop"
+  ],
+  "protected_assets": [
+    "docs/reversible-tpu-door-stop-firm-or-flexible-model_files/587553-reversible-tpu-door-stop-firm-or-flexible-e70a0ef0-badf-42cc-86ba-270af79f83ac.pdf",
+    "originals/Reversible TPU Door Stop.stl",
+    "originals/reversible-tpu-door-stop-firm-or-flexible-model_files.zip"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

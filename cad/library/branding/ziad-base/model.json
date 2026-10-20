@@ -1,0 +1,16 @@
+{
+  "id": "ziad-base",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/ziad-base.stl": "ziad-base.stl"
+  },
+  "protected_assets": [
+    "ziad-base.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "feral-wall-hook",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/feral-creative/feral-wall-hook.3mf": "feral-wall-hook.3mf",
+    "_originals/feral-creative/feral-wall-hook.stl": "feral-wall-hook.stl"
+  },
+  "protected_assets": [
+    "feral-wall-hook.3mf",
+    "feral-wall-hook.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

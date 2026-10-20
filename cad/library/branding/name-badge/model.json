@@ -1,0 +1,40 @@
+{
+  "id": "name-badge",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bx/name-badge-01-front.stl": "name-badge-01-front.stl",
+    "_originals/bx/name-badge-02-logo.stl": "name-badge-02-logo.stl",
+    "_originals/bx/name-badge-02-name.stl": "name-badge-02-name.stl",
+    "_originals/bx/name-badge-03-back.stl": "name-badge-03-back.stl",
+    "_originals/bx/name-badge-03-name.stl": "name-badge-03-name.stl",
+    "_originals/bx/name-badge-80x40.3mf": "name-badge-80x40.3mf",
+    "_originals/bx/name-badge-80x40.stl": "name-badge-80x40.stl",
+    "_originals/bx/name-badge-80x40~.skp": "name-badge-80x40~.skp",
+    "_originals/bx/name-badge-name.stl": "name-badge-name.stl",
+    "_originals/bx/name-badge.3mf": "name-badge.3mf",
+    "_originals/bx/name-badge.skp": "name-badge.skp",
+    "_originals/bx/name-badge.stl": "name-badge.stl",
+    "_originals/bx/name-badge~.skp": "name-badge~.skp"
+  },
+  "protected_assets": [
+    "name-badge-01-front.stl",
+    "name-badge-02-logo.stl",
+    "name-badge-02-name.stl",
+    "name-badge-03-back.stl",
+    "name-badge-03-name.stl",
+    "name-badge-80x40.3mf",
+    "name-badge-80x40.stl",
+    "name-badge-80x40~.skp",
+    "name-badge-name.stl",
+    "name-badge.3mf",
+    "name-badge.skp",
+    "name-badge.stl",
+    "name-badge~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

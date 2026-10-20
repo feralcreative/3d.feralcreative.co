@@ -1,0 +1,18 @@
+{
+  "id": "bit",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/printer-tools/bit-test.stl": "bit-test.stl",
+    "_originals/printer-tools/bit-test~.skp": "bit-test~.skp"
+  },
+  "protected_assets": [
+    "bit-test.stl",
+    "bit-test~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

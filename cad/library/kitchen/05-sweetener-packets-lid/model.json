@@ -1,0 +1,16 @@
+{
+  "id": "05-sweetener-packets-lid",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/kitchen/05-sweetener-packets-lid.stl": "05-sweetener-packets-lid.stl"
+  },
+  "protected_assets": [
+    "05-sweetener-packets-lid.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

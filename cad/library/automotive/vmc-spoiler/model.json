@@ -1,0 +1,30 @@
+{
+  "id": "vmc-spoiler",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/vmc/blank-spoiler.stl": "blank-spoiler.stl",
+    "_originals/vmc/car spoiler 2.stl": "car spoiler 2.stl",
+    "_originals/vmc/mini-car-spoiler-gtr-v2-model_files/1135561-mini-car-spoiler-gtr-v2-2fe4862b-15cf-4479-99d8-274c09d48097.pdf": "docs/vmc/mini-car-spoiler-gtr-v2-model_files/1135561-mini-car-spoiler-gtr-v2-2fe4862b-15cf-4479-99d8-274c09d48097.pdf",
+    "_originals/vmc/mini-car-spoiler-gtr-v2-model_files/car-spoiler-2.3mf": "car-spoiler-2.3mf",
+    "_originals/vmc/mini-car-spoiler-gtr-v2-model_files.zip": "originals/vmc/mini-car-spoiler-gtr-v2-model_files.zip",
+    "_originals/vmc/vmc-spoiler copy.stl": "vmc-spoiler copy.stl",
+    "_originals/vmc/vmc-spoiler.3mf": "vmc-spoiler.3mf",
+    "_originals/vmc/vmc-spoiler.stl": "vmc-spoiler.stl"
+  },
+  "protected_assets": [
+    "blank-spoiler.stl",
+    "car spoiler 2.stl",
+    "car-spoiler-2.3mf",
+    "docs/vmc/mini-car-spoiler-gtr-v2-model_files/1135561-mini-car-spoiler-gtr-v2-2fe4862b-15cf-4479-99d8-274c09d48097.pdf",
+    "originals/vmc/mini-car-spoiler-gtr-v2-model_files.zip",
+    "vmc-spoiler copy.stl",
+    "vmc-spoiler.3mf",
+    "vmc-spoiler.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

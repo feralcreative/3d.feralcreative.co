@@ -1,0 +1,18 @@
+{
+  "id": "cat-lane-lock",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/cat-lane-lock.3mf": "cat-lane-lock.3mf",
+    "_originals/cats/cat-lane-lock.stl": "cat-lane-lock.stl"
+  },
+  "protected_assets": [
+    "cat-lane-lock.3mf",
+    "cat-lane-lock.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

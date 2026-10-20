@@ -1,0 +1,24 @@
+{
+  "id": "gorn-bust-not-a-hernia",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/star-trek/Gorn bust (not a hernia!) - 30734/LICENSE.txt": "docs/star-trek/Gorn bust (not a hernia!) - 30734/LICENSE.txt",
+    "_originals/star-trek/Gorn bust (not a hernia!) - 30734/README.txt": "docs/star-trek/Gorn bust (not a hernia!) - 30734/README.txt",
+    "_originals/star-trek/Gorn bust (not a hernia!) - 30734/files/gorn03.stl": "gorn03.stl",
+    "_originals/star-trek/Gorn bust (not a hernia!) - 30734/files/hood-gornament.3mf": "hood-gornament.3mf"
+  },
+  "protected_assets": [
+    "docs/star-trek/Gorn bust (not a hernia!) - 30734/LICENSE.txt",
+    "docs/star-trek/Gorn bust (not a hernia!) - 30734/README.txt",
+    "gorn03.stl",
+    "hood-gornament.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/star-trek/Gorn bust (not a hernia!) - 30734/LICENSE.txt"
+  ]
+}

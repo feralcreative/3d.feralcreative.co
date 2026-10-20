@@ -1,0 +1,22 @@
+{
+  "id": "shower-hook",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bathroom/shower-hook.3mf": "shower-hook.3mf",
+    "_originals/bathroom/shower-hook.skp": "shower-hook.skp",
+    "_originals/bathroom/shower-hook.stl": "shower-hook.stl",
+    "_originals/bathroom/shower-hook~.skp": "shower-hook~.skp"
+  },
+  "protected_assets": [
+    "shower-hook.3mf",
+    "shower-hook.skp",
+    "shower-hook.stl",
+    "shower-hook~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

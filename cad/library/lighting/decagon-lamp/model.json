@@ -1,0 +1,24 @@
+{
+  "id": "decagon-lamp",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/lighting/decagon-lamp-with-lid.3mf": "decagon-lamp-with-lid.3mf",
+    "_originals/lighting/decagon-lamp-with-lid.stl": "decagon-lamp-with-lid.stl",
+    "_originals/lighting/decagon-lamp.stl": "decagon-lamp.stl",
+    "_originals/lighting/decagon-lid.stl": "decagon-lid.stl",
+    "_originals/lighting/decagon-test.stl": "decagon-test.stl"
+  },
+  "protected_assets": [
+    "decagon-lamp-with-lid.3mf",
+    "decagon-lamp-with-lid.stl",
+    "decagon-lamp.stl",
+    "decagon-lid.stl",
+    "decagon-test.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

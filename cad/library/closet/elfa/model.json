@@ -1,0 +1,23 @@
+{
+  "id": "elfa",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {},
+  "protected_assets": [
+    "docs/1118038-hook-for-container-store-elfa-closet-system-wire-shelves-d9a8a4f1-0a4d-4dd9-81c0-9d6eaf87fdbd.pdf",
+    "closethookv2.3mf",
+    "hanger_hook.stl",
+    "hookpoleholder.stl",
+    "originals/hook-for-container-store-elfa-closet-system-wire-shelves-model_files.zip",
+    "slide10mmhook.stl",
+    "slidinghook.stl",
+    "twomorehooks.3mf"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/1118038-hook-for-container-store-elfa-closet-system-wire-shelves-d9a8a4f1-0a4d-4dd9-81c0-9d6eaf87fdbd.pdf"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "i-dot",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/feral-creative/i-dot.3mf": "i-dot.3mf",
+    "_originals/feral-creative/i-dot.stl": "i-dot.stl"
+  },
+  "protected_assets": [
+    "i-dot.3mf",
+    "i-dot.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

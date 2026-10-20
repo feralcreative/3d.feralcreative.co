@@ -1,0 +1,26 @@
+{
+  "id": "s3",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/woodworking-tools/s3_stls/obj_1_1.stl_2.stl": "obj_1_1.stl_2.stl",
+    "_originals/woodworking-tools/s3_stls/obj_2_1.stl_3.stl": "obj_2_1.stl_3.stl",
+    "_originals/woodworking-tools/s3_stls/obj_3_1.stl_4.stl": "obj_3_1.stl_4.stl",
+    "_originals/woodworking-tools/s3_stls/obj_4_1.stl_5.stl": "obj_4_1.stl_5.stl",
+    "_originals/woodworking-tools/s3_stls/obj_5_1.stl": "obj_5_1.stl",
+    "_originals/woodworking-tools/s3_stls/obj_6_1.stl": "obj_6_1.stl"
+  },
+  "protected_assets": [
+    "obj_1_1.stl_2.stl",
+    "obj_2_1.stl_3.stl",
+    "obj_3_1.stl_4.stl",
+    "obj_4_1.stl_5.stl",
+    "obj_5_1.stl",
+    "obj_6_1.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,16 @@
+{
+  "id": "ag03-stand",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/desk/AG03_stand.stl": "AG03_stand.stl"
+  },
+  "protected_assets": [
+    "AG03_stand.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

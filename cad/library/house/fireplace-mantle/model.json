@@ -1,0 +1,18 @@
+{
+  "id": "fireplace-mantle",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/fireplace+mantle.skp": "fireplace+mantle.skp",
+    "_originals/fireplace+mantle~.skp": "fireplace+mantle~.skp"
+  },
+  "protected_assets": [
+    "fireplace+mantle.skp",
+    "fireplace+mantle~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

@@ -1,0 +1,24 @@
+{
+  "id": "vday-box",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/bx/vday-box-bottom.stl": "vday-box-bottom.stl",
+    "_originals/bx/vday-box-top.stl": "vday-box-top.stl",
+    "_originals/bx/vday-box.3mf": "vday-box.3mf",
+    "_originals/bx/vday-box.skp": "vday-box.skp",
+    "_originals/bx/vday-box~.skp": "vday-box~.skp"
+  },
+  "protected_assets": [
+    "vday-box-bottom.stl",
+    "vday-box-top.stl",
+    "vday-box.3mf",
+    "vday-box.skp",
+    "vday-box~.skp"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}

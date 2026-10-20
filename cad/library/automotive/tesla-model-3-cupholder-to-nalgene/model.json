@@ -1,0 +1,30 @@
+{
+  "id": "tesla-model-3-cupholder-to-nalgene",
+  "origin": "imported",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/LICENSE.txt": "docs/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/LICENSE.txt",
+    "_originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/README.txt": "docs/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/README.txt",
+    "_originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/files/Tesla_Model_3_Cup_to_Nalgene_taper.stl": "Tesla_Model_3_Cup_to_Nalgene_taper.stl",
+    "_originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/94e1d4c9c98ecd7cbeb9a4ae1c9a3899.png": "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/94e1d4c9c98ecd7cbeb9a4ae1c9a3899.png",
+    "_originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192937.jpg": "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192937.jpg",
+    "_originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192945.jpg": "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192945.jpg",
+    "_originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192948.jpg": "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192948.jpg"
+  },
+  "protected_assets": [
+    "Tesla_Model_3_Cup_to_Nalgene_taper.stl",
+    "docs/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/LICENSE.txt",
+    "docs/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/README.txt",
+    "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/94e1d4c9c98ecd7cbeb9a4ae1c9a3899.png",
+    "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192937.jpg",
+    "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192945.jpg",
+    "originals/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/images/IMG_20190428_192948.jpg"
+  ],
+  "additional_scad_files": [],
+  "licenses": [
+    "docs/tesla/Tesla Model 3 Cupholder to Nalgene - 3594760/LICENSE.txt"
+  ]
+}

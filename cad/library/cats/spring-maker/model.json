@@ -1,0 +1,20 @@
+{
+  "id": "spring-maker",
+  "origin": "legacy",
+  "status": "unreviewed",
+  "scad": null,
+  "scad_files": [],
+  "exports": [],
+  "aliases": {
+    "_originals/cats/spring-maker-v2.3mf": "spring-maker-v2.3mf",
+    "_originals/cats/spring-maker-v2.stl": "spring-maker-v2.stl",
+    "_originals/spring-maker-v2.stl": "originals/spring-maker-v2.stl"
+  },
+  "protected_assets": [
+    "originals/spring-maker-v2.stl",
+    "spring-maker-v2.3mf",
+    "spring-maker-v2.stl"
+  ],
+  "additional_scad_files": [],
+  "licenses": []
+}
