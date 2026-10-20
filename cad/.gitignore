@@ -341,3 +341,7 @@ library/**/_work/
 # BOSL2 is expected at lib/BOSL2 as a git submodule.
 # If you'd rather vendor it as a plain clone instead, uncomment:
 # lib/BOSL2/
+
+# Software installers are not model assets.
+*.[dD][mM][gG]
+*.[pP][kK][gG]
