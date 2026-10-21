@@ -1,0 +1,106 @@
+# Node modules
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Documentation
+README.md
+docs/
+_AI_AGENT_PRIMER.md
+_NOTES.md
+_TASKS
+DEPLOYMENT.md
+PRINTER_SETUP.md
+QUICK_START.md
+CONSOLE.txt
+
+# Archives and backups
+_archive/
+*.backup
+*.old
+*.bak
+
+# OS files
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+*.code-workspace
+
+# Build outputs (will be created during build)
+dist/
+build/
+out/
+
+# Logs
+*.log
+logs/
+
+# Data files (not needed in image)
+data/
+
+# Design files
+*.psd
+*.ai
+*.sketch
+
+# Video files
+*.mp4
+*.mov
+*.mkv
+
+# Temporary files
+*.tmp
+*.temp
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+
+# Deployment scripts
+utils/deploy/
+
+# Cache
+.cache/
+.parcel-cache/
+.sass-cache/
+
+# SCSS sources stay in the context: the builder stage compiles them, and only
+# dist/ reaches the runtime image.
+
+# CAD library, toolchain, archives, and generated model work. Models reach the
+# site through the NAS mount, never through the image.
+cad/
+3d
+_PLANS/
+

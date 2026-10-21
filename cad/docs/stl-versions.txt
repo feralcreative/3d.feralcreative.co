@@ -48,10 +48,15 @@ doorbell-wire-channel 48
 doorbell-wire-channel-cap 27
 fabric-cube-placard-60x40 1
 fabric-cube-placard-6x4 4
+fence-pumpkin-door-exploded 1
+fence-pumpkin-door-seated 1
 fence-pumpkin-traditional 5
-fence-pumpkin-traditional-body 9
-fence-pumpkin-traditional-door 4
-fence-pumpkin-traditional-stem 1
+fence-pumpkin-traditional-body 19
+fence-pumpkin-traditional-cap 1
+fence-pumpkin-traditional-disc-pause-trial 3
+fence-pumpkin-traditional-door 5
+fence-pumpkin-traditional-fused-trial 1
+fence-pumpkin-traditional-stem 4
 gridfinity-baseplate-5x2 3
 gridfinity-baseplate-6x1 1
 gridfinity-baseplate-dogleg 4
@@ -119,7 +124,7 @@ magnet-polarity-tool-10x2-shaft-c 1
 magnet-polarity-tool-10x2-shaft-d 1
 middle-finger-emboss 14
 middle-finger-wrist-emboss 1
-nacs-plug-holder 7
+nacs-plug-holder 8
 nacs-plug-holder-fit-coupon 1
 nightlight-floor-hood 16
 overture-spool-main-body-ribbed 10

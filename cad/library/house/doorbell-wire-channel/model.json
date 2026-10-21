@@ -40,5 +40,31 @@
     "originals/house/doorbell-wire-channel~.skp"
   ],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "doorbell-wire-channel.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "doorbell-wire-channel.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "doorbell-wire-channel.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

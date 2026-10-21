@@ -30,6 +30,10 @@
 // screwtop's, so the ring is centred on this face's own centre line rather
 // than the screwtop's.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 use <overture-spool-screwtop-ribbed.scad>
 
 /* [Source] */
@@ -73,4 +77,18 @@ module main_body() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_6036a5c929f6() {
 main_body();
+}
+
+module feral_assembly_view_6036a5c929f6(explode=false) {
+main_body();
+translate([0,0,body_h+flange_extra-overture_screwtop_height()+(explode ? 35 : 0)]) screwtop();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_6036a5c929f6();
+else feral_assembly_view_6036a5c929f6(view == "exploded");

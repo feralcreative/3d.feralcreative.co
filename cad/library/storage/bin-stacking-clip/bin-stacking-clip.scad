@@ -5,6 +5,10 @@
 // Tray insertion, retention and load stability remain physical fit trials.
 
 /* [Fit] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 side_clearance = 2;      // outward shift of the original skirt profile (mm)
 outer_extension = 7;     // extend outside pillars downward from their previous bottoms (mm)
 inner_extension = 10;    // extend inside skirt downward from its previous bottom (mm)
@@ -343,4 +347,18 @@ module posed_clip() {
         translate([-pose_offset, -pose_offset, -lowest_z]) bin_stacking_clip();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_ac1d13a78fcd() {
 posed_clip();
+}
+
+module feral_assembly_view_ac1d13a78fcd(explode=false) {
+feral_default_output_ac1d13a78fcd();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_ac1d13a78fcd();
+else feral_assembly_view_ac1d13a78fcd(view == "exploded");

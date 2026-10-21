@@ -290,6 +290,24 @@ package-lock.json
 !/docs/decisions.md
 !/docs/debugging.md
 
+# Unified CAD library: source archives remain retained; staging stays local.
+cad/_work/
+!cad/docs/
+!cad/docs/**
+!docs/3d-library-*.md
+!docs/model-catalog.md
+!utils/models.sh
+
+!docs/printer-site-readme.md
+
+/_work/
+
+# Container context rules are source; private deployment configuration stays ignored.
+!/.dockerignore
+
+# Persistent website project organization (runtime data, not CAD source).
+/data/model-organization.json*
+
 # Software installers are not model assets.
 *.[dD][mM][gG]
 *.[pP][kK][gG]

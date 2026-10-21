@@ -134,11 +134,16 @@ class GoogleAuth {
     const streamImage = document.getElementById("stream-image");
     const uploadBtn = document.getElementById("upload-btn");
     const prepFilamentBtn = document.getElementById("prep-filament-btn");
+    const isModelsPage = /^\/models\/?$/.test(window.location.pathname);
+
+    window.modelLibrary?.setAuthenticated(Boolean(this.user));
+    window.modelAdmin?.setUser(this.user);
+    window.modelViewer?.setAccessAllowed(Boolean(this.user));
 
     if (this.user) {
       // User is signed in
       loginScreen.style.display = "none";
-      streamContainer.style.display = "flex";
+      streamContainer.style.display = isModelsPage ? "none" : "flex";
       hamburgerMenu.style.display = "block";
       userEmail.textContent = this.user.email;
 
@@ -162,19 +167,13 @@ class GoogleAuth {
 
       // Start the video stream (only once). MjpegStream decodes the multipart
       // feed itself and handles its own reconnects and offline image.
-      if (!this.streamUrlSet) {
+      if (!isModelsPage && !this.streamUrlSet) {
         window.mjpegStream = new MjpegStream(streamImage, this.getStreamUrl());
         window.mjpegStream.start();
         this.streamUrlSet = true;
 
         // Initialize printer status monitoring
         this.initPrinterStatus();
-      }
-
-      // Handle deeplink: open model viewer if ?model=filename is in URL
-      const modelParam = new URLSearchParams(window.location.search).get("model");
-      if (modelParam && window.modelViewer) {
-        window.modelViewer.openModal(modelParam);
       }
     } else {
       // User is signed out

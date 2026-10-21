@@ -127,7 +127,8 @@
   },
   "publish_exports": [
     "screen-fence-key",
-    "screen-fence-test-rail"
+    "screen-fence-test-rail",
+    "screen-fence-insert"
   ],
   "protected_assets": [
     "docs/cats/screen-fence/Bottom-Track-Dimensions.pdf",
@@ -161,7 +162,31 @@
   ],
   "additional_scad_files": [],
   "licenses": [],
-  "draft_exports": [
-    "screen-fence-insert"
-  ]
+  "draft_exports": [],
+  "assembly_view_sources": {
+    "screen-fence-rail.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "screen-fence-rail.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "screen-fence-rail.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

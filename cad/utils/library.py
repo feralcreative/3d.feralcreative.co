@@ -178,6 +178,7 @@ def register_export(args):
 def finalize(args):
     collection = models()
     chosen = [(m, m.get("exports", [])) for m in collection] if args.all else selected(args.names, collection)
+    plans = []
     for model, outputs in chosen:
         work = workspace(model)
         if args.all or not outputs or model["id"] in args.names:
@@ -193,24 +194,36 @@ def finalize(args):
             protected = model.get("protected_assets", [])
             if (source.is_file() and model.get("scad") and destination.name in protected) or (job.is_file() and job.name in protected):
                 raise ValueError(f"Finalization would overwrite a source asset in {model['id']}; use a distinct output name")
-            if source.is_file() and model.get("scad"):
-                shutil.copy2(source, destination)
-                publish = model.setdefault("publish_exports", [])
-                model["draft_exports"] = [n for n in model.get("draft_exports", []) if n != name]
-                if name not in publish:
-                    publish.append(name)
-                    data = {k: v for k, v in model.items() if k != "directory"}
-                    (model["directory"] / "model.json").write_text(json.dumps(data, indent=2) + "\n")
-            for path in (work / "stl").glob(f"{name}-v[0-9][0-9]*.stl"):
-                path.unlink()
-            for path in (work / "stl").glob(f"{name}-*coupon*.stl"):
-                path.unlink()
-            for path in (work / "renders").glob(f"{name}-*.png"):
-                if "-" not in path.name[len(name) + 1:-4]:
-                    path.unlink()
+            # Resolve destinations before changing anything, including symlinks.
             if job.is_file():
-                shutil.copy2(job, asset(model, job.name))
-            print(f"Finalized {model['id']}: {name}")
+                asset(model, job.name)
+            plans.append((model, name, work, source, destination, job))
+    # Check every protected destination first: a blocked later model must not
+    # leave a repository-wide cleanup half applied.
+    for model, name, work, source, destination, job in plans:
+        if args.dry_run:
+            print(f"Would finalize {model['id']}: {name}")
+            continue
+        if source.is_file() and model.get("scad"):
+            shutil.copy2(source, destination)
+            publish = model.setdefault("publish_exports", [])
+            model["draft_exports"] = [n for n in model.get("draft_exports", []) if n != name]
+            if name not in publish:
+                publish.append(name)
+            data = {k: v for k, v in model.items() if k != "directory"}
+            (model["directory"] / "model.json").write_text(json.dumps(data, indent=2) + "\n")
+        for path in (work / "stl").glob(f"{name}-v[0-9][0-9]*.stl"):
+            path.unlink()
+        for path in (work / "stl").glob(f"{name}-*coupon*.stl"):
+            path.unlink()
+        for path in (work / "renders").glob(f"{name}-*.png"):
+            if "-" not in path.name[len(name) + 1:-4]:
+                path.unlink()
+        if job.is_file():
+            shutil.copy2(job, asset(model, job.name))
+        print(f"Finalized {model['id']}: {name}")
+    if args.dry_run:
+        print(f"Preview: {len(plans)} output(s); current STL/3MF files would be retained, numbered drafts, coupons and renders removed. No files changed.")
 
 
 def discard(args):
@@ -352,7 +365,7 @@ def main():
     p = subs.add_parser("resolve"); p.add_argument("input"); p.add_argument("--shell", action="store_true"); p.set_defaults(func=resolve)
     p = subs.add_parser("can-finalize"); p.add_argument("names", nargs="+"); p.set_defaults(func=can_finalize)
     p = subs.add_parser("register-export"); p.add_argument("model"); p.add_argument("name"); p.add_argument("--check", action="store_true"); p.set_defaults(func=register_export)
-    p = subs.add_parser("finalize"); p.add_argument("names", nargs="*"); p.add_argument("--all", action="store_true"); p.set_defaults(func=finalize)
+    p = subs.add_parser("finalize"); p.add_argument("names", nargs="*"); p.add_argument("--all", action="store_true"); p.add_argument("--dry-run", action="store_true"); p.set_defaults(func=finalize)
     p = subs.add_parser("discard"); p.add_argument("names", nargs="+"); p.add_argument("--apply", action="store_true"); p.set_defaults(func=discard)
     p = subs.add_parser("clean"); p.add_argument("--keep", type=int, default=2); p.add_argument("--stale", type=int); p.add_argument("--all", action="store_true"); p.add_argument("--scratch", action="store_true"); p.add_argument("--apply", "-y", action="store_true"); p.set_defaults(func=clean)
     p = subs.add_parser("catalog"); p.set_defaults(func=catalog)

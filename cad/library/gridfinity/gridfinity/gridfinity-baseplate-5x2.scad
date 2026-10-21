@@ -1,6 +1,10 @@
 // gridfinity-baseplate-5x2.scad — 5 x 2 gridfinity baseplate on a flat floor,
 // so it can be stuck down with adhesive strips. Footprint 210 x 84 mm.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-plate-modules.scad>
 
 /* [Grid] */
@@ -21,6 +25,20 @@ magnet_skin = 0.4;      // mm over the cavity and under it — 2 layers at 0.2.
 
 $fn = 48;
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_06ca06093732() {
 plate_blocks([[0, 0, xsize, ysize]], floor_ht = floor_thickness,
              magnet_hole_d = magnet_hole_d,
              magnet_cav_h = magnet_cav_h, magnet_skin = magnet_skin);
+}
+
+module feral_assembly_view_06ca06093732(explode=false) {
+feral_default_output_06ca06093732();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_06ca06093732();
+else feral_assembly_view_06ca06093732(view == "exploded");

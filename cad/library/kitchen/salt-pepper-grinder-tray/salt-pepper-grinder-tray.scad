@@ -45,6 +45,10 @@
 // now that the grinders came down to Ø80 — it was 200 long at Ø90, which was
 // within 5 mm of the edge.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 
 /* [Grinders] */
@@ -187,4 +191,18 @@ module grinder_tray() {
                 cyl(d = pad_d, h = pad_h, rounding2 = pad_round, anchor = BOTTOM);
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_589ca19d4a6b() {
 grinder_tray();
+}
+
+module feral_assembly_view_589ca19d4a6b(explode=false) {
+feral_default_output_589ca19d4a6b();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_589ca19d4a6b();
+else feral_assembly_view_589ca19d4a6b(view == "exploded");

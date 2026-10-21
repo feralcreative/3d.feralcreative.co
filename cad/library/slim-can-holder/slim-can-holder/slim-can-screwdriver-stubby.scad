@@ -44,6 +44,10 @@
 // on the base hole were each fitted by least squares to a circle; the fits are
 // quoted with their errors beside the parameters they produced.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 $fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
 $fs = 0.4;
 eps = 0.01;
@@ -337,6 +341,11 @@ module can_holder() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_9bde2929a1bf() {
 if (show == "cut")
     difference() {
         can_holder();
@@ -345,3 +354,12 @@ if (show == "cut")
     }
 else
     can_holder();
+}
+
+module feral_assembly_view_9bde2929a1bf(explode=false) {
+feral_default_output_9bde2929a1bf();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_9bde2929a1bf();
+else feral_assembly_view_9bde2929a1bf(view == "exploded");

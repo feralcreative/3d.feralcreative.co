@@ -1,25 +1,12 @@
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity_modules.scad>
 
 part = 5;
 
-if (part == 1) {
-  socket_holder(4, [12,12,12,13,14,16,16,17,21,22], "METRIC");
-}
-else if (part == 2) {
-  socket_holder(4, [12,13,14,14,16,16,17,18,20,22], "IMPERIAL");
-}
-else if (part == 3) {
-  socket_holder(4, [12,12,12,12,12,12,13,14,14,16,16], "Imperial < 1/2\"", num_z=5);
-}
-else if (part == 4) {
-  socket_holder(3, [17,18,20,22,24], "Imperial >= 1/2\"");
-}
-else if (part == 5) {
-  socket_holder(4, [12,12,12,13,14,16,16,17,21,22], "Metric >=7mm", num_z=6);
-}
-else if (part == 6) {
-  socket_holder(2, [12,12,12,12,12,12], "metric<7mm");
-}
+
 
 function inc(v, a=.6) = [for (i = v) i+a ];
 
@@ -49,3 +36,34 @@ module sockets(widths=[], width = 100) {
     translate([s,-widths[i]/2,0])cylinder(h=26, d=widths[i]);
   }
 }
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_db870e09d7aa() {
+if (part == 1) {
+  socket_holder(4, [12,12,12,13,14,16,16,17,21,22], "METRIC");
+}
+else if (part == 2) {
+  socket_holder(4, [12,13,14,14,16,16,17,18,20,22], "IMPERIAL");
+}
+else if (part == 3) {
+  socket_holder(4, [12,12,12,12,12,12,13,14,14,16,16], "Imperial < 1/2\"", num_z=5);
+}
+else if (part == 4) {
+  socket_holder(3, [17,18,20,22,24], "Imperial >= 1/2\"");
+}
+else if (part == 5) {
+  socket_holder(4, [12,12,12,13,14,16,16,17,21,22], "Metric >=7mm", num_z=6);
+}
+else if (part == 6) {
+  socket_holder(2, [12,12,12,12,12,12], "metric<7mm");
+}
+}
+
+module feral_assembly_view_db870e09d7aa(explode=false) {
+feral_default_output_db870e09d7aa();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_db870e09d7aa();
+else feral_assembly_view_db870e09d7aa(view == "exploded");

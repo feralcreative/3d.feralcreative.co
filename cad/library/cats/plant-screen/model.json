@@ -70,5 +70,34 @@
   ],
   "protected_assets": [],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "plant-screen-130.scad": {
+      "kind": "inherited"
+    },
+    "plant-screen.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "plant-screen.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "plant-screen.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

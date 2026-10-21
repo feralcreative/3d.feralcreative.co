@@ -4,6 +4,10 @@
 // Original meshes are retained. Sample their solid plate below the old mounts.
 
 /* [Bat] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 bat = "body22"; // [body14, body15, body16, body17, body19, body21, body22, body23, body25, body26]
 plate_h = 2.1;             // mm, decorative wing plate and cavity floor
 source_slice_z = 0.8;      // mm, inside the original 1.5 mm plate, below magnet bosses
@@ -114,6 +118,11 @@ module magnet_entry_sweep() {
         cylinder(d = magnet_d, h = magnet_h + part_h + entry_travel);
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_39475d0958ed() {
 if (show == "bat") bat_part();
 else if (show == "coupon") fit_coupon();
 else if (show == "before-cap") before_cap();
@@ -132,3 +141,12 @@ else if (show == "wall-fit") linear_extrude(height = eps) difference() {
     bat_outline();
 }
 else assert(false, str("unknown show: ", show));
+}
+
+module feral_assembly_view_39475d0958ed(explode=false) {
+feral_default_output_39475d0958ed();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_39475d0958ed();
+else feral_assembly_view_39475d0958ed(view == "exploded");

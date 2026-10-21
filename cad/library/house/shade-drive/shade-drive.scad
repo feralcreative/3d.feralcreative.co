@@ -14,6 +14,10 @@
 // Sprocket print frame: axis on Z, each half outer face on the bed.
 
 /* [Chain: measured 2026-10-16] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 chain_bead_d = 4.5;        // mm, #10 plastic bead chain
 chain_pitch = 6.0;         // mm bead centre to bead centre
 chain_cord_d = 1.5;        // mm, cord between beads
@@ -623,6 +627,10 @@ module assembly(cover_on, release = false) {
     if (cover_on) { cover(); controls(); }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_6b62426e78c7() {
 if (show == "print-set") print_set();
 else if (show == "half-a") spr_half_colored(spr_pocket_clear, "a");
 else if (show == "half-b") spr_half_colored(spr_pocket_clear, "b");
@@ -637,3 +645,27 @@ else if (show == "section")
 else if (show == "assembly") assembly(true);
 else if (show == "assembly-open") assembly(false);
 else if (show == "release") assembly(false, true);
+}
+
+module feral_assembly_view_6b62426e78c7(explode=false) {
+if(asm_show_wall) wall();
+base_plate();
+translate([0,explode ? 20 : 0,0]) carrier();
+translate([ele_board_x,ele_board_y0,ele_board_top+(explode ? 35 : 0)]) electronics();
+translate([0,explode ? 40 : 0,0]) {
+ wheel_to_asm() {
+  hw=spr_half_w(spr_pocket_clear);
+  translate([0,0,-hw-(explode ? 15 : 0)]) spr_half_colored(spr_pocket_clear,"a");
+  translate([0,0,hw+(explode ? 15 : 0)]) rotate([180,0,0]) spr_half_colored(spr_pocket_clear,"b");
+ }
+ translate([0,y_hub_face,0]) hub_1999(); translate([0,y_gear_face,0]) motor_37d();
+ translate([explode ? -35 : 0,0,0]) cartridge(); translate([0,explode ? 25 : 0,0]) keeper();
+ if(brg_show) { translate([explode ? 35 : 0,0,0]) yoke(); translate([0,y_leg1-(brg_leg_t-brg_w)/2+(explode ? 40 : 0),0]) bearing_625(); }
+}
+chain_placeholder();
+translate([0,explode ? 100 : 0,0]) { cover(); controls(); }
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_6b62426e78c7();
+else feral_assembly_view_6b62426e78c7(view == "exploded");

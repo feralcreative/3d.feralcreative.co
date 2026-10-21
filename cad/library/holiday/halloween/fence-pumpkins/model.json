@@ -4,13 +4,25 @@
   "status": "unreviewed",
   "scad": "fence-pumpkin.scad",
   "scad_files": [
-    "fence-pumpkin.scad"
+    "fence-pumpkin.scad",
+    "fence-pumpkin-assembly.scad",
+    "fence-pumpkin-door-fix.scad"
   ],
   "exports": [
     "fence-pumpkin-traditional",
     "fence-pumpkin-traditional-body",
     "fence-pumpkin-traditional-door",
-    "fence-pumpkin-traditional-stem"
+    "fence-pumpkin-traditional-stem",
+    "fence-pumpkin-traditional-cap",
+    "fence-pumpkin-traditional-fused-trial",
+    "fence-pumpkin-traditional-disc-pause-trial",
+    "fence-pumpkin-door-seated",
+    "fence-pumpkin-door-exploded",
+    "fence-pumpkin-body",
+    "fence-pumpkin-door",
+    "fence-pumpkin-stem",
+    "fence-pumpkin-door-fix",
+    "exp-pumpkin-display-export"
   ],
   "aliases": {},
   "protected_assets": [
@@ -24,7 +36,124 @@
     "led-tea-light-jack-o-lantern-pumpkins-model_files/stem-lid.stl",
     "led-tea-light-jack-o-lantern-pumpkins-model_files/traditional-shell.3mf",
     "led-tea-light-jack-o-lantern-pumpkins-model_files/traditional-shell.stl",
-    "led-tea-light-jack-o-lantern-pumpkins-model_files.zip"
+    "led-tea-light-jack-o-lantern-pumpkins-model_files.zip",
+    "originals/door-fix/fence-pumpkin-body.stl",
+    "originals/retired-stls-2026-10-20.zip"
   ],
-  "licenses": []
+  "licenses": [],
+  "publish_exports": [
+    "fence-pumpkin-body",
+    "fence-pumpkin-door",
+    "fence-pumpkin-stem",
+    "fence-pumpkin-door-fix"
+  ],
+  "draft_exports": [],
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "fence-pumpkin-assembly.scad",
+      "defines": {
+        "show": "assembled",
+        "file_prefix": "",
+        "view": "together",
+        "preview_light": true,
+        "$preview": true
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "fence-pumpkin-assembly.scad",
+      "defines": {
+        "show": "assembled",
+        "file_prefix": "",
+        "view": "exploded",
+        "preview_light": true,
+        "$preview": true
+      }
+    }
+  ],
+  "title": "Fence-post pumpkin",
+  "website": {
+    "description": "A fence-post jack-o’-lantern with a matching sculpted body and sliding rear door, a solar cork-light holder, a separate stem, and an internal steel disc for magnetic mounting. A separate door fix fits the previously printed body. Both doors have a rounded transition beneath the light holder.",
+    "default_view": "assembled",
+    "view_labels": {
+      "assembled": "Together",
+      "exploded": "Exploded",
+      "fence-pumpkin-body": "Complete-set body",
+      "fence-pumpkin-door": "Complete-set door",
+      "fence-pumpkin-stem": "Stem",
+      "fence-pumpkin-door-fix": "Door fix—existing pumpkins"
+    },
+    "instructions": [
+      {
+        "title": "Files and assembly views",
+        "text": "For a new pumpkin, use the complete-set body, complete-set door, and stem. Download their STLs and assembly SCAD into one folder, retaining the filenames. The SCAD shows the matching complete set together or exploded. The roof is integral. For a previously printed pumpkin, use only the separate door-fix STL; its joint matches the older body. The two door versions fit different bodies."
+      },
+      {
+        "title": "Steel disc insertion",
+        "text": "Use one 25 mm diameter × 2 mm thick steel disc. This body captures the disc under a printed cover, so insert it during a print pause before the cover begins. The disc top is 4.10 mm above the bed; set and verify the pause in the actual sliced job before the first cover layer. Do not reuse a layer number from a different slicing profile."
+      },
+      {
+        "title": "Supports and assembly",
+        "text": "Both doors include curved rear lobes and a rounded taper beneath the light holder. Print with the flat inner door face on the bed. The raised shell and curved overhangs require supports; slicing and support removal for these revisions are unverified. Remove supports before fitting. Feed the strand through the cork opening and 6 mm passage, slide the door down from above, then fit the cork light with its supplied silicone sheath."
+      },
+      {
+        "title": "Fit and mounting",
+        "text": "The complete-set body and door follow the same original pumpkin surface, separated by a 0.3 mm fitting joint. The door fix preserves the older body guides and adds rounded backing to the delicate side lobe. Both retain the previously printed and tested 18.5 mm cork bore and 22 mm insertion depth. Mesh and continuous insertion-clearance checks pass; these revisions have not been printed. Disc fit, support removal and magnetic holding strength require physical checks."
+      }
+    ],
+    "parts": [
+      {
+        "name": "Nickel-plated steel disc",
+        "quantity": "1",
+        "specification": "25 mm diameter × 2 mm thick. Fits the modelled internal disc pocket.",
+        "url": "https://www.amazon.com/dp/B0CYSZTN79"
+      },
+      {
+        "name": "Fence-side magnet",
+        "quantity": "1",
+        "specification": "Fence-side cup magnet for the internal steel disc. Holding strength with the printed pumpkin has not been physically verified.",
+        "url": "https://www.amazon.com/dp/B0CS6MX8FP"
+      },
+      {
+        "name": "Solar cork light",
+        "quantity": "1",
+        "specification": "Uses the previously printed and tested 18.5 mm bore and 22 mm insertion depth with its supplied silicone sheath. Fits through the sculpted rear shell's top opening; the relocated holder is not yet physically tested.",
+        "url": "https://www.amazon.com/dp/B07SWZKQDM"
+      }
+    ],
+    "links": [
+      {
+        "label": "Original design by artwells — CC BY 4.0",
+        "url": "https://www.printables.com/model/1835966-led-tea-light-jack-o-lantern-pumpkins"
+      }
+    ]
+  },
+  "publication_excluded_exports": [
+    "fence-pumpkin-traditional",
+    "fence-pumpkin-traditional-body",
+    "fence-pumpkin-traditional-door",
+    "fence-pumpkin-traditional-stem",
+    "fence-pumpkin-traditional-cap",
+    "fence-pumpkin-traditional-fused-trial",
+    "fence-pumpkin-traditional-disc-pause-trial",
+    "fence-pumpkin-door-seated",
+    "fence-pumpkin-door-exploded"
+  ],
+  "source_downloads": [
+    "fence-pumpkin-assembly.scad"
+  ],
+  "assembly_view_sources": {
+    "fence-pumpkin-assembly.scad": {
+      "kind": "assembly"
+    },
+    "fence-pumpkin.scad": {
+      "kind": "assembly"
+    },
+    "fence-pumpkin-door-fix.scad": {
+      "kind": "assembly"
+    }
+  }
 }

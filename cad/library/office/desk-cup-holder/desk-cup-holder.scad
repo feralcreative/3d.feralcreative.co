@@ -62,6 +62,10 @@
 
 // Bore. A mug goes in here; nothing grips it, so no compensation for the
 // polygon's inscription is applied ($fn is high enough to make it moot).
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 bore_d = 90;      // mm
 
 // Outside at the foot and at the rim. The wall between is a straight cone.
@@ -263,4 +267,18 @@ module desk_cup_holder() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_c634c48d5024() {
 desk_cup_holder();
+}
+
+module feral_assembly_view_c634c48d5024(explode=false) {
+feral_default_output_c634c48d5024();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_c634c48d5024();
+else feral_assembly_view_c634c48d5024(view == "exploded");

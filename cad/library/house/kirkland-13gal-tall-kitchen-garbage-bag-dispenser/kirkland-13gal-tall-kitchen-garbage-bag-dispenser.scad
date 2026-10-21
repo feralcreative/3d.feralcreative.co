@@ -8,6 +8,10 @@
 // The custom, single-start thread has 45-degree flanks and generous clearance.
 // Print the full-diameter thread coupons before committing to the tall pieces.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/threading.scad>
 
@@ -356,6 +360,10 @@ module coupon_top() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_10a9d237a296() {
 if (show == "assembled") assembly();
 else if (show == "exploded") assembly(thread_start_clear + explode_gap);
 else if (show == "section") intersection() {
@@ -384,3 +392,12 @@ else if (show == "cap-over-roll-fit") intersection() {
 }
 else if (show == "thread-guard-fit") thread_guard_fit();
 else if (show == "thread-path") thread_path();
+}
+
+module feral_assembly_view_10a9d237a296(explode=false) {
+assembly(explode ? thread_start_clear+explode_gap : 0);
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_10a9d237a296();
+else feral_assembly_view_10a9d237a296(view == "exploded");

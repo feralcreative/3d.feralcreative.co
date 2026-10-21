@@ -23,6 +23,10 @@
 
 // "cut" is a half-section for checking the double wall. Not for printing —
 // build it with --name if you ever want it as its own STL.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part";   // [part, cut]
 
 $fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
@@ -170,6 +174,11 @@ module slim_can_koozie() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_03380fa81a84() {
 if (show == "cut")
     difference() {
         slim_can_koozie();
@@ -177,3 +186,12 @@ if (show == "cut")
     }
 else
     slim_can_koozie();
+}
+
+module feral_assembly_view_03380fa81a84(explode=false) {
+feral_default_output_03380fa81a84();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_03380fa81a84();
+else feral_assembly_view_03380fa81a84(view == "exploded");

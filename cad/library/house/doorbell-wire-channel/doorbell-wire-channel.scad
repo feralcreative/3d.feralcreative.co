@@ -135,6 +135,10 @@
 // cap   — cap and plug alone, the fit coupon
 // both  — the print plate: both pieces, each the way up it prints, the
 //         upper plate_gap off the cap's edge, both diagonal on the bed
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "both";  // [lower, upper, cap, both]
 
 // Printed orientation, front face on the bed. false draws it as it mounts.
@@ -557,10 +561,10 @@ module print_plate() rotate([0, 0, plate_angle]) {
              joint_y + lap_len - upper_run, 0]) oriented() upper();
 }
 
-if (show == "lower") oriented() lower();
-if (show == "upper") rotate([0, 0, plate_angle]) oriented() upper();
-if (show == "cap")   oriented() cap_only();
-if (show == "both")  print_plate();
+
+
+
+
 
 echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t,
          "; channel ", rw_w, " x ", rw_h, "; groove ", slot_w, " x ", slot_d,
@@ -570,3 +574,20 @@ echo(str("cap ", cap_w, " x ", cap_h, " x ", cap_t,
          "; side halves ", side_wall, " / ", tongue_rail, ", glue gap ", side_clr,
          "; mount tabs ", rail_w, " x ", tab_len, " x ", tab_t,
          "; rotated plate ", plate_x, " x ", plate_y));
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_40c9ec101aa3() {
+if (show == "lower") oriented() lower();
+if (show == "upper") rotate([0, 0, plate_angle]) oriented() upper();
+if (show == "cap")   oriented() cap_only();
+if (show == "both")  print_plate();
+}
+
+module feral_assembly_view_40c9ec101aa3(explode=false) {
+color("SlateGray") lower();
+color("SteelBlue") translate([jog,joint_y+(explode ? 35 : 0),0]) upper();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_40c9ec101aa3();
+else feral_assembly_view_40c9ec101aa3(view == "exploded");

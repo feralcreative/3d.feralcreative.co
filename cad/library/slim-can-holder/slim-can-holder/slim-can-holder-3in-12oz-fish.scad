@@ -132,6 +132,10 @@
 
 // "cut" is a half-section for reading the fill, the floor, the lead-in, and
 // the ribs. Not for printing. "coupon" is the fit test; see [Fit coupon].
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part";   // [part, cut, coupon]
 
 $fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
@@ -405,6 +409,14 @@ module fit_coupon() {
     }
 }
 
+
+
+// COUPON-COMPONENTS: fit=coupon
+// COUPON-PLATE: coupon
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_985c62340885() {
 if (show == "coupon")
     fit_coupon();
 else if (show == "cut")
@@ -414,6 +426,12 @@ else if (show == "cut")
     }
 else
     fish_koozie();
+}
 
-// COUPON-COMPONENTS: fit=coupon
-// COUPON-PLATE: coupon
+module feral_assembly_view_985c62340885(explode=false) {
+feral_default_output_985c62340885();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_985c62340885();
+else feral_assembly_view_985c62340885(view == "exploded");

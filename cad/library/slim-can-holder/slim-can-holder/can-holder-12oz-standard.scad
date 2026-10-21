@@ -59,6 +59,10 @@
 
 // Artwork for the logo tiles. marks.scad defines modules and calls none, so
 // including it puts nothing on the holder; only tile() draws from it.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../logos/marks.scad>
 
 /* [Output] */
@@ -242,11 +246,11 @@ bevel_step = 0.10;
 /* [Colors] */
 
 // Preview only. STLs carry no colour.
-holder_color = "MediumPurple";
-tile_color   = "Gold";
+holder_color = "#90A553";
+tile_color   = "#90A553";
 // The logo is part of the tile's print. Its own colour is for telling them
 // apart here, or a reminder to swap filament at the logo's first layer.
-logo_color   = "Black";
+logo_color   = "Gold";
 
 /* [Grip ribs] */
 
@@ -794,6 +798,10 @@ module fit_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_5f49d186a6e4() {
 if (show == "coupon")
     fit_coupon();
 else if (show == "tile")
@@ -810,3 +818,12 @@ else if (show == "cut")
     }
 else
     can_holder();
+}
+
+module feral_assembly_view_5f49d186a6e4(explode=false) {
+can_holder(); holder_tiles(explode ? 25 : 0,"wagon-queen");
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_5f49d186a6e4();
+else feral_assembly_view_5f49d186a6e4(view == "exploded");

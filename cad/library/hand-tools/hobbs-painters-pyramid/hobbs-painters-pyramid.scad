@@ -41,6 +41,10 @@
 // supports weld on just as hard as automatic ones. Several of the profiles in
 // docs/profiles/ are set that way.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../logos/marks.scad>
 
 /* [Shell] */
@@ -241,4 +245,18 @@ module painters_pyramid() {
             face_frame(i) art_word_relief();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_773fe3d070f9() {
 painters_pyramid();
+}
+
+module feral_assembly_view_773fe3d070f9(explode=false) {
+feral_default_output_773fe3d070f9();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_773fe3d070f9();
+else feral_assembly_view_773fe3d070f9(view == "exploded");

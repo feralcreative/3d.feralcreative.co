@@ -5,6 +5,10 @@
 // This is an open holder, not a snap fit. The stacking lip is omitted so
 // the top remains a short, unobstructed collar around the cup.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-magnets.scad>
 
 /* [Cup] */
@@ -81,6 +85,21 @@ module cup_envelope() {
            d2 = cup_rim_d * facet_factor, h = cup_h);
 }
 
+
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_a8ff7fe6f10e() {
 metal_cup_base();
 if (show == "assembly")
   %translate([0, 0, floor_z]) cup_envelope();
+}
+
+module feral_assembly_view_a8ff7fe6f10e(explode=false) {
+feral_default_output_a8ff7fe6f10e();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_a8ff7fe6f10e();
+else feral_assembly_view_a8ff7fe6f10e(view == "exploded");

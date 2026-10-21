@@ -3,6 +3,10 @@
 // and three below the label keep the hardware clear of the label itself.
 // Print flat, back on the bed, label face upward. Use metal backing washers
 // on the fabric side and rivets whose grip range covers the complete stack.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/rounding.scad>
 
@@ -108,5 +112,20 @@ module label_reference() {
             cube([label_w, label_h, eps]);
 }
 
+
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_27dd89fdd9bb() {
 placard();
 if (show == "label-layout") label_reference();
+}
+
+module feral_assembly_view_27dd89fdd9bb(explode=false) {
+feral_default_output_27dd89fdd9bb();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_27dd89fdd9bb();
+else feral_assembly_view_27dd89fdd9bb(view == "exploded");

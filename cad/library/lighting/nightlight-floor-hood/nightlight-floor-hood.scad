@@ -10,6 +10,10 @@
 // CGAL preserves clean binary-STL topology at the full-width corner joins.
 
 /* [View] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part"; // [part, assembly, section, fitcheck, body-sweep, body, rib]
 flip = true; // Front face flat on the bed; false gives service axes.
 
@@ -257,8 +261,7 @@ module selected_view() {
     else hood();
 }
 
-if (flip) translate([0,0,print_front_z]) rotate([0,180,0]) selected_view();
-else selected_view();
+
 
 echo(str("Clear cavity: ",cavity_w," x ",cavity_h," mm; rim ",rim_depth," mm"));
 echo(str("Panel back against light at Z=0; rear sleeve flush with ring back at Z=",sleeve_rear_z,
@@ -270,3 +273,18 @@ echo(str("Rounded friction rib, cleared from channel: ",grip_projection," mm pro
          grip_width," mm axial width; ",grip_projection-fit," mm radial interference; centre Z=",grip_z," mm"));
 echo(str("Trace-derived front corner radius: ",light_corner_r," mm; cavity radius: ",cavity_corner_r," mm"));
 echo("Front radius is fitted from a photographed trace; rear body is photo-estimated. Physical fit still requires a trial.");
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_ff6c59a5a5c5() {
+if (flip) translate([0,0,print_front_z]) rotate([0,180,0]) selected_view();
+else selected_view();
+}
+
+module feral_assembly_view_ff6c59a5a5c5(explode=false) {
+feral_default_output_ff6c59a5a5c5();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_ff6c59a5a5c5();
+else feral_assembly_view_ff6c59a5a5c5(view == "exploded");

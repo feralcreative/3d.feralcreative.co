@@ -19,5 +19,31 @@
   ],
   "protected_assets": [],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "seedling-tray-2x2.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "seedling-tray-2x2.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "seedling-tray-2x2.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

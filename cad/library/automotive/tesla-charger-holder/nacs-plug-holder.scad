@@ -4,6 +4,10 @@
 // latch snaps into the connector's own latch pocket, the one the car's pin uses.
 // Print with the wall face on the bed; no supports.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 use <../../../logos/fonts/Gwendolyn-Bold.ttf>
 
 /* [Plug] */
@@ -319,6 +323,11 @@ module coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_b6229a878500() {
 if (show == "holder") holder();
 else if (show == "coupon") coupon();
 else if (show == "section") difference() {
@@ -326,3 +335,12 @@ else if (show == "section") difference() {
     translate([0, -200, -1]) cube([200, 400, 200]);
 }
 else assert(false, str("unknown show: ", show));
+}
+
+module feral_assembly_view_b6229a878500(explode=false) {
+feral_default_output_b6229a878500();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_b6229a878500();
+else feral_assembly_view_b6229a878500(view == "exploded");

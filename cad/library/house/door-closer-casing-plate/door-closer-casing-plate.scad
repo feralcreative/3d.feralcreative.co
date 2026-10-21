@@ -40,6 +40,10 @@
 // COUPON-PLATE: coupon
 
 /* [Casing] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 casing_w      = 41;    // mm, full width of the casing face
 casing_max_h  = 13.5;  // mm, thickness at the outside edge
 casing_a      = 3.4;   // exponent across the width: higher keeps the face flatter for longer
@@ -114,5 +118,19 @@ module plate(len = closer_l) {
 }
 
 len = show == "coupon" ? coupon_l : closer_l;
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_5b5cabc73816() {
 if (flip) translate([0, 0, top_z]) rotate([0, 180, 0]) translate([-plate_x1, 0, 0]) plate(len);
 else plate(len);
+}
+
+module feral_assembly_view_5b5cabc73816(explode=false) {
+feral_default_output_5b5cabc73816();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_5b5cabc73816();
+else feral_assembly_view_5b5cabc73816(view == "exploded");

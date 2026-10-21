@@ -35,6 +35,10 @@
 // scale, in final millimetres.
 
 /* [Overall] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 mesh_length = 99.625;  // source mesh, tip to tip — the scale every number is in (mm)
 length      = 77;      // finished part, tip to tip (mm)
 shrink      = length / mesh_length;
@@ -314,4 +318,18 @@ module batleth() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_9837034b8a94() {
 batleth();
+}
+
+module feral_assembly_view_9837034b8a94(explode=false) {
+feral_default_output_9837034b8a94();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_9837034b8a94();
+else feral_assembly_view_9837034b8a94(view == "exploded");

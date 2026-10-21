@@ -1,4 +1,8 @@
 // include instead of use, so we get the pitch
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity_modules.scad>
 include <gridfinity-magnets.scad>
 
@@ -13,17 +17,7 @@ magnet_cav_h = 2.2;     // mm tall: a 2 mm disc and 0.2 to drop it in
 magnet_skin = 0.4;      // mm over the cavity and under it — the discs go in at
                         // a print pause and get bridged over
 
-if (lid) {
-  base_lid(xsize, ysize);
-}
-else if (weighted) {
-  weighted_baseplate(xsize, ysize);
-}
-else {
-  frame_plain(xsize, ysize, floor_ht=floor_thickness,
-              magnet_hole_d=magnet_hole_d, magnet_cav_h=magnet_cav_h,
-              magnet_skin=magnet_skin);
-}
+
 
 
 module base_lid(num_x, num_y) {
@@ -102,3 +96,26 @@ module frame_plain(num_x, num_y, extra_down=0, trim=0, floor_ht=0,
     }
   }
 }
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_43a1dacb67a5() {
+if (lid) {
+  base_lid(xsize, ysize);
+}
+else if (weighted) {
+  weighted_baseplate(xsize, ysize);
+}
+else {
+  frame_plain(xsize, ysize, floor_ht=floor_thickness,
+              magnet_hole_d=magnet_hole_d, magnet_cav_h=magnet_cav_h,
+              magnet_skin=magnet_skin);
+}
+}
+
+module feral_assembly_view_43a1dacb67a5(explode=false) {
+feral_default_output_43a1dacb67a5();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_43a1dacb67a5();
+else feral_assembly_view_43a1dacb67a5(view == "exploded");

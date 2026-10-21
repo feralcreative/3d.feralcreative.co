@@ -16,6 +16,10 @@
 // 2026-09-22: print it in one piece and accept the corner-lift risk. Split it
 // at the inside corner if a print does lift.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-plate-modules.scad>
 
 /* [Grid] */
@@ -37,6 +41,20 @@ magnet_skin = 0.4;      // mm over the cavity and under it — 2 layers at 0.2.
 $fn = 48;
 
 // The two arms, sharing the leg x leg block at the outside corner.
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_982633bb8bd2() {
 plate_blocks([[0, 0, run, leg], [0, 0, leg, run]], floor_ht = floor_thickness,
              magnet_hole_d = magnet_hole_d,
              magnet_cav_h = magnet_cav_h, magnet_skin = magnet_skin);
+}
+
+module feral_assembly_view_982633bb8bd2(explode=false) {
+feral_default_output_982633bb8bd2();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_982633bb8bd2();
+else feral_assembly_view_982633bb8bd2(view == "exploded");

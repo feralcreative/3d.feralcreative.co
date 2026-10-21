@@ -2,9 +2,10 @@
   "id": "lid-with-knrul",
   "origin": "legacy",
   "status": "unreviewed",
-  "scad": "lid_with_knrul.scad",
+  "scad": "knurled-lid.scad",
   "scad_files": [
-    "lid_with_knrul.scad"
+    "lid_with_knrul.scad",
+    "knurled-lid.scad"
   ],
   "exports": [],
   "aliases": {
@@ -19,5 +20,31 @@
   "output_names": {
     "lid_with_knrul.scad": "lid-with-knrul"
   },
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "knurled-lid.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "knurled-lid.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "knurled-lid.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

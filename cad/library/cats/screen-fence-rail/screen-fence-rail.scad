@@ -167,6 +167,10 @@
 // A bare build.sh run would otherwise stamp the assembly into the fence's own
 // version series and leave stl/screen-fence-rail.stl pointing at a rail with a
 // fence inside it. There is an echo at the bottom of this file to catch that.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "twinassembly";  // [fence, coupon, pair, pairfit, twin, twincoupon, twinfit, twinpath, twinassembly, key, keyfit, keyblock, clip, clipcoupon, clipfit, clippath, clipassembly, track, assembly, fitcheck, compare, concepts, fixture]
 
 // COUPON-COMPONENTS: fit=coupon
@@ -2239,17 +2243,23 @@ module twincoupon() {
             twin_slice(clip_coupon_hook[i], i + 1);
 }
 
-if (trk_hook_x - twin_bump_gap > twin_hook - 0.10)
-    echo(str("twin_bump clamped ", trk_hook_x - twin_bump_gap, " -> ", twin_hook - 0.10,
-             ": it cannot out-reach the squeeze the tab provides."));
+
 
 // The default is a preview. Say so on every run, so an accidental unnamed
 // build is caught in the log rather than in the printer.
+
+
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_694229cd7af3() {
+if (trk_hook_x - twin_bump_gap > twin_hook - 0.10)
+    echo(str("twin_bump clamped ", trk_hook_x - twin_bump_gap, " -> ", twin_hook - 0.10,
+             ": it cannot out-reach the squeeze the tab provides."));
 if (show == "track" || show == "assembly" || show == "compare" || show == "concepts"
     || show == "clipassembly" || show == "twinassembly")
     echo(str("PREVIEW ONLY (show=\"", show, "\") — NOT printable. ",
              "Build the part with -D 'show=\"fence\"'."));
-
 if      (show == "coupon")     coupon();
 else if (show == "clip")         clip_upright();
 else if (show == "clipcoupon")   clipcoupon();
@@ -2273,3 +2283,14 @@ else if (show == "compare")  compare();
 else if (show == "concepts") concepts();
 else if (show == "fixture")  fixture();
 else                         fence();
+}
+
+module feral_assembly_view_694229cd7af3(explode=false) {
+color("silver",track_alpha) track(preview_len);
+color("darkorange") translate([0,0,explode ? 35 : 0]) twin_length(preview_len);
+if(twin_key) color("steelblue") translate([0,preview_len+(explode ? 35 : 0),explode ? 35 : 0]) rotate([90,0,0]) key_upright(preview_len);
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_694229cd7af3();
+else feral_assembly_view_694229cd7af3(view == "exploded");

@@ -20,5 +20,31 @@
   ],
   "protected_assets": [],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "bong-liftout-cradle.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "bong-liftout-cradle.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "bong-liftout-cradle.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

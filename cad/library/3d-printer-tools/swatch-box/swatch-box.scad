@@ -1,3 +1,7 @@
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 $fn=32;
 
 // Artwork comes from here, never from a bare import() — a missing import
@@ -114,12 +118,7 @@ cutoff=.1; // 10%
 
 
 divider_x=case_w+swatch_x + wiggle_x;
-*for(j=[0:1:swatches-1])
-for(i=[0:1:side_by_side_boxes-1])
-    translate([divider_x*i, j*(slot_y+slot_w), 0])
-        translate([case_w,case_w+swatch_y/2,case_h])
-            color("white")
-                cube([swatch_x,swatch_y,swatch_z]);
+
 
                 
 module pin()
@@ -144,17 +143,10 @@ module pin()
 
 //cube([dist_horiz,dist_horiz,10]);
 
-if (part != "top" && Pegboard_holder == "yes")
-{
-    for ( i = [-.5 : 1 : .5] )
-    //    translate([i*dist_horiz,0,j*dist_vert])
-        translate([i*dist_horiz+case_x/2,0,0])
-            pin();
-
-}
 
 
-print_part();
+
+
 
 module print_part()
 {
@@ -454,3 +446,33 @@ module Corner()
             cube([case_w, case_w, 1]);
     }
 }
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_b83d5a7e105b() {
+*for(j=[0:1:swatches-1])
+for(i=[0:1:side_by_side_boxes-1])
+    translate([divider_x*i, j*(slot_y+slot_w), 0])
+        translate([case_w,case_w+swatch_y/2,case_h])
+            color("white")
+                cube([swatch_x,swatch_y,swatch_z]);
+if (part != "top" && Pegboard_holder == "yes")
+{
+    for ( i = [-.5 : 1 : .5] )
+    //    translate([i*dist_horiz,0,j*dist_vert])
+        translate([i*dist_horiz+case_x/2,0,0])
+            pin();
+
+}
+print_part();
+}
+
+module feral_assembly_view_b83d5a7e105b(explode=false) {
+color("SlateGray") CaseBot();
+sx=part == "both" && side_by_side_boxes>1 ? inner_x+2*case_w : -5;
+sy=part == "both" && side_by_side_boxes>1 ? inner_y+2*case_w+5 : 0;
+translate([0,0,slot_h+case_h+(explode ? 40 : 0)]) rotate([0,180,0]) translate([-sx,-sy,-(slot_z-slot_h+case_h)]) CaseTop();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_b83d5a7e105b();
+else feral_assembly_view_b83d5a7e105b(view == "exploded");

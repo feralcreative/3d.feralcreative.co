@@ -174,6 +174,10 @@
 // stood at and the depth it is sliced to; this file only asks for it at a
 // width, a relief depth and a crop height. standalone = false is what stops its
 // own hand appearing at this part's origin — see the note on it over there.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <middle-finger-wrist-emboss.scad>
 standalone = false;
 
@@ -897,6 +901,11 @@ module fit_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_5c2789e183ba() {
 if (show == "coupon")
     fit_coupon();
 else if (show == "cut")
@@ -907,3 +916,12 @@ else if (show == "cut")
     }
 else
     slim_can_holder();
+}
+
+module feral_assembly_view_5c2789e183ba(explode=false) {
+feral_default_output_5c2789e183ba();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_5c2789e183ba();
+else feral_assembly_view_5c2789e183ba(view == "exploded");

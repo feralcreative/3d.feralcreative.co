@@ -37,6 +37,10 @@
 // so it reads from below.
 
 /* [Source] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 src = "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyscrewtop.stl";
 src_h = 5;              // mm, plate thickness of the original
 
@@ -174,4 +178,20 @@ module screwtop() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_c7e0e07445a4() {
 screwtop();
+}
+
+module feral_assembly_view_c7e0e07445a4(explode=false) {
+feral_default_output_c7e0e07445a4();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_c7e0e07445a4();
+else feral_assembly_view_c7e0e07445a4(view == "exploded");
+
+function overture_screwtop_height() = src_h;

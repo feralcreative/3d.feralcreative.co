@@ -71,6 +71,10 @@
 // at 60 mm up; each gets 5 mm of room. Nothing grips it, so no compensation
 // for the polygon's inscription is applied ($fn is high enough to make it
 // moot).
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 bore_bot_d = 65;   // mm, at the floor
 bore_top_d = 80;   // mm, at the rim
 
@@ -280,4 +284,18 @@ module desk_cup_holder() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_db88ea6beec1() {
 desk_cup_holder();
+}
+
+module feral_assembly_view_db88ea6beec1(explode=false) {
+feral_default_output_db88ea6beec1();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_db88ea6beec1();
+else feral_assembly_view_db88ea6beec1(view == "exploded");

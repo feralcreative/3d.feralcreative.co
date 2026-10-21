@@ -90,6 +90,10 @@
 // "cut" is a half-section for reading the double wall, the cavity and the ribs.
 // Not for printing — build it with --name if you want it as its own STL.
 // "coupon" is the fit test; see [Fit coupon].
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part";   // [part, cut, coupon]
 
 $fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
@@ -698,9 +702,7 @@ echo(str("wording=", wording, "  plaque ", sign_w, " x ", sign_h,
          "  deep ", sign_sag, " (= bevel height)  wall behind ", sign_t,
          "  z ", sign_z0, "..", sign_z1,
          "  overall with bevels ", sign_h + 2 * sign_sag));
-for (i = [0 : len(lines) - 1])
-    echo(str("  line ", i, "  \"", lines[i], "\"  size ", sizes[i],
-             "  cap ", heights[i]));
+
 
 // The fit coupon: the top coupon_h of the finished part, dropped onto the bed
 // the same way up as the part itself. Taking it off the real thing rather than
@@ -725,6 +727,14 @@ module fit_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_cc089c5dd84c() {
+for (i = [0 : len(lines) - 1])
+    echo(str("  line ", i, "  \"", lines[i], "\"  size ", sizes[i],
+             "  cap ", heights[i]));
 if (show == "coupon")
     fit_coupon();
 else if (show == "cut")
@@ -735,3 +745,12 @@ else if (show == "cut")
     }
 else
     slim_can_holder();
+}
+
+module feral_assembly_view_cc089c5dd84c(explode=false) {
+feral_default_output_cc089c5dd84c();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_cc089c5dd84c();
+else feral_assembly_view_cc089c5dd84c(view == "exploded");

@@ -100,6 +100,10 @@
 
 // One part per build. "assembly" is a check view for eyeballing the fits, not
 // something to print.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "base";   // [base, spinner, fin, post, assembly, exploded]
 
 // Assembly and exploded views only: turn the spinner to show that the fin is
@@ -370,6 +374,10 @@ module exploded() {
 
 // ---------------------------------------------------------------------------
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_aad5f076cea8() {
 if      (show == "base")     base();
 else if (show == "post")     post();
 else if (show == "spinner")  spinner();
@@ -378,3 +386,12 @@ else if (show == "assembly") assembly();
 else if (show == "exploded") exploded();
 else assert(false,
     "show must be one of: base, spinner, fin, post, assembly, exploded");
+}
+
+module feral_assembly_view_aad5f076cea8(explode=false) {
+if(explode) exploded(); else assembly();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_aad5f076cea8();
+else feral_assembly_view_aad5f076cea8(view == "exploded");

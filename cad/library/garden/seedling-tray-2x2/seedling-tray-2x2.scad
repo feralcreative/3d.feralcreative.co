@@ -7,6 +7,10 @@
 // +Z is up in use and in print.
 
 /* [Show] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "tray"; // [tray, section]
 walls = "separate"; // [separate, shared]
 
@@ -204,6 +208,11 @@ module tray_separate() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_b268c18bd7bb() {
 if (show == "section")
     difference() {
         tray();
@@ -212,3 +221,12 @@ if (show == "section")
     }
 else
     tray();
+}
+
+module feral_assembly_view_b268c18bd7bb(explode=false) {
+feral_default_output_b268c18bd7bb();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_b268c18bd7bb();
+else feral_assembly_view_b268c18bd7bb(view == "exploded");

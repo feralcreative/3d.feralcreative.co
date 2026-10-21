@@ -22,6 +22,10 @@
 // dome still does, as the original's did.
 
 /* [View] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "body"; // [body, section, assembly]
 
 /* [Size] */
@@ -331,6 +335,10 @@ module pumpkin_body() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_1c9a63c6ddad() {
 if (show == "body") pumpkin_body();
 else if (show == "section" || show == "assembly") difference() {
     union() {
@@ -340,3 +348,13 @@ else if (show == "section" || show == "assembly") difference() {
     // cut on the cable's plane so the groove shows
     rotate([0, 0, cable_angle]) translate([-150, 0, -1]) cube([300, 300, 200]);
 }
+}
+
+module feral_assembly_view_1c9a63c6ddad(explode=false) {
+pumpkin_body();
+translate([0,0,explode ? -40 : 0]) puck_dummy();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_1c9a63c6ddad();
+else feral_assembly_view_1c9a63c6ddad(view == "exploded");

@@ -158,6 +158,10 @@
 // defines modules and calls none, so unlike middle-finger-emboss.scad there is
 // no standalone flag to switch off — nothing appears at this part's origin
 // just from including it.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../logos/marks.scad>
 
 /* [Output] */
@@ -1041,6 +1045,11 @@ module fit_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_c433dc08e028() {
 if (show == "coupon")
     fit_coupon();
 else if (show == "cut")
@@ -1051,3 +1060,12 @@ else if (show == "cut")
     }
 else
     slim_can_holder();
+}
+
+module feral_assembly_view_c433dc08e028(explode=false) {
+feral_default_output_c433dc08e028();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_c433dc08e028();
+else feral_assembly_view_c433dc08e028(view == "exploded");

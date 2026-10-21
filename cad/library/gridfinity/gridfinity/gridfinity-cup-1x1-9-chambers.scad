@@ -1,6 +1,10 @@
 // gridfinity-cup-1x1-9-chambers.scad — a one-cell cup with a 3 x 3 grid.
 // Smooth cartridge connector recesses sit above the buried magnet cavities.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-magnets.scad>
 use <gridfinity_cup_modules.scad>
 include <../../../logos/marks.scad>
@@ -185,6 +189,20 @@ module decorated_cup() {
   }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_e3ea3b3643f6() {
 if (show == "cup") decorated_cup();
 else if (show == "coupon") fit_coupon();
 else assert(false, "unknown output");
+}
+
+module feral_assembly_view_e3ea3b3643f6(explode=false) {
+feral_default_output_e3ea3b3643f6();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_e3ea3b3643f6();
+else feral_assembly_view_e3ea3b3643f6(view == "exploded");

@@ -6,6 +6,10 @@
 // The Bambu LED puck enters from underneath; its lens shines through the seat.
 // Test coupon-base with the production collar and one screw before the wide foot.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/threading.scad>
 
@@ -360,6 +364,10 @@ module collar_sweep(side) {
             }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_fbf52fd25228() {
 if (show == "base") stabilizer_base();
 else if (show == "lens") gel_lens();
 else if (show == "coupon-base") stabilizer_base(coupon = true);
@@ -438,3 +446,16 @@ else if (show == "screw-path") {
         }
 }
 else assert(false, str("unknown show: ", show));
+}
+
+module feral_assembly_view_fbf52fd25228(explode=false) {
+stabilizer_base();
+for(side=[-1,1]) translate([0,side*(explode ? exploded_gap : 0),collar_z+(explode ? exploded_gap : 0)]) collar_half(side);
+screw_positions() translate([0,0,screw_tip_z+(explode ? 2*exploded_gap : 0)]) thumbscrew();
+translate([0,0,seat_floor_z-(explode ? exploded_gap : 0)]) gel_lens();
+translate([0,0,puck_depth_extra-(explode ? 2*exploded_gap : 0)]) puck_dummy();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_fbf52fd25228();
+else feral_assembly_view_fbf52fd25228(view == "exploded");

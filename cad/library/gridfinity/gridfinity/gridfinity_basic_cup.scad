@@ -1,4 +1,8 @@
 // include <gridfinity_modules.scad>
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 use <gridfinity_cup_modules.scad>
 
 // X dimension in grid units
@@ -43,6 +47,11 @@ module end_of_customizer_opts() {}
 // Separator positions are defined in terms of grid units from the left end
 separator_positions = [ 0.25, 0.5, 1.4 ];
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_ff9cebfaefbb() {
 if (filled_in) {
   grid_block(width, depth, height, magnet_diameter=magnet_diameter, 
     screw_depth=screw_depth, hole_overhang_remedy=hole_overhang_remedy,
@@ -87,3 +96,12 @@ else {
     box_corner_attachments_only=box_corner_attachments_only
   );
 }
+}
+
+module feral_assembly_view_ff9cebfaefbb(explode=false) {
+feral_default_output_ff9cebfaefbb();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_ff9cebfaefbb();
+else feral_assembly_view_ff9cebfaefbb(view == "exploded");

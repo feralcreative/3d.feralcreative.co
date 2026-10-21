@@ -27,6 +27,10 @@
 /* [Output] */
 // set  — count clips face down, the way they print
 // clip — one clip, as mounted
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "set";  // [set, clip]
 
 // Clips on the plate.
@@ -118,5 +122,19 @@ module print_set() {
       clip_face_down();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_4713f7da4156() {
 if (show == "clip") simplisafe_wire_guide();
 else print_set();
+}
+
+module feral_assembly_view_4713f7da4156(explode=false) {
+feral_default_output_4713f7da4156();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_4713f7da4156();
+else feral_assembly_view_4713f7da4156(view == "exploded");

@@ -37,6 +37,10 @@
 /* [Overall] */
 
 // Extrusion depth — the width of the wedge, and the height it prints at.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 width        = 30;       // mm
 
 // Length of the floor, knife edge to toe, over the toe roll.
@@ -263,5 +267,19 @@ module reversible_door_stop_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_a6ba77c1b85c() {
 if (show == "coupon") reversible_door_stop_coupon();
 else                  reversible_door_stop();
+}
+
+module feral_assembly_view_a6ba77c1b85c(explode=false) {
+feral_default_output_a6ba77c1b85c();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_a6ba77c1b85c();
+else feral_assembly_view_a6ba77c1b85c(view == "exploded");

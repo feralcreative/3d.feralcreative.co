@@ -89,6 +89,10 @@
 // "coupon" is the fit test, see [Coupon]. "stack" draws two units seated on
 // each other, for the render. "fitcheck" is their intersection in that pose
 // and must build empty; see fitcheck_offset.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part";   // [part, cut, coupon, stack, fitcheck]
 // Added to the stack pitch for the fitcheck (mm). 0 is the seated pose and
 // must give nothing; -0.2 must give something, or the check is not looking.
@@ -412,6 +416,10 @@ echo(str("volume estimate: unit ", round(unit_vol(total_h) / 100) / 10,
          round(unit_vol(coupon_h) / 100) / 10, " cm3 (",
          round(unit_vol(coupon_h) * 1.27 / 100) / 10, " g)"));
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_39cf3076f0e1() {
 if (show == "coupon")
     unit(coupon_h);
 else if (show == "cut")
@@ -428,3 +436,13 @@ else if (show == "fitcheck")
     }
 else if (show == "part")
     unit(total_h);
+}
+
+module feral_assembly_view_39cf3076f0e1(explode=false) {
+color("DarkSeaGreen") unit(total_h);
+color("MediumSeaGreen") translate([0,0,stack_pitch+(explode ? 35 : 0)]) unit(total_h);
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_39cf3076f0e1();
+else feral_assembly_view_39cf3076f0e1(view == "exploded");

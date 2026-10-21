@@ -39,5 +39,31 @@
   "source_url": "https://www.printables.com/model/1016779-cute-haunted-tree-family-halloween-candle-lights",
   "additional_scad_files": [
     "face-openings.scad"
-  ]
+  ],
+  "assembly_view_sources": {
+    "haunted-tree-family.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "haunted-tree-family.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "haunted-tree-family.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

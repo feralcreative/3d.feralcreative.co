@@ -45,8 +45,34 @@
   "licenses": [],
   "protected_assets": [],
   "additional_scad_files": [],
-  "publish_exports": [],
-  "draft_exports": [
+  "publish_exports": [
     "awl-sheath"
-  ]
+  ],
+  "draft_exports": [],
+  "assembly_view_sources": {
+    "awl-sheath.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "awl-sheath.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "awl-sheath.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

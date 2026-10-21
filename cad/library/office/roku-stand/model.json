@@ -86,5 +86,31 @@
   ],
   "licenses": [
     "docs/roku-remote-holder/Roku Remote Holder - 5955308/LICENSE.txt"
-  ]
+  ],
+  "assembly_view_sources": {
+    "roku-stand.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "roku-stand.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "roku-stand.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

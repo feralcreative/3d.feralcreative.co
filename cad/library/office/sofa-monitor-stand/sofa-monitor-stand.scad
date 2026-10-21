@@ -93,6 +93,10 @@
 //               the arm fit — cavity width, crown, bend radius, deck and leg
 //               thickness — is in that section; the leg length proves
 //               nothing but costs most of the print
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "base";  // [top, base, plug, coupon, base-slice]
 
 /* [Top] */
@@ -286,14 +290,31 @@ module base_oriented() {
 
 // ---- output ----------------------------------------------------------------
 
-if (show == "top")        stand_top();
-if (show == "base")       base_oriented() stand_base();
-if (show == "plug")       stand_plug();
-if (show == "coupon")     stand_coupon();
-if (show == "base-slice") stand_base_slice();
+
+
+
+
+
 
 echo(str("plug = ", stand_plug_w, " sq x ", stand_plug_h, " mm; socket = ",
          stand_socket_w, " sq x ", stand_socket_depth, " mm"));
 echo(str("saddle = ", base_w, " x ", base_depth, " x ", base_h + stand_plug_h,
          " mm over the plug; cavity = ", base_cavity_w, " wide x ", base_leg_drop,
          " deep at the sides, ", base_leg_drop + base_arm_crown, " at the crown"));
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_6105d24796e4() {
+if (show == "top")        stand_top();
+if (show == "base")       base_oriented() stand_base();
+if (show == "plug")       stand_plug();
+if (show == "coupon")     stand_coupon();
+if (show == "base-slice") stand_base_slice();
+}
+
+module feral_assembly_view_6105d24796e4(explode=false) {
+color("SlateGray") stand_base(); color("SteelBlue") translate([0,0,base_h+(explode ? 45 : 0)]) stand_top();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_6105d24796e4();
+else feral_assembly_view_6105d24796e4(view == "exploded");

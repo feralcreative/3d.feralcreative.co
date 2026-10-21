@@ -2,9 +2,10 @@
   "id": "filament-swatches",
   "origin": "legacy",
   "status": "unreviewed",
-  "scad": "swatch_box_remix_v5.scad",
+  "scad": "filament-swatch-box.scad",
   "scad_files": [
-    "swatch_box_remix_v5.scad"
+    "swatch_box_remix_v5.scad",
+    "filament-swatch-box.scad"
   ],
   "exports": [],
   "aliases": {
@@ -211,5 +212,31 @@
     "docs/filament-swatch/Customizable Filament Swatch (Filament test) - 3346069/LICENSE.txt",
     "docs/filament-swatch/Customizable Filament Swatch (Filament test) - 3346069/benchy/LICENSE.txt",
     "docs/filament-swatch/My Customized Filament Swatch (Filament test) - 7261711/LICENSE.txt"
-  ]
+  ],
+  "assembly_view_sources": {
+    "filament-swatch-box.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "filament-swatch-box.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "filament-swatch-box.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

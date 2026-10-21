@@ -1,31 +1,44 @@
 # Project agent instructions
 
+## Unified project layout
+
+The canonical checkout is `3d.feralcreative.co`. Website source stays at the root; the complete CAD library and its existing tooling live under `cad/`. Read `cad/AGENTS.md` before changing model geometry, slicer profiles or CAD utilities. Website commands below run from this root; CAD commands also have root `utils/{build,render,slice,coupon,finalize,clean}.sh` forwarding entrypoints. `utils/models.sh` builds the complete schema-1 catalog and selected-asset staging; add `--render-colours` to export SCAD colours or `--push` only when publication is explicitly requested. Generated catalog assets live under `cad/_work/site-models/` and are not application build inputs. Keep CAD source archives, `_work`, and the external `3d` symlink out of the website build context. Preserve the inherited website runtime files and their ignore rules. The 2026-10-20 consolidation is explicitly authorized; deployment and printer actions are separate.
+
 ## Commands
 
 Run commands from the repository root. Read the verification limits below before treating setup as complete.
 
 | Task | Command | Verification |
 |---|---|---|
-| Install dependencies without lifecycle scripts | `npm install --ignore-scripts --no-audit --no-fund --package-lock=false --fetch-retries=0` | Blocked by registry DNS in the authoring environment. |
-| Frontend only | `BROWSER=none npm run dev -- --host 127.0.0.1 --strictPort` | Blocked by sandbox permission to bind the local port. |
-| Build | `npm run build` | Fails on an unavailable local model asset; see debugging guide. |
+| Install dependencies without lifecycle scripts | `npm install --ignore-scripts --no-audit --no-fund --package-lock=false --fetch-retries=0` | Passed with registry access on 2026-10-20; a clean-checkout install remains unverified. |
+| Frontend only | `BROWSER=none npm run dev -- --host 127.0.0.1 --strictPort` | Requires sandbox permission to bind the local port; local HTTP verification passed on 2026-10-20. |
+| Development stack with Sass watchers | `npm start` | Compiles expanded/minified CSS, then watches both outputs alongside Vite and the development proxy. Requires private runtime setup. |
+| Compile styles | `npm run build:css` | Generates ignored expanded/minified CSS from SCSS. |
+| Build | `npm run build` | Compiles styles, then builds Vite. Passed locally on 2026-10-20; inspect artifacts as well as exit status. |
+| Check model library syntax | `node --check models.js` | Run after model library changes. |
+| Check project presentation syntax | `node --check project-content.js && node --check model-previews.js` | Run after project content or thumbnail changes. |
+| Check development launcher syntax | `node --check utils/dev.js` | Run after launcher changes. |
 | Check authentication syntax | `node --check auth.js` | Passed. |
 | Check printer client syntax | `node --check printer.js` | Passed. |
 | Check stream syntax | `node --check stream.js` | Passed. |
 | Check viewer syntax | `node --check viewer-3d.js` | Passed. |
 | Check logger syntax | `node --check logger.js` | Passed. |
 | Check monitor persistence syntax | `node --check utils/monitor-state.js` | Passed. |
+| Check deployment verifier syntax | `node --check utils/verify-model-deployment.mjs` | Run after deployment verifier changes. |
+| Deployment verifier tests | `node --test utils/verify-model-deployment.test.mjs` | Temporary files and loopback HTTP fixtures; no production access. |
+| Production entrypoint tests | `python3 utils/test-prod-deploy.py` | Fake transports/containers; requires the ignored private `prod.sh`. |
+| Deployment publisher tests | `python3 cad/utils/test-catalog-publish.py` | Fake rsync; proves asset-first/catalog-last ordering. |
 | Check repair wrapper syntax | `node --check utils/stl-repair.js` | Passed. |
 | Check local development proxy syntax | `node --check server.js` | Passed with the ignored local implementation present. |
 | Check local production proxy syntax | `node --check printer-proxy-server.js` | Passed with the ignored local implementation present. |
-| Automated tests | TBD | No test script or maintained suite is configured. |
-| Single test file | TBD | No maintained test runner is configured. |
+| Gallery regression tests | `npm run test:models` | Built-in Node tests for filtering, project content, links, fallbacks, and thumbnail scheduling. |
+| Catalog exporter tests | `python3 cad/utils/test-web-library.py` | Preserves source files and checks authored project metadata and presentation exports. |
 | Lint / format | TBD | No project lint or format command is configured. |
 | Typecheck | TBD | No project typecheck command is configured. |
 | Fresh-checkout runtime setup | TBD | Checked-in examples do not reproduce the current local runtime. |
 
-- Treat these results as the 2026-09-28 local authoring baseline, not a guarantee for another checkout.
-- The attempted test invocation failed because `package.json` has no test script; do not report a passing suite.
+- Treat these results as the 2026-09-28 local authoring baseline with dated updates, not a guarantee for another checkout.
+- `package.json` has no default `test` script; use the scoped gallery and CAD commands above and report exactly what ran.
 - The offline install attempt also failed because the npm cache lacked required registry metadata.
 - Existing dependencies allowed the build to start; a clean dependency installation remains unverified.
 - Request the private runtime configuration from Ziad before attempting a complete application setup.
@@ -71,7 +84,7 @@ Run commands from the repository root. Read the verification limits below before
 ### Generated and private files
 
 - Edit SCSS sources, not generated `styles/css/` files.
-- Preserve the predecessor's rule: use the VS Code Live Sass Compile workflow; do not compile SCSS manually.
+- Use `npm start` for Sass watch mode and `npm run build:css` for one-off compilation. The user replaced the editor-only workflow on 2026-10-20.
 - Do not hand-edit `dist/`; Vite and the `copy-js-files` plugin regenerate it.
 - Do not hand-edit `node_modules/` or dependency lockfiles.
 - Keep the existing ignored-lockfile policy unless the task explicitly changes dependency management.
@@ -101,8 +114,10 @@ Run commands from the repository root. Read the verification limits below before
 4. The production Nginx `/api/` route strips the prefix and forwards to the Node printer proxy; PHP files use the separate PHP handler.
 5. The private production proxy communicates with the printer and camera; its independent `PrinterMonitor` sends notifications without a browser tab.
 6. `utils/monitor-state.js` persists notification state through a temporary-file write and rename on the mounted data volume.
-7. `ModelViewer.loadModel` maps printer filenames to STL assets served from `/models/`; uploaded printer files do not populate that model library.
+7. `ModelCatalog` resolves model IDs, published filenames and printer-job aliases from `/models/catalog.json`. The viewer loads explicit presentation formats. Visitor file access requires a SCAD-backed catalog project; uploaded printer files do not populate the CAD library.
 8. The development upload path can invoke `utils/stl-repair.js`, which calls `utils/stl-repair-pymeshlab.py`; the current production upload implementation disables repair.
+9. `/models` and `/models/` show signed-in project cards without starting the stream or printer polling. Only projects with a current SCAD source and browser-supported default view are listed. Source-less, source-only, unsupported-only, withheld, and internal-placeholder entries stay out of the gallery. Preserve aliases for eligible projects; unregistered meshes remain private.
+10. Production Nginx lists the runtime models mount as JSON after a session subrequest; Vite provides a development/preview equivalent without starting the proxy. The development catalog is not an authentication boundary.
 
 - Keep browser classes independent of Node/Python utilities; communicate across the proxy boundary.
 - Preserve script load order and explicit browser-global assignments when changing module boundaries.
@@ -132,9 +147,9 @@ Run commands from the repository root. Read the verification limits below before
 
 - Use existing variables from `styles/scss/_variables.scss`; do not invent undefined color names.
 - Use the existing breakpoint mixins in `styles/scss/_mixins.scss`.
-- Keep generated CSS available before building; the npm build does not compile SCSS.
-- Preserve the existing Live Sass Compile workflow until the user requests a different build pipeline.
-- Match model basenames to printer job filenames; the viewer replaces the final extension with `.stl`.
+- `npm run build` compiles expanded and compressed CSS before Vite; keep generated outputs ignored.
+- `npm start` prepares styles and starts both Sass watchers, the development proxy, and Vite. Ctrl+C stops the child process groups.
+- Preserve model-ID, published-filename and printer-job aliases. Catalog views declare their format; legacy filename resolution must still pass server-side SCAD eligibility checks.
 - Treat model files as external runtime assets, not application source.
 - Verify special-character filenames through the existing query-string and model-path logic before changing encoding.
 
@@ -188,6 +203,11 @@ Run commands from the repository root. Read the verification limits below before
 - `utils/pymeshlab-repair.py` is not the current Node wrapper's invoked script; follow `repairSTL` to `utils/stl-repair-pymeshlab.py`.
 - Old ADMesh instructions in `docs/STL_REPAIR_GUIDE.md` do not describe the current wrapper.
 - A model loaded successfully in the viewer is not proof of a watertight mesh or a printable part.
+- The generated catalog includes every CAD manifest, explicit views/downloads and source-only availability. The legacy autoindex contributes only unclaimed top-level STL files, excluding `no-model-loaded.stl`. Newly published catalogs and files appear without an application rebuild.
+- Project descriptions, printing/assembly instructions, parts, product URLs and view labels belong in each manifest's `website` object. Read [docs/model-catalog.md](docs/model-catalog.md) before changing this contract. Never invent product links or physical validation claims.
+- `cad/catalog-settings.json` contains the optional public Amazon.com affiliate tag. Empty tags leave links untagged; missing product URLs produce no purchase link. Regenerate with `utils/models.sh` after metadata/settings changes.
+- `model-previews.js` uses one shared, lazy offscreen renderer and a bounded browser image cache. Meshes over 25 MB are opened explicitly instead of downloaded for automatic thumbnails. Keep thumbnail work stopped on sign-out and background gallery work paused while a project modal is open.
+- Preserve the exact Nginx locations for `/models` and `/models/`; otherwise the physical STL directory can mask the library page. Keep direct `/models/<filename>.stl` serving intact.
 
 ## Commit and PR conventions
 
@@ -208,3 +228,13 @@ Run commands from the repository root. Read the verification limits below before
 - [docs/deployment.md](docs/deployment.md)—Read before runtime setup, container work, or an authorized release.
 - [docs/decisions.md](docs/decisions.md)—Read before replacing the stream, monitor-state, styling, or proxy design.
 - [docs/debugging.md](docs/debugging.md)—Read when setup, build, streaming, repair, or validation fails.
+
+### Model administration
+
+- `npm run test:models` includes gallery, model-management persistence and permission fixtures.
+- Use `utils/model-management.js` for website organization; keep its production mount before the private proxy catch-all and pass the verified `readSession` callback. Never trust a posted email or client admin flag.
+- Persistent organization is ignored runtime data in `data/model-organization.json` (container `/app/data/model-organization.json`); do not publish it as a static asset or treat it as generated CAD metadata.
+- Vite grants local management only to a loopback connection with a local Host. Production uses the existing signed admin session. Ordinary viewers must not receive hidden inventory.
+- Model hiding requires the effective catalog, filtered listing and file-access routes in the updated Node/Nginx stack; frontend-only hiding is insufficient. Read `docs/model-catalog.md` before changing this contract.
+
+- Site models require an existing declared SCAD source (`has_scad`) and a supported 3D preview. Do not restore unmanaged STL fallback or publish models without SCAD. Retain source-less entries privately as `Needs SCAD`; recreation is a separate user-selected task.

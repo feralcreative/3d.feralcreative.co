@@ -68,6 +68,20 @@ utils/finalize.sh awl-sheath
 
 Finalization promotes workspace plain-name STL exports and matching generated 3MF jobs into the model folder. It removes obsolete numbered drafts, coupons, and corresponding renders; it leaves the version ledger unchanged. Imported models can retain newly sliced jobs without a SCAD source. A source project or mesh listed in `protected_assets` is never overwritten by finalization; use a distinct generated output name.
 
+Finalize every registered library export and any remaining legacy STL series, then stage and publish the complete model catalog and selected assets in one command:
+
+```bash
+utils/finalize.sh --all --push
+```
+
+Preview the cleanup without changing files or contacting the NAS:
+
+```bash
+utils/finalize.sh --all --push --dry-run
+```
+
+Use `--all` alone for local finalization. This uses existing builds; it does not rebuild SCAD sources or slice new jobs. Each current plain-name mesh is retained, numbered drafts, coupons and matching renders are removed, and matching generated 3MF files are retained locally. Uploading starts only after finalization succeeds. In the unified repository it runs root `utils/models.sh --push`, publishing the complete catalog and selected presentation/download assets, including imported designs. Publication exclusions and protected source assets remain intact. Original downloads are not finalized as exports, and nothing is deleted from the NAS. If uploading fails, local finalization remains applied; retry from the root with `utils/models.sh --push`.
+
 ```bash
 utils/clean.sh
 utils/clean.sh --stale 7

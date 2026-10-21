@@ -3,6 +3,10 @@
 // Print flat underside on the bed. Use the fit coupon before the wide foot.
 // A 1 mm soft seat liner brings the glass to its nominal seating height.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/rounding.scad>
 
@@ -156,6 +160,11 @@ module cradle_assembly() {
     %color(glass_color) translate([0, 0, glass_bottom_z]) glass_envelope();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_66e6506d7bf1() {
 if (show == "cradle") liftout_cradle();
 else if (show == "coupon") liftout_cradle(coupon = true);
 else if (show == "ring-coupon") ring_fit_coupon();
@@ -172,3 +181,12 @@ else if (show == "glass-insertion") intersection() {
         cylinder(d = glass_base_d * bore_factor, h = glass_total_h + rim_z);
 }
 else assert(false, str("unknown show: ", show));
+}
+
+module feral_assembly_view_66e6506d7bf1(explode=false) {
+feral_default_output_66e6506d7bf1();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_66e6506d7bf1();
+else feral_assembly_view_66e6506d7bf1(view == "exploded");

@@ -26,5 +26,34 @@
   ],
   "protected_assets": [],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "desk-cup-holder-starbucks.scad": {
+      "kind": "single-part"
+    },
+    "desk-cup-holder.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "desk-cup-holder.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "desk-cup-holder.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

@@ -25,6 +25,10 @@
 // one extrusion width. The groove now bottoms at 7.800. Nothing that mates has
 // moved; the wall is 1.300 mm and 0.895 mm.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/threading.scad>
 
@@ -265,4 +269,18 @@ module chalk_holder_tip() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_1d7741384ea8() {
 chalk_holder_tip();
+}
+
+module feral_assembly_view_1d7741384ea8(explode=false) {
+feral_default_output_1d7741384ea8();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_1d7741384ea8();
+else feral_assembly_view_1d7741384ea8(view == "exploded");

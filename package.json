@@ -5,10 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "npx vite --host",
-    "build": "npx vite build",
+    "sass": "sass --no-source-map styles/scss/main.scss styles/css/main.css",
+    "sass:min": "sass --no-source-map --style=compressed styles/scss/main.scss styles/css/main.min.css",
+    "sass:watch": "sass --watch --no-source-map styles/scss/main.scss:styles/css/main.css",
+    "sass:watch:min": "sass --watch --no-source-map --style=compressed styles/scss/main.scss:styles/css/main.min.css",
+    "build:css": "npm run sass && npm run sass:min",
+    "build": "npm run build:css && vite build",
     "preview": "npx vite preview",
+    "test:models": "node --test utils/project-gallery.test.js utils/model-management.test.js utils/model-admin.test.js",
     "proxy": "node server.js",
-    "start": "npm run proxy & npm run dev"
+    "start": "node utils/dev.js"
   },
   "keywords": [
     "flashforge",
@@ -26,6 +32,7 @@
     "online-3d-viewer": "^0.18.0"
   },
   "devDependencies": {
+    "sass": "^1.105.2",
     "vite": "^5.0.0"
   }
 }

@@ -3,6 +3,10 @@
 // rounded corners give a measured 204.8 x 204.8 mm mesh footprint, inside
 // the documented 205 mm safe design envelope before any brim or skirt.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-plate-modules.scad>
 
 /* [Grid] */
@@ -25,4 +29,18 @@ module gridfinity_baseplate_6x1() {
                magnet_cav_h = magnet_cav_h, magnet_skin = magnet_skin);
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_9085f37f7e2e() {
 gridfinity_baseplate_6x1();
+}
+
+module feral_assembly_view_9085f37f7e2e(explode=false) {
+feral_default_output_9085f37f7e2e();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_9085f37f7e2e();
+else feral_assembly_view_9085f37f7e2e(view == "exploded");

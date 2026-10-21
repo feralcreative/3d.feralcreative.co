@@ -82,6 +82,10 @@
 /* [Overall] */
 
 // Extrusion depth — the width of the wedge, and the height it prints at.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 width       = 25;     // mm
 
 // Length of the floor, knife edge to toe.
@@ -360,5 +364,19 @@ module tpu_door_stop_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_78af042f4709() {
 if (show == "coupon") tpu_door_stop_coupon();
 else                  tpu_door_stop();
+}
+
+module feral_assembly_view_78af042f4709(explode=false) {
+feral_default_output_78af042f4709();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_78af042f4709();
+else feral_assembly_view_78af042f4709(view == "exploded");

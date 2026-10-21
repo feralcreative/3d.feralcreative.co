@@ -114,6 +114,10 @@
 // its wall with nothing under it. Upright, the two rails are identical and
 // both lips run within 11 degrees of vertical.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 
 /* [Which output] */
@@ -745,6 +749,10 @@ module plate() {
 // it can go: backward, the way it went on, and the way the glass blocks.
 explode = 25.0;
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_76da12c52b2e() {
 if (show == "plate") {
     plate();
 } else if (show == "exploded") {
@@ -771,3 +779,13 @@ if (show == "plate") {
                     cube([phone_w, phone_t, phone_l]);
     }
 }
+}
+
+module feral_assembly_view_76da12c52b2e(explode=false) {
+piece_hook(); piece_cradle();
+color("Goldenrod") translate([0,explode ? -25 : 0,0]) piece_spine();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_76da12c52b2e();
+else feral_assembly_view_76da12c52b2e(view == "exploded");

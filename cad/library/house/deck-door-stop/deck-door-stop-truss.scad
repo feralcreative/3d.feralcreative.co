@@ -46,6 +46,10 @@
 // the derived ramp angle, the tangency solve, the semicircular ridges, and the
 // truss bands with their opening.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../logos/marks.scad>
 
 /* [The door] */
@@ -408,5 +412,19 @@ module deck_door_stop_truss_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_bffb333396fe() {
 if (show == "coupon") deck_door_stop_truss_coupon();
 else                  deck_door_stop_truss();
+}
+
+module feral_assembly_view_bffb333396fe(explode=false) {
+feral_default_output_bffb333396fe();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_bffb333396fe();
+else feral_assembly_view_bffb333396fe(view == "exploded");

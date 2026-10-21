@@ -2,9 +2,10 @@
   "id": "stackable-storage-caddy",
   "origin": "legacy",
   "status": "unreviewed",
-  "scad": "codeandmake.com_Stackable_Storage_Caddies_v1.4.scad",
+  "scad": "stackable-storage-caddy.scad",
   "scad_files": [
-    "codeandmake.com_Stackable_Storage_Caddies_v1.4.scad"
+    "codeandmake.com_Stackable_Storage_Caddies_v1.4.scad",
+    "stackable-storage-caddy.scad"
   ],
   "exports": [],
   "aliases": {
@@ -135,5 +136,31 @@
   },
   "licenses": [
     "docs/storage/Stackable Storage Caddies - 5437525/LICENSE.txt"
-  ]
+  ],
+  "assembly_view_sources": {
+    "stackable-storage-caddy.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "stackable-storage-caddy.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "stackable-storage-caddy.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

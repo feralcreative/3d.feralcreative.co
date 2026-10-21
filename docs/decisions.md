@@ -31,15 +31,20 @@
 
 ## Preserve the styling workflow
 
-- Retain the predecessor's prohibition on manual SCSS compilation and the VS Code Live Sass Compile workflow.
-- The npm build consumes generated CSS; it does not own compilation.
-- Rationale for choosing editor compilation over a package script: TBD.
+- On 2026-10-20, Ziad replaced the editor-only workflow with Sass watchers under `npm start`.
+- Compile expanded `main.css` and compressed `main.min.css` before starting the watchers, Vite, and the development proxy. Keep generated CSS ignored.
+- `npm run build` runs the same style compilation before Vite so production builds include current styles.
 
 ## Keep models outside the application image lifecycle
 
 - Preserve runtime model mounting so adding an STL does not require rebuilding application code.
-- Keep the filename-based mapping from printer jobs to model assets; printer uploads and viewer model files have separate lifecycles.
+- Keep the filename-based mapping from printer jobs to model assets; printer uploads and viewer model files have separate lifecycles. The catalog extends it: a job name resolves by its stem to the catalog model that publishes a file or alias of that name.
 - Treat model viewing, mesh integrity, and physical printability as separate verification layers.
+- `/models` uses the shared signed-in shell and modal without starting camera streaming or printer polling. List every catalog model, including no-mesh and withheld entries with a badge, then every top-level STL the catalog does not claim, except the internal placeholder.
+- Coloured views are standard GLB (metres, Y-up, linear `baseColorFactor`). Native 3MF imports one sRGB step too dark in the installed viewer, so it is not used as a view format.
+- STEP, 3DM, and FCStd views are listed as download-only. Their Online 3D Viewer importers fetch OCCT or rhino3dm from `cdn.jsdelivr.net` at runtime; previewing them in the browser is a separate decision.
+- Nginx generates `/model-catalog/` from the mounted models directory, guarded by an `auth_request` to the existing session endpoint. Do not bake the catalog into the application build; publishing a model has a separate lifecycle.
+- Vite supplies the same catalog shape for development and preview. Its catalog is a local development convenience, not a replacement for production authentication.
 
 ## Preserve uncertainty in inherited deployment guidance
 

@@ -14,6 +14,10 @@
 // and checked outside OpenSCAD (pieces cover the cat exactly, every tab sits 2.5 mm
 // inside the outline, every printed piece fits 200 mm square). Do not rescale.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../../lib/BOSL2/std.scad>
 include <../../../../lib/BOSL2/beziers.scad>
 
@@ -253,6 +257,11 @@ module joint_coupon(gap = 2 * tab_depth) {
 
 function mean(pts) = [for (i = [0, 1]) sum([for (p = pts) p[i]]) / len(pts)];
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_9d48bd35e680() {
 if (show == "assembled") for (n = piece_names) piece3d(n);
 else if (show == "exploded") for (n = piece_names) {
     d = mean(piece_row(n)[3]) - magnet_xy;
@@ -276,3 +285,12 @@ else if (show == "before-cap") intersection() {
     translate([-100, -100, -eps]) cube([1000, 1000, roof_z]);
 }
 else assert(false, str("unknown show: ", show));
+}
+
+module feral_assembly_view_9d48bd35e680(explode=false) {
+feral_default_output_9d48bd35e680();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_9d48bd35e680();
+else feral_assembly_view_9d48bd35e680(view == "exploded");

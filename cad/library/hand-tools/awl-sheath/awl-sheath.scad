@@ -25,6 +25,10 @@
 // COUPON-PLATE: coupon
 
 /* [View] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "sheath"; // [sheath, section, coupon, coupon-mouth]
 
 /* [Blade, measured] */
@@ -137,6 +141,11 @@ module coupon_mouth() {
   }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_dc0f5878f138() {
 if (show == "sheath") sheath();
 else if (show == "section") difference() {
     sheath();
@@ -144,3 +153,12 @@ else if (show == "section") difference() {
   }
 else if (show == "coupon-mouth") coupon_mouth();
 else if (show == "coupon") coupon_mouth();
+}
+
+module feral_assembly_view_dc0f5878f138(explode=false) {
+feral_default_output_dc0f5878f138();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_dc0f5878f138();
+else feral_assembly_view_dc0f5878f138(view == "exploded");

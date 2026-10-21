@@ -34,12 +34,17 @@ REPO_DIR="${REPO_ROOT}/docs/profiles"
 APP_DIR="${APP_DIR:-$HOME/Library/Application Support/Orca-Flashforge/user/default}"
 
 MODE="check"
-case "${1:-}" in
-  --install) MODE="install" ;;
-  --capture) MODE="capture" ;;
-  "")        ;;
-  *) echo "usage: $0 [--install|--capture]" >&2; exit 64 ;;
-esac
+ONLY_NAME=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --install) MODE="install"; shift ;;
+    --capture) MODE="capture"; shift ;;
+    --only)
+      [[ $# -ge 2 && -n "$2" ]] || { echo "error: --only requires a preset name" >&2; exit 64; }
+      ONLY_NAME="$2"; shift 2 ;;
+    *) echo "usage: $0 [--install|--capture] [--only <preset-name>]" >&2; exit 64 ;;
+  esac
+done
 
 if [[ ! -d "$APP_DIR" ]]; then
   echo "error: no Flash Studio user preset tree at $APP_DIR" >&2
@@ -64,6 +69,7 @@ for kind in filament process printer machine; do
 
   while IFS= read -r name; do
     [[ -n "$name" ]] || continue
+    if [[ -n "$ONLY_NAME" && "$name" != "$ONLY_NAME" ]]; then continue; fi
     for ext in json info; do
       r="$REPO_DIR/$kind/$name.$ext"
       a="$APP_DIR/$kind/$name.$ext"

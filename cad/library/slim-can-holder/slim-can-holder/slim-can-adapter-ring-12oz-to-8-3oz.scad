@@ -74,6 +74,10 @@
 // "cut" is a half-section for reading the wall, the lip and the ribs. Not for
 // printing — build it with --name if you want it as its own STL.
 // "coupon" is the fit test; see [Fit coupon].
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part";   // [part, cut, coupon]
 // Printed orientation, lip on the bed. false draws it the way it sits in the
 // holder, lip up.
@@ -355,6 +359,11 @@ echo(str("on the can: printed bore ", bore_d - host_bore_loss,
          ", clearance ", bore_d - host_bore_loss - 2 * rib_h - can_d,
          " on a ", can_d, " can"));
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_8cebab4a867f() {
 if (show == "coupon")
     oriented(coupon_h) fit_coupon();
 else if (show == "cut")
@@ -365,3 +374,12 @@ else if (show == "cut")
     }
 else
     oriented(total_h) adapter_ring();
+}
+
+module feral_assembly_view_8cebab4a867f(explode=false) {
+feral_default_output_8cebab4a867f();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_8cebab4a867f();
+else feral_assembly_view_8cebab4a867f(view == "exploded");

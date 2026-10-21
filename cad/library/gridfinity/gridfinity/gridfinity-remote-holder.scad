@@ -23,6 +23,10 @@
 // nothing else: a remote that passes a 1.2 mm sheet can still bind in a 38 mm
 // pocket, because the walls have that much further to bulge inwards.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity_modules.scad>
 include <gridfinity-magnets.scad>
 include <../../../lib/BOSL2/std.scad>
@@ -167,12 +171,7 @@ gap = (inner_y - tsum(slot_t, len(slot_t))) / (len(remotes) + 1);
 slot_y = [for (i = [0:len(remotes) - 1])
   -inner_y / 2 + gap * (i + 1) + tsum(slot_t, i) + slot_t[i] / 2];
 
-if (show == "coupon") {
-  slot_coupon();
-}
-else {
-  remote_holder();
-}
+
 
 module remote_holder() {
   assert(gap > 0, "the slots do not fit — more cells in Y, or less clearance");
@@ -332,3 +331,22 @@ module slot_profile(w, t, shape) {
     assert(false, str("unknown slot profile: ", shape));
   }
 }
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_3fc955787382() {
+if (show == "coupon") {
+  slot_coupon();
+}
+else {
+  remote_holder();
+}
+}
+
+module feral_assembly_view_3fc955787382(explode=false) {
+feral_default_output_3fc955787382();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_3fc955787382();
+else feral_assembly_view_3fc955787382(view == "exploded");

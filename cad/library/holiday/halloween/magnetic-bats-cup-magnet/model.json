@@ -63,5 +63,34 @@
     "halloween-cat-chest",
     "halloween-cat-head",
     "halloween-cat-forelegs"
-  ]
+  ],
+  "assembly_view_sources": {
+    "bat-cat.scad": {
+      "kind": "single-part"
+    },
+    "magnetic-bats-cup-magnet.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "magnetic-bats-cup-magnet.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "magnetic-bats-cup-magnet.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

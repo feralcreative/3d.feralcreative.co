@@ -396,5 +396,71 @@
   "publication_excluded_exports": [
     "slim-can-holder-3in-12oz-fish"
   ],
-  "draft_exports": []
+  "draft_exports": [],
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "can-holder-12oz-standard-set.scad",
+      "defines": {
+        "config": "lineup",
+        "show_cans": false,
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "can-holder-12oz-standard-set.scad",
+      "defines": {
+        "config": "lineup",
+        "show_cans": false,
+        "view": "exploded"
+      }
+    }
+  ],
+  "assembly_view_sources": {
+    "can-holder-12oz-standard-set.scad": {
+      "kind": "assembly"
+    },
+    "can-holder-12oz-standard.scad": {
+      "kind": "assembly"
+    },
+    "slim-can-adapter-ring-12oz-standard-to-slim.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-adapter-ring-12oz-to-8-3oz-nested.scad": {
+      "kind": "inherited"
+    },
+    "slim-can-adapter-ring-12oz-to-8-3oz.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-adapter-ring-fish-12oz-to-8-3oz.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-adapter.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-holder-12oz.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-holder-3in-12oz-fish.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-holder-3in-12oz-middle-finger-02.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-holder-3in-12oz-wagon-queen.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-holder-8-3oz.scad": {
+      "kind": "single-part"
+    },
+    "slim-can-screwdriver-stubby.scad": {
+      "kind": "single-part"
+    }
+  },
+  "website": {
+    "default_view": "assembled"
+  }
 }

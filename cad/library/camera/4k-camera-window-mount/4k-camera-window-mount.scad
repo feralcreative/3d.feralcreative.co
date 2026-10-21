@@ -27,6 +27,10 @@
 // end round-over makes the first layer a disc 1 mm smaller than the body, which
 // is worth an extra brim line if adhesion is marginal.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 
 /* [Cylinder] */
@@ -95,4 +99,18 @@ module camera_window_mount() {
     );
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_4386a91eac8a() {
 camera_window_mount();
+}
+
+module feral_assembly_view_4386a91eac8a(explode=false) {
+feral_default_output_4386a91eac8a();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_4386a91eac8a();
+else feral_assembly_view_4386a91eac8a(view == "exploded");

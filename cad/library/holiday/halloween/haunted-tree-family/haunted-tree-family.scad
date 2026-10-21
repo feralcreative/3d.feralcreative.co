@@ -4,6 +4,10 @@
 // Trees print upright. The default interior fills the unused candle cavity and
 // leaves a cone-roofed light channel to the original face openings.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <face-openings.scad>
 
 /* [View] */
@@ -243,6 +247,10 @@ module assembly(t) {
     else translate([0, 0, pocket_h]) gel_lens();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_7ea7d1a17bc4() {
 if (show == "grin" || show == "teeth" || show == "teeth-flat" || show == "oh" || show == "sad") tree_body(show);
 else if (show == "lens") gel_lens();
 else if (show == "diffuser") diffuser_print();
@@ -257,3 +265,15 @@ else if (show == "section") difference() {
 }
 else if (show == "fitcheck") fitcheck(tree);
 else if (show == "insertioncheck") insertioncheck(tree);
+}
+
+module feral_assembly_view_7ea7d1a17bc4(explode=false) {
+tree_body(tree);
+translate([0,0,puck_depth_extra-(explode ? 70 : 0)]) puck_dummy();
+if(interior == "hollow") translate([0,0,pocket_h-(explode ? 35 : 0)]) diffuser_upright();
+else translate([0,0,pocket_h-(explode ? 35 : 0)]) gel_lens();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_7ea7d1a17bc4();
+else feral_assembly_view_7ea7d1a17bc4(view == "exploded");

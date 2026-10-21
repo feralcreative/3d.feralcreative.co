@@ -45,6 +45,10 @@
 /* [Tomato] */
 
 // Largest roma diameter the trough should take.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 tomato_d = 58;      // mm
 
 // Clearance between the tomato and the trough, on the radius.
@@ -123,4 +127,18 @@ module slicing_guide() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_0e513b4eb0af() {
 slicing_guide();
+}
+
+module feral_assembly_view_0e513b4eb0af(explode=false) {
+feral_default_output_0e513b4eb0af();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_0e513b4eb0af();
+else feral_assembly_view_0e513b4eb0af(view == "exploded");

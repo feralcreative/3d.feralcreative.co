@@ -31,5 +31,35 @@
   "additional_scad_files": [],
   "licenses": [
     "docs/tesla/Tesla Charger Holder - 6223537/LICENSE.txt"
-  ]
+  ],
+  "publish_exports": [
+    "nacs-plug-holder"
+  ],
+  "draft_exports": [],
+  "assembly_view_sources": {
+    "nacs-plug-holder.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "nacs-plug-holder.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "nacs-plug-holder.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

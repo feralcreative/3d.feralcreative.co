@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "mixins" as *;
 @use "variables" as *;
 
@@ -321,7 +322,7 @@ body {
     }
 
     &:hover {
-      background: lighten($color-fpo, 10%);
+      background: color.adjust($color-fpo, $lightness: 10%);
       transform: translateY(-1px);
     }
 
@@ -655,6 +656,211 @@ body {
   }
 }
 
+// Model library
+.models-page {
+  height: 100%;
+  overflow-y: auto;
+  color: white;
+  padding: 2rem 1rem;
+
+  > * {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  a:focus-visible,
+  input:focus-visible,
+  button:focus-visible {
+    outline: 2px solid $color-fpo;
+    outline-offset: 3px;
+  }
+
+  //@ Library spacing on larger screens
+  @include breakpoint(md) {
+    padding: 3rem 2rem;
+  }
+}
+
+.models-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-right: 4rem;
+
+  img {
+    display: block;
+    width: 70px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+  }
+}
+
+.models-controls {
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  input {
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font: inherit;
+    color: white;
+    background: #181818;
+    border: 1px solid #666;
+    border-radius: 0.25rem;
+  }
+}
+
+.models-status {
+  color: #bbb;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.models-retry {
+  display: block;
+  padding: 0.75rem 1rem;
+  background: $color-feral;
+  color: white;
+  border: 0;
+  border-radius: 0.25rem;
+  font: inherit;
+  cursor: pointer;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.models-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  list-style: none;
+
+  > li { min-width: 0; }
+
+  //@ Compact cards scale from two tablet columns to six on wide desktops.
+  @include breakpoint(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include breakpoint(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  @include breakpoint(xl) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  @include breakpoint(xxl) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  &[hidden] { display: none; }
+}
+
+.model-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  color: white;
+  text-decoration: none;
+  border: 1px solid #333;
+  border-radius: 0.5rem;
+  background: #111;
+
+  &:hover { border-color: $color-feral; }
+}
+
+.model-preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  background: #16161a;
+  overflow: hidden;
+
+  img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &[data-state="ready"] img { display: block; }
+  &[data-state="ready"] .model-preview-caption { display: none; }
+}
+
+.model-preview-caption {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  color: #aaa;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.model-preview-renderer {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 480px;
+  height: 320px;
+  pointer-events: none;
+}
+
+.model-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.65rem;
+}
+
+.model-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.model-meta,
+.model-card-footer { color: #aaa; font-size: 0.75rem; }
+.model-card-footer { margin-top: auto; padding-top: 0.25rem; }
+.model-card-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #ccc;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.models-group {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #bbb;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
 // 3D Model Viewer Modal
 .model-viewer-modal {
   position: fixed;
@@ -683,19 +889,14 @@ body {
   border-radius: 0.75rem;
   border: 1px solid rgba(136, 0, 136, 0.3);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-  max-width: 90vw;
-  max-height: 90vh;
-  width: 1200px;
-  height: 800px;
+  max-width: 96vw;
+  max-height: 92dvh;
+  width: 1440px;
+  height: 900px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 
-  //@ Small screens
-  @include breakpoint(xs) {
-    max-width: 95vw;
-    max-height: 80vh;
-  }
 }
 
 .model-viewer-header {
@@ -713,6 +914,8 @@ body {
     font-weight: 600;
     margin: 0;
     flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   //@ Small screens
@@ -785,11 +988,181 @@ body {
   }
 }
 
+.model-viewer-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  &[hidden],
+  [hidden] {
+    display: none;
+  }
+}
+
+.model-viewer-downloads {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.model-viewer-views {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  overflow-x: auto;
+  border-top: 1px solid #333;
+  background: #111;
+
+  &[hidden] { display: none; }
+}
+
+.model-view-btn {
+  width: 126px;
+  flex: 0 0 126px;
+  overflow: hidden;
+  padding: 0;
+  font: inherit;
+  color: white;
+  background: #16161a;
+  border: 1px solid #444;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover,
+  &[aria-pressed="true"] { border-color: $color-fpo; }
+  &[aria-pressed="true"] { box-shadow: 0 0 0 1px $color-fpo; }
+}
+
+.model-view-label {
+  display: block;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+// Always on the right, so the right-anchored file list has room to open.
+.model-viewer-downloads {
+  margin-left: auto;
+}
+
+// The file list drops over the viewer instead of pushing it down.
+.model-downloads-menu {
+  position: relative;
+
+  summary {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.375rem;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $color-fpo;
+    }
+  }
+
+  ul {
+    position: absolute;
+    right: 0;
+    z-index: 2;
+    width: max-content;
+    max-width: min(90vw, 32rem);
+    max-height: 50vh;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    list-style: none;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.375rem;
+  }
+
+  li + li {
+    border-top: 1px solid #333;
+  }
+}
+
+.model-download-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: white;
+  overflow-wrap: anywhere;
+
+  &:hover {
+    color: $color-fpo;
+  }
+}
+
 .model-viewer-body {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  min-height: 0;
   overflow: hidden;
+
+  &.has-project {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+.model-viewer-stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+
+  .model-viewer-error {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    margin: 0;
+  }
+}
+
+.model-project-details {
+  padding: 1.25rem;
+  overflow-y: auto;
+  color: #ccc;
+  background: #111;
+  border-left: 1px solid #333;
+  font-size: 0.875rem;
+  line-height: 1.6;
+
+  &[hidden] { display: none; }
+  section + section { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #333; }
+  h4 { color: white; font-size: 1rem; margin-bottom: 0.75rem; }
+  h5 { color: white; font-size: 0.875rem; margin: 1rem 0 0.375rem; }
+  p { white-space: pre-line; }
+  a { color: $color-fpo; overflow-wrap: anywhere; }
+  .project-source-link { display: block; margin-bottom: 0.5rem; }
+  .affiliate-disclosure { margin-top: 1rem; color: #aaa; font-size: 0.75rem; }
+}
+
+.project-parts {
+  list-style: none;
+  li + li { margin-top: 1rem; }
+  strong { color: white; }
+  p { margin: 0.25rem 0; }
+}
+
+//@ Stack project details beneath the interactive model on tablets and phones
+@include breakpoint-max(lg) {
+  .model-viewer-body,
+  .model-viewer-body.has-project { display: block; overflow-y: auto; }
+  .model-viewer-stage { height: 60dvh; min-height: 360px; }
+  .model-project-details { overflow: visible; border-left: 0; border-top: 1px solid #333; }
 }
 
 .model-viewer-container {
@@ -801,12 +1174,14 @@ body {
 }
 
 .model-viewer-stats {
+  flex-shrink: 0;
   width: 100%;
   background: rgba(0, 0, 0, 0.8);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem 1.5rem;
 
-  h4 {
+  summary {
+    cursor: pointer;
     color: rgba(255, 255, 255, 0.9);
     font-size: 0.875rem;
     font-weight: 600;
@@ -854,6 +1229,43 @@ body {
   margin: 2rem;
   font-size: 1rem;
   font-weight: 500;
+
+  // No mesh to show is not a failure.
+  &.is-notice {
+    color: #bbb;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+//@ Keep viewer controls and statistics usable on phones
+@include breakpoint-max(sm) {
+  .model-viewer-header {
+    padding: 0.75rem;
+    gap: 0.5rem;
+
+    h3 {
+      font-size: 1rem;
+    }
+  }
+
+  .model-viewer-options {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .model-viewer-toolbar,
+  .model-viewer-close {
+    flex-shrink: 0;
+  }
+
+  .model-viewer-stats {
+    padding: 0.75rem;
+    max-height: 30vh;
+    overflow-y: auto;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 // Upload Modal
@@ -1104,3 +1516,24 @@ body {
     background: rgba(255, 255, 255, 0.1);
   }
 }
+
+// Website organization is separate from the CAD source tree.
+.models-admin-wrap { max-width: 1440px; margin: 0 auto; }
+.models-manage-toggle, .models-admin button { background: #222; color: #fff; border: 1px solid #777; border-radius: .25rem; font: inherit; padding: .5rem .75rem; }
+.models-manage-toggle { margin: 1rem 0; cursor: pointer; border-color: $color-feral; }
+.models-admin button:hover:not(:disabled), .models-manage-toggle:hover { background: $color-feral-dk; }
+.models-admin button:focus-visible, .models-manage-toggle:focus-visible { outline: 2px solid $color-fpo; outline-offset: 2px; }
+.models-admin {
+  margin: 0 0 1.5rem; padding: 1rem; border: 1px solid #666; border-radius: .5rem;
+  p { margin: .5rem 0; }
+  label { display: block; font-size: .9rem; }
+  input:not([type=checkbox]), select { display: block; width: 100%; padding: .5rem; margin: .25rem 0 .5rem; color: inherit; background: #222; border: 1px solid #777; border-radius: .25rem; }
+  button { padding: .5rem .75rem; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  [hidden] { display: none !important; }
+}
+.models-admin-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: .5rem 0; }
+.models-admin-projects { max-height: 24rem; overflow: auto; border-block: 1px solid #555; }
+.models-admin-project { padding: .5rem; display: flex; flex-wrap: wrap; gap: .25rem .5rem; align-items: center; > label { flex: 1 1 12rem; } > button { font-size: .8rem; } > details { flex-basis: 100%; } border-bottom: 1px solid #444; label { display: flex; align-items: baseline; gap: .5rem; overflow-wrap: anywhere; } input[type=checkbox] { flex-shrink: 0; } }
+.models-admin-files { padding: .5rem 0 0 1.5rem; label { padding-top: .35rem; } summary { cursor: pointer; font-size: .85rem; } }
+.models-admin-form { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem 1rem; margin-top: 1rem; > label { flex: 1 1 13rem; } .models-admin-help { flex-basis: 100%; } }

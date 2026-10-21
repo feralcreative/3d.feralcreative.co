@@ -51,5 +51,39 @@
     "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2-assemblyspacer-body.stl",
     "originals/printer-tools/reusable-spool-for-overture-cardboard-spools-model_files/cardboardspooladapterv2.fcstd"
   ],
-  "additional_scad_files": []
+  "additional_scad_files": [],
+  "publish_exports": [
+    "overture-spool-main-body-ribbed",
+    "overture-spool-screwtop-ribbed"
+  ],
+  "draft_exports": [],
+  "assembly_view_sources": {
+    "overture-spool-main-body-ribbed.scad": {
+      "kind": "assembly"
+    },
+    "overture-spool-screwtop-ribbed.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "overture-spool-main-body-ribbed.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "overture-spool-main-body-ribbed.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

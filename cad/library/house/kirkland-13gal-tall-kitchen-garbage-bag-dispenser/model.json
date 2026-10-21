@@ -25,5 +25,31 @@
   ],
   "protected_assets": [],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "kirkland-13gal-tall-kitchen-garbage-bag-dispenser.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "kirkland-13gal-tall-kitchen-garbage-bag-dispenser.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

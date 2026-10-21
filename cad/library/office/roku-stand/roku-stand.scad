@@ -129,6 +129,10 @@
 // 54.73, 68.24, 27.7, 47, 26.3. They are kept as measured.
 
 /* [Base] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 base_w         = 54.73;  // widest point of the base ellipse (mm)
 base_ellipse_l = 68.24;  // full length of that ellipse before the front is cut off (mm)
 base_d         = 55.40;  // front face to back, after the cut (mm)
@@ -507,6 +511,11 @@ module roku_stand()
         base_mark_cut();
     }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_58d65c8966f0() {
 if (show == "cut")
     difference() {
         roku_stand();
@@ -514,3 +523,12 @@ if (show == "cut")
     }
 else
     roku_stand();
+}
+
+module feral_assembly_view_58d65c8966f0(explode=false) {
+feral_default_output_58d65c8966f0();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_58d65c8966f0();
+else feral_assembly_view_58d65c8966f0(view == "exploded");

@@ -1,3 +1,5 @@
+> **Historical handoff—superseded on 2026-10-20.** Continue work from the unified root and read [the current project handoff](../../docs/3d-library-handoff.md) and [the standalone archive record](../../docs/3d-library-archive.md). The CAD subtree here is active; only the former standalone checkout is retired. The October 13 handoff below is retained as historical print context.
+
 # End-of-day handoff
 
 - **Date:** 13 October 2026

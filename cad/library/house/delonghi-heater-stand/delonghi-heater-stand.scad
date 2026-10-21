@@ -191,6 +191,10 @@
 //
 // Axes: X across the heater's thickness, Z up, Y along the heater's edge.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/beziers.scad>
 include <../../../lib/BOSL2/rounding.scad>
@@ -638,9 +642,24 @@ echo(str("front wall tops at ", front_h, " (", front_down, " off the flat edge),
 echo(str("stand ", stand_len, " long wall to wall, ", sections, " pieces of ", section_len,
          "; the center prints ", section_len + 2 * tab_len, " with its tabs"));
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_258f5e9d3745() {
 if      (show == "coupon")       coupon();
 else if (show == "joint-coupon") joint_coupon();
 else if (show == "end-left")     end_piece_left();
 else if (show == "end-right")    end_piece_right();
 else if (show == "center")       center_piece();
 else                             stand();
+}
+
+module feral_assembly_view_258f5e9d3745(explode=false) {
+color("SteelBlue") translate([0,-section_len-(explode ? 30 : 0),0]) end_piece_left();
+color("DarkOrange") center_piece();
+color("SeaGreen") translate([0,section_len+(explode ? 30 : 0),0]) end_piece_right();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_258f5e9d3745();
+else feral_assembly_view_258f5e9d3745(view == "exploded");

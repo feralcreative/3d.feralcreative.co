@@ -41,5 +41,31 @@
   "additional_scad_files": [],
   "licenses": [
     "docs/Klingon Bat'Leth - 55100/LICENSE.txt"
-  ]
+  ],
+  "assembly_view_sources": {
+    "batleth.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "batleth.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "batleth.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

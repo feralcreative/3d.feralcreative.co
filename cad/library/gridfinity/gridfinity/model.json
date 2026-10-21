@@ -422,5 +422,73 @@
     "originals/gridfinity/gridfinity-base-woodscrew-version-customizable-openscad-model_files/gridfinity_silverware.scad",
     "originals/gridfinity/gridfinity-base-woodscrew-version-customizable-openscad-model_files/gridfinity_socket_holder.scad"
   ],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "gridfinity-baseplate-5x2.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-baseplate-6x1.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-baseplate-dogleg.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-cup-1x1-9-chambers.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-cup.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-metal-cup-base.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-picture-frame-base.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-remote-holder.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity-watch-charger-base.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity_baseplate.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity_basic_cup.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity_flsun_q5.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity_glue_stick.scad": {
+      "kind": "single-part"
+    },
+    "gridfinity_socket_holder.scad": {
+      "kind": "single-part"
+    },
+    "wire-shelf-gridfinity-4x2.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "gridfinity-cup.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "gridfinity-cup.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

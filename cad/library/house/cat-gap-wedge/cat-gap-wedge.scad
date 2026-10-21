@@ -103,6 +103,10 @@
 // "coupon" is the bottom coupon_h of the printed orientation — the ring and
 // the start of the channel — for checking the fit, the bore, and the door
 // angle without printing 100 mm. Build it with --name cat-gap-wedge-coupon.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part";   // [part, coupon]
 // Print the part ring-down. The ring is modelled at the top because that is
 // where it belongs on the door; it is printed at the bottom because that is
@@ -247,14 +251,7 @@ module cat_gap_wedge_oriented() {
   else cat_gap_wedge();
 }
 
-if (show == "coupon") {
-  intersection() {
-    cat_gap_wedge_oriented();
-    translate([-80, -80, 0]) cube([300, 160, coupon_h]);
-  }
-} else {
-  cat_gap_wedge_oriented();
-}
+
 
 echo(str("depth, far face to the pin = ", wedge_depth, " mm"));
 echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
@@ -267,3 +264,24 @@ echo(str("channel floor = ", knob_x - bore_r, " mm from the far face"));
 echo(str("channel mouth = ", knob_x - mouth_s, " mm from the far face, tips ", half_width(mouth_s), " mm off axis"));
 echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
 echo(str("ring from z = ", wedge_height - ring_h, " to ", wedge_height, " mm"));
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_ed66b086102d() {
+if (show == "coupon") {
+  intersection() {
+    cat_gap_wedge_oriented();
+    translate([-80, -80, 0]) cube([300, 160, coupon_h]);
+  }
+} else {
+  cat_gap_wedge_oriented();
+}
+}
+
+module feral_assembly_view_ed66b086102d(explode=false) {
+feral_default_output_ed66b086102d();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_ed66b086102d();
+else feral_assembly_view_ed66b086102d(view == "exploded");

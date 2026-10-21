@@ -73,6 +73,10 @@
 
 // "cut" is a half-section for reading the wall, the chamfers and the ribs.
 // Not for printing. "coupon" is the fit test; see [Fit coupon].
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "part";   // [part, cut, coupon]
 
 $fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
@@ -275,6 +279,11 @@ echo(str("on the can: printed bore ", bore_d - host_bore_loss,
          ", clearance ", bore_d - host_bore_loss - 2 * rib_h - can_d,
          " on a ", can_d, " can"));
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_1a8d7f3046da() {
 if (show == "coupon")
     fit_coupon();
 else if (show == "cut")
@@ -285,3 +294,12 @@ else if (show == "cut")
     }
 else if (show == "part")
     sleeve();
+}
+
+module feral_assembly_view_1a8d7f3046da(explode=false) {
+feral_default_output_1a8d7f3046da();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_1a8d7f3046da();
+else feral_assembly_view_1a8d7f3046da(view == "exploded");

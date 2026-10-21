@@ -75,6 +75,41 @@ RUN mkdir -p /var/run/nginx && \
     echo '    listen 6198;' >> /etc/nginx/sites-available/default && \
     echo '    root /app/dist;' >> /etc/nginx/sites-available/default && \
     echo '    index index.html;' >> /etc/nginx/sites-available/default && \
+    echo '    # /models is a page even though the STL directory has the same name.' >> /etc/nginx/sites-available/default && \
+    echo '    location = /models { try_files /index.html =404; }' >> /etc/nginx/sites-available/default && \
+    echo '    location = /models/ { try_files /index.html =404; }' >> /etc/nginx/sites-available/default && \
+    echo '    # Model files: a missing one is a real 404, not the HTML shell, and ^~ keeps' >> /etc/nginx/sites-available/default && \
+    echo '    # the PHP handler away from anything in the mount.' >> /etc/nginx/sites-available/default && \
+    echo '    location ^~ /models/ {' >> /etc/nginx/sites-available/default && \
+    echo '        auth_request /_model-file-access;' >> /etc/nginx/sites-available/default && \
+    echo '        add_header Cache-Control "private, no-store" always;' >> /etc/nginx/sites-available/default && \
+    echo '        try_files $uri =404;' >> /etc/nginx/sites-available/default && \
+    echo '        types { model/stl stl; model/gltf-binary glb; model/gltf+json gltf; model/3mf 3mf; model/obj obj; application/json json; }' >> /etc/nginx/sites-available/default && \
+    echo '        default_type application/octet-stream;' >> /etc/nginx/sites-available/default && \
+    echo '    }' >> /etc/nginx/sites-available/default && \
+    echo '    # The generated catalog changes on every publish.' >> /etc/nginx/sites-available/default && \
+    echo '    location = /models/catalog.json {' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_pass http://127.0.0.1:6199/model-library/catalog;' >> /etc/nginx/sites-available/default && \
+    echo '        default_type application/json;' >> /etc/nginx/sites-available/default && \
+    echo '        add_header Cache-Control "no-store" always;' >> /etc/nginx/sites-available/default && \
+    echo '    }' >> /etc/nginx/sites-available/default && \
+    echo '    location = /model-catalog/ {' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_pass http://127.0.0.1:6199/model-library/listing;' >> /etc/nginx/sites-available/default && \
+    echo '        add_header Cache-Control "no-store" always;' >> /etc/nginx/sites-available/default && \
+    echo '    }' >> /etc/nginx/sites-available/default && \
+    echo '    location = /_model-file-access {' >> /etc/nginx/sites-available/default && \
+    echo '        internal;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_pass http://127.0.0.1:6199/model-library/file-access;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_pass_request_body off;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_set_header Content-Length "";' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_set_header X-Model-URI $request_uri;' >> /etc/nginx/sites-available/default && \
+    echo '    }' >> /etc/nginx/sites-available/default && \
+    echo '    location = /_model-session {' >> /etc/nginx/sites-available/default && \
+    echo '        internal;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_pass http://127.0.0.1:6199/session;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_pass_request_body off;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_set_header Content-Length "";' >> /etc/nginx/sites-available/default && \
+    echo '    }' >> /etc/nginx/sites-available/default && \
     echo '    # Proxy all /api/* requests to Node.js printer proxy server on port 6199' >> /etc/nginx/sites-available/default && \
     echo '    location /api/ {' >> /etc/nginx/sites-available/default && \
     echo '        proxy_pass http://127.0.0.1:6199/;' >> /etc/nginx/sites-available/default && \
@@ -84,7 +119,7 @@ RUN mkdir -p /var/run/nginx && \
     echo '        # would cut the connection every 60s.' >> /etc/nginx/sites-available/default && \
     echo '        proxy_buffering off;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_read_timeout 3600s;' >> /etc/nginx/sites-available/default && \
-    echo '        proxy_set_header Host $host;' >> /etc/nginx/sites-available/default && \
+    echo '        proxy_set_header Host $http_host;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/sites-available/default && \
     echo '        proxy_set_header X-Forwarded-Proto $scheme;' >> /etc/nginx/sites-available/default && \

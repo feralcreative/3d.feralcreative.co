@@ -3,6 +3,10 @@
 // +X runs along the shelf, +Y points away from it, +Z is up in use.
 // COUPON-COMPONENTS: box-fit=coupon
 // COUPON-PLATE: coupon
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 use <wire-shelf-dovetail.scad>
 
 /* [Box] */
@@ -291,6 +295,10 @@ module floor_wire_sweep(width = channel_length,
         }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_48d471b6e899() {
 if (show == "print-set") { box_deck_pose() box_deck(); box_set_rail_pose() box_rail(); }
 else if (show == "platform") box_platform();
 else if (show == "deck") box_deck_pose() box_deck();
@@ -332,3 +340,12 @@ else if (show == "assembly") {
         }
     }
 }
+}
+
+module feral_assembly_view_48d471b6e899(explode=false) {
+color("SteelBlue") translate([0,0,explode ? 35 : 0]) box_deck(); color("DarkOrange") box_rail();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_48d471b6e899();
+else feral_assembly_view_48d471b6e899(view == "exploded");

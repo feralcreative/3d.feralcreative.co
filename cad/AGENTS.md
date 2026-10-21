@@ -1,5 +1,7 @@
 # AGENTS.md — Feral SCAD Parts
 
+This CAD subtree now lives at `3d.feralcreative.co/cad/` in the unified project. Commands in this file run from `cad/`; root `utils/{build,render,slice,coupon,finalize,clean}.sh` wrappers forward to them. The former sibling `scad` path remains a compatibility link after migration. Read the unified root `AGENTS.md` for website work. CAD paths, model IDs, source-relative includes, retained assets and generated-work rules remain scoped to this subtree. Website catalog staging lives in `cad/_work/site-models/`; `utils/models.sh` at the unified root generates it, with `--render-colours` for cached coloured GLB exports. No generation command publishes or sends a printer job unless its explicit publication flag is supplied.
+
 Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine (FlashForge Adventurer 5M Pro), sliced with Flash Studio. Owner: Ziad (Feral Creative). There is no application, no test suite, and no package manager here—the "build" is geometry, and the checks are visual and G-code-level.
 
 **Read [docs/STATUS.md](docs/STATUS.md) before touching a print setting or the chalk holder.** It records where the part stands and how a whole session was lost to tuning that was never the problem.
@@ -18,6 +20,7 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Collapse a finished part to one file, and delete its coupons and renders   | `utils/finalize.sh <name>`                                                                                        |
 | Build to an explicit scratch folder                               | `OUTDIR=/tmp/model-build utils/build.sh <source.scad>`                                               |
 | Collapse every finished series                                              | `utils/finalize.sh --all`                                                                                         |
+| Finalize all library/legacy outputs and upload finished STLs                 | `utils/finalize.sh --all --push` (needs explicit permission; add `--dry-run` for a local preview with no NAS contact) |
 | Collapse every name matching a pattern (quote it — zsh drops an unmatched glob) | `utils/finalize.sh 'delonghi-heater-stand*'` (or `stl/delonghi-heater-stand*`, which the shell can expand)  |
 | Throw an output away for good — meshes, renders, slice job, ledger line     | `utils/finalize.sh --shitcan <name>` (lists and stops; `--apply` removes)                                         |
 | Show what generated output could go (deletes nothing)                       | `utils/clean.sh`                                                                                                  |
@@ -32,7 +35,7 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Record that the last coupon was printed                                     | `utils/coupon.sh <source.scad> --printed`                                                                     |
 | Turn a one-path SVG trace into a BOSL2 bezpath to paste into a part        | `utils/svg2bez.py "_incoming/<trace>.svg" --height 80` (or `--width`)                                          |
 | Split a scanned STL into its overlapping shells so a part can union them   | `utils/stl-shells.py "_incoming/<thing>/mesh.stl"` (then `import()` each shell; see Gotchas)                    |
-| Fill a hollow mesh's section into a solid outline, for a flat wall or door  | `utils/section-outline.py "<mesh>.stl" --axis y --at 25 --name back_outline -o back-outline.scad` (`for (p = back_outline) polygon(p)`; needs numpy and shapely) |
+| Fill a hollow mesh's section into a solid outline, for a flat wall or door  | `utils/section-outline.py "<mesh>.stl" --axis y --at 25 --name back_outline -o back-outline.scad` (`for (p = back_outline) polygon(p)`; needs numpy; shapely optional for complex contours) |
 | Bend budget for the screen-fence clip's legs                                | `utils/legcheck.py`                                                                                               |
 | Compare leg section options                                                 | `utils/legcheck.py --sweep`                                                                                       |
 | Slice and verify the job                                                    | `utils/slice.sh <model-folder>/<output>.stl` or `utils/slice.sh <source.scad>`                                             |
@@ -78,7 +81,7 @@ Not required: nothing here needs a full print to be considered done by you. Prin
 - **Be very reluctant to tune print settings at all.** Retraction length and temperature both trade against feed reliability. The 2026-08-10 session traded three working prints for a cosmetic stringing complaint and jammed the feed drive three times. Change one thing, print a part, then change the next.
 - **Never `import()` an SVG from a part.** Use `include <../logos/marks.scad>` and the modules there. Reasons in [docs/decisions.md](docs/decisions.md); the failure is silent—a missing import prints an ERROR and then _exits 0_, so `build.sh` reports success and hands you an STL with no artwork on it.
 - **Do not hand-edit generated model work:** `library/**/_work/` and the remaining legacy generated trees. Retained files outside `_work/` are source assets or selected deliverables; cleanup must preserve them. `MODELS` remains a local symlink into the printer-site repo.
-- **Do not edit `lib/BOSL2`.** It is a git submodule (v2.0.755); changes belong upstream.
+- **Do not edit `lib/BOSL2`.** It is a git submodule (v2.0.775); changes belong upstream.
 - **Do not investigate Ziad's machine to answer questions about his setup.** If you need to know whether something is installed or how it is configured, ask him.
 - **Do not migrate the Dropbox SketchUp archive** at `/Volumes/Feral SSD/Dropbox (Personal)/_FERAL/3d`. It stays where it is; this repo is a change of method, not a migration.
 
@@ -100,7 +103,7 @@ Non-obvious coupling:
 - **`OPENSCADPATH`.** `lib/` is not a directory OpenSCAD searches. `render.sh` and `build.sh` export `OPENSCADPATH` themselves, so `include <BOSL2/std.scad>` resolves. Invoking the `openscad` binary directly, outside the scripts, will fail to resolve it. So does opening the part in the OpenSCAD GUI. `include <../lib/BOSL2/std.scad>` resolves relative to the part's own file and works in both; `delonghi-heater-stand.scad` does it that way, the chalk-holder parts still use the bare form.
 - **A coupon carries only what changed since the last print, by default.** `utils/coupon.sh` hashes each component's mesh, compares it against `docs/print-log.txt`, and leaves off anything identical to what was last printed — reprinting an unchanged half costs plate time and answers nothing. The part declares its own components in two comment directives (`// COUPON-COMPONENTS:`, `// COUPON-PLATE:`); the script knows nothing about any particular part. Nothing in the repo can see a print, so the printed columns move only when Ziad runs `--printed`. Pass `--all` to override.
 - **The STL version counter is committed; the versioned STLs are not.** `docs/stl-versions.txt` holds one `<name> <n>` line per output name and is the only durable record of where a series is up to — every `-vNN.stl` is gitignored and regenerable, so a counter kept beside the meshes would reset to v1 the first time the tree was cleaned. It counts builds, not design changes. The finished unversioned file is committed and does not affect this.
-- **The NAS is the only join to the printer site.** `~/www/feral/3d.feralcreative.co` shares no code and no history with this repo. `build.sh --push` rsyncs an STL to `/volume1/web/3d-printer-stream/public/models`, which is bind-mounted into that container, so a new model appears in the web viewer immediately with no rebuild and no deploy.
+- **The website and CAD library share one repository.** Website source is at the root; this subtree owns CAD sources and tools. The NAS models directory remains a runtime bind mount, so publishing selected models does not require rebuilding or deploying the website. `build.sh --push` retains its existing single-STL behavior; the unified root `utils/models.sh --push` publishes catalog assets first and the catalog last.
 - **Slicer presets exist in two places and drift.** See [docs/architecture.md](docs/architecture.md).
 
 ## 5. Conventions
@@ -184,3 +187,11 @@ Evidence markers in the two references are not interchangeable: `[SPEC]` is a ha
 ## Maintenance
 
 When a change makes anything in this file inaccurate—a command, a path, a convention, a prohibition—update this file in the same change.
+
+### Curated website files
+
+Use `publish_exports` to select the final STL set and `source_downloads` for explicit, existing SCAD downloads. The website generator treats an explicit export list as authoritative and keeps retired `publication_excluded_exports` filenames claimed and excluded. Source downloads must resolve with the advertised companion files; do not expose helper files or retained trials by scanning the directory. See root `docs/model-catalog.md` and the fence-pumpkin model for the contract.
+
+### Together and exploded views
+
+Renderable library SCAD entrypoints support `view="together"` and `view="exploded"`; `view="default"` preserves their existing print, part and coupon selectors. Keep the display transforms separate from printable geometry and include every assembly component. Single-piece models intentionally remain intact in both display modes. Includes, geometry helpers and archived/protected originals are not standalone display entrypoints; use a working adaptation when an active project points at a protected source. Model metadata records `assembly_view_sources` and the website's `assembled`/`exploded` presentations. See [docs/assembly-views.md](docs/assembly-views.md) for usage and verification limits.

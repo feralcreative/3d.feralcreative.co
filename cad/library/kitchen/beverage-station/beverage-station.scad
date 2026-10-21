@@ -5,6 +5,10 @@
 // Dimensions are mm. No archived mesh is needed to render or build this file.
 
 /* [View] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "drinks-body"; // [assembled, exploded, coffee-body, coffee-lid, coffee-base, drinks-body, drinks-lid, drinks-base, base-fit, base-insertion, coffee-base-fit, coffee-base-insertion, drinks-base-fit, drinks-base-insertion, coffee-lid-fit, coffee-lid-insertion, drinks-lid-fit, drinks-lid-insertion]
 explode_gap = 35; // mm, separation above each seated piece
 
@@ -532,4 +536,17 @@ module beverage_station() {
     else assert(false, str("Unknown show: ", show));
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_0052e1c1606e() {
 beverage_station();
+}
+
+module feral_assembly_view_0052e1c1606e(explode=false) {
+station(explode);
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_0052e1c1606e();
+else feral_assembly_view_0052e1c1606e(view == "exploded");

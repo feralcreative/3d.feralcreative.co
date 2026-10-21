@@ -15,7 +15,9 @@
 #   utils/finalize.sh slim-can-holder-3in-explicit slim-can-holder-3in-censored
 #   utils/finalize.sh 'delonghi-heater-stand*'    # every name that matches
 #   utils/finalize.sh stl/delonghi-heater-stand*  # same, expanded by the shell
-#   utils/finalize.sh --all          # every series in stl/
+#   utils/finalize.sh --all          # every library export and legacy series
+#   utils/finalize.sh --all --push   # finalize, then upload finished STLs
+#   utils/finalize.sh --all --push --dry-run  # preview locally; no NAS contact
 #
 #   utils/finalize.sh --shitcan doorbell-wire-channel-upper   # say what would go
 #   utils/finalize.sh --shitcan --apply doorbell-wire-channel-upper
@@ -137,41 +139,34 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-if [[ "${1:-}" == --shitcan ]]; then
-  library_names=(); library_apply=()
-  for arg in "${@:2}"; do
-    if [[ "$arg" == --apply ]]; then library_apply=(--apply); else library_names+=("$arg"); fi
-  done
-  if python3 "${REPO_ROOT}/utils/library.py" can-finalize "${library_names[@]}" 2>/dev/null; then
-    exec python3 "${REPO_ROOT}/utils/library.py" discard "${library_apply[@]+"${library_apply[@]}"}" "${library_names[@]}"
-  fi
-elif [[ "${1:-}" == --all ]]; then
-  python3 "${REPO_ROOT}/utils/library.py" finalize --all
-elif [[ "${1:-}" != --shitcan ]] && python3 "${REPO_ROOT}/utils/library.py" can-finalize "$@" 2>/dev/null; then
-  exec python3 "${REPO_ROOT}/utils/library.py" finalize "$@"
-fi
 OUTDIR="${OUTDIR:-${REPO_ROOT}/stl}"
 
 usage() {
   echo "usage: $0 <name> [<name>...]" >&2
   echo "       $0 '<pattern>' [...]     quoted: zsh will not hand over an unmatched glob" >&2
   echo "       $0 stl/<name>*           or a path it can expand" >&2
-  echo "       $0 --all" >&2
+  echo "       $0 --all [--push] [--dry-run]" >&2
   echo "       $0 --shitcan [--apply] <name> [<name>...]" >&2
   echo >&2
   echo "  <name> is an output name (build.sh --name), not a .scad path." >&2
-  exit 64
+  echo "  --push uploads finished STLs after a successful --all cleanup." >&2
+  echo "  --dry-run previews --all without changing files or contacting the NAS." >&2
+  exit "${1:-64}"
 }
 
 SHITCAN=0
 APPLY=0
+PUSH=0
+DRY_RUN=0
 ARGS=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --shitcan)  SHITCAN=1; shift ;;
     --apply|-y) APPLY=1; shift ;;
     --all)      ARGS[${#ARGS[@]}]="--all"; shift ;;
-    -h|--help)  usage ;;
+    --push)     PUSH=1; shift ;;
+    --dry-run|-n) DRY_RUN=1; shift ;;
+    -h|--help)  usage 0 ;;
     -*)         echo "error: unknown option: $1" >&2; usage ;;
     *)          ARGS[${#ARGS[@]}]="$1"; shift ;;
   esac
@@ -187,14 +182,65 @@ if [[ "$SHITCAN" -eq 1 && "$1" == "--all" ]]; then
   echo "error: --shitcan takes names, never --all" >&2
   exit 64
 fi
+if [[ " $* " == *" --all "* && ( "$#" -ne 1 || "$1" != --all ) ]]; then
+  echo "error: --all takes no names or patterns" >&2
+  exit 64
+fi
+if [[ "$PUSH" -eq 1 || "$DRY_RUN" -eq 1 ]]; then
+  if [[ "$SHITCAN" -eq 1 || "$#" -ne 1 || "$1" != --all ]]; then
+    echo "error: --push and --dry-run require --all" >&2
+    exit 64
+  fi
+fi
+
+# Publish only after every finalizer succeeds. A preview never calls rsync:
+# even rsync --dry-run would open an SSH connection to the live NAS.
+publish_all() {
+  [[ "$PUSH" -eq 1 ]] || return 0
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ "$(basename "$REPO_ROOT")" == cad && -f "$REPO_ROOT/../utils/models.sh" ]]; then
+      echo "Would stage and publish the complete model catalog with root utils/models.sh --push after finalization."
+    else
+      echo "Would upload finished STLs with utils/deploy/prod.sh after finalization."
+    fi
+    echo "Publication exclusions and protected source assets remain excluded."
+    echo "No files changed; no NAS connection made."
+  else
+    if [[ "$(basename "$REPO_ROOT")" == cad && -f "$REPO_ROOT/../utils/models.sh" ]]; then
+      bash "$REPO_ROOT/../utils/models.sh" --push
+    else
+      "${REPO_ROOT}/utils/deploy/prod.sh"
+    fi
+  fi
+}
+
+# Parse and validate all flags before either finalizer can change anything.
+if [[ "$SHITCAN" -eq 1 ]]; then
+  library_apply=()
+  [[ "$APPLY" -eq 0 ]] || library_apply=(--apply)
+  if python3 "${REPO_ROOT}/utils/library.py" can-finalize "$@" 2>/dev/null; then
+    exec python3 "${REPO_ROOT}/utils/library.py" discard "${library_apply[@]+"${library_apply[@]}"}" "$@"
+  fi
+elif [[ "$1" == --all ]]; then
+  library_flags=(--all)
+  [[ "$DRY_RUN" -eq 0 ]] || library_flags+=(--dry-run)
+  python3 "${REPO_ROOT}/utils/library.py" finalize "${library_flags[@]}"
+  if [[ ! -d "$OUTDIR" ]]; then
+    publish_all
+    exit 0
+  fi
+elif python3 "${REPO_ROOT}/utils/library.py" can-finalize "$@" 2>/dev/null; then
+  exec python3 "${REPO_ROOT}/utils/library.py" finalize "$@"
+fi
 
 [[ -d "$OUTDIR" ]] || { echo "error: no such directory: $OUTDIR" >&2; exit 66; }
 
-# Every name in stl/ that has at least one -vNN.stl beside it. Uses the same
-# two-digit-minimum shape build.sh stamps, so a v100 series is still found.
+# Include plain files too, so --all sweeps their coupons and renders even
+# when they have no numbered drafts left.
 all_names() {
-  find "$OUTDIR" -name '*-v[0-9][0-9]*.stl' -print \
-    | sed 's|.*/||; s|-v[0-9][0-9]*\.stl$||' \
+  find "$OUTDIR" -name '*.stl' -print \
+    | sed 's|\.stl$||' \
+    | sed 's|.*/||; s|-v[0-9][0-9]*$||' \
     | sort -u
 }
 
@@ -300,7 +346,7 @@ NAMES=()
 if [[ "$1" == "--all" ]]; then
   [[ $# -eq 1 ]] || { echo "error: --all takes no other arguments" >&2; exit 64; }
   while IFS= read -r n; do [[ -n "$n" ]] && NAMES+=("$n"); done < <(all_names | drop_coupons)
-  [[ "${#NAMES[@]}" -gt 0 ]] || { echo "nothing to finalize: no versioned STLs in $OUTDIR"; exit 0; }
+  [[ "${#NAMES[@]}" -gt 0 ]] || { echo "nothing to finalize in $OUTDIR"; publish_all; exit 0; }
 elif [[ "$SHITCAN" -eq 1 ]]; then
   expanded="$(expand_names shitcan "$@")"
   while IFS= read -r n; do [[ -n "$n" ]] && NAMES+=("$n"); done <<< "$expanded"
@@ -337,7 +383,7 @@ sweep_renders() {
       printf '  %-40s note: %s is tracked, left alone\n' "" "$(basename "$f")" >&2
       continue
     fi
-    rm -f "$f"
+    [[ "$DRY_RUN" -eq 1 ]] || rm -f "$f"
     n=$((n + 1))
   done
   echo "$n"
@@ -353,7 +399,7 @@ sweep_coupons() {
       printf '  %-40s note: %s is tracked, left alone\n' "" "$(basename "$f")" >&2
       continue
     fi
-    rm -f "$f"
+    [[ "$DRY_RUN" -eq 1 ]] || rm -f "$f"
     n=$((n + 1))
   done < <(find "$dir" -maxdepth 1 -name "${name}-*coupon*.stl")
   echo "$n"
@@ -421,16 +467,16 @@ finalize_one() {
 
   # Drop the link before the move, or mv would write through it and land the
   # mesh back on top of itself. build.sh guards the same trap for --no-version.
-  [[ -L "$plain" ]] && rm "$plain"
+  if [[ "$DRY_RUN" -eq 0 && -L "$plain" ]]; then rm "$plain"; fi
 
   if [[ -n "$keep" ]]; then
-    mv "$keep" "$plain"
+    [[ "$DRY_RUN" -eq 1 ]] || mv "$keep" "$plain"
   fi
 
   local removed=0
   for f in "${versions[@]}"; do
     [[ "$f" == "$keep" ]] && continue
-    rm -f "$f"
+    [[ "$DRY_RUN" -eq 1 ]] || rm -f "$f"
     removed=$((removed + 1))
   done
 
@@ -524,7 +570,11 @@ if [[ "$SHITCAN" -eq 1 ]]; then
   exit 0
 fi
 
-echo "== finalizing in $OUTDIR"
+if [[ "$DRY_RUN" -eq 1 ]]; then
+  echo "== preview in $OUTDIR (the following changes would be made)"
+else
+  echo "== finalizing in $OUTDIR"
+fi
 failed=0
 for n in "${NAMES[@]}"; do
   finalize_one "$n" || failed=$((failed + 1))
@@ -532,5 +582,10 @@ done
 
 echo
 echo "docs/stl-versions.txt is unchanged — a rebuild resumes at the next number."
-echo "Renders are gone with the drafts — utils/render.sh remakes them."
+if [[ "$DRY_RUN" -eq 1 ]]; then
+  echo "Preview only — no files changed."
+else
+  echo "Renders are gone with the drafts — utils/render.sh remakes them."
+fi
 [[ "$failed" -eq 0 ]] || exit 1
+publish_all

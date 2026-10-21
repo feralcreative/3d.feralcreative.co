@@ -42,7 +42,10 @@
     "docs/fabric-cube-placard-6x4.md": "docs/fabric-cube-placard-6x4.md",
     "docs/fabric-cube-placard-60x40.md": "docs/fabric-cube-placard-60x40.md"
   },
-  "publish_exports": [],
+  "publish_exports": [
+    "fabric-cube-placard-60x40",
+    "fabric-cube-placard-6x4"
+  ],
   "protected_assets": [
     "docs/office/bin-label-test-260723T1719Z.pdf",
     "docs/office/bin-labels.pdf",
@@ -51,8 +54,34 @@
   ],
   "additional_scad_files": [],
   "licenses": [],
-  "draft_exports": [
-    "fabric-cube-placard-60x40",
-    "fabric-cube-placard-6x4"
-  ]
+  "draft_exports": [],
+  "assembly_view_sources": {
+    "fabric-cube-placard-60x40.scad": {
+      "kind": "single-part"
+    },
+    "fabric-cube-placard-6x4.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "fabric-cube-placard-60x40.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "fabric-cube-placard-60x40.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

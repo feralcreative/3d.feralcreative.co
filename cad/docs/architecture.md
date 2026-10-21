@@ -45,18 +45,20 @@ Every preset is two files: the `.json` with the settings and a `.info` sidecar t
 
 ## The join to the printer site
 
-`~/www/feral/3d.feralcreative.co` streams live video from the printer with a status overlay and serves an in-browser STL viewer, deployed as a Docker container on the Synology NAS. The two repos share no code and no history. They are joined by exactly one directory:
+The canonical project is `~/www/feralcreative/3d.feralcreative.co`, with website source at the root and this CAD toolchain under `cad/`. Both histories are preserved in the unified repository. The website streams printer video, displays status, and serves the model catalog. Publication remains independent of an application rebuild through the existing models bind mount:
 
 ```text
-this repo                 build.sh --push renders + rsyncs
+cad/library/              utils/models.sh stages selected files and catalog
     │
     ▼
-NAS: /volume1/web/3d-printer-stream/public/models/*.stl
+NAS: /volume1/web/3d-printer-stream/public/models/
     │                     bind-mounted into the container
     ▼
-3d.feralcreative.co       viewer serves them at /models
+3d.feralcreative.co       catalog-driven viewer serves them at /models
 ```
 
 Retained STL deliverables are committed with their model here. Publication still uses rsync to the NAS: the publisher selects declared retained exports, or current workspace outputs with `--all`, and refuses duplicate filenames because the NAS directory is flat. A published STL appears in the viewer without a site rebuild because that directory is a bind mount.
+
+The unified root `utils/models.sh` stages every model entry, selected retained files, and cached coloured GLB views into `cad/_work/site-models/`. `--render-colours` evaluates configured SCAD presentations through native coloured 3MF and converts them into standard metre/Y-up GLB with linear material factors. `--push` sends the selected asset set followed by `catalog.json`; unrelated NAS files are preserved. Imported meshes and source-only entries remain visible according to availability. The website consumes explicit formats rather than rewriting every model to STL. See the unified root `docs/model-catalog.md` for the contract.
 
 `--push` writes to a live production host. It is opt-in, and only on Ziad's explicit request.

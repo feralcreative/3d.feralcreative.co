@@ -24,11 +24,37 @@
     "renders/simplisafe-wire-guide-zminus.png": "_work/renders/simplisafe-wire-guide-zminus.png",
     "renders/simplisafe-wire-guide-zplus.png": "_work/renders/simplisafe-wire-guide-zplus.png"
   },
-  "publish_exports": [],
+  "publish_exports": [
+    "simplisafe-wire-guide"
+  ],
   "protected_assets": [],
   "additional_scad_files": [],
   "licenses": [],
-  "draft_exports": [
-    "simplisafe-wire-guide"
-  ]
+  "draft_exports": [],
+  "assembly_view_sources": {
+    "simplisafe-wire-guide.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "simplisafe-wire-guide.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "simplisafe-wire-guide.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

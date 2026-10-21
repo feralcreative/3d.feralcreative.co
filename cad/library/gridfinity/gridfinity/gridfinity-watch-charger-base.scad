@@ -4,6 +4,10 @@
 // The stacking lip is omitted so the deck is a plain flat surface.
 // Rear is +Y: the 32.5 mm face has a cable channel that scoops upward.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-magnets.scad>
 include <../../../lib/BOSL2/std.scad>
 
@@ -99,4 +103,18 @@ module block_base() {
   }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_fc65883d7c1b() {
 block_base();
+}
+
+module feral_assembly_view_fc65883d7c1b(explode=false) {
+feral_default_output_fc65883d7c1b();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_fc65883d7c1b();
+else feral_assembly_view_fc65883d7c1b(view == "exploded");

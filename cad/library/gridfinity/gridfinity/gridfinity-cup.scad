@@ -11,6 +11,10 @@
 //   utils/build.sh parts/gridfinity/gridfinity-cup.scad \
 //     -D 'width=2' -D 'depth=2' -D 'height=6' --name gridfinity-cup-2x2x6
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-magnets.scad>
 use <gridfinity_cup_modules.scad>
 
@@ -33,6 +37,11 @@ lip_style = "normal";   // [normal, reduced, none]
 
 $fn = 48;
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_1423db6f9a04() {
 difference() {
   basic_cup(num_x = width, num_y = depth, num_z = height,
             chambers = chambers,
@@ -50,3 +59,12 @@ difference() {
     magnet_cavities(width, depth, magnet_hole_d, magnet_cav_h, magnet_skin);
   }
 }
+}
+
+module feral_assembly_view_1423db6f9a04(explode=false) {
+feral_default_output_1423db6f9a04();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_1423db6f9a04();
+else feral_assembly_view_1423db6f9a04(view == "exploded");

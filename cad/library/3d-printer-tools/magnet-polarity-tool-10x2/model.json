@@ -180,5 +180,31 @@
     "_incoming/the-magic-magnet-polarity-tool-v2-model_files/Tool Covers/Magnet Tool Cover Texture D.stl": "originals/the-magic-magnet-polarity-tool-v2-model_files/Tool Covers/Magnet Tool Cover Texture D.stl",
     "_incoming/the-magic-magnet-polarity-tool-v2-model_files/magnet-tool-cover-tall.stl": "originals/the-magic-magnet-polarity-tool-v2-model_files/magnet-tool-cover-tall.stl",
     "_incoming/the-magic-magnet-polarity-tool-v2-model_files/magnet-tool-threads.stl": "originals/the-magic-magnet-polarity-tool-v2-model_files/magnet-tool-threads.stl"
+  },
+  "assembly_view_sources": {
+    "magnet-polarity-tool-10x2.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "magnet-polarity-tool-10x2.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "magnet-polarity-tool-10x2.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
   }
 }

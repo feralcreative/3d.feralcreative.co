@@ -129,7 +129,7 @@ class LibraryWorkflow(unittest.TestCase):
         (self.model/'model.json').write_text(json.dumps(self.metadata))
         self.assertEqual(self.run_tool('library','publish-files','--all').stdout,'')
 
-    def test_prod_publishes_library_exports_with_or_without_legacy_directory(self):
+    def prepare_publisher(self):
         deploy=self.root/'utils/deploy';deploy.mkdir()
         shutil.copy2(REPO/'utils/deploy/prod.sh',deploy/'prod.sh')
         config=self.root/'.vscode';config.mkdir()
@@ -139,6 +139,10 @@ class LibraryWorkflow(unittest.TestCase):
         calls=self.root/'rsync-calls.json'
         (bin_dir/'rsync').write_text("#!/usr/bin/env python3\nimport json,pathlib,sys\npathlib.Path("+repr(str(calls))+").write_text(json.dumps(sys.argv[1:]))\n")
         for name in ['jq','rsync']:(bin_dir/name).chmod(0o755)
+        return calls
+
+    def test_prod_publishes_library_exports_with_or_without_legacy_directory(self):
+        calls=self.prepare_publisher()
         (self.model/'sample.stl').write_bytes(b'approved')
         (self.root/'stl').rmdir()
         for legacy in [False,True]:
@@ -152,6 +156,82 @@ class LibraryWorkflow(unittest.TestCase):
                 self.assertIn(str(self.model/'sample.stl'),args)
                 self.assertIn('--dry-run',args)
                 if legacy:self.assertIn(str(self.root/'stl/legacy.stl'),args)
+
+    def test_finalize_all_push_handles_library_only_and_legacy_outputs(self):
+        calls=self.prepare_publisher()
+        self.metadata.update(publish_exports=['sample'],draft_exports=['sample'])
+        (self.model/'model.json').write_text(json.dumps(self.metadata))
+        (self.root/'stl').rmdir()
+        for legacy in [False,True]:
+            with self.subTest(legacy=legacy):
+                self.run_tool('build','sample');self.run_tool('slice','sample')
+                ledger=(self.root/'docs/stl-versions.txt').read_bytes()
+                if legacy:
+                    folder=self.root/'stl/nested';folder.mkdir(parents=True)
+                    for name,data in [('legacy.stl',b'current'),('legacy-v02.stl',b'old'),('plain.stl',b'plain'),('plain-coupon.stl',b'coupon')]:
+                        (folder/name).write_bytes(data)
+                self.run_tool('finalize','--push','--all')
+                self.assertEqual((self.model/'sample.stl').read_bytes(),b'mesh or image')
+                self.assertEqual((self.model/'sample.3mf').read_bytes(),b'job')
+                self.assertFalse(list((self.model/'_work/stl').glob('*-v*.stl')))
+                self.assertEqual((self.root/'docs/stl-versions.txt').read_bytes(),ledger)
+                self.assertEqual(json.loads((self.model/'model.json').read_text())['draft_exports'],[])
+                args=json.loads(calls.read_text())
+                self.assertIn(str(self.model/'sample.stl'),args)
+                self.assertNotIn(str(self.model/'_work/stl/sample.stl'),args)
+                self.assertNotIn('--all',args)
+                if legacy:
+                    self.assertIn(str(folder/'legacy.stl'),args)
+                    self.assertIn(str(folder/'plain.stl'),args)
+                    self.assertFalse((folder/'legacy-v02.stl').exists())
+                    self.assertFalse((folder/'plain-coupon.stl').exists())
+
+    def test_bulk_preview_preserves_every_file_and_never_calls_publisher(self):
+        calls=self.prepare_publisher()
+        self.run_tool('build','sample');self.run_tool('render','sample');self.run_tool('slice','sample')
+        folder=self.root/'stl/nested';folder.mkdir()
+        for name in ['legacy.stl','legacy-v01.stl','legacy-coupon.stl']:(folder/name).write_bytes(b'keep')
+        def snapshot():
+            return {str(p.relative_to(self.root)):p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+        before=snapshot()
+        result=self.run_tool('finalize','--all','--push','--dry-run')
+        self.assertEqual(before,snapshot())
+        self.assertIn('Would finalize sample: sample',result.stdout)
+        self.assertIn('Would upload finished STLs',result.stdout)
+        self.assertFalse(calls.exists())
+
+    def test_invalid_bulk_flags_fail_before_any_cleanup(self):
+        calls=self.prepare_publisher()
+        self.run_tool('build','sample')
+        for args in [('--all','--typo'),('--all','sample'),('sample','--all'),('--push','sample'),('--shitcan','--all','--push'),('--all','--apply')]:
+            with self.subTest(args=args):
+                self.run_tool('finalize',*args,ok=False)
+                self.assertFalse((self.model/'sample.stl').exists())
+                self.assertTrue((self.model/'_work/stl/sample-v08.stl').exists())
+                self.assertFalse(calls.exists())
+
+    def test_blocked_finalization_prevents_bulk_cleanup_and_upload(self):
+        calls=self.prepare_publisher()
+        self.run_tool('build','sample')
+        other=self.root/'library/z/blocked';other.mkdir(parents=True)
+        (other/'blocked.scad').write_text('cube(1);')
+        (other/'blocked.stl').write_bytes(b'original source')
+        (other/'model.json').write_text(json.dumps({'id':'blocked','scad':'blocked.scad','scad_files':['blocked.scad'],'exports':['blocked'],'protected_assets':['blocked.stl']}))
+        work=other/'_work/stl';work.mkdir(parents=True);(work/'blocked.stl').write_bytes(b'generated')
+        self.run_tool('finalize','--all','--push',ok=False)
+        self.assertEqual((other/'blocked.stl').read_bytes(),b'original source')
+        self.assertFalse((self.model/'sample.stl').exists())
+        self.assertTrue((self.model/'_work/stl/sample-v08.stl').exists())
+        self.assertFalse(calls.exists())
+
+    def test_bulk_upload_failure_is_reported_after_local_finalization(self):
+        self.prepare_publisher()
+        (self.root/'bin/rsync').write_text('#!/usr/bin/env bash\nexit 23\n')
+        self.run_tool('build','sample')
+        result=self.run_tool('finalize','--all','--push',ok=False)
+        self.assertEqual(result.returncode,23)
+        self.assertTrue((self.model/'sample.stl').exists())
+        self.assertFalse(list((self.model/'_work/stl').glob('*-v*.stl')))
 
     def test_finalize_accepts_a_legacy_mesh_path(self):
         self.run_tool('build','sample')

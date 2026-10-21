@@ -87,5 +87,37 @@
     "originals/woodworking-tools/simple-chalk-holder-model_files/nut_round.stl"
   ],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "chalk-holder-handle.scad": {
+      "kind": "single-part"
+    },
+    "chalk-holder-tip.scad": {
+      "kind": "single-part"
+    },
+    "hobbs-chalk-holder.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "hobbs-chalk-holder.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "hobbs-chalk-holder.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

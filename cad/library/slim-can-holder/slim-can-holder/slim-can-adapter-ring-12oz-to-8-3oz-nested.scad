@@ -42,4 +42,4 @@ host_od = 84.84;
 
 /* [Colors] */
 
-ring_color = "Coral";
+ring_color = "#90A553";

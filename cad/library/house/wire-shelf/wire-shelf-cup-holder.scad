@@ -1,6 +1,10 @@
 // Cup holder using the physically proven box-platform mounting channel.
 // +X runs along the shelf, +Y points away from it, +Z is up in use.
 // Reuse the exact channel cutter; do not redraw or rescale the wire seats.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 use <wire-shelf-box-platform.scad>
 use <wire-shelf-dovetail.scad>
 
@@ -134,6 +138,10 @@ module cup_envelope(extra_h = 0) {
                  r = (inner_r - probe_clearance) / cos(180 / cup_facets), $fn = cup_facets);
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_93f430a32545() {
 if (show == "print-set") { holder_body_pose() holder_body(); holder_set_rail_pose() holder_rail(); }
 else if (show == "holder") cup_holder();
 else if (show == "body") holder_body_pose() holder_body();
@@ -181,3 +189,12 @@ else if (show == "assembly") {
             cube([wall_t, cup_y + outer_r + 2 * eps, rim_z + 2 * eps]);
     }
 }
+}
+
+module feral_assembly_view_93f430a32545(explode=false) {
+color("SteelBlue") translate([0,0,explode ? 35 : 0]) holder_body(); color("DarkOrange") holder_rail();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_93f430a32545();
+else feral_assembly_view_93f430a32545(view == "exploded");

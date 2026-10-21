@@ -31,6 +31,10 @@
 //   utils/build.sh parts/can-light-trim.scad -D 'show="lens"' --name can-light-lens
 
 /* [View] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "assembly"; // [assembly, section, trim, lens]
 
 /* [Measured] */
@@ -170,6 +174,10 @@ module assembly() {
     translate([0, 0, flange_t]) lens();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_5a0f99d4c6ff() {
 if (show == "trim") trim();
 else if (show == "lens") lens();
 else if (show == "section")
@@ -178,3 +186,12 @@ else if (show == "section")
         translate([-flange_r - 1, -2*flange_r, -1]) cube([2*flange_r + 2, 2*flange_r, collar_top + 2]);
     }
 else assembly();
+}
+
+module feral_assembly_view_5a0f99d4c6ff(explode=false) {
+trim(); translate([0,0,flange_t+(explode ? 35 : 0)]) lens();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_5a0f99d4c6ff();
+else feral_assembly_view_5a0f99d4c6ff(view == "exploded");

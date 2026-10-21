@@ -81,6 +81,10 @@
 /* [Overall] */
 
 // Extrusion depth. 2 in on the reference.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 width       = 50.8;   // mm
 
 // Fall of the top face, measured from horizontal.
@@ -307,5 +311,19 @@ module door_stop_coupon() {
     }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_0c911c45941c() {
 if (show == "coupon") door_stop_coupon();
 else                  door_stop();
+}
+
+module feral_assembly_view_0c911c45941c(explode=false) {
+feral_default_output_0c911c45941c();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_0c911c45941c();
+else feral_assembly_view_0c911c45941c(view == "exploded");

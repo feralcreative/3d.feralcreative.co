@@ -87,6 +87,10 @@
 // COUPON-COMPONENTS: handle=coupon-handle ring=ring
 // COUPON-PLATE: coupon
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/threading.scad>
 include <../../../logos/marks.scad>
@@ -1492,4 +1496,18 @@ module chalk_holder() {
             chalk_holder_ring();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_418ae8fd1110() {
 chalk_holder();
+}
+
+module feral_assembly_view_418ae8fd1110(explode=false) {
+color("DarkOrange") chalk_holder_handle();
+color("SteelBlue") translate([0,0,handle_z_collar+ring_height+(explode ? 35 : 0)]) rotate([180,0,0]) chalk_holder_ring();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_418ae8fd1110();
+else feral_assembly_view_418ae8fd1110(view == "exploded");

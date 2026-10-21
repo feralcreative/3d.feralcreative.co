@@ -3,16 +3,16 @@
 ## Authorization and verification
 
 - Require explicit task-specific permission before deploying, transferring files, touching a remote server, or changing cloud state.
-- Read the installed `ziad-deploy-workflows` skill before modifying or running deployment scripts.
+- Use the `personal-knowledge` skill’s migrated deployment procedures (`references/docs/DEPLOY_SCRIPT_INSTRUCTIONS.md`) when modifying deployment scripts. This repository uses the existing standalone Docker-on-NAS flow; the former `ziad-deploy-workflows` skill is not installed here.
 - Use the existing `utils/deploy/` entrypoints; do not create a separate release mechanism for a documentation change.
-- Deployment and rollback execution: TBD.
+- The revised deployment flow has passed isolated tests and an offline dry run. A real release with this revision and rollback execution remain unverified.
 - The 2026-09-28 documentation pass read local source only; it did not verify the running production system.
 
 ## Build-context prerequisites
 
 - Obtain private `config.js`, `server.js`, and `printer-proxy-server.js` from Ziad through the established private configuration channel.
 - Do not overwrite populated private files with examples. The examples omit configuration keys and endpoints required by the current app.
-- Obtain generated CSS through the existing Live Sass Compile workflow.
+- `npm run build` generates expanded and minified CSS before Vite. For local watch mode, use `npm start`.
 - Resolve model availability with Ziad before building; do not silently remove missing model references.
 - Docker invokes `npm ci` in its stages, while Git ignores the lockfile. Confirm the local build context includes a valid lockfile before an authorized container build.
 - `requirements.txt` currently has no active PyMeshLab dependency. The Docker Python install tolerates failure; container build success does not prove repair support.
@@ -35,13 +35,45 @@
 - Never put the contents of these files into a commit, diagnostic dump, or chat response.
 - Keep all credentials out of the new canonical docs, including masked forms and URL query values.
 
-## Existing release mechanism
+## Production release command
 
-- The private `utils/deploy/prod.sh` builds an image, saves and transfers it over SSH, loads it remotely, applies Compose, and purges Cloudflare cache.
-- Its current source does not implement the standard dry-run, force, help, or Git-state gates. Do not invoke it with a supposed harmless flag to inspect behavior.
-- `utils/deploy/deploy-utils.sh` includes operations that contact and mutate the remote system; even log or status access requires the user's remote-access authorization.
-- The checked-in `.example.sh` files are templates, not configured deployment commands.
-- Preserve the existing Debian-based Docker package installation and Nginx/PHP paths; a prior partial Alpine conversion broke those assumptions.
-- Preserve host networking and the data, logs, and models mounts unless the deployment task explicitly changes them.
-- Preserve unbuffered proxying and the extended read timeout for MJPEG streams.
-- Verify the image running remotely and the requested application behavior after an authorized release; a local build or image transfer is not deployment confirmation.
+Run from any working directory; the entrypoint resolves the unified repository root:
+
+```bash
+utils/deploy/prod.sh --help
+utils/deploy/prod.sh --dry-run
+utils/deploy/prod.sh
+```
+
+The script requires a clean working tree on `main`. `--force` permits a dirty tree or another branch; it never bypasses the production confirmation prompt. An offline preview in the current working checkout can use `utils/deploy/prod.sh --dry-run --force`. Help has no side effects; dry-run validates the publication destination and prints the plan without loading `.env`, generating models, building an image, contacting the NAS, uploading, restarting services or purging caches.
+
+A real invocation performs these steps in order:
+
+1. Confirm the CAD publisher uses the same SSH destination and models volume as the application. Check the private runtime files and lockfile required by the Docker build. Ask for `yes` before doing release work, then load `.env` without splitting quoted values.
+2. Refresh the complete catalog and all configured coloured presentations through `utils/models.sh --render-colours`. Reject failed configured views, missing or incomplete selected files, unsafe paths and SHA-256 mismatches. Conversion warnings for retained unsupported originals do not by themselves block deployment.
+3. Build the existing Linux/AMD64 Docker image. Run the image with a Node-only entrypoint to check entry HTML, its bundles/CSS, copied classic scripts, manifest and environment maps. This artifact check does not start the production proxy or printer monitor. Save the image to a temporary compressed archive.
+4. Transfer/load the image, then invoke the existing CAD publisher with the selected SSH identity. It dereferences staging links, checksums file transfers, preserves unrelated remote files and publishes `catalog.json` only after the selected assets succeed. A publication failure stops before the application container is recreated.
+5. Transfer Compose and run `up -d --force-recreate`. Host networking and existing data/log/model mounts are preserved. The script does not run `down` first.
+6. Verify the running container uses the loaded image; check the deployed catalog hash and every selected asset's presence/size inside the model mount. Retry startup checks through Nginx, then verify the public HTTPS routes. Both `/models` spellings and the catalog must work, and representative STL and GLB downloads must return the right MIME type, byte count and SHA-256. A failure prevents the success summary.
+7. Purge Cloudflare cache when configured; a purge failure is non-fatal. Print the verified release summary and remove the local image archive on exit.
+
+The app and library remain separate storage concerns, but the production entrypoint now coordinates both. Generated catalog assets stay out of the Docker context. Local CAD-only updates can still use `utils/models.sh --push` when explicitly authorized. The CAD publisher respects `SSH_KEY_PATH`, including paths containing spaces; otherwise SSH uses its normal configured identity/agent.
+
+## Verification and limits
+
+```bash
+bash -n utils/deploy/prod.sh cad/utils/deploy/catalog.sh
+python3 utils/test-prod-deploy.py
+node --check utils/verify-model-deployment.mjs
+node --test utils/verify-model-deployment.test.mjs
+python3 cad/utils/test-catalog-publish.py
+python3 cad/utils/test-web-library.py
+npm run build
+node utils/verify-model-deployment.mjs --build dist
+```
+
+The production-entrypoint tests use isolated fake Git, Docker, SSH, publication and cache-purge commands. They cover offline/help behavior, Git gates, confirmation, mismatched destinations, asset validation, release ordering, identity paths containing spaces, publication/build/verification failures and non-fatal cache purge. The suite skips if the ignored private entrypoint is unavailable in a clean checkout. The Node tests use temporary files and a loopback HTTP fixture, including catalog outages, HTML returned for model routes, truncated/wrong downloads and redirects. Publisher tests prove asset-first/catalog-last ordering and transfer-failure propagation. Exporter regression coverage also checks case-only filename collisions, including stale staging symlinks, without modifying originals. These are not a live release or container-runtime verification.
+
+Preserve the Debian-based package installation, Nginx/PHP paths, host networking, persistent mounts, unbuffered proxying and extended stream timeouts. Nginx serves the exact `/models` and `/models/` HTML routes; it proxies the effective catalog/listing to the model-management middleware and checks model-file visibility through an internal subrequest. `utils/verify-model-deployment.mjs` is copied into the runtime image with the existing `utils/` copy.
+
+The private `utils/deploy/deploy-utils.sh` remains the management entrypoint; it includes remote mutations, and even its log/status reads require remote-access authorization. Checked-in `.example.sh` files remain templates. Production restarts, public sign-in, printer/stream behavior, real Cloudflare purge and rollback remain separate runtime checks. No actual deployment was performed while modifying the script.

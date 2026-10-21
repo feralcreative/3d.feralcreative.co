@@ -1,0 +1,14 @@
+{
+    "from": "User",
+    "inherits": "0.12mm Fine @Flashforge AD5M Pro 0.4 Nozzle",
+    "name": "0.12mm Fine @AD5M Pro 0.4 - Pumpkin Rim Supports",
+    "print_settings_id": "0.12mm Fine @AD5M Pro 0.4 - Pumpkin Rim Supports",
+    "enable_support": "1",
+    "support_type": "tree(manual)",
+    "support_style": "tree_slim",
+    "support_on_build_plate_only": "0",
+    "support_top_z_distance": "0.3",
+    "version": "2.1.1.0",
+    "type": "process",
+    "reduce_crossing_wall": "1"
+}

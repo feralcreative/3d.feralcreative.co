@@ -337,6 +337,7 @@ _PLANS
 !library/**/*.rtf
 !library/**/LICENSE.txt
 library/**/_work/
+_work/
 
 # BOSL2 is expected at lib/BOSL2 as a git submodule.
 # If you'd rather vendor it as a plain clone instead, uncomment:

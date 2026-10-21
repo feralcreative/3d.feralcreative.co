@@ -21,5 +21,31 @@
   "openscad_args": [
     "--enable=textmetrics"
   ],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "zr-monogram-stamp-2026.scad": {
+      "kind": "single-part"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "zr-monogram-stamp-2026.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "zr-monogram-stamp-2026.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

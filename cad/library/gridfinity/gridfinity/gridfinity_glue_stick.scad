@@ -1,3 +1,7 @@
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity_modules.scad>
 
 cup_height = 5;
@@ -6,8 +10,7 @@ easement_z = 0.7; // a slightly large opening at the top for compliance while in
 minimum_wall = 4;
 blocks_needed = ceil((stick_diameter+2*minimum_wall)/gridfinity_pitch);
 
-render()
-glue_stick_cup(blocks_needed, blocks_needed, cup_height);
+
 
 
 module glue_stick_cup(num_x=1, num_y=1, num_z=2) {
@@ -23,3 +26,18 @@ module glue_stick(num_z=5, diam) {
   translate([0, 0, (num_z - easement_z)*gridfinity_zpitch + 1.2]) 
     cylinder(h=easement_z*gridfinity_zpitch, d1=diam, d2=diam*1.1);
 }
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_d7292064de81() {
+render()
+glue_stick_cup(blocks_needed, blocks_needed, cup_height);
+}
+
+module feral_assembly_view_d7292064de81(explode=false) {
+feral_default_output_d7292064de81();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_d7292064de81();
+else feral_assembly_view_d7292064de81(view == "exploded");

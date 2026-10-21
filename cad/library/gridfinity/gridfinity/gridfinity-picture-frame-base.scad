@@ -3,6 +3,10 @@
 // The flat floor carries it; surrounding walls locate it without a press fit.
 // No stacking lip: the frame occupies this base while in use.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 include <gridfinity-magnets.scad>
 include <../../../lib/BOSL2/std.scad>
 
@@ -71,4 +75,18 @@ module picture_frame_base() {
   }
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.
+module feral_default_output_84c73e659604() {
 picture_frame_base();
+}
+
+module feral_assembly_view_84c73e659604(explode=false) {
+feral_default_output_84c73e659604();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_84c73e659604();
+else feral_assembly_view_84c73e659604(view == "exploded");

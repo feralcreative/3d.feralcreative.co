@@ -7,6 +7,10 @@
 // Glue the pin/head/shaft and the magnet; leave the threaded cover removable.
 
 /* [Output] */
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 show = "plate"; // [plate, shaft-a, shaft-b, shaft-c, shaft-d, cover-smooth, cover-b, cover-c, cover-d, head, pin, assembly, section]
 shaft_style = "A"; // [A, B, C, D]
 cover_style = "Smooth"; // [Smooth, B, C, D]
@@ -125,6 +129,10 @@ module plate() {
     translate([plate_pitch*5,-plate_pitch,0]) pin();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_9d5b72060754() {
 if (show == "plate") plate();
 else if (show == "head") head();
 else if (show == "pin") pin();
@@ -143,3 +151,16 @@ else if (show == "section") intersection() {
         cube([plate_pitch*2,plate_pitch,plate_pitch*6]);
 }
 else assert(false,str("Unknown output: ",show));
+}
+
+module feral_assembly_view_9d5b72060754(explode=false) {
+color("silver") translate([0,0,shaft_base_z]) shaft(shaft_style);
+color("orange") translate([0,0,shaft_base_z-(explode ? 25 : 0)]) rotate([180,0,0]) head();
+color("gray") translate([explode ? 20 : 0,0,pin_base_z]) pin();
+color("red",0.7) translate([0,0,explode ? -55 : 0]) rotate([0,0,cover_seated_angle]) cover_original_pose(cover_style);
+color("black") translate([explode ? -20 : 0,0,shaft_base_z-original_head_h+magnet_h_clearance]) cylinder(d=magnet_d,h=magnet_h);
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_9d5b72060754();
+else feral_assembly_view_9d5b72060754(view == "exploded");

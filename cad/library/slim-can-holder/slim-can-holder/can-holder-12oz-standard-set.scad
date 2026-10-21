@@ -18,6 +18,10 @@
 // the published sizes. They are there to show what holds what, not to check
 // a fit — the fits are the part files' business.
 
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 use <can-holder-12oz-standard.scad>
 use <slim-can-adapter-ring-12oz-standard-to-slim.scad>
 use <slim-can-adapter-ring-12oz-to-8-3oz-nested.scad>
@@ -26,7 +30,7 @@ use <slim-can-adapter-ring-12oz-to-8-3oz-nested.scad>
 
 // Which can the holder is set up for: the holder alone, with ring 1, or with
 // both rings. "lineup" puts all three side by side.
-config = "standard";   // [standard, slim-12oz, 8-3oz, lineup]
+config = "lineup";   // [standard, slim-12oz, 8-3oz, lineup]
 // Seated, or pulled apart along the axis.
 exploded = false;
 // Gap between parts when exploded (mm). Tiles move out radially by half this.
@@ -45,7 +49,7 @@ lineup_gap = 30;
 // The parts carry their own colours from their files; the cans are the only
 // thing coloured here. Alpha under 1 so the rings show through.
 can_color = "Silver";
-can_alpha = 0.45;
+can_alpha = 0.85;
 
 /* [Hidden] */
 
@@ -123,6 +127,10 @@ module scene() {
         stack(config, g);
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_2ec6c96763f6() {
 if (cut)
     difference() {
         scene();
@@ -130,3 +138,14 @@ if (cut)
     }
 else
     scene();
+}
+
+module feral_assembly_view_2ec6c96763f6(explode=false) {
+g=explode ? explode_gap : 0;
+if(config == "lineup") for(i=[0:2]) translate([(i-1)*(holder_od()+lineup_gap),0,0]) stack(["standard","slim-12oz","8-3oz"][i],g);
+else stack(config,g);
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_2ec6c96763f6();
+else feral_assembly_view_2ec6c96763f6(view == "exploded");

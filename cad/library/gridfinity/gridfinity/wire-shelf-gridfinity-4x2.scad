@@ -1,6 +1,10 @@
 // 4 x 2 Gridfinity plate that hangs off the wire shelf on the proven mount.
 // +X runs along the shelf, +Y points away from it, +Z is up in use.
 // Reuse the exact channel and wire cutters; do not redraw the wire seats.
+/* [Assembly display] */
+// default preserves the original part, coupon and print selectors.
+view = "default"; // [default, together, exploded]
+
 use <../../house/wire-shelf/wire-shelf-box-platform.scad>
 include <gridfinity-plate-modules.scad>
 
@@ -222,6 +226,10 @@ module print_pose() {
     else children();
 }
 
+
+
+// Assembly display changes placement only; the original output remains the default.
+module feral_default_output_f1292a768f5b() {
 if (show == "plate") print_pose() shelf_plate();
 else if (show == "deck") deck_pose() deck();
 else if (show == "rail") rail();
@@ -238,3 +246,12 @@ else if (show == "section") {
             cube([mount_wall_t, plate_d + 2 * mount_eps, deck_z + 20]);
     }
 }
+}
+
+module feral_assembly_view_f1292a768f5b(explode=false) {
+color("SteelBlue") translate([0,0,explode ? 35 : 0]) deck(); color("DarkOrange") rail();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_f1292a768f5b();
+else feral_assembly_view_f1292a768f5b(view == "exploded");
