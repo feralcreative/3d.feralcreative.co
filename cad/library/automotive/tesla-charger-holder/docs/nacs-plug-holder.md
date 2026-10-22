@@ -17,6 +17,7 @@ The bore is snug, 0.4 mm per side, and the hold comes from a printed cantilever 
 | Pocket position | 20.2 mm behind the plug face (spec); 21.0 mm (STEP latch window) | Both; the tooth is self-locating, so either works |
 | Tooth | 2.2 mm engagement, 65° holding face, 35° lead-in, 8 mm wide | Design |
 | Arm | 9 mm wide, tapering from 5.0 mm at the root to 3.0 mm at the tooth, 1.5 mm fillets in both root corners, rooted 10 mm behind the stop, about 30 mm from root to tooth, about 34 N at the tooth and 1.3% nominal root strain at full deflection | Design |
+| Shell | 5.5 mm around the bore and under the latch slot: 3 mm `wall` plus 2.5 mm `skin` (2026-10-21). `skin` thickens only the outside; the bore, latch, slot and screws do not move relative to the wall, and the extra behind the wall face is cut off | Design |
 
 The arm is deflection-controlled: the tooth always moves 2.2 mm, so for a given force the root strain depends on how long the arm is and how the bend is spread along it. A longer arm, thicker in proportion, gives more force at the same strain; the taper thins the outer arm so it takes more of the bend, and the fillets remove the square inside corners that roughly doubled or tripled the peak. The arm cannot get wider: the screw channels clear the slot by 0.9 mm.
 

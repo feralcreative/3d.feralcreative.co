@@ -18,6 +18,9 @@ floor_depth = 48;          // mm, the latch side of the nose stays straight to h
 relief = 6;                // mm, handle relief grown outward beyond those depths
 relief_floor_keep = 4;     // mm, floor height kept under the relief between the two depths
 end_wall = 3;              // mm, stop behind the plug face
+skin = 2.5;                // mm, extra outside thickness; pivot_z ignores it, so the bore, latch and
+                           // screws stay put and the surplus behind the wall is cut off. At 2.0 the
+                           // name's strips leave stray slivers (genus 5); 2.5 and 3 build clean
 
 /* [Latch] */
 latch_engage = 2.2;        // mm, tooth height into the connector's 4 mm-deep pocket
@@ -96,6 +99,7 @@ tooth_b = latch_hold_w + latch_engage / tan(hold_angle);
 tooth_c = tooth_b + tooth_top;
 tooth_d = tooth_c + (tooth_v - arm_top) / tan(ramp_angle);
 arm_free_w = tooth_d + 0.5;
+shell = wall + skin;
 
 assert(tooth_a > arm_root_w + 15, "the arm needs length behind the tooth to flex");
 assert(arm_free_w + arm_end_gap < bore_depth, "latch slot must end inside the full bore");
@@ -111,7 +115,7 @@ name_last = len(name_top) - 1;
 name_n = [for (i = [0 : name_last]) unit(
     (i > 0 ? out_normal(name_top[i] - name_top[i - 1]) : [0, 0]) +
     (i < name_last ? out_normal(name_top[i + 1] - name_top[i]) : [0, 0]))];
-name_pts = [for (i = [0 : name_last]) name_top[i] + (plug_clearance + wall) * name_n[i]];
+name_pts = [for (i = [0 : name_last]) name_top[i] + (plug_clearance + shell) * name_n[i]];
 name_cum = [for (i = 0, a = 0; i <= name_last;
                  a = a + (i < name_last ? norm(name_pts[i + 1] - name_pts[i]) : 0), i = i + 1) a];
 function name_seg(s) = max([0, for (i = [0 : name_last - 1]) if (name_cum[i] <= s) i]);
@@ -145,7 +149,7 @@ function name_u(g) = let(L = name_len[name_k / 2] + g,
 
 assert(name_s0 - name_span / 2 > 0 && name_s0 + name_span / 2 < name_cum[name_last],
        "the name runs off the top of the sleeve");
-assert(wall - name_depth >= 1.2, "not enough wall left behind the name");
+assert(shell - name_depth >= 1.2, "not enough wall left behind the name");
 
 // Local frame: x across the plug, y toward its top, z out of the bore.
 module plug_frame() {
@@ -166,11 +170,11 @@ module above_floor_2d(keep) {
 module sleeve() {
     intersection() {
         translate([-100, -200, 0]) cube([200, 400, body_front]);
-        plug_frame() translate([0, 0, -sleeve_back])
-            linear_extrude(sleeve_back + body_back_w, convexity = 4) hull() {
-                bore_2d(wall);
-                translate([-(arm_width / 2 + arm_side_gap + wall), low_v])
-                    square([arm_width + 2 * (arm_side_gap + wall), -low_v]);
+        plug_frame() translate([0, 0, -(sleeve_back + skin)])
+            linear_extrude(sleeve_back + skin + body_back_w, convexity = 4) hull() {
+                bore_2d(shell);
+                translate([-(arm_width / 2 + arm_side_gap + shell), low_v - skin])
+                    square([arm_width + 2 * (arm_side_gap + shell), skin - low_v]);
             }
     }
 }
@@ -287,8 +291,8 @@ module name_cut() {
             }
             // Band 0 reaches eps out past the face; the rest reach into the band above.
             translate([0, 0, -50]) linear_extrude(200, convexity = 4) difference() {
-                bore_2d(wall - d_out + eps);
-                bore_2d(wall - d_in);
+                bore_2d(shell - d_out + eps);
+                bore_2d(shell - d_in);
             }
         }
     }
