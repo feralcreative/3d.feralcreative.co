@@ -61,15 +61,15 @@ screw_y = -15.5;           // mm, below the stop's centre, so the channel clears
 /* [Name] */
 name_text = "Charlotte";
 name_font = "Gwendolyn:style=Bold"; // loaded from logos/fonts by the use<> below
-name_arc = 46;             // mm, ink width measured around the curve of the top face
-name_w = -6;               // mm, ink centre along the plug axis from the stop, negative behind it;
-                           // -6 centres the name top to bottom on the face
+name_arc = 50.6;           // mm, ink width measured around the curve of the top face
+name_w = -6.8;             // mm, ink centre along the plug axis from the stop, negative behind it;
+                           // -6.8 centres the name top to bottom on the face
 name_depth = 0.8;          // mm, deboss depth below the face
 name_taper = 70;           // deg from the face; 90 is a prismatic cut
 name_steps = 5;            // bands the taper is built from
 name_swell = 0.15;         // mm, grown onto every stroke: Gwendolyn's hairlines are thinner
                            // than a 0.4 nozzle can cut at this size
-name_strip = 0.4;          // mm, width of the flat strips the name is wrapped in
+name_strip = 0.35;         // mm, width of the flat strips the name is wrapped in
 
 /* [Coupon] */
 coupon_h = 10;             // mm, fit-test sleeve length
