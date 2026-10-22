@@ -1,6 +1,6 @@
 # NACS plug holder with spring latch
 
-Source: [nacs-plug-holder.scad](../nacs-plug-holder.scad). Replaces the imported ImBain holder (`Tesla_Charger_Holder.stl`), which Ziad found insecure.
+Source: [nacs-plug-holder.scad](../nacs-plug-holder.scad). Replaces the imported ImBain holder, which Ziad found insecure. Its STLs, and the Model S reference meshes, were removed 2026-10-21 and remain in Git history; current builds live only in `_work/stl/`.
 
 ## Why the old holder lets go
 
