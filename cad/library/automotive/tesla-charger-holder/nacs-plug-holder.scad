@@ -46,6 +46,8 @@ arm_travel_extra = 0.4;    // mm, free travel under the arm's root beyond the to
 wall = 3;                  // mm, around the bore and under the latch slot
 body_front = 60;           // mm, body depth from the wall
 body_back_w = 50;          // mm, body length along the plug axis from the stop
+mouth_round = 2;           // mm, radius rounded off every edge of the mouth, inside and out
+mouth_step = 0.25;         // mm, slab height the rounding is built from; under a layer, it vanishes in print
 
 /* [Mounting] */
 plate_t = 5;               // mm, solid base under the body
@@ -299,16 +301,44 @@ module name_cut() {
     }
 }
 
+// Rounds every edge on the plane `top` by eroding horizontal sections in thin slabs,
+// quarter-circle profile; the rest of the part passes through untouched.
+module round_top(top) {
+    n = ceil(mouth_round / mouth_step);
+    st = mouth_round / n;
+    union() {
+        intersection() {
+            children();
+            translate([-500, -500, -500]) cube([1000, 1000, 500 + top - mouth_round + eps]);
+        }
+        for (i = [0 : n - 1]) {
+            z0 = top - mouth_round + i * st;
+            h = (i + 0.5) * st;
+            d = mouth_round - sqrt(mouth_round * mouth_round - h * h);
+            translate([0, 0, z0]) linear_extrude(st + (i < n - 1 ? eps : 0), convexity = 4)
+                offset(r = -d) projection(cut = true) translate([0, 0, -(z0 + st / 2)]) children();
+        }
+    }
+}
+
+module round_mouth() {
+    if (mouth_round <= 0) children();
+    else plug_frame() round_top(body_back_w)
+        rotate([-tilt, 0, 0]) translate([0, 0, -pivot_z]) round_top(body_front) children();
+}
+
 module holder() {
     color(holder_color) {
         difference() {
-            hull() {
-                sleeve();
-                linear_extrude(plate_t) projection() sleeve();
+            round_mouth() difference() {
+                hull() {
+                    sleeve();
+                    linear_extrude(plate_t) projection() sleeve();
+                }
+                bore_cut();
+                latch_slot();
+                for (sx = [-screw_x, screw_x]) translate([sx, screw_y, 0]) screw_hole();
             }
-            bore_cut();
-            latch_slot();
-            for (sx = [-screw_x, screw_x]) translate([sx, screw_y, 0]) screw_hole();
             // render(): hundreds of strip intersections overflow preview's CSG
             // normalization, which then gives up and draws nothing at all.
             if (name_text != "") render() name_cut();
