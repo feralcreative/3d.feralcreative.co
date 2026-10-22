@@ -22,7 +22,7 @@ end_wall = 3;              // mm, stop behind the plug face
 /* [Latch] */
 latch_engage = 2.2;        // mm, tooth height into the connector's 4 mm-deep pocket
 latch_hold_w = 17.4;       // mm, holding face from the stop, at the plug surface (pocket near edge 16.9-17.7)
-hold_angle = 60;           // deg, holding face to the axis; steeper holds harder
+hold_angle = 65;           // deg, holding face to the axis; steeper holds harder
 ramp_angle = 35;           // deg, lead-in face to the axis
 tooth_width = 8;           // mm, across the pocket, which is 9.71 mm at its base
 tooth_top = 0.6;           // mm, flat on the tooth crest
