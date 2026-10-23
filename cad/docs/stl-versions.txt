@@ -18,6 +18,9 @@ bong-stabilizer-coupon-base 6
 bong-stabilizer-lens 1
 bong-stabilizer-screw 6
 bong-stabilizer-screw-set 6
+bookshelf-lid-clip-mount 1
+bookshelf-lid-clip-platform 2
+bookshelf-lid-clip-print-set 4
 can-holder-12oz-standard 1
 can-holder-12oz-standard-coupon 1
 can-holder-12oz-standard-tile 2

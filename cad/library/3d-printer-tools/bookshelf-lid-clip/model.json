@@ -1,0 +1,50 @@
+{
+  "id": "bookshelf-lid-clip",
+  "origin": "authored",
+  "status": "draft",
+  "scad": "bookshelf-lid-clip.scad",
+  "scad_files": [
+    "bookshelf-lid-clip.scad"
+  ],
+  "exports": [
+    "bookshelf-lid-clip-print-set",
+    "bookshelf-lid-clip-mount",
+    "bookshelf-lid-clip-platform"
+  ],
+  "draft_exports": [
+    "bookshelf-lid-clip-print-set",
+    "bookshelf-lid-clip-mount",
+    "bookshelf-lid-clip-platform"
+  ],
+  "publish_exports": [],
+  "aliases": {},
+  "protected_assets": [],
+  "additional_scad_files": [],
+  "licenses": [],
+  "assembly_view_sources": {
+    "bookshelf-lid-clip.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "bookshelf-lid-clip.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "bookshelf-lid-clip.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
+}
