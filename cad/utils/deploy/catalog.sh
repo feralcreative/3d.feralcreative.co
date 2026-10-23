@@ -46,7 +46,7 @@ FILES=()
 while IFS= read -r file; do [[ -z "$file" ]] || FILES+=("$file"); done <<< "$SELECTED"
 if [[ "${#FILES[@]}" -gt 0 ]]; then
   echo "Publishing ${#FILES[@]} catalog assets. Existing unrelated remote files are preserved."
-  rsync -avzLc --delay-updates "${DRY[@]+"${DRY[@]}"}" -e "$SSH_COMMAND" "${FILES[@]}" "$REMOTE_USER@$HOST:$REMOTE/"
+  rsync -avzLc --chmod=F644 --delay-updates "${DRY[@]+"${DRY[@]}"}" -e "$SSH_COMMAND" "${FILES[@]}" "$REMOTE_USER@$HOST:$REMOTE/"
 fi
 # Only advertise newly referenced files after their transfer succeeds.
-rsync -avzc --delay-updates "${DRY[@]+"${DRY[@]}"}" -e "$SSH_COMMAND" "$CATALOG" "$REMOTE_USER@$HOST:$REMOTE/"
+rsync -avzc --chmod=F644 --delay-updates "${DRY[@]+"${DRY[@]}"}" -e "$SSH_COMMAND" "$CATALOG" "$REMOTE_USER@$HOST:$REMOTE/"
