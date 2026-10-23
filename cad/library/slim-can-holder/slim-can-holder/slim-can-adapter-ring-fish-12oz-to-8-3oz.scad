@@ -1,4 +1,231 @@
-// Sleeve — drops into the fish koozie and holds a 250 ml / 8.3 oz slim can
+// Note 1.
+
+// COUPON-COMPONENTS: fit=coupon
+// COUPON-PLATE: coupon
+
+/* [Output] */
+
+// Note 2.
+
+/* [Assembly display] */
+// Note 3.
+view = "default"; // [default, together, exploded]
+
+show = "part";   // [part, cut, coupon]
+
+$fa = 4;   // Note 4.
+$fs = 0.4;
+eps = 0.01;
+
+/* [Can] */
+
+// Note 5.
+
+can_d = 53.0;
+// Note 6.
+
+can_slop = 0.40;
+// Note 7.
+
+bore_comp = 0.60;
+
+/* [Host — the fish this drops into] */
+
+// Note 8.
+
+host_bore_d = 58.40;
+// Note 9.
+
+host_bore_loss = 0.23;
+// Note 10.
+host_rib_h = 0.30;
+// Note 11.
+host_floor_z = 5.40;
+// Note 12.
+host_bore_top_z = 86.03;
+// Note 13.
+
+host_mouth_low_z = 89.3;
+// Note 14.
+
+host_drain_d = 12.0;
+
+/* [Sleeve] */
+
+// Note 15.
+
+wall_w = 1.68;
+// Note 16.
+
+proud = -1.0;
+// Note 17.
+
+base_cham = 0.50;
+// Note 18.
+rim_cham = 0.50;
+// Note 19.
+
+mouth_cham_r = 0.60;
+mouth_cham_h = 1.20;
+
+/* [Grip ribs] */
+
+// Note 20.
+rib_count = 6;
+rib_h     = 0.30;   // Note 21.
+rib_w     = 3.00;   // Note 22.
+rib_ramp  = 8.0;    // Note 23.
+rib_foot  = 2.0;    // Note 24.
+
+/* [Fit coupon] */
+
+// Note 25.
+
+coupon_h = 20.00;
+
+/* [Quality] */
+
+// Note 26.
+chord_err = 0.02;
+
+/* [Hidden] */
+
+// Note 27.
+function facets(r, e = chord_err) = ceil(180 / acos(1 - e / r));
+// Note 28.
+function r_hole(r, n) = r / cos(180 / n);
+
+bore_d    = can_d + can_slop + bore_comp;
+bore_r    = bore_d / 2;
+sleeve_od = bore_d + 2 * wall_w;
+sleeve_r  = sleeve_od / 2;
+
+rim_z     = host_mouth_low_z + proud;      // Note 29.
+total_h   = rim_z - host_floor_z;          // Note 30.
+
+nseg      = facets(sleeve_r);
+r_bore    = r_hole(bore_r, nseg);
+
+// Note 31.
+host_across_ribs = host_bore_d - host_bore_loss - 2 * host_rib_h;
+host_clear       = host_across_ribs - sleeve_od;
+
+rib_r    = rib_h > 0 ? (rib_w * rib_w / 4 + rib_h * rib_h) / (2 * rib_h) : 0;
+rib_ax   = bore_r + rib_r - rib_h;
+rib_z0   = base_cham + 1.0;
+rib_z1   = total_h - mouth_cham_h - 1.0;
+
+assert(sleeve_od < host_bore_d - 2 * host_rib_h,
+       str("the sleeve is fatter than the fish's ribs will pass: ",
+           sleeve_od, " against ", host_bore_d - 2 * host_rib_h));
+assert(wall_w >= 1.26,
+       "the wall is under 3 lines at 0.42: raise wall_w");
+assert(bore_r + mouth_cham_r < sleeve_r - rim_cham,
+       "the mouth lead-in has run into the rim's chamfer: the rim has no top");
+assert(bore_d > host_drain_d + 2,
+       "the sleeve's bottom ring sits over the fish's drain");
+assert(rim_z > host_bore_top_z + 1,
+       "the rim is down inside the fish's bore: raise proud");
+assert(rib_z1 - rib_ramp > rib_z0 + rib_foot,
+       "the rib ramp and foot overlap: the sleeve is too short for them");
+assert(coupon_h > rib_z0 + rib_foot + 5,
+       "the coupon is too short to reach full-proud rib");
+
+// Note 32.
+
+module sleeve_solid() {
+    pts = [
+        [r_bore,                 0],
+        [sleeve_r - base_cham,   0],
+        [sleeve_r,               base_cham],
+        [sleeve_r,               total_h - rim_cham],
+        [sleeve_r - rim_cham,    total_h],
+        [r_bore + mouth_cham_r,  total_h],
+        [r_bore,                 total_h - mouth_cham_h]
+    ];
+    rotate_extrude(angle = 360, $fn = nseg) polygon(pts);
+}
+
+module ribs() {
+    n = facets(rib_r);
+    for (i = [0 : rib_count - 1])
+        // Note 33.
+
+        rotate([0, 0, 30 + i * 360 / rib_count])
+            hull() {
+                translate([bore_r + rib_r, 0, rib_z0])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+                translate([rib_ax, 0, rib_z0 + rib_foot])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+                translate([rib_ax, 0, rib_z1 - rib_ramp])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+                translate([bore_r + rib_r, 0, rib_z1])
+                    cylinder(r = rib_r, h = eps, $fn = n);
+            }
+}
+
+// Note 34.
+
+module sleeve() {
+    union() {
+        sleeve_solid();
+        if (rib_count > 0 && rib_h > 0)
+            intersection() {
+                ribs();
+                cylinder(r = sleeve_r - 0.20, h = total_h, $fn = nseg);
+            }
+    }
+}
+
+// Note 35.
+module fit_coupon() {
+    intersection() {
+        sleeve();
+        translate([-sleeve_od, -sleeve_od, -eps])
+            cube([2 * sleeve_od, 2 * sleeve_od, coupon_h + eps]);
+    }
+}
+
+echo(str("sleeve: outside ", sleeve_od, "  bore ", bore_d,
+         "  across ribs ", bore_d - 2 * rib_h, "  wall ", wall_w,
+         "  ", total_h, " tall, floor at ", host_floor_z,
+         " to rim at ", rim_z, " on the fish"));
+echo(str("in the fish: faces ", host_across_ribs,
+         " across its printed ribs, clearance ", host_clear,
+         " on diameter; rim stands ", proud,
+         " above the low corner of the mouth (negative is below it) and ",
+         rim_z - host_bore_top_z, " above the bore's top"));
+echo(str("on the can: printed bore ", bore_d - host_bore_loss,
+         ", across ribs ", bore_d - host_bore_loss - 2 * rib_h,
+         ", clearance ", bore_d - host_bore_loss - 2 * rib_h - can_d,
+         " on a ", can_d, " can"));
+
+// Note 36.
+
+module feral_default_output_1a8d7f3046da() {
+if (show == "coupon")
+    fit_coupon();
+else if (show == "cut")
+    difference() {
+        sleeve();
+        translate([-sleeve_od, -sleeve_od, -eps])
+            cube([2 * sleeve_od, sleeve_od, total_h + 1]);
+    }
+else if (show == "part")
+    sleeve();
+}
+
+module feral_assembly_view_1a8d7f3046da(explode=false) {
+feral_default_output_1a8d7f3046da();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_1a8d7f3046da();
+else feral_assembly_view_1a8d7f3046da(view == "exploded");
+
+// Notes
+
+// Note 1. Sleeve — drops into the fish koozie and holds a 250 ml / 8.3 oz slim can
 // instead of the 12 oz one.
 //
 // The fish-koozie cousin of slim-can-adapter-ring-12oz-to-8-3oz.scad, and
@@ -65,241 +292,102 @@
 // The coupon is the only thing here a plate can answer, and there is one
 // variant for it, so the plate and the component are the same. Keep the
 // names stable — utils/coupon.sh reads these and knows nothing about the part.
-//
-// COUPON-COMPONENTS: fit=coupon
-// COUPON-PLATE: coupon
 
-/* [Output] */
-
-// "cut" is a half-section for reading the wall, the chamfers and the ribs.
+// Note 2. "cut" is a half-section for reading the wall, the chamfers and the ribs.
 // Not for printing. "coupon" is the fit test; see [Fit coupon].
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
 
-show = "part";   // [part, cut, coupon]
+// Note 3. default preserves the original part, coupon and print selectors.
 
-$fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
-$fs = 0.4;
-eps = 0.01;
+// Note 4. organic faceting per the 0.4-nozzle rule; no global high $fn
 
-/* [Can] */
-
-// Body diameter of a 250 ml / 8.3 oz slim can (mm). Red Bull's sleek can, and
+// Note 5. Body diameter of a 250 ml / 8.3 oz slim can (mm). Red Bull's sleek can, and
 // the number slim-can-holder-8-3oz.scad is cut to.
-can_d = 53.0;
-// Clearance on diameter at the bore itself (mm). The ribs, not this, set the
+
+// Note 6. Clearance on diameter at the bore itself (mm). The ribs, not this, set the
 // grip — this only has to let the can pass.
-can_slop = 0.40;
-// Extra diameter added to the bore to cover this machine's bore shrinkage (mm).
+
+// Note 7. Extra diameter added to the bore to cover this machine's bore shrinkage (mm).
 // Settled 2026-08-22 on the 250 ml holder's fit coupon and carried here
 // unchanged, as the ring carries it. ⚠️ Do NOT "correct" this to the measured
 // 0.23: it and rib_h are a matched pair.
-bore_comp = 0.60;
 
-/* [Host — the fish this drops into] */
-
-// Read off parts/slim-can-holder-3in-12oz-fish.scad and its built mesh. Change them only
+// Note 8. Read off parts/slim-can-holder-3in-12oz-fish.scad and its built mesh. Change them only
 // if the fish changes; nothing here is a choice.
-
 // The fish's bore as drawn (mm): can 57.40 + slop 0.40 + comp 0.60.
-host_bore_d = 58.40;
-// What this machine takes out of a bore that size (mm on diameter), measured
+
+// Note 9. What this machine takes out of a bore that size (mm on diameter), measured
 // on the Ø54 bore and carried by the holders' own argument that the loss is
 // absolute, not proportional.
-host_bore_loss = 0.23;
-// How far the fish's grip ribs stand into its bore (mm).
-host_rib_h = 0.30;
-// Top of the fish's floor (mm above its bed): floor_t. The sleeve stands on it.
-host_floor_z = 5.40;
-// Top of the fish's bore (mm), where the lead-in starts opening: bore_top.
-host_bore_top_z = 86.03;
-// The lowest point of the mouth's rim at the bore (mm above the fish's bed):
+
+// Note 10. How far the fish's grip ribs stand into its bore (mm).
+
+// Note 11. Top of the fish's floor (mm above its bed): floor_t. The sleeve stands on it.
+
+// Note 12. Top of the fish's bore (mm), where the lead-in starts opening: bore_top.
+
+// Note 13. The lowest point of the mouth's rim at the bore (mm above the fish's bed):
 // the corner of the mouth at 180–210 degrees, measured on the built mesh.
 // The sleeve's rim stands proud of this.
-host_mouth_low_z = 89.3;
-// Drain through the fish's floor (mm), on the axis. The sleeve's bottom ring
+
+// Note 14. Drain through the fish's floor (mm), on the axis. The sleeve's bottom ring
 // has to clear it.
-host_drain_d = 12.0;
 
-/* [Sleeve] */
-
-// Wall between the can and the fish (mm). 1.68 is 4 walls at 0.42; see THE
+// Note 15. Wall between the can and the fish (mm). 1.68 is 4 walls at 0.42; see THE
 // WALL IS ONE RUNG in the header.
-wall_w = 1.68;
-// How far the rim stands above the lowest corner of the fish's mouth (mm).
+
+// Note 16. How far the rim stands above the lowest corner of the fish's mouth (mm).
 // Negative puts it below, out of sight: -1 is a millimetre of margin under
 // the corner, and still 2.3 above the top of the bore.
-proud = -1.0;
-// 45-degree chamfer on the outside of the bottom edge (mm). On the bed, so
+
+// Note 17. 45-degree chamfer on the outside of the bottom edge (mm). On the bed, so
 // it is the elephant-foot chamfer — the reference's PETG minimum — and the
 // lead-in past the fish's ribs on the way down.
-base_cham = 0.50;
-// 45-degree chamfer on the outside of the rim (mm). Narrows going up.
-rim_cham = 0.50;
-// Lead-in at the mouth, for the can (mm): how far out on radius, and over
+
+// Note 18. 45-degree chamfer on the outside of the rim (mm). Narrows going up.
+
+// Note 19. Lead-in at the mouth, for the can (mm): how far out on radius, and over
 // what height. Small, because the wall has 1.68 to share between this and
 // the rim chamfer and the rim still has to have a top.
-mouth_cham_r = 0.60;
-mouth_cham_h = 1.20;
 
-/* [Grip ribs] */
+// Note 20. Rounded vertical ribs in the bore. The 250 ml holder's six, unchanged.
 
-// Rounded vertical ribs in the bore. The 250 ml holder's six, unchanged.
-rib_count = 6;
-rib_h     = 0.30;   // how far each rib stands into the bore (mm)
-rib_w     = 3.00;   // chord width of the bump (mm)
-rib_ramp  = 8.0;    // lead-in at the top, over which the rib fades to nothing (mm)
-rib_foot  = 2.0;    // the same at the bottom, where the printer sees it as an overhang (mm)
+// Note 21. how far each rib stands into the bore (mm)
 
-/* [Fit coupon] */
+// Note 22. chord width of the bump (mm)
 
-// Height of the coupon (mm): the bottom of the sleeve, base chamfer and rib
+// Note 23. lead-in at the top, over which the rib fades to nothing (mm)
+
+// Note 24. the same at the bottom, where the printer sees it as an overhang (mm)
+
+// Note 25. Height of the coupon (mm): the bottom of the sleeve, base chamfer and rib
 // feet included, printed the same way up as the sleeve. 20 is the 2 mm foot
 // and 16.5 mm of full-proud rib.
-coupon_h = 20.00;
 
-/* [Quality] */
+// Note 26. Chord error target (mm). 0.02 is the 0.4-nozzle figure.
 
-// Chord error target (mm). 0.02 is the 0.4-nozzle figure.
-chord_err = 0.02;
+// Note 27. Facets for a target chord error on a given radius.
 
-/* [Hidden] */
+// Note 28. Radius that makes the INSCRIBED polygon's inner radius equal r.
 
-// Facets for a target chord error on a given radius.
-function facets(r, e = chord_err) = ceil(180 / acos(1 - e / r));
-// Radius that makes the INSCRIBED polygon's inner radius equal r.
-function r_hole(r, n) = r / cos(180 / n);
+// Note 29. the rim, on the fish's scale
 
-bore_d    = can_d + can_slop + bore_comp;
-bore_r    = bore_d / 2;
-sleeve_od = bore_d + 2 * wall_w;
-sleeve_r  = sleeve_od / 2;
+// Note 30. floor to rim
 
-rim_z     = host_mouth_low_z + proud;      // the rim, on the fish's scale
-total_h   = rim_z - host_floor_z;          // floor to rim
+// Note 31. What the sleeve faces in the fish, printed, and what it leaves.
 
-nseg      = facets(sleeve_r);
-r_bore    = r_hole(bore_r, nseg);
-
-// What the sleeve faces in the fish, printed, and what it leaves.
-host_across_ribs = host_bore_d - host_bore_loss - 2 * host_rib_h;
-host_clear       = host_across_ribs - sleeve_od;
-
-rib_r    = rib_h > 0 ? (rib_w * rib_w / 4 + rib_h * rib_h) / (2 * rib_h) : 0;
-rib_ax   = bore_r + rib_r - rib_h;
-rib_z0   = base_cham + 1.0;
-rib_z1   = total_h - mouth_cham_h - 1.0;
-
-assert(sleeve_od < host_bore_d - 2 * host_rib_h,
-       str("the sleeve is fatter than the fish's ribs will pass: ",
-           sleeve_od, " against ", host_bore_d - 2 * host_rib_h));
-assert(wall_w >= 1.26,
-       "the wall is under 3 lines at 0.42: raise wall_w");
-assert(bore_r + mouth_cham_r < sleeve_r - rim_cham,
-       "the mouth lead-in has run into the rim's chamfer: the rim has no top");
-assert(bore_d > host_drain_d + 2,
-       "the sleeve's bottom ring sits over the fish's drain");
-assert(rim_z > host_bore_top_z + 1,
-       "the rim is down inside the fish's bore: raise proud");
-assert(rib_z1 - rib_ramp > rib_z0 + rib_foot,
-       "the rib ramp and foot overlap: the sleeve is too short for them");
-assert(coupon_h > rib_z0 + rib_foot + 5,
-       "the coupon is too short to reach full-proud rib");
-
-// Solid section, before the bore is cut. Bottom inner corner first, running
+// Note 32. Solid section, before the bore is cut. Bottom inner corner first, running
 // counter-clockwise: bottom, base chamfer, outside, rim chamfer, top, mouth
 // lead-in, bore.
-module sleeve_solid() {
-    pts = [
-        [r_bore,                 0],
-        [sleeve_r - base_cham,   0],
-        [sleeve_r,               base_cham],
-        [sleeve_r,               total_h - rim_cham],
-        [sleeve_r - rim_cham,    total_h],
-        [r_bore + mouth_cham_r,  total_h],
-        [r_bore,                 total_h - mouth_cham_h]
-    ];
-    rotate_extrude(angle = 360, $fn = nseg) polygon(pts);
-}
 
-module ribs() {
-    n = facets(rib_r);
-    for (i = [0 : rib_count - 1])
-        // Half a pitch off the x axis, so the cut view at y = 0 shows the bore
-        // and not a rib edge-on.
-        rotate([0, 0, 30 + i * 360 / rib_count])
-            hull() {
-                translate([bore_r + rib_r, 0, rib_z0])
-                    cylinder(r = rib_r, h = eps, $fn = n);
-                translate([rib_ax, 0, rib_z0 + rib_foot])
-                    cylinder(r = rib_r, h = eps, $fn = n);
-                translate([rib_ax, 0, rib_z1 - rib_ramp])
-                    cylinder(r = rib_r, h = eps, $fn = n);
-                translate([bore_r + rib_r, 0, rib_z1])
-                    cylinder(r = rib_r, h = eps, $fn = n);
-            }
-}
+// Note 33. Half a pitch off the x axis, so the cut view at y = 0 shows the bore
+// and not a rib edge-on.
 
-// Each rib is a 3.90 mm arc of which 0.30 is wanted, so left alone it would
+// Note 34. Each rib is a 3.90 mm arc of which 0.30 is wanted, so left alone it would
 // poke out through a 1.68 mm wall. It is clipped to a cylinder inside the
 // sleeve's outer face before it goes in — inside, not at it, so no face of
 // the clip is coincident with the sleeve.
-module sleeve() {
-    union() {
-        sleeve_solid();
-        if (rib_count > 0 && rib_h > 0)
-            intersection() {
-                ribs();
-                cylinder(r = sleeve_r - 0.20, h = total_h, $fn = nseg);
-            }
-    }
-}
 
-// The fit coupon: the bottom coupon_h of the sleeve, as it is.
-module fit_coupon() {
-    intersection() {
-        sleeve();
-        translate([-sleeve_od, -sleeve_od, -eps])
-            cube([2 * sleeve_od, 2 * sleeve_od, coupon_h + eps]);
-    }
-}
+// Note 35. The fit coupon: the bottom coupon_h of the sleeve, as it is.
 
-echo(str("sleeve: outside ", sleeve_od, "  bore ", bore_d,
-         "  across ribs ", bore_d - 2 * rib_h, "  wall ", wall_w,
-         "  ", total_h, " tall, floor at ", host_floor_z,
-         " to rim at ", rim_z, " on the fish"));
-echo(str("in the fish: faces ", host_across_ribs,
-         " across its printed ribs, clearance ", host_clear,
-         " on diameter; rim stands ", proud,
-         " above the low corner of the mouth (negative is below it) and ",
-         rim_z - host_bore_top_z, " above the bore's top"));
-echo(str("on the can: printed bore ", bore_d - host_bore_loss,
-         ", across ribs ", bore_d - host_bore_loss - 2 * rib_h,
-         ", clearance ", bore_d - host_bore_loss - 2 * rib_h - can_d,
-         " on a ", can_d, " can"));
-
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 36. Assembly display changes placement only; the original output remains the default.
 // Single printed piece: both display modes show the same intact part.
-module feral_default_output_1a8d7f3046da() {
-if (show == "coupon")
-    fit_coupon();
-else if (show == "cut")
-    difference() {
-        sleeve();
-        translate([-sleeve_od, -sleeve_od, -eps])
-            cube([2 * sleeve_od, sleeve_od, total_h + 1]);
-    }
-else if (show == "part")
-    sleeve();
-}
-
-module feral_assembly_view_1a8d7f3046da(explode=false) {
-feral_default_output_1a8d7f3046da();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_1a8d7f3046da();
-else feral_assembly_view_1a8d7f3046da(view == "exploded");

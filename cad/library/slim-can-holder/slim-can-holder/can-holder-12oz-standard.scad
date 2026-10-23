@@ -1,360 +1,201 @@
-// Can holder — standard 355 ml / 12 oz can, with glue-in logo tiles.
-//
-// Started as a copy of slim-can-holder-3in-12oz-wagon-queen.scad rebored for
-// the squat can, and it is now generic: no artwork is modelled on the barrel.
-// Each of the four plaques is an empty rectangular pocket, and the logo is
-// printed flat on a separate tile (show = "tile") and glued in. Printing a
-// logo flat puts its face on the top of the print instead of on a vertical
-// wall, which is the whole reason for doing it this way.
-//
-// Two rings drop into the bore and stack, one inside the other:
-//
-//     slim-can-adapter-ring-12oz-standard-to-slim.scad   standard -> slim 12 oz
-//     slim-can-adapter-ring-12oz-to-8-3oz-nested.scad    slim 12 oz -> 8.3 oz
-//
-// THE CAN. Ø66.04 x 122.2 — the standard 12 oz body, 2.60 in. A 211 can code
-// is the seam, not the body.
-//
-// THE OUTSIDE IS NOT 3 INCHES (Ziad, 2026-10-18). On a 76.20 barrel this bore
-// leaves 4.6 mm of wall: no cavity, and no depth for a pocket. So the WALL was
-// held instead of the outside — 8.90 mm on radius, the 3 in sibling's exactly
-// — and the outside grew by the 8.64 the can grew: 76.20 -> 84.84. The
-// cavity, the shells, the roof, the webs, the floor, the flutes and the ribs
-// are all the sibling's numbers. It will not fit a 3 in cupholder.
-//
-// THE POCKET. A flat floor tile_t below the plane where the barrel meets a
-// pocket_w chord, with vertical side walls and 45-degree ends. The tile is
-// tile_t thick, so it sits flush with the barrel at its two side edges and
-// sign_sag below it in the middle — the same flat-panel look the moulded
-// plaques had. The ends are 45 degrees and not square for the reason the
-// sibling's header gives: a square top to the pocket is a cantilevered
-// ceiling with nothing under its outer edge. The tile carries a matching 45
-// degree chamfer on both ends, so it fills the pocket to its own face.
-//
-// ⚠️ THE LOGO'S HEIGHT BUDGET TAPERS ACROSS THE TILE. The barrel curves away
-// over a flat face, so a logo standing h proud stays inside the 84.84 circle
-// only where |y| <= sqrt(out_r^2 - (flat_r + h)^2): at 2.00 proud that is
-// ±10.6 of the tile's 32.6 width. The echo prints it. Past that the logo
-// stands outside the barrel, which is harmless in a hand and matters only if
-// the outside diameter does.
-//
-// THE FIT — INHERITED, NOT CONFIRMED. bore_comp 0.60 and rib_h 0.30 carry
-// over unchanged on the sibling's argument that this machine's bore loss is
-// constant in absolute terms: printed bore 66.81, 66.21 across the ribs, 0.17
-// clearance on a 66.04 can. Print [Fit coupon] before the part. The tile's
-// clearance is not proven either; print one tile with the coupon.
-//
-// ORIENTATION. Holder floor-down; nothing needs support. Tile back-down, logo
-// up; its chamfered ends are 45-degree overhangs.
-//
-// The can is 122 tall and this is 100, so 22 mm stands proud.
+// Note 1.
 
-// The one thing a coupon can answer here, and the variant that puts it on a
-// plate. There is only one, so the plate and the component are the same
-// variant; utils/coupon.sh reads these directives and needs no knowledge of
-// this part. Keep the names stable.
-//
 // COUPON-COMPONENTS: fit=coupon
 // COUPON-PLATE: coupon
 
-// Artwork for the logo tiles. marks.scad defines modules and calls none, so
-// including it puts nothing on the holder; only tile() draws from it.
+// Note 2.
+
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 3.
 view = "default"; // [default, together, exploded]
 
 include <../../../logos/marks.scad>
 
 /* [Output] */
 
-// "cut" is a half-section for reading the double wall, the cavity and the ribs.
-// Not for printing — build it with --name if you want it as its own STL.
-// "coupon" is the fit test; see [Fit coupon].
-// "tile" is one blank logo tile, as printed. "assembly" is the holder with a
-// tile in every pocket — preview only, never an STL.
+// Note 4.
+
 show = "part";   // [part, cut, coupon, tile, assembly]
 
-$fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
+$fa = 4;   // Note 5.
 $fs = 0.4;
 eps = 0.01;
 
 /* [Can] */
 
-// Body diameter of a standard 355 ml / 12 oz can (mm), 2.60 in.
-//
-// outer_d is derived from this, so the wall, the cavity and the plaque depth
-// hold still if it changes; only the outside and the rib clearance move.
+// Note 6.
+
 can_d = 66.04;
-// Clearance on diameter at the bore itself (mm). The ribs, not this, set the
-// grip — this only has to let the can pass.
+// Note 7.
+
 can_slop = 0.40;
-// Extra diameter added to the bore to cover this machine's bore shrinkage (mm).
-//
-// SETTLED, 2026-08-22, on the 250 ml part's fit coupon, and carried here
-// unchanged. A bore drawn at 54.00 miked 53.77 between the ribs — a loss of
-// 0.23 on diameter. Ziad pushed a real can in: "fits perfectly, snug enough but
-// not difficult".
-//
-// It transfers to this bore because the loss does not scale. The slicing
-// reference measured 0.55–0.65 off a bore drawn at 10.15; the 250 ml part
-// measured 0.23 off one drawn at 54.00. A fixed loss would have taken 0.60 off
-// the big bore and did not; a proportional loss would have taken 0.04 off the
-// small one and did not. The small-bore figure is first-layer squish and
-// extrusion pull-in — local, and roughly constant in absolute terms — so
-// between Ø54.00 and Ø58.40 there is nothing left in it that changes.
-//
-// ⚠️ Do NOT "correct" this number to the measured 0.23. 0.60 is what produced a
-// bore that fits, and the ribs were sized against it. The two are a matched
-// pair; changing one without the other opens the fit back up.
+// Note 8.
+
 bore_comp = 0.60;
 
 /* [Shell] */
 
-// Radial wall from bore to outside (mm). 8.90 is the 3 in sibling's, (76.20 -
-// 58.40) / 2, and holding it is what keeps every shell, cavity and plaque
-// number of that part valid here. See THE OUTSIDE in the header.
+// Note 9.
+
 wall_r = 8.90;
-// Outside diameter (mm): 84.84 at the defaults.
+// Note 10.
 outer_d = can_d + can_slop + bore_comp + 2 * wall_r;
-// Overall height (mm). The can is 122, so this leaves 22 mm proud.
+// Note 11.
 total_h = 100.0;
-// Inner shell, the tube around the can (mm). 2.10 is 5 walls at 0.42.
+// Note 12.
 inner_w = 2.10;
-// Outer shell at the top of a flute — the flats, not the valleys (mm). 2.40 is
-// thicker than the inner shell on purpose: the flutes eat into it.
+// Note 13.
+
 outer_w = 2.40;
-// Roof over the annular cavity (mm). 1.60 is 8 layers at 0.20, bridging 4.40 —
-// 2.20 mm less span than the same roof carries on the 250 ml part, so this is
-// the easy end of the trade the bigger bore made.
+// Note 14.
+
 roof_t = 1.60;
 
 /* [Floor] */
 
-// Floor thickness (mm). The requirement is "at least 5"; 5.40 is 27 layers at
-// 0.20 and it is what the can lands on and what you set down on things.
+// Note 15.
+
 floor_t = 5.40;
-// Hole through the floor (mm). Drains condensation and lets a finger push the
-// can back out of a 100 mm bore, which matters more here than on a short one.
-// Set to 0 for a closed floor.
+// Note 16.
+
 drain_d = 12.0;
-// Radius of the round on the bottom outside edge (mm). Set to 0 for a plain
-// chamfer of base_cham instead.
-//
-// ⚠️ It is NOT a full quarter-round, and it cannot be. A round tangent to the
-// bottom face is horizontal where it meets the bed: the first 0.20 mm of layer
-// would grow 1.40 mm outward with nothing under it, which is a 90-degree
-// overhang and prints as a drooping skirt. So the arc is truncated at
-// base_over, and below that it runs on as a straight cone at that same angle
-// down to the bed. The radius you asked for is the radius you get everywhere
-// the eye reads it; only the last 1.46 mm is a cone.
+// Note 17.
+
 base_round = 5.00;
 
-// Steepest overhang the round is allowed to reach, measured from vertical.
-// 45 is MAX_OVERHANG_DEG out of the printer reference — safe unsupported on
-// this machine, and FlashForge's own guidance is more conservative still.
+// Note 18.
+
 base_over = 45;
 
-// 45-degree chamfer on the bottom outside edge (mm), used only when
-// base_round is 0 — more reliable than the slicer's elephant-foot compensation.
+// Note 19.
+
 base_cham = 0.60;
 
 /* [Mouth] */
 
-// 45-degree chamfer on the top outside edge (mm). Cosmetic, and it takes the
-// sharpness off the rim.
+// Note 20.
+
 top_cham = 1.00;
-// Lead-in at the mouth of the bore: how far it opens on radius (mm)...
+// Note 21.
 mouth_cham_r = 1.20;
-// ...over how much height (mm). This is what lets the can be dropped in without
-// being aimed. It opens outward going up, so it costs no support.
+// Note 22.
+
 mouth_cham_h = 2.00;
 
 /* [Flutes] */
 
-// Shallow vertical flutes cut into the outside. They run the full height and
-// off both chamfers, so there is no ledge anywhere and no floating detail.
+// Note 23.
+
 flute_count = 24;
-// How deep each one cuts on radius (mm). This comes straight out of outer_w —
-// see the assert below.
+// Note 24.
+
 flute_depth = 0.80;
-// Radius of the circle that cuts each flute (mm). With the defaults this makes
-// a flute 5.6 mm across on a 9.97 mm pitch, so 4.4 mm of flat between them.
+// Note 25.
+
 flute_cut_r = 6.00;
-// How close a flute is allowed to come to the edge of a plaque (mm) before it
-// is dropped altogether. A flute that clips the corner of a plaque steals the
-// padding it was supposed to leave, and there is no way to have both — so the
-// flute goes. With the defaults this drops 4 of the 24; the echo says how many.
+// Note 26.
+
 flute_clear = 0.50;
 
 /* [Pockets] */
 
-// Rectangular pockets milled into the barrel, one per tile, evenly spaced.
-// Cut in, never stood off, so the outside diameter is untouched.
+// Note 27.
+
 sign_count = 4;
-// Width of a pocket round the barrel, at its floor (mm). The sibling's plaque
-// was 33.00 — 27.00 of artwork and 3.00 of padding a side — and this keeps
-// it. Wider sinks the middle deeper, as the square of the width.
+// Note 28.
+
 pocket_w = 33.00;
-// Height of a pocket's floor along the barrel (mm), not counting the
-// 45-degree ends. The ends add tile_t + sign_sag each.
+// Note 29.
+
 pocket_h = 64.00;
-// Height of the centre of the pocket above the base (mm). Centred on the
-// barrel, as the sibling's plaques were (Ziad, 2026-09-16).
+// Note 30.
+
 pocket_z = total_h / 2;
 
 /* [Tile] */
 
-// Thickness of a tile, and so the depth of the pocket at its side edges (mm).
-// 2.00 is 10 layers at 0.20. Bounded from above by the wall it leaves over
-// the bore — there is an assert at 2.10 — and from below by having something
-// to glue.
+// Note 31.
+
 tile_t = 2.00;
-// Clearance per side between tile and pocket (mm). Measured square to each
-// face, so the chamfered ends get the same gap as the sides. It is the glue
-// gap; it is not a proven fit.
+// Note 32.
+
 tile_clear = 0.20;
-// Logo on the tile's face. "none" is a blank to glue your own artwork onto,
-// or to put your own logo on in another file.
+// Note 33.
+
 tile_logo = "wagon-queen";   // [none, wagon-queen]
 
 /* [Logo] */
 
-// Width of the Wagon Queen lockup, crest and lettering (mm). 27.00 is what the
-// barrel carried before the logos came off it, and it is near the ceiling: a
-// 1.00 relief stays inside the barrel only within ±13.96 of the tile's centre,
-// and there is an assert on that.
+// Note 34.
+
 logo_w = 27.00;
-// How far the logo stands proud of the tile's face (mm). 1.00 is 5 layers at
-// 0.20. It is not 2.00, as on the old moulded plaques, because 2.00 proud at
-// this width stands up to 0.85 outside the barrel at the lockup's edges — see
-// THE LOGO'S HEIGHT BUDGET in the header. Printed flat it is the top of the
-// print, so the relief costs nothing to print.
+// Note 35.
+
 logo_relief = 1.00;
-// Swell on the lettering (mm per side). The script's thin strokes are 1.94% of
-// the lockup's width, 0.52 here, which prints as a broken line; this takes
-// them to 0.90. Bounded above by the lettering's counters, which start to
-// close at 1.47% of the width. Both are asserted. Measured on the old part.
+// Note 36.
+
 logo_swell = 0.19;
-// Round on the top edge of the raised crest and of the lettering (mm). Each is
-// bounded by its own thinnest stroke: the top of the narrowest is kept over
-// 0.20 by assert.
+// Note 37.
+
 logo_bevel_crest = 0.35;
 logo_bevel_word  = 0.25;
-// Slab height in that roll (mm), half a 0.20 layer.
+// Note 38.
 bevel_step = 0.10;
 
 /* [Colors] */
 
-// Preview only. STLs carry no colour.
+// Note 39.
 holder_color = "#90A553";
 tile_color   = "#90A553";
-// The logo is part of the tile's print. Its own colour is for telling them
-// apart here, or a reminder to swap filament at the logo's first layer.
+// Note 40.
+
 logo_color   = "Gold";
 
 /* [Grip ribs] */
 
-// Rounded vertical ribs inside the bore, so the can is held rather than
-// rattling, without shrinking the bore itself. Set rib_count or rib_h to 0 for
-// a plain slip fit.
-//
-// THE ARITHMETIC. Two ribs sit across any diameter, so the working size is
-// (printed bore) - 2 x rib_h. The bore is drawn 58.40 and this machine takes
-// 0.23 out of a bore that size — measured, see bore_comp — so the printed bore
-// is 58.17.
-//
-//     rib_h 0.20  ->  57.77   0.37 clearance on a Ø57.4 can
-//     rib_h 0.30  ->  57.57   0.17 clearance   <- carried from the 250 ml part
-//     rib_h 0.40  ->  57.37   0.03 interference
-//     rib_h 0.50  ->  57.17   0.23 interference
-//
-// That is the same ladder the 250 ml part has, shifted bodily by the 4.40 the
-// can grew, and it lands on the same 0.17 — the clearance Ziad printed and
-// called snug but not difficult. Nothing here is a new decision. Go to 0.40
-// only if the can measures under Ø57.4, and sand rather than reprint.
+// Note 41.
+
 rib_count = 6;
-// How far each rib stands into the bore (mm).
+// Note 42.
 rib_h = 0.30;
-// Chord width of the bump (mm). Sets the bearing area; its radius is derived so
-// the arc is exactly this wide at exactly rib_h proud.
+// Note 43.
+
 rib_w = 3.00;
-// Lead-in at the top, over which the rib fades to nothing (mm). This is what
-// makes insertion progressive instead of a step.
+// Note 44.
+
 rib_ramp = 8.0;
-// Foot at the bottom, same idea (mm). This end is the one the printer sees as
-// an overhang, and at 0.30 over 2 mm it is 8.5 degrees off vertical.
+// Note 45.
+
 rib_foot = 2.0;
 
 /* [Webs] */
 
-// Radial webs tying the inner tube to the outer shell across the cavity. They
-// also break the cavity roof into eight short bridges.
+// Note 46.
+
 web_count = 8;
-// Web thickness (mm). 1.35 is 3 walls at the real 0.45 inner line width.
+// Note 47.
 web_t = 1.35;
 
 /* [Fit coupon] */
 
-// The top of the part, cut off and stood on the bed, so a real can can be
-// pushed into it before committing to a six-hour print.
-//
-// IT IS FOR THE INSIDE DIAMETER AND NOTHING ELSE (Ziad, 2026-09-16). What the
-// outside of the coupon looks like is of no consequence — it is not a
-// presentation piece and nobody is judging its plaques.
-//
-// It is still a genuine slice of the barrel rather than a bare tube, and that
-// is not about appearance: the inner shell, cavity, webs and outer shell are
-// what decide whether the bore comes out round and on size, so a bare tube
-// would not answer the same question. Including a plaque is if anything BETTER
-// than avoiding one, because a plaque replaces 4.40 mm of cavity with 5.79 mm
-// of solid wall behind the bore, and that asymmetry is exactly the kind of
-// thing that pulls a bore out of round.
-//
-// ⚠️ PRINT THIS ONE FIRST. On the 250 ml part the coupon confirmed a bore that
-// had already been reasoned out. Here it is also the only thing that will tell
-// you whether Ø57.40 is the can you actually have.
-//
-// Height (mm). The budget from the top down: 2.00 of mouth chamfer, 1.00 of
-// clearance, 8.00 of rib ramp and then full-proud rib.
-//
-// That budget says 7.00 mm of full-proud rib and the mesh says 6.11: the
-// coupon_relief cone eats the first 0.90 mm of the bore, so the rib is at full
-// height from z 0.90 to 7.01. Still plenty to feel, and the 7.00 in the
-// inherited comment was never measured. The tightest point across the bore
-// measures 57.80, which is bore_d less twice rib_h exactly.
-//
-// It went 18.00 -> 17.50 -> 16.50 and back on 2026-09-16, chasing a constraint
-// that does not exist. Centring the plaque put its bevel at 82.03 and its
-// backing wedge at 83.03, and the coupon was shortened twice to stay clear of
-// both — on the assumption that the coupon had to be a plain barrel section.
-// It does not: the outside is of no consequence, so the coupon is free to
-// contain as much plaque as the height happens to catch. 18.00 restored.
-//
-// What that episode DID leave behind is worth keeping: sign_back_z1, a name
-// for the fact that a plaque reaches 1.0 mm further up the barrel than its
-// bevel does, because sign_backing runs long at both ends. The echo below
-// reports whether the coupon catches any of it, so it is legible in the log
-// rather than a surprise in the mesh — a coupon that contains wedge tops
-// reports a negative genus, since they subdivide its cavity into sealed
-// pockets. That is now information, not an error.
+// Note 48.
+
 coupon_h = 18.00;
 
-// Relief on the bore at the cut face (mm), at 45 degrees, taking the rib tips
-// with it. The real part's bore never touches the bed — the floor does — so
-// without this the coupon's tightest point would be its own elephant foot and
-// it would read tight for a reason the part does not share.
+// Note 49.
+
 coupon_relief = 0.60;
 
 /* [Quality] */
 
-// Chord error target (mm). 0.02 is the 0.4-nozzle figure.
+// Note 50.
 chord_err = 0.02;
 
 /* [Hidden] */
 
-// Facets for a target chord error on a given radius.
+// Note 51.
 function facets(r, e = chord_err) = ceil(180 / acos(1 - e / r));
-// Radius that makes the INSCRIBED polygon's inner radius equal r.
+// Note 52.
 function r_hole(r, n) = r / cos(180 / n);
 
 bore_d   = can_d + can_slop + bore_comp;
@@ -365,41 +206,32 @@ nseg     = facets(out_r);
 r_bore   = r_hole(bore_r, nseg);
 r_drain  = drain_d > 0 ? r_hole(drain_d / 2, nseg) : 0;
 
-// The cavity, and what it leaves of each shell.
+// Note 53.
 cav_ri   = bore_r + inner_w;
 cav_ro   = out_r - outer_w;
 cav_z0   = floor_t;
 cav_z1   = total_h - roof_t;
 
-// The base round. Centre sits one radius in and one radius up, so the arc is
-// tangent to the barrel at z = base_round. base_tan is where it reaches
-// base_over from vertical and hands over to the cone; base_foot is where that
-// cone lands on the bed.
+// Note 54.
+
 base_cz     = base_round;
 base_cr     = out_r - base_round;
 base_tan_r  = base_cr + base_round * cos(base_over);
 base_tan_z  = base_cz - base_round * sin(base_over);
 base_foot_r = base_tan_r - base_tan_z * tan(base_over);
-// Height at which the barrel first reaches full width, whichever edge is used.
+// Note 55.
 base_top_z  = base_round > 0 ? base_round : base_cham;
 
-// Flute cutter: a circle of flute_cut_r whose nearest approach to the axis
-// leaves flute_depth cut out of the outside.
+// Note 56.
+
 flute_off = out_r - flute_depth + flute_cut_r;
-// Half-chord where that cutter breaks the surface — the visible flute width.
+// Note 57.
 flute_a   = (pow(flute_off, 2) + pow(out_r, 2) - pow(flute_cut_r, 2))
             / (2 * flute_off);
 flute_hw  = sqrt(pow(out_r, 2) - pow(flute_a, 2));
 
-// The pocket. flat_r is where a chord pocket_w long sits on the barrel: the
-// plane of the tile's face, flush with the barrel at the tile's two edges.
-// sign_sag is how far below the surface that plane is in the middle, and the
-// floor is a tile thickness below it. The 45-degree ends run from the floor
-// to the surface, so they are sign_bev tall.
-//
-// Set against the INRADIUS of the barrel polygon, not the circle it is drawn
-// in — see the sibling for why; the short version is that it keeps the tile's
-// edges from standing a hair proud at the polygon's flats.
+// Note 58.
+
 sign_w   = pocket_w;
 flat_r   = sqrt(pow(out_r * cos(180 / nseg), 2) - pow(sign_w / 2, 2));
 sign_sag = out_r - flat_r;
@@ -407,43 +239,32 @@ floor_r  = flat_r - tile_t;
 sign_bev = out_r - floor_r;
 sign_z0  = pocket_z - pocket_h / 2;
 sign_z1  = pocket_z + pocket_h / 2;
-sign_t   = floor_r - r_bore;                 // solid wall left behind a pocket
-// The top of the BACKING WEDGE, 1.0 mm past the pocket's upper end; see
-// sign_backing. It is the highest thing a pocket puts into the barrel.
+sign_t   = floor_r - r_bore;                 // Note 59.
+
 sign_back_z1 = sign_z1 + sign_bev + 1.0;
-// Half the angle the pocket subtends, for the do-they-collide assert.
+// Note 60.
 sign_ang = asin((sign_w / 2) / out_r);
-// Half-angle of the wedge that backs it, taken at the cavity's inner radius
-// because that is where the pocket covers the widest sweep.
+// Note 61.
+
 sign_back_ang = asin(min(0.98, (sign_w / 2 + 1.0) / cav_ri));
 
-// The tile, as drawn: tile_clear off every face of the pocket. On the
-// 45-degree ends a square gap of c is c x sqrt(2) measured along the barrel.
-tile_w  = pocket_w - 2 * tile_clear;
-tile_hb = pocket_h - 2 * tile_clear * sqrt(2);   // back face, glued down
-tile_hf = tile_hb + 2 * tile_t;                   // front face, logo side
+// Note 62.
 
-// Half-width of the tile over which a logo h proud stays inside the barrel.
+tile_w  = pocket_w - 2 * tile_clear;
+tile_hb = pocket_h - 2 * tile_clear * sqrt(2);   // Note 63.
+tile_hf = tile_hb + 2 * tile_t;                   // Note 64.
+
 function logo_room(h) = sqrt(max(0, pow(out_r, 2) - pow(flat_r + h, 2)));
 
-// The Wagon Queen lockup's thinnest features and swell budget, as fractions of
-// its width, measured on the old part by eroding or swelling the artwork until
-// the mesh changed.
-script_thin_frac    = 2 * 7.25 / 746.806;                       // 1.94%
-crest_thin_frac     = (2 * 21.5 / 606.804) * (606.804 / 746.806);  // 5.76%
-counter_budget_frac = 11.0 / 746.806;                           // 1.47%
+// Note 65.
+
+script_thin_frac    = 2 * 7.25 / 746.806;                       // Note 66.
+crest_thin_frac     = (2 * 21.5 / 606.804) * (606.804 / 746.806);  // Note 67.
+counter_budget_frac = 11.0 / 746.806;                           // Note 68.
 logo_h = wagon_queen_height(logo_w);
 
-// Does a flute cutter centred at angle t eat into the plaque's flat? The cutter
-// is a circle of flute_cut_r at flute_off from the axis, so it reaches the
-// plane x = flat_r only when the plane passes through it, and the chord it cuts
-// there runs cy +/- h. If that chord reaches inside the plaque's width the
-// flute takes a bite out of the corner of the flat.
-//
-// This is not hypothetical. Before the check went in on the 250 ml part, the
-// flute at 30 degrees clipped both corners and left a flat 36.94 wide instead
-// of 40.00 — 1.47 mm of side padding where 3.00 was specified. It is invisible
-// in a render and shows up immediately in the mesh.
+// Note 69.
+
 function flute_bite(t, clear) =
     let (cx = flute_off * cos(t),
          cy = flute_off * sin(t),
@@ -452,7 +273,7 @@ function flute_bite(t, clear) =
     : let (h = sqrt(pow(flute_cut_r, 2) - pow(d, 2)))
       cy - h < sign_w / 2 + clear && cy + h > -(sign_w / 2 + clear);
 
-// True if flute i bites any of the plaques.
+// Note 70.
 function flute_bites(i) = sign_count == 0 ? false :
     len([for (j = [0 : sign_count - 1])
          if (flute_bite(i * 360 / flute_count - j * 360 / sign_count,
@@ -461,7 +282,7 @@ function flute_bites(i) = sign_count == 0 ? false :
 kept_flutes = flute_count == 0 ? []
             : [for (i = [0 : flute_count - 1]) if (!flute_bites(i)) i];
 
-// Ribs: a circular arc rib_w wide at exactly rib_h proud of the bore.
+// Note 71.
 rib_r    = rib_h > 0 ? (rib_w * rib_w / 4 + rib_h * rib_h) / (2 * rib_h) : 0;
 rib_ax   = bore_r + rib_r - rib_h;
 rib_z0   = floor_t + 1.0;
@@ -519,14 +340,11 @@ assert(sign_count == 0
        || (sign_z0 - sign_bev > base_top_z && sign_z1 + sign_bev < total_h - top_cham),
        "the pocket and its ends have run off the end of the barrel");
 
-// Solid section of the holder, before the wall is hollowed out. Bottom inner
-// corner first, running counter-clockwise: floor, base chamfer, barrel, top
-// chamfer, rim, mouth lead-in, bore, floor again.
+// Note 72.
+
 module holder_solid() {
-    // Bottom edge: a cone from the bed up to base_tan, then the arc round to
-    // vertical. Angles are measured at the arc's centre, 0 being the
-    // tangent-to-vertical point and -base_over the handover to the cone. The
-    // segment count comes off the same chord-error budget as everything else.
+    // Note 73.
+
     n = max(2, ceil(facets(base_round) * base_over / 360));
     base = base_round > 0
         ? concat(
@@ -549,7 +367,7 @@ module holder_solid() {
     rotate_extrude(angle = 360, $fn = nseg) polygon(pts);
 }
 
-// The annular void between the two shells.
+// Note 74.
 module cavity() {
     rotate_extrude(angle = 360, $fn = nseg)
         polygon([[cav_ri, cav_z0], [cav_ro, cav_z0],
@@ -557,16 +375,16 @@ module cavity() {
 }
 
 module webs() {
-    // Half-pitch offset keeps a web off the y = 0 plane, so the "cut" view
-    // shows the cavity rather than a web edge-on.
+    // Note 75.
+
     for (i = [0 : web_count - 1])
         rotate([0, 0, (i + 0.5) * 360 / web_count])
             translate([0, -web_t / 2, 0])
                 cube([out_r, web_t, total_h]);
 }
 
-// Full-height vertical cutters. Running them past both ends is what keeps the
-// flutes free of ledges — they simply run off the chamfers.
+// Note 76.
+
 module flutes() {
     n = facets(flute_cut_r);
     for (i = kept_flutes)
@@ -575,17 +393,8 @@ module flutes() {
                 cylinder(r = flute_cut_r, h = total_h + 2 * eps, $fn = n);
 }
 
-// One pocket per tile, as a meridian profile swept pocket_w wide. Read bottom
-// to top: a 45-degree ramp in from the surface to the floor, the floor itself
-// from sign_z0 to sign_z1, then a 45-degree ramp back out. Both ramps are
-// sign_bev tall because that is what 45 degrees costs over that depth, and the
-// top one is the one that is not optional.
-//
-// Unlike the sibling's plaques this IS bounded in y. Its floor is a tile below
-// the chord plane, and that deeper plane meets the barrel wider than pocket_w,
-// so an unbounded cut would run out past the tile's edges. Bounded, the sides
-// are vertical walls exactly tile_t deep at the barrel: the tile's edges land
-// flush.
+// Note 77.
+
 module sign_pockets() {
     big = 4 * outer_d;
     pts = [
@@ -602,22 +411,8 @@ module sign_pockets() {
                 linear_extrude(height = sign_w, center = true) polygon(pts);
 }
 
-// Solid behind each pocket, made by taking a wedge back out of the cavity over
-// the pocket's height. The pocket floor sits at 37.06 and the cavity runs
-// 35.62 to 40.02, so the pocket lands inside the cavity and something has to
-// give — this is the something.
-//
-// IT HAS TO BE A WEDGE, NOT A BOX. A box spanning |y| <= 21 and x >= cav_ri - 1
-// looks like it covers the sector and does not: the cavity's inner corner where
-// it meets a web at 22.5 degrees sits at x = 28.91, inboard of the box, so a
-// 1.4 mm sliver of cavity squeaks past the block and runs the full height. The
-// pocket behind each plaque then comes out as a TORUS rather than being severed
-// — caught on the 250 ml part by counting shells in the mesh, where two pockets
-// reported genus 1, and invisible in every render. A wedge from the axis has no
-// such corner.
-//
-// The half-angle is taken at cav_ri, the radius where the plaque subtends the
-// most, so the whole footprint is covered at every depth.
+// Note 78.
+
 module sign_backing() {
     big = 4 * outer_d;
     n   = ceil(2 * sign_back_ang / 4);
@@ -634,8 +429,8 @@ module sign_backing() {
 module ribs() {
     n = facets(rib_r);
     for (i = [0 : rib_count - 1])
-        // Half-pitch off the webs, so a rib never lands on a web edge-on in
-        // the cut view. Nothing structural depends on where they sit.
+        // Note 79.
+
         rotate([0, 0, 30 + i * 360 / rib_count])
             hull() {
                 translate([bore_r + rib_r, 0, rib_z0])
@@ -650,20 +445,15 @@ module ribs() {
 }
 
 module holder_body() {
-    // The ribs are unioned in BEFORE the cavity is cut, not after. Each rib is
-    // a 3.90 mm arc and only 0.30 mm of it is wanted, so left to itself a rib
-    // reaches 36.70 mm out — 5.40 mm into a cavity that is only 4.40 wide, so
-    // it crosses the whole thing. Cutting the cavity last shaves them off flush
-    // with the inner shell and gets the dead air back.
+    // Note 80.
+
     difference() {
         union() {
             holder_solid();
             if (rib_count > 0 && rib_h > 0) ribs();
         }
-        // The cavity less the webs is the set of pockets to hollow out. Doing
-        // it in one subtraction beats hollowing and then unioning the webs back
-        // in — that version dropped webs to boolean robustness failures on
-        // slim-can-adapter.scad.
+        // Note 81.
+
         difference() {
             cavity();
             webs();
@@ -676,16 +466,8 @@ module holder_body() {
 
 module can_holder() color(holder_color) holder_body();
 
-// One tile as printed: back on the bed at z = 0, logo face up at z = tile_t.
-// X runs round the barrel, Y along it. The ends are chamfered at 45 degrees to
-// match the pocket's, which makes the tile wider at its face than at its back
-// — so the chamfers are 45-degree overhangs in print, and nothing worse.
-//
-// The logo sits on the face, centred, width along X and reading up +Y. Seated,
-// that puts it upright and unmirrored seen from outside the barrel — the same
-// turns the old moulded crest used. For another logo, union it onto the face
-// at z = tile_t; see THE LOGO'S HEIGHT BUDGET in the header for how far it can
-// stand proud, and where.
+// Note 82.
+
 module tile(logo = tile_logo) {
     color(tile_color)
         hull() {
@@ -704,12 +486,8 @@ module tile(logo = tile_logo) {
             }
 }
 
-// A 2D shape extruded h tall with its TOP edge rolled over by r: a core, then
-// slabs inset along a quarter circle. Only the top is rolled — rolling the
-// bottom would undercut the join to the face. Every slab starts from the
-// middle of the core, not its top, so no two slabs meet face to face; stacked
-// that way the union comes apart into separate shells (see cat_slab in
-// logos/marks.scad).
+// Note 83.
+
 module rolled_relief(h, r) {
     n    = max(3, ceil(r / bevel_step));
     core = h - r;
@@ -722,11 +500,8 @@ module rolled_relief(h, r) {
     }
 }
 
-// A tile seated in every pocket, back on the floor. The turns map the tile's
-// (x, y, z) onto the barrel's (y, z, x): width round it, height along it,
-// thickness outward.
-// out pushes every tile that far radially clear of its pocket, for an
-// exploded view.
+// Note 84.
+
 module tiles_seated(out = 0, logo = tile_logo) {
     for (i = [0 : sign_count - 1])
         rotate([0, 0, i * 360 / sign_count])
@@ -735,10 +510,8 @@ module tiles_seated(out = 0, logo = tile_logo) {
                     tile(logo);
 }
 
-// Entry points for can-holder-12oz-standard-set.scad, which `use`s this file
-// alongside both rings. Every part file in the set defines ribs(),
-// fit_coupon() and the rest, so the viewer only ever calls these, whose names
-// are unique across the set; inside them, names resolve in this file.
+// Note 85.
+
 module holder_part() can_holder();
 module holder_tiles(out = 0, logo = tile_logo) tiles_seated(out, logo);
 function holder_floor_z() = floor_t;
@@ -766,18 +539,12 @@ echo(str("tile ", tile_w, " wide x ", tile_hb, " (back) / ", tile_hf,
          "; 1.00 proud fits |x| <= ", logo_room(1.00),
          ", 2.00 proud fits |x| <= ", logo_room(2.00)));
 
-// The fit coupon: the top coupon_h of the finished part, dropped onto the bed
-// the same way up as the part itself. Taking it off the real thing rather than
-// drawing a lookalike is deliberate — every number that could move the bore is
-// then the number the part will print with.
+// Note 86.
+
 module fit_coupon() {
     z0 = total_h - coupon_h;
-    c  = coupon_relief + rib_h;          // 45 degrees, clearing the rib tips
-    // NOT an assert. The coupon is for the bore, so catching part of a plaque
-    // is a fact about it rather than a fault in it. Said out loud because it
-    // changes what the geometry summary looks like: wedge tops inside the
-    // coupon subdivide its cavity into sealed pockets and the genus goes
-    // negative, and that is easier to read here than to work out later.
+    c  = coupon_relief + rib_h;          // Note 87.
+
     if (sign_count > 0 && z0 <= sign_back_z1)
         echo(str("coupon note: it catches the pocket — top of its end ",
                  sign_z1 + sign_bev, ", backing wedge top ", sign_back_z1,
@@ -798,9 +565,7 @@ module fit_coupon() {
     }
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 88.
 module feral_default_output_5f49d186a6e4() {
 if (show == "coupon")
     fit_coupon();
@@ -827,3 +592,474 @@ can_holder(); holder_tiles(explode ? 25 : 0,"wagon-queen");
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_5f49d186a6e4();
 else feral_assembly_view_5f49d186a6e4(view == "exploded");
+
+// Notes
+
+// Note 1. Can holder — standard 355 ml / 12 oz can, with glue-in logo tiles.
+//
+// Started as a copy of slim-can-holder-3in-12oz-wagon-queen.scad rebored for
+// the squat can, and it is now generic: no artwork is modelled on the barrel.
+// Each of the four plaques is an empty rectangular pocket, and the logo is
+// printed flat on a separate tile (show = "tile") and glued in. Printing a
+// logo flat puts its face on the top of the print instead of on a vertical
+// wall, which is the whole reason for doing it this way.
+//
+// Two rings drop into the bore and stack, one inside the other:
+//
+// slim-can-adapter-ring-12oz-standard-to-slim.scad   standard -> slim 12 oz
+// slim-can-adapter-ring-12oz-to-8-3oz-nested.scad    slim 12 oz -> 8.3 oz
+//
+// THE CAN. Ø66.04 x 122.2 — the standard 12 oz body, 2.60 in. A 211 can code
+// is the seam, not the body.
+//
+// THE OUTSIDE IS NOT 3 INCHES (Ziad, 2026-10-18). On a 76.20 barrel this bore
+// leaves 4.6 mm of wall: no cavity, and no depth for a pocket. So the WALL was
+// held instead of the outside — 8.90 mm on radius, the 3 in sibling's exactly
+// — and the outside grew by the 8.64 the can grew: 76.20 -> 84.84. The
+// cavity, the shells, the roof, the webs, the floor, the flutes and the ribs
+// are all the sibling's numbers. It will not fit a 3 in cupholder.
+//
+// THE POCKET. A flat floor tile_t below the plane where the barrel meets a
+// pocket_w chord, with vertical side walls and 45-degree ends. The tile is
+// tile_t thick, so it sits flush with the barrel at its two side edges and
+// sign_sag below it in the middle — the same flat-panel look the moulded
+// plaques had. The ends are 45 degrees and not square for the reason the
+// sibling's header gives: a square top to the pocket is a cantilevered
+// ceiling with nothing under its outer edge. The tile carries a matching 45
+// degree chamfer on both ends, so it fills the pocket to its own face.
+//
+// ⚠️ THE LOGO'S HEIGHT BUDGET TAPERS ACROSS THE TILE. The barrel curves away
+// over a flat face, so a logo standing h proud stays inside the 84.84 circle
+// only where |y| <= sqrt(out_r^2 - (flat_r + h)^2): at 2.00 proud that is
+// ±10.6 of the tile's 32.6 width. The echo prints it. Past that the logo
+// stands outside the barrel, which is harmless in a hand and matters only if
+// the outside diameter does.
+//
+// THE FIT — INHERITED, NOT CONFIRMED. bore_comp 0.60 and rib_h 0.30 carry
+// over unchanged on the sibling's argument that this machine's bore loss is
+// constant in absolute terms: printed bore 66.81, 66.21 across the ribs, 0.17
+// clearance on a 66.04 can. Print [Fit coupon] before the part. The tile's
+// clearance is not proven either; print one tile with the coupon.
+//
+// ORIENTATION. Holder floor-down; nothing needs support. Tile back-down, logo
+// up; its chamfered ends are 45-degree overhangs.
+//
+// The can is 122 tall and this is 100, so 22 mm stands proud.
+// The one thing a coupon can answer here, and the variant that puts it on a
+// plate. There is only one, so the plate and the component are the same
+// variant; utils/coupon.sh reads these directives and needs no knowledge of
+// this part. Keep the names stable.
+
+// Note 2. Artwork for the logo tiles. marks.scad defines modules and calls none, so
+// including it puts nothing on the holder; only tile() draws from it.
+
+// Note 3. default preserves the original part, coupon and print selectors.
+
+// Note 4. "cut" is a half-section for reading the double wall, the cavity and the ribs.
+// Not for printing — build it with --name if you want it as its own STL.
+// "coupon" is the fit test; see [Fit coupon].
+// "tile" is one blank logo tile, as printed. "assembly" is the holder with a
+// tile in every pocket — preview only, never an STL.
+
+// Note 5. organic faceting per the 0.4-nozzle rule; no global high $fn
+
+// Note 6. Body diameter of a standard 355 ml / 12 oz can (mm), 2.60 in.
+//
+// outer_d is derived from this, so the wall, the cavity and the plaque depth
+// hold still if it changes; only the outside and the rib clearance move.
+
+// Note 7. Clearance on diameter at the bore itself (mm). The ribs, not this, set the
+// grip — this only has to let the can pass.
+
+// Note 8. Extra diameter added to the bore to cover this machine's bore shrinkage (mm).
+//
+// SETTLED, 2026-08-22, on the 250 ml part's fit coupon, and carried here
+// unchanged. A bore drawn at 54.00 miked 53.77 between the ribs — a loss of
+// 0.23 on diameter. Ziad pushed a real can in: "fits perfectly, snug enough but
+// not difficult".
+//
+// It transfers to this bore because the loss does not scale. The slicing
+// reference measured 0.55–0.65 off a bore drawn at 10.15; the 250 ml part
+// measured 0.23 off one drawn at 54.00. A fixed loss would have taken 0.60 off
+// the big bore and did not; a proportional loss would have taken 0.04 off the
+// small one and did not. The small-bore figure is first-layer squish and
+// extrusion pull-in — local, and roughly constant in absolute terms — so
+// between Ø54.00 and Ø58.40 there is nothing left in it that changes.
+//
+// ⚠️ Do NOT "correct" this number to the measured 0.23. 0.60 is what produced a
+// bore that fits, and the ribs were sized against it. The two are a matched
+// pair; changing one without the other opens the fit back up.
+
+// Note 9. Radial wall from bore to outside (mm). 8.90 is the 3 in sibling's, (76.20 -
+// 58.40) / 2, and holding it is what keeps every shell, cavity and plaque
+// number of that part valid here. See THE OUTSIDE in the header.
+
+// Note 10. Outside diameter (mm): 84.84 at the defaults.
+
+// Note 11. Overall height (mm). The can is 122, so this leaves 22 mm proud.
+
+// Note 12. Inner shell, the tube around the can (mm). 2.10 is 5 walls at 0.42.
+
+// Note 13. Outer shell at the top of a flute — the flats, not the valleys (mm). 2.40 is
+// thicker than the inner shell on purpose: the flutes eat into it.
+
+// Note 14. Roof over the annular cavity (mm). 1.60 is 8 layers at 0.20, bridging 4.40 —
+// 2.20 mm less span than the same roof carries on the 250 ml part, so this is
+// the easy end of the trade the bigger bore made.
+
+// Note 15. Floor thickness (mm). The requirement is "at least 5"; 5.40 is 27 layers at
+// 0.20 and it is what the can lands on and what you set down on things.
+
+// Note 16. Hole through the floor (mm). Drains condensation and lets a finger push the
+// can back out of a 100 mm bore, which matters more here than on a short one.
+// Set to 0 for a closed floor.
+
+// Note 17. Radius of the round on the bottom outside edge (mm). Set to 0 for a plain
+// chamfer of base_cham instead.
+//
+// ⚠️ It is NOT a full quarter-round, and it cannot be. A round tangent to the
+// bottom face is horizontal where it meets the bed: the first 0.20 mm of layer
+// would grow 1.40 mm outward with nothing under it, which is a 90-degree
+// overhang and prints as a drooping skirt. So the arc is truncated at
+// base_over, and below that it runs on as a straight cone at that same angle
+// down to the bed. The radius you asked for is the radius you get everywhere
+// the eye reads it; only the last 1.46 mm is a cone.
+
+// Note 18. Steepest overhang the round is allowed to reach, measured from vertical.
+// 45 is MAX_OVERHANG_DEG out of the printer reference — safe unsupported on
+// this machine, and FlashForge's own guidance is more conservative still.
+
+// Note 19. 45-degree chamfer on the bottom outside edge (mm), used only when
+// base_round is 0 — more reliable than the slicer's elephant-foot compensation.
+
+// Note 20. 45-degree chamfer on the top outside edge (mm). Cosmetic, and it takes the
+// sharpness off the rim.
+
+// Note 21. Lead-in at the mouth of the bore: how far it opens on radius (mm)...
+
+// Note 22. ...over how much height (mm). This is what lets the can be dropped in without
+// being aimed. It opens outward going up, so it costs no support.
+
+// Note 23. Shallow vertical flutes cut into the outside. They run the full height and
+// off both chamfers, so there is no ledge anywhere and no floating detail.
+
+// Note 24. How deep each one cuts on radius (mm). This comes straight out of outer_w —
+// see the assert below.
+
+// Note 25. Radius of the circle that cuts each flute (mm). With the defaults this makes
+// a flute 5.6 mm across on a 9.97 mm pitch, so 4.4 mm of flat between them.
+
+// Note 26. How close a flute is allowed to come to the edge of a plaque (mm) before it
+// is dropped altogether. A flute that clips the corner of a plaque steals the
+// padding it was supposed to leave, and there is no way to have both — so the
+// flute goes. With the defaults this drops 4 of the 24; the echo says how many.
+
+// Note 27. Rectangular pockets milled into the barrel, one per tile, evenly spaced.
+// Cut in, never stood off, so the outside diameter is untouched.
+
+// Note 28. Width of a pocket round the barrel, at its floor (mm). The sibling's plaque
+// was 33.00 — 27.00 of artwork and 3.00 of padding a side — and this keeps
+// it. Wider sinks the middle deeper, as the square of the width.
+
+// Note 29. Height of a pocket's floor along the barrel (mm), not counting the
+// 45-degree ends. The ends add tile_t + sign_sag each.
+
+// Note 30. Height of the centre of the pocket above the base (mm). Centred on the
+// barrel, as the sibling's plaques were (Ziad, 2026-09-16).
+
+// Note 31. Thickness of a tile, and so the depth of the pocket at its side edges (mm).
+// 2.00 is 10 layers at 0.20. Bounded from above by the wall it leaves over
+// the bore — there is an assert at 2.10 — and from below by having something
+// to glue.
+
+// Note 32. Clearance per side between tile and pocket (mm). Measured square to each
+// face, so the chamfered ends get the same gap as the sides. It is the glue
+// gap; it is not a proven fit.
+
+// Note 33. Logo on the tile's face. "none" is a blank to glue your own artwork onto,
+// or to put your own logo on in another file.
+
+// Note 34. Width of the Wagon Queen lockup, crest and lettering (mm). 27.00 is what the
+// barrel carried before the logos came off it, and it is near the ceiling: a
+// 1.00 relief stays inside the barrel only within ±13.96 of the tile's centre,
+// and there is an assert on that.
+
+// Note 35. How far the logo stands proud of the tile's face (mm). 1.00 is 5 layers at
+// 0.20. It is not 2.00, as on the old moulded plaques, because 2.00 proud at
+// this width stands up to 0.85 outside the barrel at the lockup's edges — see
+// THE LOGO'S HEIGHT BUDGET in the header. Printed flat it is the top of the
+// print, so the relief costs nothing to print.
+
+// Note 36. Swell on the lettering (mm per side). The script's thin strokes are 1.94% of
+// the lockup's width, 0.52 here, which prints as a broken line; this takes
+// them to 0.90. Bounded above by the lettering's counters, which start to
+// close at 1.47% of the width. Both are asserted. Measured on the old part.
+
+// Note 37. Round on the top edge of the raised crest and of the lettering (mm). Each is
+// bounded by its own thinnest stroke: the top of the narrowest is kept over
+// 0.20 by assert.
+
+// Note 38. Slab height in that roll (mm), half a 0.20 layer.
+
+// Note 39. Preview only. STLs carry no colour.
+
+// Note 40. The logo is part of the tile's print. Its own colour is for telling them
+// apart here, or a reminder to swap filament at the logo's first layer.
+
+// Note 41. Rounded vertical ribs inside the bore, so the can is held rather than
+// rattling, without shrinking the bore itself. Set rib_count or rib_h to 0 for
+// a plain slip fit.
+//
+// THE ARITHMETIC. Two ribs sit across any diameter, so the working size is
+// (printed bore) - 2 x rib_h. The bore is drawn 58.40 and this machine takes
+// 0.23 out of a bore that size — measured, see bore_comp — so the printed bore
+// is 58.17.
+//
+// rib_h 0.20  ->  57.77   0.37 clearance on a Ø57.4 can
+// rib_h 0.30  ->  57.57   0.17 clearance   <- carried from the 250 ml part
+// rib_h 0.40  ->  57.37   0.03 interference
+// rib_h 0.50  ->  57.17   0.23 interference
+//
+// That is the same ladder the 250 ml part has, shifted bodily by the 4.40 the
+// can grew, and it lands on the same 0.17 — the clearance Ziad printed and
+// called snug but not difficult. Nothing here is a new decision. Go to 0.40
+// only if the can measures under Ø57.4, and sand rather than reprint.
+
+// Note 42. How far each rib stands into the bore (mm).
+
+// Note 43. Chord width of the bump (mm). Sets the bearing area; its radius is derived so
+// the arc is exactly this wide at exactly rib_h proud.
+
+// Note 44. Lead-in at the top, over which the rib fades to nothing (mm). This is what
+// makes insertion progressive instead of a step.
+
+// Note 45. Foot at the bottom, same idea (mm). This end is the one the printer sees as
+// an overhang, and at 0.30 over 2 mm it is 8.5 degrees off vertical.
+
+// Note 46. Radial webs tying the inner tube to the outer shell across the cavity. They
+// also break the cavity roof into eight short bridges.
+
+// Note 47. Web thickness (mm). 1.35 is 3 walls at the real 0.45 inner line width.
+
+// Note 48. The top of the part, cut off and stood on the bed, so a real can can be
+// pushed into it before committing to a six-hour print.
+//
+// IT IS FOR THE INSIDE DIAMETER AND NOTHING ELSE (Ziad, 2026-09-16). What the
+// outside of the coupon looks like is of no consequence — it is not a
+// presentation piece and nobody is judging its plaques.
+//
+// It is still a genuine slice of the barrel rather than a bare tube, and that
+// is not about appearance: the inner shell, cavity, webs and outer shell are
+// what decide whether the bore comes out round and on size, so a bare tube
+// would not answer the same question. Including a plaque is if anything BETTER
+// than avoiding one, because a plaque replaces 4.40 mm of cavity with 5.79 mm
+// of solid wall behind the bore, and that asymmetry is exactly the kind of
+// thing that pulls a bore out of round.
+//
+// ⚠️ PRINT THIS ONE FIRST. On the 250 ml part the coupon confirmed a bore that
+// had already been reasoned out. Here it is also the only thing that will tell
+// you whether Ø57.40 is the can you actually have.
+//
+// Height (mm). The budget from the top down: 2.00 of mouth chamfer, 1.00 of
+// clearance, 8.00 of rib ramp and then full-proud rib.
+//
+// That budget says 7.00 mm of full-proud rib and the mesh says 6.11: the
+// coupon_relief cone eats the first 0.90 mm of the bore, so the rib is at full
+// height from z 0.90 to 7.01. Still plenty to feel, and the 7.00 in the
+// inherited comment was never measured. The tightest point across the bore
+// measures 57.80, which is bore_d less twice rib_h exactly.
+//
+// It went 18.00 -> 17.50 -> 16.50 and back on 2026-09-16, chasing a constraint
+// that does not exist. Centring the plaque put its bevel at 82.03 and its
+// backing wedge at 83.03, and the coupon was shortened twice to stay clear of
+// both — on the assumption that the coupon had to be a plain barrel section.
+// It does not: the outside is of no consequence, so the coupon is free to
+// contain as much plaque as the height happens to catch. 18.00 restored.
+//
+// What that episode DID leave behind is worth keeping: sign_back_z1, a name
+// for the fact that a plaque reaches 1.0 mm further up the barrel than its
+// bevel does, because sign_backing runs long at both ends. The echo below
+// reports whether the coupon catches any of it, so it is legible in the log
+// rather than a surprise in the mesh — a coupon that contains wedge tops
+// reports a negative genus, since they subdivide its cavity into sealed
+// pockets. That is now information, not an error.
+
+// Note 49. Relief on the bore at the cut face (mm), at 45 degrees, taking the rib tips
+// with it. The real part's bore never touches the bed — the floor does — so
+// without this the coupon's tightest point would be its own elephant foot and
+// it would read tight for a reason the part does not share.
+
+// Note 50. Chord error target (mm). 0.02 is the 0.4-nozzle figure.
+
+// Note 51. Facets for a target chord error on a given radius.
+
+// Note 52. Radius that makes the INSCRIBED polygon's inner radius equal r.
+
+// Note 53. The cavity, and what it leaves of each shell.
+
+// Note 54. The base round. Centre sits one radius in and one radius up, so the arc is
+// tangent to the barrel at z = base_round. base_tan is where it reaches
+// base_over from vertical and hands over to the cone; base_foot is where that
+// cone lands on the bed.
+
+// Note 55. Height at which the barrel first reaches full width, whichever edge is used.
+
+// Note 56. Flute cutter: a circle of flute_cut_r whose nearest approach to the axis
+// leaves flute_depth cut out of the outside.
+
+// Note 57. Half-chord where that cutter breaks the surface — the visible flute width.
+
+// Note 58. The pocket. flat_r is where a chord pocket_w long sits on the barrel: the
+// plane of the tile's face, flush with the barrel at the tile's two edges.
+// sign_sag is how far below the surface that plane is in the middle, and the
+// floor is a tile thickness below it. The 45-degree ends run from the floor
+// to the surface, so they are sign_bev tall.
+//
+// Set against the INRADIUS of the barrel polygon, not the circle it is drawn
+// in — see the sibling for why; the short version is that it keeps the tile's
+// edges from standing a hair proud at the polygon's flats.
+
+// Note 59. solid wall left behind a pocket
+// The top of the BACKING WEDGE, 1.0 mm past the pocket's upper end; see
+// sign_backing. It is the highest thing a pocket puts into the barrel.
+
+// Note 60. Half the angle the pocket subtends, for the do-they-collide assert.
+
+// Note 61. Half-angle of the wedge that backs it, taken at the cavity's inner radius
+// because that is where the pocket covers the widest sweep.
+
+// Note 62. The tile, as drawn: tile_clear off every face of the pocket. On the
+// 45-degree ends a square gap of c is c x sqrt(2) measured along the barrel.
+
+// Note 63. back face, glued down
+
+// Note 64. front face, logo side
+// Half-width of the tile over which a logo h proud stays inside the barrel.
+
+// Note 65. The Wagon Queen lockup's thinnest features and swell budget, as fractions of
+// its width, measured on the old part by eroding or swelling the artwork until
+// the mesh changed.
+
+// Note 66. 1.94%
+
+// Note 67. 5.76%
+
+// Note 68. 1.47%
+
+// Note 69. Does a flute cutter centred at angle t eat into the plaque's flat? The cutter
+// is a circle of flute_cut_r at flute_off from the axis, so it reaches the
+// plane x = flat_r only when the plane passes through it, and the chord it cuts
+// there runs cy +/- h. If that chord reaches inside the plaque's width the
+// flute takes a bite out of the corner of the flat.
+//
+// This is not hypothetical. Before the check went in on the 250 ml part, the
+// flute at 30 degrees clipped both corners and left a flat 36.94 wide instead
+// of 40.00 — 1.47 mm of side padding where 3.00 was specified. It is invisible
+// in a render and shows up immediately in the mesh.
+
+// Note 70. True if flute i bites any of the plaques.
+
+// Note 71. Ribs: a circular arc rib_w wide at exactly rib_h proud of the bore.
+
+// Note 72. Solid section of the holder, before the wall is hollowed out. Bottom inner
+// corner first, running counter-clockwise: floor, base chamfer, barrel, top
+// chamfer, rim, mouth lead-in, bore, floor again.
+
+// Note 73. Bottom edge: a cone from the bed up to base_tan, then the arc round to
+// vertical. Angles are measured at the arc's centre, 0 being the
+// tangent-to-vertical point and -base_over the handover to the cone. The
+// segment count comes off the same chord-error budget as everything else.
+
+// Note 74. The annular void between the two shells.
+
+// Note 75. Half-pitch offset keeps a web off the y = 0 plane, so the "cut" view
+// shows the cavity rather than a web edge-on.
+
+// Note 76. Full-height vertical cutters. Running them past both ends is what keeps the
+// flutes free of ledges — they simply run off the chamfers.
+
+// Note 77. One pocket per tile, as a meridian profile swept pocket_w wide. Read bottom
+// to top: a 45-degree ramp in from the surface to the floor, the floor itself
+// from sign_z0 to sign_z1, then a 45-degree ramp back out. Both ramps are
+// sign_bev tall because that is what 45 degrees costs over that depth, and the
+// top one is the one that is not optional.
+//
+// Unlike the sibling's plaques this IS bounded in y. Its floor is a tile below
+// the chord plane, and that deeper plane meets the barrel wider than pocket_w,
+// so an unbounded cut would run out past the tile's edges. Bounded, the sides
+// are vertical walls exactly tile_t deep at the barrel: the tile's edges land
+// flush.
+
+// Note 78. Solid behind each pocket, made by taking a wedge back out of the cavity over
+// the pocket's height. The pocket floor sits at 37.06 and the cavity runs
+// 35.62 to 40.02, so the pocket lands inside the cavity and something has to
+// give — this is the something.
+//
+// IT HAS TO BE A WEDGE, NOT A BOX. A box spanning |y| <= 21 and x >= cav_ri - 1
+// looks like it covers the sector and does not: the cavity's inner corner where
+// it meets a web at 22.5 degrees sits at x = 28.91, inboard of the box, so a
+// 1.4 mm sliver of cavity squeaks past the block and runs the full height. The
+// pocket behind each plaque then comes out as a TORUS rather than being severed
+// — caught on the 250 ml part by counting shells in the mesh, where two pockets
+// reported genus 1, and invisible in every render. A wedge from the axis has no
+// such corner.
+//
+// The half-angle is taken at cav_ri, the radius where the plaque subtends the
+// most, so the whole footprint is covered at every depth.
+
+// Note 79. Half-pitch off the webs, so a rib never lands on a web edge-on in
+// the cut view. Nothing structural depends on where they sit.
+
+// Note 80. The ribs are unioned in BEFORE the cavity is cut, not after. Each rib is
+// a 3.90 mm arc and only 0.30 mm of it is wanted, so left to itself a rib
+// reaches 36.70 mm out — 5.40 mm into a cavity that is only 4.40 wide, so
+// it crosses the whole thing. Cutting the cavity last shaves them off flush
+// with the inner shell and gets the dead air back.
+
+// Note 81. The cavity less the webs is the set of pockets to hollow out. Doing
+// it in one subtraction beats hollowing and then unioning the webs back
+// in — that version dropped webs to boolean robustness failures on
+// slim-can-adapter.scad.
+
+// Note 82. One tile as printed: back on the bed at z = 0, logo face up at z = tile_t.
+// X runs round the barrel, Y along it. The ends are chamfered at 45 degrees to
+// match the pocket's, which makes the tile wider at its face than at its back
+// — so the chamfers are 45-degree overhangs in print, and nothing worse.
+//
+// The logo sits on the face, centred, width along X and reading up +Y. Seated,
+// that puts it upright and unmirrored seen from outside the barrel — the same
+// turns the old moulded crest used. For another logo, union it onto the face
+// at z = tile_t; see THE LOGO'S HEIGHT BUDGET in the header for how far it can
+// stand proud, and where.
+
+// Note 83. A 2D shape extruded h tall with its TOP edge rolled over by r: a core, then
+// slabs inset along a quarter circle. Only the top is rolled — rolling the
+// bottom would undercut the join to the face. Every slab starts from the
+// middle of the core, not its top, so no two slabs meet face to face; stacked
+// that way the union comes apart into separate shells (see cat_slab in
+// logos/marks.scad).
+
+// Note 84. A tile seated in every pocket, back on the floor. The turns map the tile's
+// (x, y, z) onto the barrel's (y, z, x): width round it, height along it,
+// thickness outward.
+// out pushes every tile that far radially clear of its pocket, for an
+// exploded view.
+
+// Note 85. Entry points for can-holder-12oz-standard-set.scad, which `use`s this file
+// alongside both rings. Every part file in the set defines ribs(),
+// fit_coupon() and the rest, so the viewer only ever calls these, whose names
+// are unique across the set; inside them, names resolve in this file.
+
+// Note 86. The fit coupon: the top coupon_h of the finished part, dropped onto the bed
+// the same way up as the part itself. Taking it off the real thing rather than
+// drawing a lookalike is deliberate — every number that could move the bore is
+// then the number the part will print with.
+
+// Note 87. 45 degrees, clearing the rib tips
+// NOT an assert. The coupon is for the bore, so catching part of a plaque
+// is a fact about it rather than a fault in it. Said out loud because it
+// changes what the geometry summary looks like: wedge tops inside the
+// coupon subdivide its cavity into sealed pockets and the genus goes
+// negative, and that is easier to read here than to work out later.
+
+// Note 88. Assembly display changes placement only; the original output remains the default.

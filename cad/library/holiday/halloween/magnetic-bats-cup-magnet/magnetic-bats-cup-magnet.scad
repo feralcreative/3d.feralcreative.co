@@ -1,30 +1,27 @@
-// Ten wings-out Halloween bats adapted for a fully enclosed cup magnet.
-// Print the flat decorative face on the bed. Insert the magnet during a pause,
-// before the rear roof starts, with the magnet's working face toward the roof.
-// Original meshes are retained. Sample their solid plate below the old mounts.
+// Note 1.
 
 /* [Bat] */
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 bat = "body22"; // [body14, body15, body16, body17, body19, body21, body22, body23, body25, body26]
-plate_h = 2.1;             // mm, decorative wing plate and cavity floor
-source_slice_z = 0.8;      // mm, inside the original 1.5 mm plate, below magnet bosses
-outline_margin = 0.25;    // mm, plate extends beyond the widened rear housing
-safe_xy = 205;             // mm, documented safe printer footprint
+plate_h = 2.1;             // Note 3.
+source_slice_z = 0.8;      // Note 4.
+outline_margin = 0.25;    // Note 5.
+safe_xy = 205;             // Note 6.
 
 /* [Cup magnet] */
-magnet_d = 51.7;           // mm, measured steel cup outside diameter
-magnet_h = 10.75;          // mm, measured complete cup thickness
-pocket_diameter_extra = 0.3; // mm, nominal 0.15 mm clearance per side
-pocket_depth_extra = 0.29; // mm, extra depth above the seated magnet
-housing_wall = 2.1;        // mm, radial plastic around the pocket
-roof_h = 0.84;             // mm, solid rear cover over the magnet's working face
-entry_travel = 30;         // mm, swept path starts completely above the open housing
+magnet_d = 51.7;           // Note 7.
+magnet_h = 10.75;          // Note 8.
+pocket_diameter_extra = 0.3; // Note 9.
+pocket_depth_extra = 0.29; // Note 10.
+housing_wall = 2.1;        // Note 11.
+roof_h = 0.84;             // Note 12.
+entry_travel = 30;         // Note 13.
 
 /* [Colors] */
-bat_color = "SlateGray";   // preview only; STL does not specify filament color
+bat_color = "SlateGray";   // Note 14.
 magnet_color = "Silver";
 
 /* [Output] */
@@ -39,7 +36,7 @@ roof_z = plate_h + pocket_h;
 part_h = roof_z + roof_h;
 housing_d = pocket_d + 2 * housing_wall;
 bore_factor = 1 / cos(180 / $fn);
-// Source file, measured centre, XY scale, print rotation, widen body.
+// Note 15.
 bat_data = bat == "body14" ? ["originals/obj_6_Body14.stl", 389.7737300481852, -92.74608295291189, 1.798, 45.0, true] :
            bat == "body15" ? ["originals/obj_7_Body15.stl", 349.63140951774056, -139.55378075423604, 1.827, 82.5, true] :
            bat == "body16" ? ["originals/obj_8_Body16.stl", 475.67489286814134, -83.62892765119665, 1.989, 9.0, true] :
@@ -66,8 +63,8 @@ module original_outline() {
                     import(bat_data[0], convexity = 10);
 }
 
-// Grow only the torso around the cup; keep the imported wings and head intact.
-// The three offset pocket centres preserve ears that a larger torso could hide.
+// Note 16.
+
 module bat_outline() {
     union() {
         original_outline();
@@ -91,7 +88,7 @@ module bat_part() {
 }
 
 module fit_coupon() {
-    // Same floor, pocket and wall; open top permits a physical cup-fit check.
+    // Note 17.
     color(bat_color) difference() {
         cylinder(d = housing_d, h = roof_z);
         translate([0, 0, plate_h])
@@ -113,15 +110,13 @@ module magnet_dummy() {
 }
 
 module magnet_entry_sweep() {
-    // Exact continuous vertical translation through the open, paused housing.
+    // Note 18.
     translate([0, 0, plate_h + eps])
         cylinder(d = magnet_d, h = magnet_h + part_h + entry_travel);
 }
 
+// Note 19.
 
-
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
 module feral_default_output_39475d0958ed() {
 if (show == "bat") bat_part();
 else if (show == "coupon") fit_coupon();
@@ -150,3 +145,48 @@ feral_default_output_39475d0958ed();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_39475d0958ed();
 else feral_assembly_view_39475d0958ed(view == "exploded");
+
+// Notes
+
+// Note 1. Ten wings-out Halloween bats adapted for a fully enclosed cup magnet.
+// Print the flat decorative face on the bed. Insert the magnet during a pause,
+// before the rear roof starts, with the magnet's working face toward the roof.
+// Original meshes are retained. Sample their solid plate below the old mounts.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, decorative wing plate and cavity floor
+
+// Note 4. mm, inside the original 1.5 mm plate, below magnet bosses
+
+// Note 5. mm, plate extends beyond the widened rear housing
+
+// Note 6. mm, documented safe printer footprint
+
+// Note 7. mm, measured steel cup outside diameter
+
+// Note 8. mm, measured complete cup thickness
+
+// Note 9. mm, nominal 0.15 mm clearance per side
+
+// Note 10. mm, extra depth above the seated magnet
+
+// Note 11. mm, radial plastic around the pocket
+
+// Note 12. mm, solid rear cover over the magnet's working face
+
+// Note 13. mm, swept path starts completely above the open housing
+
+// Note 14. preview only; STL does not specify filament color
+
+// Note 15. Source file, measured centre, XY scale, print rotation, widen body.
+
+// Note 16. Grow only the torso around the cup; keep the imported wings and head intact.
+// The three offset pocket centres preserve ears that a larger torso could hide.
+
+// Note 17. Same floor, pocket and wall; open top permits a physical cup-fit check.
+
+// Note 18. Exact continuous vertical translation through the open, paused housing.
+
+// Note 19. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

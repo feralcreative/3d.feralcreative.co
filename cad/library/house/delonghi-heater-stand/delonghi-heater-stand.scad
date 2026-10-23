@@ -1,4 +1,407 @@
-// De'Longhi panel heater stand.
+// Note 1.
+
+/* [Assembly display] */
+// Note 2.
+view = "default"; // [default, together, exploded]
+
+include <../../../lib/BOSL2/std.scad>
+include <../../../lib/BOSL2/beziers.scad>
+include <../../../lib/BOSL2/rounding.scad>
+
+/* [Build] */
+
+show = "stand";     // [stand, end-left, end-right, center, coupon, joint-coupon]
+
+/* [Fit] */
+
+clearance = 0.5;    // Note 3.
+cool_depth = 23;    // Note 4.
+back_floor_in = 1.25; // Note 5.
+front_tip_in = 0.25; // Note 6.
+front_knee   = 0.30; // Note 7.
+front_tip_lean = 0;  // Note 8.
+lead_in   = 2;      // Note 9.
+
+/* [Stand] */
+
+heater_len = 500;   // Note 10.
+end_clear  = 1;     // Note 11.
+end_wall   = 5;     // Note 12.
+sections   = 3;     // Note 13.
+
+/* [Joint] */
+
+tab_len   = 12;     // Note 14.
+tab_neck  = 14;     // Note 15.
+tab_head  = 20;     // Note 16.
+tab_h     = 40;     // Note 17.
+tab_x     = 43;     // Note 18.
+tab_clear = 0.25;   // Note 19.
+tab_foot  = 0.5;    // Note 20.
+tab_roof  = 10;     // Note 21.
+
+/* [Block] */
+
+base_w   = 150;     // Note 22.
+top_w    = 100;     // Note 23.
+front_down = 15;    // Note 24.
+back_up    = 30;    // Note 25.
+floor_t  = 6;       // Note 26.
+top_r    = 6;       // Note 27.
+step_r      = 16;   // Note 28.
+step_fillet = 6;    // Note 29.
+foot_chamfer = 0.5; // Note 30.
+
+/* [Coupon] */
+
+coupon_length = 5;  // Note 31.
+coupon_band   = 6;  // Note 32.
+
+/* [Hidden] */
+
+$fn = 64;
+eps = 0.01;
+
+// Note 33.
+
+HEATER_TRACE = [
+    [62.912, 80.000],
+    [41.941, 80.000], [20.971, 80.000], [ 0.000, 80.000],   // Note 34.
+    [ 0.000, 58.397], [ 7.994, 40.757], [ 9.088, 37.472],   // Note 35.
+    [10.183, 34.187], [16.909, 16.825], [18.630, 11.976],
+    [19.795,  8.694], [20.028,  4.368], [20.057,  1.915],
+    [20.069,  0.853], [20.933,  0.000], [21.995,  0.000],   // Note 36.
+    [27.036,  0.000], [32.077,  0.000], [37.118,  0.000],   // Note 37.
+    [37.872,  0.000], [38.561,  0.422], [38.902,  1.095],   // Note 38.
+    [42.335,  7.867], [60.380, 44.907], [62.912, 80.000],   // Note 39.
+];
+HEATER_W = 62.912;  // Note 40.
+HEATER_H = 80;      // Note 41.
+
+BACK_LAST = 15;     // Note 42.
+HEATER_BEZ = [
+    for (i = [0 : len(HEATER_TRACE) - 1])
+        i <= BACK_LAST
+            ? HEATER_TRACE[i] + [back_floor_in * (HEATER_H - HEATER_TRACE[i][1]) / HEATER_H, 0]
+            : HEATER_TRACE[i]
+];
+
+// Note 43.
+
+FRONT_I    = 21;
+front_bez  = select(HEATER_BEZ, FRONT_I, FRONT_I + 3);
+front_A    = front_bez[0];
+front_B    = front_bez[3];
+front_L    = norm(front_B - front_A);                // Note 44.
+front_u    = (front_B - front_A) / front_L;          // Note 45.
+front_base = bezier_curve(front_bez, 48);            // Note 46.
+front_m0   = (last(front_base)[0] - front_base[len(front_base) - 2][0])
+           / (last(front_base)[1] - front_base[len(front_base) - 2][1]);   // Note 47.
+front_arm  = (1 - front_knee) * front_L;             // Note 48.
+
+front_k    = (front_m0 - tan(front_tip_lean)) / (front_u[0] * front_m0 + front_u[1]);
+front_b    = (front_k * front_arm - 2 * front_tip_in) / pow(front_arm, 3);
+front_a    = (front_k - 3 * front_b * front_arm * front_arm) / (2 * front_arm);
+function front_d(s) = s <= 0 ? 0 : front_a * s * s + front_b * s * s * s;
+function front_bent(p) =
+    let (s = (p - front_A) * front_u - front_knee * front_L)   // Note 49.
+    p - [front_d(s), 0];
+front_pts = [for (p = front_base) front_bent(p)];
+front_tip = last(front_pts);                         // Note 50.
+
+front_d_max = max([for (p = front_base) front_d((p - front_A) * front_u - front_knee * front_L)]);
+assert(front_d_max <= front_tip_in + 0.05,
+       str("the front would come in ", front_d_max, " and back out to ", front_tip_in,
+           " at the tip: ease front_tip_lean, or move front_knee down"));
+
+// Note 51.
+
+heater_pts = concat(bezpath_curve(select(HEATER_BEZ, 3, FRONT_I), splinesteps = 24),
+                    list_tail(front_pts, 1));
+
+// Note 52.
+
+left_dxdy  = (HEATER_BEZ[3][0] - HEATER_BEZ[4][0]) / (HEATER_BEZ[3][1] - HEATER_BEZ[4][1]);
+right_dxdy = tan(front_tip_lean);
+function left_x(y)  = 0            + left_dxdy  * (y - HEATER_H);   // Note 53.
+function right_x(y) = front_tip[0] + right_dxdy * (y - HEATER_H);
+ext = back_up + lead_in + 5;   // Note 54.
+
+front_xy = [for (p = front_pts) [p[1], p[0]]];
+back_xy  = [for (p = reverse(bezpath_curve(select(HEATER_BEZ, 3, 12), splinesteps = 24))) [p[1], p[0]]];
+function wall_x(side, y) =
+    y >= HEATER_H ? (side > 0 ? right_x(y) : left_x(y))
+                  : lookup(y, side > 0 ? front_xy : back_xy);
+
+// Note 55.
+
+front_lip_y   = HEATER_H - front_down;
+front_reentry = max([for (p = front_pts) if (p[1] <= front_lip_y) p[0]]) - wall_x(1, front_lip_y);
+
+// Note 56.
+
+function wall_m(side, y) = (wall_x(side, y + 0.25) - wall_x(side, y - 0.25)) / 0.5;
+mouth_w = (wall_x( 1, front_lip_y) + clearance * sqrt(1 + pow(wall_m( 1, front_lip_y), 2)))
+        - (wall_x(-1, front_lip_y) - clearance * sqrt(1 + pow(wall_m(-1, front_lip_y), 2)));
+
+// Note 57.
+
+x_off   = -HEATER_W / 2;             // Note 58.
+mid_x   = -x_off;                    // Note 59.
+block_h = floor_t + HEATER_H;        // Note 60.
+front_h = block_h - front_down;      // Note 61.
+back_h  = block_h + back_up;         // Note 62.
+assert(back_h > front_h + 2 * top_r, "the two wall tops are too close to round: give the outline back a single top");
+assert(back_h - front_h > step_r + step_fillet, "step_r and step_fillet do not both fit in the fall");
+assert(cool_face(back_h) - step_r > -half_w(back_h) + top_r + 2,
+       "the step's round reaches the back's top corner: drop step_r");
+
+// Note 63.
+
+taper = (base_w - top_w) / 2 / block_h;          // Note 64.
+function half_w(y) = base_w / 2 - taper * y;     // Note 65.
+
+function cool_face(y) = x_off + left_x(y - floor_t) + cool_depth;
+
+stand_len   = heater_len + 2 * end_clear + 2 * end_wall;   // Note 66.
+section_len = stand_len / sections;                        // Note 67.
+assert(section_len + 2 * tab_len <= 210,
+       str("the center prints ", section_len + 2 * tab_len, " long, past the bed's probed 210"));
+assert(tab_h + tab_clear + tab_roof < min(front_h, back_h) - 10, "socket roof is up in the mouth");
+
+// Note 68.
+
+module heater_trace() {
+    translate([x_off, floor_t]) polygon(heater_pts);
+}
+
+// Note 69.
+
+module heater_section() {
+    union() {
+        heater_trace();
+        translate([x_off, floor_t]) polygon([
+            [left_x(HEATER_H),        HEATER_H - eps],
+            [right_x(HEATER_H),       HEATER_H - eps],
+            [right_x(HEATER_H + ext), HEATER_H + ext],
+            [left_x(HEATER_H + ext),  HEATER_H + ext],
+        ]);
+    }
+}
+
+// Note 70.
+
+module lip(side, y_top) {
+    polygon([
+        [mid_x,                                                        y_top - lead_in],
+        [wall_x(side, y_top - lead_in) + side * clearance,             y_top - lead_in],
+        [wall_x(side, y_top)           + side * (clearance + lead_in), y_top + eps],
+        [mid_x,                                                        y_top + eps],
+    ]);
+}
+
+// Note 71.
+
+module v_cut() {
+    union() {
+        offset(r = clearance) heater_section();
+        translate([x_off, floor_t]) {
+            lip( 1, HEATER_H - front_down);
+            lip(-1, HEATER_H + back_up);
+        }
+    }
+}
+
+// Note 72.
+
+raw_outline = [
+    [ half_w(0),          0      ],   // Note 73.
+    [ half_w(front_h),    front_h],   // Note 74.
+    [ cool_face(front_h), front_h],   // Note 75.
+    [ cool_face(back_h),  back_h ],   // Note 76.
+    [-half_w(back_h),     back_h ],   // Note 77.
+    [-half_w(0),          0      ],   // Note 78.
+];
+
+// Note 79.
+
+function chamfered(path, i, d) =
+    let (p = path[i], a = select(path, i - 1), b = select(path, i + 1))
+    [p + d * unit(a - p), p + d * unit(b - p)];
+
+block_path = round_corners(
+    concat(chamfered(raw_outline, 0, foot_chamfer),
+           select(raw_outline, 1, 4),
+           chamfered(raw_outline, 5, foot_chamfer)),
+    radius = [0, 0, top_r, step_fillet, step_r, top_r, 0, 0]);
+
+module block_outline() {
+    polygon(block_path);
+}
+
+module section() {
+    difference() {
+        block_outline();
+        v_cut();
+    }
+}
+
+// Note 80.
+
+module upright(len) {
+    rotate([90, 0, 0]) linear_extrude(len, center = true, convexity = 4) children();
+}
+
+// Note 81.
+
+module body(len, y0 = -1, y1 = 1) {
+    difference() {
+        upright(len) block_outline();
+        translate([0, (y0 + y1) / 2 * len / 2, 0])
+            upright(abs(y1 - y0) / 2 * len + eps) v_cut();
+        for (sy = [-1, 1])
+            translate([0, sy * len / 2, 0]) rotate([45, 0, 0])
+                cube([2 * base_w, foot_chamfer * sqrt(2), foot_chamfer * sqrt(2)], center = true);
+    }
+}
+
+// Note 82.
+
+module tab2d()
+    polygon([[-tab_neck / 2, -1], [tab_neck / 2, -1],
+             [tab_head / 2, tab_len], [-tab_head / 2, tab_len]]);
+
+// Note 83.
+module tab(h = tab_h)
+    hull() {
+        translate([0, 0, tab_foot]) linear_extrude(h - tab_foot) tab2d();
+        linear_extrude(eps) offset(delta = -tab_foot) tab2d();
+    }
+
+// Note 84.
+
+module socket_void(h = tab_h)
+    hull() {
+        translate([0, 0, -eps]) linear_extrude(h + tab_clear + eps)
+            mirror([0, 1, 0]) offset(delta = tab_clear) tab2d();
+        translate([0, -tab_len / 2, h + tab_clear + tab_roof]) cube(eps, center = true);
+    }
+
+// Note 85.
+module facing(dir) { if (dir < 0) mirror([0, 1, 0]) children(); else children(); }
+
+// Note 86.
+module tabs_on(yf, dir, h = tab_h)
+    for (x = [-tab_x, tab_x])
+        translate([x, yf, 0]) facing(dir) tab(h);
+
+module sockets_on(yf, dir, h = tab_h)
+    for (x = [-tab_x, tab_x])
+        translate([x, yf, 0]) facing(dir) socket_void(h);
+
+// Note 87.
+
+module center_piece()
+    union() {
+        body(section_len);
+        tabs_on( section_len / 2,  1);
+        tabs_on(-section_len / 2, -1);
+    }
+
+// Note 88.
+
+module end_piece_left()
+    difference() {
+        body(section_len, -1 + 2 * end_wall / section_len, 1);
+        sockets_on(section_len / 2, 1);
+    }
+
+module end_piece_right() mirror([0, 1, 0]) end_piece_left();
+
+// Note 89.
+module stand() {
+    translate([0, -section_len, 0]) end_piece_left();
+    center_piece();
+    translate([0,  section_len, 0]) end_piece_right();
+}
+
+// Note 90.
+
+jc_h    = 15;
+jc_wall = 5;
+module joint_coupon() {
+    w = tab_head + 2 * tab_clear + 2 * jc_wall;
+    d = tab_len + tab_clear + jc_wall;
+    // Note 91.
+    translate([0, -20, 0]) union() {
+        translate([-w / 2, -20, 0]) cube([w, 20, jc_h]);
+        tab(jc_h);
+    }
+    // Note 92.
+    translate([0, 10, 0]) difference() {
+        translate([-w / 2, 0, 0]) cube([w, d, jc_h + tab_clear + tab_roof + 2]);
+        mirror([0, 1, 0]) socket_void(jc_h);
+    }
+}
+
+// Note 93.
+module coupon() {
+    linear_extrude(coupon_length, convexity = 4) difference() {
+        intersection() {
+            block_outline();
+            offset(r = clearance + coupon_band) heater_section();
+        }
+        v_cut();
+    }
+}
+
+echo(str("front tip ", front_tip_in, " in, ", front_tip_lean, " deg at the tip, knee at ", front_knee * 100, "%: tip at x ", front_tip[0] + x_off,
+         " (was ", HEATER_W + x_off, "), mouth ", mouth_w, " wide as cut at the front's lip (", front_tip[0], " at the trace's flat edge), ",
+         "wall in by ", front_d(front_arm / 2), " halfway up the bend, ",
+         "mouth narrower than the V below it by ", front_reentry));
+
+echo(str("back leaned in ", back_floor_in, " at the floor, ",
+         atan(back_floor_in / HEATER_H), " deg: floor flat now ",
+         HEATER_BEZ[18][0] - HEATER_BEZ[15][0], " wide (was ",
+         HEATER_TRACE[18][0] - HEATER_TRACE[15][0], "), back's tangent at the mouth ",
+         atan(-left_dxdy), " deg off plumb"));
+
+echo(str("nothing above the rail past x ", cool_face(block_h), " (", cool_depth,
+         " forward of the back panel): the step stands there, ", back_h - front_h,
+         " tall, with ", cool_face(back_h) - step_r + half_w(back_h),
+         " of the back's top face left flat in front of its round"));
+
+echo(str("front wall tops at ", front_h, " (", front_down, " off the flat edge), back at ", back_h,
+         " (", back_up, " on): wall left at the top, front ",
+         half_w(front_h) - (x_off + wall_x( 1, front_h - floor_t) + clearance), ", back ",
+         half_w(back_h)  + (x_off + wall_x(-1, back_h  - floor_t) - clearance)));
+
+echo(str("stand ", stand_len, " long wall to wall, ", sections, " pieces of ", section_len,
+         "; the center prints ", section_len + 2 * tab_len, " with its tabs"));
+
+// Note 94.
+module feral_default_output_258f5e9d3745() {
+if      (show == "coupon")       coupon();
+else if (show == "joint-coupon") joint_coupon();
+else if (show == "end-left")     end_piece_left();
+else if (show == "end-right")    end_piece_right();
+else if (show == "center")       center_piece();
+else                             stand();
+}
+
+module feral_assembly_view_258f5e9d3745(explode=false) {
+color("SteelBlue") translate([0,-section_len-(explode ? 30 : 0),0]) end_piece_left();
+color("DarkOrange") center_piece();
+color("SeaGreen") translate([0,section_len+(explode ? 30 : 0),0]) end_piece_right();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_258f5e9d3745();
+else feral_assembly_view_258f5e9d3745(view == "exploded");
+
+// Notes
+
+// Note 1. De'Longhi panel heater stand.
 //
 // The heater normally stands on its bottom; this stands it on its side. Ziad
 // traced the edge that goes into the stand, in section, in
@@ -170,11 +573,11 @@
 // BUILDS. The plain build is the assembled stand, for looking at, not for
 // printing (it is 512 long). The pieces:
 //
-//     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="end-left"'  --name delonghi-heater-stand-end-left
-//     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="end-right"' --name delonghi-heater-stand-end-right
-//     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="center"'    --name delonghi-heater-stand-center
-//     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="coupon"'    --name delonghi-heater-stand-coupon
-//     utils/build.sh parts/delonghi-heater-stand.scad -D 'show="joint-coupon"' --name delonghi-heater-stand-joint-coupon
+// utils/build.sh parts/delonghi-heater-stand.scad -D 'show="end-left"'  --name delonghi-heater-stand-end-left
+// utils/build.sh parts/delonghi-heater-stand.scad -D 'show="end-right"' --name delonghi-heater-stand-end-right
+// utils/build.sh parts/delonghi-heater-stand.scad -D 'show="center"'    --name delonghi-heater-stand-center
+// utils/build.sh parts/delonghi-heater-stand.scad -D 'show="coupon"'    --name delonghi-heater-stand-coupon
+// utils/build.sh parts/delonghi-heater-stand.scad -D 'show="joint-coupon"' --name delonghi-heater-stand-joint-coupon
 //
 // The end pieces are mirror images, and a mirror image is not a rotation:
 // turning the left end round puts the V's front on the back. Both get built.
@@ -191,102 +594,99 @@
 //
 // Axes: X across the heater's thickness, Z up, Y along the heater's edge.
 
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
+// Note 2. default preserves the original part, coupon and print selectors.
 
-include <../../../lib/BOSL2/std.scad>
-include <../../../lib/BOSL2/beziers.scad>
-include <../../../lib/BOSL2/rounding.scad>
+// Note 3. gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
 
-/* [Build] */
+// Note 4. how far the heater's cool back panel reaches forward of its own back face (mm). Above the rail, nothing of the stand may stand against the heater past this: it is the mesh screen and the hot plate from there forward. Ziad, 2026-09-17
 
-show = "stand";     // [stand, end-left, end-right, center, coupon, joint-coupon]
+// Note 5. how far the back comes in at the floor, nothing at the flat edge — the traced back rotated about the mouth (mm). 1.25 is the 1.5-2 of air Ziad saw on the v13 coupon, less the clearance that is meant to be in there
 
-/* [Fit] */
+// Note 6. how far left (toward the back) the front's tip moves, on an arc that starts at the knee (mm). 5 off the v06 coupon, then "a few mm more" off v09, so 8; 0.25 off the printed center, 2026-09-17 — see THE BEND CAME BACK OUT in the header. 0 is the trace as traced
 
-clearance = 0.5;    // gap between the traced outline and the V, all round (mm); the trace is by eye, so start loose
-cool_depth = 23;    // how far the heater's cool back panel reaches forward of its own back face (mm). Above the rail, nothing of the stand may stand against the heater past this: it is the mesh screen and the hot plate from there forward. Ziad, 2026-09-17
-back_floor_in = 1.25; // how far the back comes in at the floor, nothing at the flat edge — the traced back rotated about the mouth (mm). 1.25 is the 1.5-2 of air Ziad saw on the v13 coupon, less the clearance that is meant to be in there
-front_tip_in = 0.25; // how far left (toward the back) the front's tip moves, on an arc that starts at the knee (mm). 5 off the v06 coupon, then "a few mm more" off v09, so 8; 0.25 off the printed center, 2026-09-17 — see THE BEND CAME BACK OUT in the header. 0 is the trace as traced
-front_knee   = 0.30; // where the bend starts, as a fraction of the front's length up from the floor corner. Was 0.5; Ziad moved it to 0.3 after v09
-front_tip_lean = 0;  // the wall's angle from vertical at the tip (deg); positive opens outward like the trace's own 4, negative leans in. Plumb, off the v10 coupon
-lead_in   = 2;      // 45-degree chamfer on both lips of the mouth (mm)
+// Note 7. where the bend starts, as a fraction of the front's length up from the floor corner. Was 0.5; Ziad moved it to 0.3 after v09
 
-/* [Stand] */
+// Note 8. the wall's angle from vertical at the tip (deg); positive opens outward like the trace's own 4, negative leans in. Plumb, off the v10 coupon
 
-heater_len = 500;   // the heater's edge, the one in the V, casters off (mm). Ziad's number, 2026-09-16
-end_clear  = 1;     // room between the heater's end and each end wall (mm)
-end_wall   = 5;     // the wall closing each end of the V (mm)
-sections   = 3;     // equal pieces along the edge; the outer two carry the walls
+// Note 9. 45-degree chamfer on both lips of the mouth (mm)
 
-/* [Joint] */
+// Note 10. the heater's edge, the one in the V, casters off (mm). Ziad's number, 2026-09-16
 
-tab_len   = 12;     // how far a tab stands out of its face (mm)
-tab_neck  = 14;     // tab width at the face (mm)
-tab_head  = 20;     // tab width at its tip (mm); (head - neck) / 2 over tab_len is the dovetail angle, 14 degrees here
-tab_h     = 40;     // tab height off the floor (mm); keep it below where the back shoulder narrows
-tab_x     = 43;     // tab centers, either side of the V (mm). See the header for the room there
-tab_clear = 0.25;   // socket bigger than tab, all round (mm); snug sliding is 0.20 on this machine, the joint coupon is for this
-tab_foot  = 0.5;    // 45-degree chamfer on the tab's bottom edges, against elephant foot (mm)
-tab_roof  = 10;     // rise of the socket's roof above the tab, a pyramid so nothing bridges (mm)
+// Note 11. room between the heater's end and each end wall (mm)
 
-/* [Block] */
+// Note 12. the wall closing each end of the V (mm)
 
-base_w   = 150;     // across the floor — this is the stability across the heater (mm)
-top_w    = 100;     // across the block at the trace's flat edge, either side of the 63 mm mouth (mm); with base_w this is the flanks' lean, which both walls keep above and below it
-front_down = 15;    // how far the front wall's top stops below the trace's flat edge (mm). Ziad, 2026-09-17
-back_up    = 30;    // how far the back wall's top stands above the trace's flat edge (mm). Ziad, 2026-09-17
-floor_t  = 6;       // under the V's floor (mm)
-top_r    = 6;       // rounding on the top corners (mm)
-step_r      = 16;   // radius at the head of the step, where the back's top face falls away to the front's (mm). What is left of the swoop once the cut is honoured
-step_fillet = 6;    // radius in the throat of that fall, where it lands on the front's top face (mm)
-foot_chamfer = 0.5; // chamfer on the bottom edges, against elephant foot (mm)
+// Note 13. equal pieces along the edge; the outer two carry the walls
 
-/* [Coupon] */
+// Note 14. how far a tab stands out of its face (mm)
 
-coupon_length = 5;  // the slice's thickness, along the heater's edge (mm). 10 until v11, then 3; 5 asked for on 2026-09-17, the wall tops being 45 apart now and the back one tall and thin
-coupon_band   = 6;  // material kept around the V; the floor under it is floor_t regardless (mm)
+// Note 15. tab width at the face (mm)
 
-/* [Hidden] */
+// Note 16. tab width at its tip (mm); (head - neck) / 2 over tab_len is the dovetail angle, 14 degrees here
 
-$fn = 64;
-eps = 0.01;
+// Note 17. tab height off the floor (mm); keep it below where the back shoulder narrows
 
-// The traced edge, "_incoming/Asset 1.svg", as an absolute cubic bezpath in
+// Note 18. tab centers, either side of the V (mm). See the header for the room there
+
+// Note 19. socket bigger than tab, all round (mm); snug sliding is 0.20 on this machine, the joint coupon is for this
+
+// Note 20. 45-degree chamfer on the tab's bottom edges, against elephant foot (mm)
+
+// Note 21. rise of the socket's roof above the tab, a pyramid so nothing bridges (mm)
+
+// Note 22. across the floor — this is the stability across the heater (mm)
+
+// Note 23. across the block at the trace's flat edge, either side of the 63 mm mouth (mm); with base_w this is the flanks' lean, which both walls keep above and below it
+
+// Note 24. how far the front wall's top stops below the trace's flat edge (mm). Ziad, 2026-09-17
+
+// Note 25. how far the back wall's top stands above the trace's flat edge (mm). Ziad, 2026-09-17
+
+// Note 26. under the V's floor (mm)
+
+// Note 27. rounding on the top corners (mm)
+
+// Note 28. radius at the head of the step, where the back's top face falls away to the front's (mm). What is left of the swoop once the cut is honoured
+
+// Note 29. radius in the throat of that fall, where it lands on the front's top face (mm)
+
+// Note 30. chamfer on the bottom edges, against elephant foot (mm)
+
+// Note 31. the slice's thickness, along the heater's edge (mm). 10 until v11, then 3; 5 asked for on 2026-09-17, the wall tops being 45 apart now and the back one tall and thin
+
+// Note 32. material kept around the V; the floor under it is floor_t regardless (mm)
+
+// Note 33. The traced edge, "_incoming/Asset 1.svg", as an absolute cubic bezpath in
 // mm: point, control, control, point, ... Origin is the SVG's left edge and
 // the 15 mm flat; y is up, so the flat edge where the trace stops is at
 // y = 80 and the narrow flat at y = 0. If the trace is ever redone:
 //
-//     utils/svg2bez.py "_incoming/Asset 1.svg" --height 80
-HEATER_TRACE = [
-    [62.912, 80.000],
-    [41.941, 80.000], [20.971, 80.000], [ 0.000, 80.000],   // the flat edge where the trace stops
-    [ 0.000, 58.397], [ 7.994, 40.757], [ 9.088, 37.472],   // one side: straight, then curling in
-    [10.183, 34.187], [16.909, 16.825], [18.630, 11.976],
-    [19.795,  8.694], [20.028,  4.368], [20.057,  1.915],
-    [20.069,  0.853], [20.933,  0.000], [21.995,  0.000],   // corner
-    [27.036,  0.000], [32.077,  0.000], [37.118,  0.000],   // the 15 mm flat
-    [37.872,  0.000], [38.561,  0.422], [38.902,  1.095],   // corner
-    [42.335,  7.867], [60.380, 44.907], [62.912, 80.000],   // the other side: one long slope
-];
-HEATER_W = 62.912;  // the trace's width at the flat edge (mm)
-HEATER_H = 80;      // the trace's height, narrow flat to flat edge (mm)
+// utils/svg2bez.py "_incoming/Asset 1.svg" --height 80
 
+// Note 34. the flat edge where the trace stops
+
+// Note 35. one side: straight, then curling in
+
+// Note 36. corner
+
+// Note 37. the 15 mm flat
+
+// Note 38. corner
+
+// Note 39. the other side: one long slope
+
+// Note 40. the trace's width at the flat edge (mm)
+
+// Note 41. the trace's height, narrow flat to flat edge (mm)
 // The trace with the back leaned in: a shear, +x by back_floor_in at the
 // floor and nothing at the flat edge, over the back, its corner, and the left
 // end of the floor flat. The front's corner and the front itself are left
 // where they are, so the flat narrows from the back rather than sliding. See
 // the header for why a rotation is the right correction and what it assumes.
-BACK_LAST = 15;     // last index the lean touches — the floor flat's left end
-HEATER_BEZ = [
-    for (i = [0 : len(HEATER_TRACE) - 1])
-        i <= BACK_LAST
-            ? HEATER_TRACE[i] + [back_floor_in * (HEATER_H - HEATER_TRACE[i][1]) / HEATER_H, 0]
-            : HEATER_TRACE[i]
-];
 
-// The front is the last cubic, from the floor corner's exit at index 21 to
+// Note 42. last index the lean touches — the floor flat's left end
+
+// Note 43. The front is the last cubic, from the floor corner's exit at index 21 to
 // the tip. It is sampled and bent: below the knee — front_knee of the way
 // up its chord — nothing moves; above it, each point moves left, straight
 // along -x so the tip stays on the flat edge, by a displacement d(s) that
@@ -298,368 +698,171 @@ HEATER_BEZ = [
 // what v10 showed (the wall stood 1-2 mm off the heater around the apex
 // while the tip was right). The traced tangent at the tip, m0, is what the
 // displacement's slope has to cancel to leave the tip plumb.
-FRONT_I    = 21;
-front_bez  = select(HEATER_BEZ, FRONT_I, FRONT_I + 3);
-front_A    = front_bez[0];
-front_B    = front_bez[3];
-front_L    = norm(front_B - front_A);                // the chord (mm)
-front_u    = (front_B - front_A) / front_L;          // along it, upward
-front_base = bezier_curve(front_bez, 48);            // the front as traced
-front_m0   = (last(front_base)[0] - front_base[len(front_base) - 2][0])
-           / (last(front_base)[1] - front_base[len(front_base) - 2][1]);   // traced tangent at the tip, x per y
-front_arm  = (1 - front_knee) * front_L;             // the chord above the knee (mm)
+
+// Note 44. the chord (mm)
+
+// Note 45. along it, upward
+
+// Note 46. the front as traced
+
+// Note 47. traced tangent at the tip, x per y
+
+// Note 48. the chord above the knee (mm)
 // Slope the displacement needs at the tip, per mm along the chord, to turn
 // the traced tangent m0 into tan(front_tip_lean). dl/dy along the traced
 // curve near the tip is u.x * m0 + u.y.
-front_k    = (front_m0 - tan(front_tip_lean)) / (front_u[0] * front_m0 + front_u[1]);
-front_b    = (front_k * front_arm - 2 * front_tip_in) / pow(front_arm, 3);
-front_a    = (front_k - 3 * front_b * front_arm * front_arm) / (2 * front_arm);
-function front_d(s) = s <= 0 ? 0 : front_a * s * s + front_b * s * s * s;
-function front_bent(p) =
-    let (s = (p - front_A) * front_u - front_knee * front_L)   // distance past the knee, along the chord
-    p - [front_d(s), 0];
-front_pts = [for (p = front_base) front_bent(p)];
-front_tip = last(front_pts);                         // where the front now meets the flat edge
 
+// Note 49. distance past the knee, along the chord
+
+// Note 50. where the front now meets the flat edge
 // The cubic must not overshoot: if the lean asked for at the tip needs the
 // wall to come in past front_tip_in and back out, the knobs disagree.
-front_d_max = max([for (p = front_base) front_d((p - front_A) * front_u - front_knee * front_L)]);
-assert(front_d_max <= front_tip_in + 0.05,
-       str("the front would come in ", front_d_max, " and back out to ", front_tip_in,
-           " at the tip: ease front_tip_lean, or move front_knee down"));
 
-// The whole outline as points, starting at the flat edge's far end and going
+// Note 51. The whole outline as points, starting at the flat edge's far end and going
 // round: down the back, along the floor, up the bent front to the tip. The
 // flat edge itself is the polygon's closing side, tip back to [0, 80], so it
 // runs to wherever the tip has moved to. The front's first point is the
 // trace's last, so it is dropped rather than doubled.
-heater_pts = concat(bezpath_curve(select(HEATER_BEZ, 3, FRONT_I), splinesteps = 24),
-                    list_tail(front_pts, 1));
 
-// Where each side is heading as it leaves the trace, x per mm of y. The left
+// Note 52. Where each side is heading as it leaves the trace, x per mm of y. The left
 // is vertical; the right stands at front_tip_lean, which the bend was built
 // to deliver, so it is taken from the knob rather than re-measured. The run
 // above the trace is kept short (ext) because a lean carried far enough
 // would cross the back and fold the polygon.
-left_dxdy  = (HEATER_BEZ[3][0] - HEATER_BEZ[4][0]) / (HEATER_BEZ[3][1] - HEATER_BEZ[4][1]);
-right_dxdy = tan(front_tip_lean);
-function left_x(y)  = 0            + left_dxdy  * (y - HEATER_H);   // in the trace's own frame
-function right_x(y) = front_tip[0] + right_dxdy * (y - HEATER_H);
-ext = back_up + lead_in + 5;   // how far the heater is carried on above the trace (mm); past the back wall's top, chamfer and all, is what matters
 
+// Note 53. in the trace's own frame
+
+// Note 54. how far the heater is carried on above the trace (mm); past the back wall's top, chamfer and all, is what matters
 // Where a wall of the V stands at a height y in the trace's own frame: side
 // is +1 for the front, -1 for the back. Below the flat edge it is the traced
 // wall — the bent front, or the back as traced — and both sides rise
 // monotonically in y, so lookup() interpolates the sampled points. Above it,
 // each side carries on along the end tangent it left on.
-front_xy = [for (p = front_pts) [p[1], p[0]]];
-back_xy  = [for (p = reverse(bezpath_curve(select(HEATER_BEZ, 3, 12), splinesteps = 24))) [p[1], p[0]]];
-function wall_x(side, y) =
-    y >= HEATER_H ? (side > 0 ? right_x(y) : left_x(y))
-                  : lookup(y, side > 0 ? front_xy : back_xy);
 
-// How much narrower the mouth is than the widest point of the V below it, on
+// Note 55. How much narrower the mouth is than the widest point of the V below it, on
 // the front (mm). Measured at the front's own lip, which since 2026-09-17 is
 // front_down below the trace's flat edge; zero when the lip is the widest
 // point, as it was on the trace's tip and is again once the front is cut down
 // to where the wall is still opening out.
-front_lip_y   = HEATER_H - front_down;
-front_reentry = max([for (p = front_pts) if (p[1] <= front_lip_y) p[0]]) - wall_x(1, front_lip_y);
 
-// The V's opening at the front's lip, as cut (mm): the two walls where they
+// Note 56. The V's opening at the front's lip, as cut (mm): the two walls where they
 // end, each pushed out along its own normal by the clearance, which for a
 // wall leaning m off plumb is clearance * sqrt(1 + m^2) horizontally. This
 // is the aperture the heater has to pass, and it is NOT the width at the
 // trace's flat edge — there is no front wall up there any more, and reading
 // that number instead is how the mouth got quoted 1.4 too wide on
 // 2026-09-17.
-function wall_m(side, y) = (wall_x(side, y + 0.25) - wall_x(side, y - 0.25)) / 0.5;
-mouth_w = (wall_x( 1, front_lip_y) + clearance * sqrt(1 + pow(wall_m( 1, front_lip_y), 2)))
-        - (wall_x(-1, front_lip_y) - clearance * sqrt(1 + pow(wall_m(-1, front_lip_y), 2)));
 
-// ---- derived ---------------------------------------------------------------
+// Note 57. ---- derived ---------------------------------------------------------------
 
-x_off   = -HEATER_W / 2;             // centers the trace on x = 0
-mid_x   = -x_off;                    // the block's centerline, in the trace's frame. The V's floor flat straddles it, so it is inside the V at every height above the floor — which is what lets a lip's chamfer close on it
-block_h = floor_t + HEATER_H;        // where the trace stops, and where the block's one top used to be
-front_h = block_h - front_down;      // the front wall's top (mm)
-back_h  = block_h + back_up;         // the back wall's top (mm)
-assert(back_h > front_h + 2 * top_r, "the two wall tops are too close to round: give the outline back a single top");
-assert(back_h - front_h > step_r + step_fillet, "step_r and step_fillet do not both fit in the fall");
-assert(cool_face(back_h) - step_r > -half_w(back_h) + top_r + 2,
-       "the step's round reaches the back's top corner: drop step_r");
+// Note 58. centers the trace on x = 0
 
-// The flanks' lean, taken from base_w and top_w at the height they were
+// Note 59. the block's centerline, in the trace's frame. The V's floor flat straddles it, so it is inside the V at every height above the floor — which is what lets a lip's chamfer close on it
+
+// Note 60. where the trace stops, and where the block's one top used to be
+
+// Note 61. the front wall's top (mm)
+
+// Note 62. the back wall's top (mm)
+
+// Note 63. The flanks' lean, taken from base_w and top_w at the height they were
 // measured at, so both walls keep the taper the block always had.
-taper = (base_w - top_w) / 2 / block_h;          // x in, per mm of rise
-function half_w(y) = base_w / 2 - taper * y;     // the block's half width at height y
 
+// Note 64. x in, per mm of rise
+
+// Note 65. the block's half width at height y
 // The line the stand may not pass, cool_depth forward of the heater's back
 // panel and parallel to it — the panel leans out as it rises, by as much as
 // the back was leaned in, so the line leans with it. Below the rail it is an
 // extrapolation and answers for nothing: there is no hot plate down there,
 // and all that matters is that it stays inside the V.
-function cool_face(y) = x_off + left_x(y - floor_t) + cool_depth;
 
+// Note 66. wall to wall, outside (mm)
 
-stand_len   = heater_len + 2 * end_clear + 2 * end_wall;   // wall to wall, outside (mm)
-section_len = stand_len / sections;                        // each piece, nominal — the center prints longer by its tabs
-assert(section_len + 2 * tab_len <= 210,
-       str("the center prints ", section_len + 2 * tab_len, " long, past the bed's probed 210"));
-assert(tab_h + tab_clear + tab_roof < min(front_h, back_h) - 10, "socket roof is up in the mouth");
+// Note 67. each piece, nominal — the center prints longer by its tabs
 
-// ---- 2D, in the section: x across, y up --------------------------------------
-
+// Note 68. ---- 2D, in the section: x across, y up --------------------------------------
 // The traced edge, centered on x = 0, sitting on y = floor_t.
-module heater_trace() {
-    translate([x_off, floor_t]) polygon(heater_pts);
-}
 
-// The trace plus the heater above it, along the end tangents, out past the
+// Note 69. The trace plus the heater above it, along the end tangents, out past the
 // top of the block.
-module heater_section() {
-    union() {
-        heater_trace();
-        translate([x_off, floor_t]) polygon([
-            [left_x(HEATER_H),        HEATER_H - eps],
-            [right_x(HEATER_H),       HEATER_H - eps],
-            [right_x(HEATER_H + ext), HEATER_H + ext],
-            [left_x(HEATER_H + ext),  HEATER_H + ext],
-        ]);
-    }
-}
 
-// A 45-degree lead-in on one lip of the mouth, in the trace's frame: side is
+// Note 70. A 45-degree lead-in on one lip of the mouth, in the trace's frame: side is
 // +1 for the front, -1 for the back, and y_top is that wall's own top. It
 // runs from the wall's face — the clearance already added — out to the
 // block's centerline, well inside the V, so it unions into the V's void with
 // nothing hanging off the far side.
-module lip(side, y_top) {
-    polygon([
-        [mid_x,                                                        y_top - lead_in],
-        [wall_x(side, y_top - lead_in) + side * clearance,             y_top - lead_in],
-        [wall_x(side, y_top)           + side * (clearance + lead_in), y_top + eps],
-        [mid_x,                                                        y_top + eps],
-    ]);
-}
 
-// The V: the heater grown by the clearance, with a lead-in on each lip at its
+// Note 71. The V: the heater grown by the clearance, with a lead-in on each lip at its
 // own wall's top. The tops are front_down + back_up apart, so one chamfer
 // across the pair would hang in mid-air on the front and sit half-way up the
 // back.
-module v_cut() {
-    union() {
-        offset(r = clearance) heater_section();
-        translate([x_off, floor_t]) {
-            lip( 1, HEATER_H - front_down);
-            lip(-1, HEATER_H + back_up);
-        }
-    }
-}
 
-// The block's outline. It was a symmetric trapezoid until the two walls got
+// Note 72. The block's outline. It was a symmetric trapezoid until the two walls got
 // their own tops; now the path is written out, counter-clockwise from the
 // front's foot: up the front flank, in along the front's top to the
 // centerline, up the centerline to the back's top, out along that, and down
 // the back flank. Both centerline points are inside the V, so that whole
 // stretch is cut away again by v_cut() and the two tops never meet.
-raw_outline = [
-    [ half_w(0),          0      ],   // the front's foot, chamfered
-    [ half_w(front_h),    front_h],   // the front's top, outside, rounded
-    [ cool_face(front_h), front_h],   // the step's throat, filleted
-    [ cool_face(back_h),  back_h ],   // the step's head, rounded
-    [-half_w(back_h),     back_h ],   // the back's top, outside, rounded
-    [-half_w(0),          0      ],   // the back's foot, chamfered
-];
 
-// Corner i of path, cut off square at d along each of its two edges. The feet
+// Note 73. the front's foot, chamfered
+
+// Note 74. the front's top, outside, rounded
+
+// Note 75. the step's throat, filleted
+
+// Note 76. the step's head, rounded
+
+// Note 77. the back's top, outside, rounded
+
+// Note 78. the back's foot, chamfered
+
+// Note 79. Corner i of path, cut off square at d along each of its two edges. The feet
 // want a chamfer and the tops a radius, and round_corners() does one method
 // per call, so the feet are done here and the tops are left to it.
-function chamfered(path, i, d) =
-    let (p = path[i], a = select(path, i - 1), b = select(path, i + 1))
-    [p + d * unit(a - p), p + d * unit(b - p)];
 
-block_path = round_corners(
-    concat(chamfered(raw_outline, 0, foot_chamfer),
-           select(raw_outline, 1, 4),
-           chamfered(raw_outline, 5, foot_chamfer)),
-    radius = [0, 0, top_r, step_fillet, step_r, top_r, 0, 0]);
-
-module block_outline() {
-    polygon(block_path);
-}
-
-
-module section() {
-    difference() {
-        block_outline();
-        v_cut();
-    }
-}
-
-// ---- 3D -------------------------------------------------------------------
-
+// Note 80. ---- 3D -------------------------------------------------------------------
 // Stand a section up: its y becomes Z, and it runs along Y.
-module upright(len) {
-    rotate([90, 0, 0]) linear_extrude(len, center = true, convexity = 4) children();
-}
 
-// A piece's body: the block, len long, centered on y = 0, with the V cut
+// Note 81. A piece's body: the block, len long, centered on y = 0, with the V cut
 // from y0 to y1 (so an end piece can leave its wall) and the bottom edge of
 // each end face chamfered like the long edges are — a butt joint with an
 // elephant foot on both faces stands the pieces apart.
-module body(len, y0 = -1, y1 = 1) {
-    difference() {
-        upright(len) block_outline();
-        translate([0, (y0 + y1) / 2 * len / 2, 0])
-            upright(abs(y1 - y0) / 2 * len + eps) v_cut();
-        for (sy = [-1, 1])
-            translate([0, sy * len / 2, 0]) rotate([45, 0, 0])
-                cube([2 * base_w, foot_chamfer * sqrt(2), foot_chamfer * sqrt(2)], center = true);
-    }
-}
 
-// ---- the joint ------------------------------------------------------------
-
+// Note 82. ---- the joint ------------------------------------------------------------
 // A tab in plan: neck on the face at y = 0, head out at y = tab_len, and a
 // millimetre back into the body so the union has something to hold.
-module tab2d()
-    polygon([[-tab_neck / 2, -1], [tab_neck / 2, -1],
-             [tab_head / 2, tab_len], [-tab_head / 2, tab_len]]);
 
-// The tab, standing on the floor, pointing +y, foot chamfered.
-module tab(h = tab_h)
-    hull() {
-        translate([0, 0, tab_foot]) linear_extrude(h - tab_foot) tab2d();
-        linear_extrude(eps) offset(delta = -tab_foot) tab2d();
-    }
+// Note 83. The tab, standing on the floor, pointing +y, foot chamfered.
 
-// The socket, as a void to subtract: the tab grown by tab_clear, pointing
+// Note 84. The socket, as a void to subtract: the tab grown by tab_clear, pointing
 // -y into the body from a face at y = 0, open at the floor, and roofed by
 // hulling the slot with a point tab_roof above its middle — every roof face
 // is then 45 degrees or steeper, and nothing bridges.
-module socket_void(h = tab_h)
-    hull() {
-        translate([0, 0, -eps]) linear_extrude(h + tab_clear + eps)
-            mirror([0, 1, 0]) offset(delta = tab_clear) tab2d();
-        translate([0, -tab_len / 2, h + tab_clear + tab_roof]) cube(eps, center = true);
-    }
 
-// Turned to point -y when dir is negative; a tab or socket is drawn for +y.
-module facing(dir) { if (dir < 0) mirror([0, 1, 0]) children(); else children(); }
+// Note 85. Turned to point -y when dir is negative; a tab or socket is drawn for +y.
 
-// Tabs on the face at y = yf, pointing away from the body (dir = +1 or -1).
-module tabs_on(yf, dir, h = tab_h)
-    for (x = [-tab_x, tab_x])
-        translate([x, yf, 0]) facing(dir) tab(h);
+// Note 86. Tabs on the face at y = yf, pointing away from the body (dir = +1 or -1).
 
-module sockets_on(yf, dir, h = tab_h)
-    for (x = [-tab_x, tab_x])
-        translate([x, yf, 0]) facing(dir) socket_void(h);
-
-// ---- the pieces ------------------------------------------------------------
-
+// Note 87. ---- the pieces ------------------------------------------------------------
 // The center: V right through, tabs out of both ends.
-module center_piece()
-    union() {
-        body(section_len);
-        tabs_on( section_len / 2,  1);
-        tabs_on(-section_len / 2, -1);
-    }
 
-// The left end: wall at -y, V from the wall to the +y face, sockets in that
+// Note 88. The left end: wall at -y, V from the wall to the +y face, sockets in that
 // face. The right end is this, mirrored.
-module end_piece_left()
-    difference() {
-        body(section_len, -1 + 2 * end_wall / section_len, 1);
-        sockets_on(section_len / 2, 1);
-    }
 
-module end_piece_right() mirror([0, 1, 0]) end_piece_left();
+// Note 89. The stand, assembled: for looking at, not printing.
 
-// The stand, assembled: for looking at, not printing.
-module stand() {
-    translate([0, -section_len, 0]) end_piece_left();
-    center_piece();
-    translate([0,  section_len, 0]) end_piece_right();
-}
-
-// The joint coupon: a tab and a socket on two small blocks, to check
+// Note 90. The joint coupon: a tab and a socket on two small blocks, to check
 // tab_clear before anything big is printed on it. The tab is jc_h tall; the
 // socket block is taller by the roof, so the roof prints exactly as it will
 // in the end piece and the socket is blind, as it will be. The blocks sit as
 // the pieces would, socket block behind the tab block, a finger's width
 // apart; lift it, drop it on.
-jc_h    = 15;
-jc_wall = 5;
-module joint_coupon() {
-    w = tab_head + 2 * tab_clear + 2 * jc_wall;
-    d = tab_len + tab_clear + jc_wall;
-    // The tab block, its tab pointing +y and reaching y = -8.
-    translate([0, -20, 0]) union() {
-        translate([-w / 2, -20, 0]) cube([w, 20, jc_h]);
-        tab(jc_h);
-    }
-    // The socket block, from y = 10 back, its socket opening on the y = 10 face.
-    translate([0, 10, 0]) difference() {
-        translate([-w / 2, 0, 0]) cube([w, d, jc_h + tab_clear + tab_roof + 2]);
-        mirror([0, 1, 0]) socket_void(jc_h);
-    }
-}
 
-// The section, its outside trimmed to a band around the V, lying flat.
-module coupon() {
-    linear_extrude(coupon_length, convexity = 4) difference() {
-        intersection() {
-            block_outline();
-            offset(r = clearance + coupon_band) heater_section();
-        }
-        v_cut();
-    }
-}
+// Note 91. The tab block, its tab pointing +y and reaching y = -8.
 
-echo(str("front tip ", front_tip_in, " in, ", front_tip_lean, " deg at the tip, knee at ", front_knee * 100, "%: tip at x ", front_tip[0] + x_off,
-         " (was ", HEATER_W + x_off, "), mouth ", mouth_w, " wide as cut at the front's lip (", front_tip[0], " at the trace's flat edge), ",
-         "wall in by ", front_d(front_arm / 2), " halfway up the bend, ",
-         "mouth narrower than the V below it by ", front_reentry));
+// Note 92. The socket block, from y = 10 back, its socket opening on the y = 10 face.
 
-echo(str("back leaned in ", back_floor_in, " at the floor, ",
-         atan(back_floor_in / HEATER_H), " deg: floor flat now ",
-         HEATER_BEZ[18][0] - HEATER_BEZ[15][0], " wide (was ",
-         HEATER_TRACE[18][0] - HEATER_TRACE[15][0], "), back's tangent at the mouth ",
-         atan(-left_dxdy), " deg off plumb"));
+// Note 93. The section, its outside trimmed to a band around the V, lying flat.
 
-echo(str("nothing above the rail past x ", cool_face(block_h), " (", cool_depth,
-         " forward of the back panel): the step stands there, ", back_h - front_h,
-         " tall, with ", cool_face(back_h) - step_r + half_w(back_h),
-         " of the back's top face left flat in front of its round"));
-
-echo(str("front wall tops at ", front_h, " (", front_down, " off the flat edge), back at ", back_h,
-         " (", back_up, " on): wall left at the top, front ",
-         half_w(front_h) - (x_off + wall_x( 1, front_h - floor_t) + clearance), ", back ",
-         half_w(back_h)  + (x_off + wall_x(-1, back_h  - floor_t) - clearance)));
-
-echo(str("stand ", stand_len, " long wall to wall, ", sections, " pieces of ", section_len,
-         "; the center prints ", section_len + 2 * tab_len, " with its tabs"));
-
-
-
-// Assembly display changes placement only; the original output remains the default.
-module feral_default_output_258f5e9d3745() {
-if      (show == "coupon")       coupon();
-else if (show == "joint-coupon") joint_coupon();
-else if (show == "end-left")     end_piece_left();
-else if (show == "end-right")    end_piece_right();
-else if (show == "center")       center_piece();
-else                             stand();
-}
-
-module feral_assembly_view_258f5e9d3745(explode=false) {
-color("SteelBlue") translate([0,-section_len-(explode ? 30 : 0),0]) end_piece_left();
-color("DarkOrange") center_piece();
-color("SeaGreen") translate([0,section_len+(explode ? 30 : 0),0]) end_piece_right();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_258f5e9d3745();
-else feral_assembly_view_258f5e9d3745(view == "exploded");
+// Note 94. Assembly display changes placement only; the original output remains the default.

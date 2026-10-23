@@ -1,53 +1,50 @@
-// Flat adhesive-label placard for fabric storage cubes.
-// A 6 x 4 inch adhesive label sits in a shallow front recess. Three rivets above
-// and three below the label keep the hardware clear of the label itself.
-// Print flat, back on the bed, label face upward. Use metal backing washers
-// on the fabric side and rivets whose grip range covers the complete stack.
+// Note 1.
+
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 include <../../../lib/BOSL2/std.scad>
 include <../../../lib/BOSL2/rounding.scad>
 
 /* [Label] */
-label_w = 152.4;         // mm, 6 inches
-label_h = 101.6;         // mm, 4 inches
-label_margin = 2;       // mm, clear space beyond each label edge
-label_clearance = 0.5;  // mm, recess clearance on each side of the label
-recess_depth = 0.6;     // mm, below the front face; leaves a 1.8 mm floor
+label_w = 152.4;         // Note 3.
+label_h = 101.6;         // Note 4.
+label_margin = 2;       // Note 5.
+label_clearance = 0.5;  // Note 6.
+recess_depth = 0.6;     // Note 7.
 
 /* [Plate] */
-border_w = 11.1;        // mm, equal border from recess to back-face edge on all four sides
-plate_t = 2.4;          // mm, uniform plate thickness
-corner_r = 5;           // mm, rounded outside corners
-front_edge_r = 2.4;     // mm, front perimeter rolls all the way down to the back
-edge_steps = 24;        // segments in the quarter-circle edge profile
+border_w = 11.1;        // Note 8.
+plate_t = 2.4;          // Note 9.
+corner_r = 5;           // Note 10.
+front_edge_r = 2.4;     // Note 11.
+edge_steps = 24;        // Note 12.
 
 /* [Rivets] */
-rivet_d = 3.2;          // mm, nominal shank; 1/8 inch by default
-hole_clearance = 0.1;   // mm, diametral clearance; verify with the actual rivet
+rivet_d = 3.2;          // Note 13.
+hole_clearance = 0.1;   // Note 14.
 rivet_count = 6;        // [4, 6]
-hole_edge = 6.4;        // mm, hole centre to straight back-face edge
+hole_edge = 6.4;        // Note 15.
 head_style = "domed"; // [domed, countersunk]
-head_d = 6.7;          // mm, assumed head envelope; verify actual rivets
-head_clearance = 0.2;  // mm, diametral head-pocket clearance
-head_recess_depth = 1.2; // mm, flat-bottom pocket for ordinary domed pop rivets
-head_seat_angle = 120; // degrees, included angle for countersunk-head variant
-head_web = 1.2;        // mm, minimum material between head recess and label recess
+head_d = 6.7;          // Note 16.
+head_clearance = 0.2;  // Note 17.
+head_recess_depth = 1.2; // Note 18.
+head_seat_angle = 120; // Note 19.
+head_web = 1.2;        // Note 20.
 
 /* [Display] */
 show = "placard";      // [placard, label-layout]
 
 /* [Colors] */
 plate_color = "SteelBlue";
-label_color = "White"; // reference only, never part of the placard STL
+label_color = "White"; // Note 21.
 
 /* [Hidden] */
 $fn = 64;
-eps = 0.01;            // mm, overshoot for every through-cut
+eps = 0.01;            // Note 22.
 hole_d = rivet_d + hole_clearance;
-hole_r = hole_d / (2 * cos(180 / $fn)); // circumscribed bore clears across flats
+hole_r = hole_d / (2 * cos(180 / $fn)); // Note 23.
 pocket_w = label_w + 2 * label_clearance;
 pocket_h = label_h + 2 * label_clearance;
 plate_w = pocket_w + 2 * border_w;
@@ -61,8 +58,8 @@ head_pocket_r = head_pocket_d / (2 * cos(180 / $fn));
 head_depth = head_style == "domed" ? head_recess_depth :
              (head_pocket_d - hole_d) / (2 * tan(head_seat_angle / 2));
 head_floor_z = plate_t - head_depth;
-// BOSL2 quantizes offset profiles to 1/1024 mm; round down so the full-height
-// roundover cannot become numerically taller than the plate.
+// Note 24.
+
 edge_profile_r = floor(front_edge_r * 1024) / 1024;
 
 assert(plate_t > 0 && corner_r > 0 && 2 * corner_r < min(plate_w, plate_h));
@@ -106,17 +103,14 @@ module placard() {
 }
 
 module label_reference() {
-    // OpenSCAD's background modifier excludes this visual guide from STL exports.
+    // Note 25.
     %color(label_color)
         translate([-label_w / 2, -label_h / 2, recess_floor_z + eps])
             cube([label_w, label_h, eps]);
 }
 
+// Note 26.
 
-
-
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
 module feral_default_output_f3fe7ba9353a() {
 placard();
 if (show == "label-layout") label_reference();
@@ -129,3 +123,63 @@ feral_default_output_f3fe7ba9353a();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_f3fe7ba9353a();
 else feral_assembly_view_f3fe7ba9353a(view == "exploded");
+
+// Notes
+
+// Note 1. Flat adhesive-label placard for fabric storage cubes.
+// A 6 x 4 inch adhesive label sits in a shallow front recess. Three rivets above
+// and three below the label keep the hardware clear of the label itself.
+// Print flat, back on the bed, label face upward. Use metal backing washers
+// on the fabric side and rivets whose grip range covers the complete stack.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, 6 inches
+
+// Note 4. mm, 4 inches
+
+// Note 5. mm, clear space beyond each label edge
+
+// Note 6. mm, recess clearance on each side of the label
+
+// Note 7. mm, below the front face; leaves a 1.8 mm floor
+
+// Note 8. mm, equal border from recess to back-face edge on all four sides
+
+// Note 9. mm, uniform plate thickness
+
+// Note 10. mm, rounded outside corners
+
+// Note 11. mm, front perimeter rolls all the way down to the back
+
+// Note 12. segments in the quarter-circle edge profile
+
+// Note 13. mm, nominal shank; 1/8 inch by default
+
+// Note 14. mm, diametral clearance; verify with the actual rivet
+
+// Note 15. mm, hole centre to straight back-face edge
+
+// Note 16. mm, assumed head envelope; verify actual rivets
+
+// Note 17. mm, diametral head-pocket clearance
+
+// Note 18. mm, flat-bottom pocket for ordinary domed pop rivets
+
+// Note 19. degrees, included angle for countersunk-head variant
+
+// Note 20. mm, minimum material between head recess and label recess
+
+// Note 21. reference only, never part of the placard STL
+
+// Note 22. mm, overshoot for every through-cut
+
+// Note 23. circumscribed bore clears across flats
+
+// Note 24. BOSL2 quantizes offset profiles to 1/1024 mm; round down so the full-height
+// roundover cannot become numerically taller than the plate.
+
+// Note 25. OpenSCAD's background modifier excludes this visual guide from STL exports.
+
+// Note 26. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

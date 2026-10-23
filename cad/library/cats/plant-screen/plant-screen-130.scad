@@ -1,4 +1,18 @@
-// Plant screen, Ø130 — the plant-screen.scad lattice at a smaller diameter,
+// Note 1.
+
+// COUPON-COMPONENTS: fit=coupon
+// COUPON-PLATE: coupon
+
+include <plant-screen.scad>
+
+/* [Envelope] */
+
+// Note 2.
+outer_d = 130.00;
+
+// Notes
+
+// Note 1. Plant screen, Ø130 — the plant-screen.scad lattice at a smaller diameter,
 // for a smaller pot. Ziad asked for a second version at 130 mm (2026-09-20).
 //
 // Everything is plant-screen.scad: the struts, the forks under the rim, the
@@ -12,13 +26,5 @@
 // assignment below wins over the base's outer_d because the last assignment
 // in a scope wins file-wide. Keep it a single override: anything else that
 // differs belongs in the base file as a parameter.
-//
-// COUPON-COMPONENTS: fit=coupon
-// COUPON-PLATE: coupon
 
-include <plant-screen.scad>
-
-/* [Envelope] */
-
-// Outside diameter (mm).
-outer_d = 130.00;
+// Note 2. Outside diameter (mm).

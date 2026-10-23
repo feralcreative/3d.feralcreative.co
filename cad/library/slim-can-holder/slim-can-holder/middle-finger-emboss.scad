@@ -1,4 +1,62 @@
-// middle-finger-emboss.scad
+// Note 1.
+
+/* [Output] */
+flip = true;   // Note 2.
+
+standalone = true;
+
+/* [Mesh] */
+mesh_file  = "originals/MiddleFingerToScale.stl";
+mesh_scale = 25.4;   // Note 3.
+tilt       = 57;     // Note 4.
+spin       = 20;     // Note 5.
+
+/* [Cut] */
+relief_depth = 20.0;  // Note 6.
+bottom_z     = -30;   // Note 7.
+
+/* [Hidden] */
+big = 400;
+
+// Note 8.
+
+art_w_mm  = 91.17;    // Note 9.
+art_h_mm  = 128.16;   // Note 10.
+art_cx_mm = -19.94;   // Note 11.
+art_cz_mm = 80.36;    // Note 12.
+
+back_y = -109.36;
+
+module stood_up() rotate([0, 0, spin]) rotate([tilt, 0, 0])
+  scale(mesh_scale) import(mesh_file, convexity = 10);
+
+// Note 13.
+
+module emboss() {
+  // Note 14.
+
+  rotate([0, 0, 180]) translate([0, -(back_y + relief_depth), 0]) intersection() {
+    stood_up();
+    translate([-big / 2, back_y - 1, bottom_z]) cube([big, relief_depth + 1, big]);
+  }
+}
+
+// Note 15.
+
+module finger_mark(w, d)
+  scale([w / art_w_mm, d / relief_depth, w / art_w_mm])
+    translate([-art_cx_mm, 0, -art_cz_mm]) emboss();
+
+module oriented() {
+  if (flip) rotate([90, 0, 0]) children();   // Note 16.
+  else children();
+}
+
+if (standalone) oriented() emboss();
+
+// Notes
+
+// Note 1. middle-finger-emboss.scad
 //
 // The middle finger, as a relief to stick on the side of things: the hand
 // from originals/MiddleFingerToScale.stl stood up so the finger is vertical,
@@ -26,9 +84,9 @@
 // actually lands on the face — where the back comes within bite of the
 // plane — because that is what holds it on:
 //
-//   tilt        54    55    56    57    58    60    62    64    66    68
-//   land 2mm  62.5  70.0  77.5  82.5  75.0  57.5  55.0  47.5  30.0  40.0
-//   land 4mm  80.0  90.0 100.0 102.5 102.5 100.0  82.5  72.5  70.0  60.0
+// tilt        54    55    56    57    58    60    62    64    66    68
+// land 2mm  62.5  70.0  77.5  82.5  75.0  57.5  55.0  47.5  30.0  40.0
+// land 4mm  80.0  90.0 100.0 102.5 102.5 100.0  82.5  72.5  70.0  60.0
 //
 // 57° is the best of them and it is not close: 82.5 mm of the height gets a
 // land, against 30 at the 66° this replaced and 40 at the 68° before that.
@@ -56,9 +114,9 @@
 //
 // Counting mesh points inside a 20 mm slab, against the turn:
 //
-//   about the long axis (wrong)   3: 53638   8: 53754  12: 53897  18: 54228
-//   about the vertical (right)    4: 53707   8: 53942  12: 54483  16: 55217
-//                                20: 56091  24: 54763
+// about the long axis (wrong)   3: 53638   8: 53754  12: 53897  18: 54228
+// about the vertical (right)    4: 53707   8: 53942  12: 54483  16: 55217
+// 20: 56091  24: 54763
 //
 // The wrong axis moved it 1.1% across 18 degrees, which is noise. The right
 // one moves it 7% and peaks at +20, which is where it sits. That is also
@@ -89,10 +147,10 @@
 // The finger's back is not parallel to the face — measured at tilt 57, in
 // 2 mm bands, its distance in from the knuckle surface is:
 //
-//   z    143  141  139  137  135  133  131  129  127  125  123
-//   in  18.7 20.2 21.9 22.6 23.1 23.2 23.1 22.7 22.3 21.6 20.9
-//   z    121  119  117  115  113  111  109  107  105  103  101   99   97   95
-//   in  20.3 20.1 19.7 19.6 19.8 20.3 20.5 20.6 20.5 20.4 20.3 20.1 19.8 19.8
+// z    143  141  139  137  135  133  131  129  127  125  123
+// in  18.7 20.2 21.9 22.6 23.1 23.2 23.1 22.7 22.3 21.6 20.9
+// z    121  119  117  115  113  111  109  107  105  103  101   99   97   95
+// in  20.3 20.1 19.7 19.6 19.8 20.3 20.5 20.6 20.5 20.4 20.3 20.1 19.8 19.8
 //
 // It bulges to 23.2 in the upper third, sits around 20 through the lower two
 // thirds, and the rounded end of the tip falls back to 18.7.
@@ -116,27 +174,21 @@
 // up off it, and their rounded fronts are the top of the print. flip = false
 // draws it standing, as mounted, finger up and the flat face at y = 0.
 
-/* [Output] */
-flip = true;   // printed orientation, flat face on the bed; false shows it standing as mounted
-
+// Note 2. printed orientation, flat face on the bed; false shows it standing as mounted
 // False when another part includes this file for finger_mark() and wants the
 // modules without the hand turning up at its origin. Nothing else uses it.
-standalone = true;
 
-/* [Mesh] */
-mesh_file  = "originals/MiddleFingerToScale.stl";
-mesh_scale = 25.4;   // the mesh is in inches
-tilt       = 57;     // deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
-spin       = 20;     // deg about the VERTICAL, after the tilt: turns the fist toward you. back_y is measured at THIS too
+// Note 3. the mesh is in inches
 
-/* [Cut] */
-relief_depth = 20.0;  // the slab's thickness, measured in from the knuckle surface. Lands the finger top and bottom and leaves a small gap between; see the profile above. 18.7 touches even the tip, 23.2 and the finger floats entirely (mm)
-bottom_z     = -30;   // squared-off bottom, in the stood-up frame. Below the mesh, which bottoms out at -17.9, so nothing is cut off the bottom at all (mm)
+// Note 4. deg about X to stand the finger up, fitted to the fist's back; back_y is measured at THIS angle
 
-/* [Hidden] */
-big = 400;
+// Note 5. deg about the VERTICAL, after the tilt: turns the fist toward you. back_y is measured at THIS too
 
-// The relief's own size, measured off the built mesh: what it comes out
+// Note 6. the slab's thickness, measured in from the knuckle surface. Lands the finger top and bottom and leaves a small gap between; see the profile above. 18.7 touches even the tip, 23.2 and the finger floats entirely (mm)
+
+// Note 7. squared-off bottom, in the stood-up frame. Below the mesh, which bottoms out at -17.9, so nothing is cut off the bottom at all (mm)
+
+// Note 8. The relief's own size, measured off the built mesh: what it comes out
 // wide and tall, and where the middle of that is. A part that puts this on
 // one of its faces needs them to place and scale it, and OpenSCAD cannot
 // measure an import.
@@ -144,40 +196,27 @@ big = 400;
 // ⚠️ Tied to tilt, spin and relief_depth exactly as back_y is. Change any of
 // them and re-measure these too, or finger_mark() places the artwork off
 // centre and scales it wrong.
-art_w_mm  = 91.17;    // across
-art_h_mm  = 128.16;   // up
-art_cx_mm = -19.94;   // the middle of that, across
-art_cz_mm = 80.36;    // and up
+
+// Note 9. across
+
+// Note 10. up
+
+// Note 11. the middle of that, across
+
+// Note 12. and up
 // The back of the whole hand after the turn: the minimum y of the mesh,
 // measured off it at tilt 57. Tied to tilt — see above.
-back_y = -109.36;
 
-module stood_up() rotate([0, 0, spin]) rotate([tilt, 0, 0])
-  scale(mesh_scale) import(mesh_file, convexity = 10);
-
-// Standing, as mounted: the flat face on y = 0, the knuckles standing out
+// Note 13. Standing, as mounted: the flat face on y = 0, the knuckles standing out
 // toward +y, the finger up.
-module emboss() {
-  // The slab, from the knuckle surface inward; then the flat face to y = 0,
-  // and turned to look at the knuckles rather than the cut.
-  rotate([0, 0, 180]) translate([0, -(back_y + relief_depth), 0]) intersection() {
-    stood_up();
-    translate([-big / 2, back_y - 1, bottom_z]) cube([big, relief_depth + 1, big]);
-  }
-}
 
-// The relief as artwork for another part: centred on the origin across and
+// Note 14. The slab, from the knuckle surface inward; then the flat face to y = 0,
+// and turned to look at the knuckles rather than the cut.
+
+// Note 15. The relief as artwork for another part: centred on the origin across and
 // up, its flat face on y = 0, scaled to w wide, and its depth squashed to d
 // rather than scaled with it. Squashing is the point — at full scale a
 // relief w wide stands w * relief_depth / art_w_mm proud, which on anything
 // small is far more than the face it is sitting in can give back.
-module finger_mark(w, d)
-  scale([w / art_w_mm, d / relief_depth, w / art_w_mm])
-    translate([-art_cx_mm, 0, -art_cz_mm]) emboss();
 
-module oriented() {
-  if (flip) rotate([90, 0, 0]) children();   // face (y = 0) to the bed, relief up
-  else children();
-}
-
-if (standalone) oriented() emboss();
+// Note 16. face (y = 0) to the bed, relief up

@@ -1,50 +1,36 @@
-// A leaping cat that chases the cup-magnet bats: three times their span, 800 mm
-// nose to tail, so it prints as seven flat pieces glued with hidden dovetails.
-// Each piece prints decorative face down. Only the belly carries a magnet, at the
-// whole cat's centre of mass, enclosed exactly as on the bats (pause and insert).
-//
-// At a seam the front band butts on a straight line, so the front shows only that
-// line. Above it each tab rides a 45° ramp that climbs into the neighbouring piece:
-// the ramp hides the dovetail, adds sloped glue face, and is the steepest overhang
-// either piece has face down, so nothing needs support. Every joint assembles
-// straight down onto the face-down neighbour, so pieces can be glued in any order.
-//
-// The outline comes from bat-cat.svg via utils/svg2bez.py --width 800. The seams,
-// tab roots, selection regions and print rotations below were placed for that size
-// and checked outside OpenSCAD (pieces cover the cat exactly, every tab sits 2.5 mm
-// inside the outline, every printed piece fits 200 mm square). Do not rescale.
+// Note 1.
 
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 include <../../../../lib/BOSL2/std.scad>
 include <../../../../lib/BOSL2/beziers.scad>
 
 /* [Cat] */
-plate_h = 2.1;             // mm, decorative plate, same as the bats
-land_h = 6.6;              // mm, rear land over each seam; 8.7 mm total there
-land_half_w = 18;          // mm, land either side of a seam
-land_inset = 2;            // mm, land stays this far inside the silhouette
+plate_h = 2.1;             // Note 3.
+land_h = 6.6;              // Note 4.
+land_half_w = 18;          // Note 5.
+land_inset = 2;            // Note 6.
 
 /* [Dovetail] */
-tab_root = 14;             // mm, tab width at the seam
-tab_tip = 20;              // mm, tab width at its end
-tab_depth = 6;             // mm, how far a tab reaches into its neighbour
-seam_front_h = 1.2;        // mm, front band that butts on the straight visible seam
-tab_tip_min = 1.5;         // mm, least tab thickness, at its end above the ramp
-tab_clearance = 0.2;       // mm per face, glue room; the proven wire-shelf dovetail value
+tab_root = 14;             // Note 7.
+tab_tip = 20;              // Note 8.
+tab_depth = 6;             // Note 9.
+seam_front_h = 1.2;        // Note 10.
+tab_tip_min = 1.5;         // Note 11.
+tab_clearance = 0.2;       // Note 12.
 
 /* [Cup magnet] */
-magnet_d = 51.7;           // mm, measured steel cup outside diameter
-magnet_h = 10.75;          // mm, measured complete cup thickness
-pocket_diameter_extra = 0.3; // mm, nominal 0.15 mm clearance per side
-pocket_depth_extra = 0.29; // mm, extra depth above the seated magnet
-housing_wall = 2.1;        // mm, radial plastic around the pocket
-roof_h = 0.84;             // mm, solid rear cover over the magnet's working face
+magnet_d = 51.7;           // Note 13.
+magnet_h = 10.75;          // Note 14.
+pocket_diameter_extra = 0.3; // Note 15.
+pocket_depth_extra = 0.29; // Note 16.
+housing_wall = 2.1;        // Note 17.
+roof_h = 0.84;             // Note 18.
 
 /* [Colors] */
-tail_color = "Goldenrod";     // preview only; STLs carry no colour
+tail_color = "Goldenrod";     // Note 19.
 hind_leg_color = "DarkOliveGreen";
 rump_color = "SteelBlue";
 belly_color = "SlateGray";
@@ -56,7 +42,7 @@ magnet_color = "Silver";
 /* [Output] */
 show = "assembled"; // [assembled, exploded, piece, coupon, joint-section, section, before-cap]
 piece = "belly"; // [tail, hind-leg, rump, belly, chest, head, forelegs]
-explode = 30;              // mm, gap added between pieces in the exploded view
+explode = 30;              // Note 20.
 
 /* [Hidden] */
 $fn = 128;
@@ -68,7 +54,7 @@ part_h = roof_z + roof_h;
 housing_d = pocket_d + 2 * housing_wall;
 bore_factor = 1 / cos(180 / $fn);
 
-// bat-cat.svg: 166 points, 55 cubics, 800.000 x 519.863 mm, y up. bezpath_curve(BEZ, splinesteps = 24)
+// Note 21.
 CAT_BEZ = [
     [787.985, 298.038],
     [764.733, 296.351], [737.301, 297.896], [711.283, 301.740],
@@ -147,14 +133,14 @@ cat_pieces = [
 ];
 // [name, male piece, female piece, rotation turning local +Y toward the female piece, chord across the outline, tab roots]
 cat_seams = [
-    ["tail", "tail", "rump", -64.09, [[225.81, 229.38], [209.05, 263.9]], [[217.43, 246.64]]],  // 38.4 mm
-    ["hip", "hind-leg", "rump", -54.13, [[213.1, 165.86], [260.07, 100.9]], [[236.59, 133.38]]],  // 80.2 mm
-    ["waist", "rump", "belly", -73.14, [[376.85, 185.48], [337.05, 316.84]], [[366.9, 218.32], [347, 284]]],  // 137.3 mm
-    ["ribs", "chest", "belly", 121.24, [[544.88, 242.19], [470.84, 364.26]], [[526.37, 272.71], [489.35, 333.75]]],  // 142.8 mm
-    ["neck", "head", "chest", 159.2, [[516.51, 394.19], [645.9, 345.04]], [[548.86, 381.9], [613.56, 357.32]]],  // 138.4 mm
-    ["shoulder", "forelegs", "chest", 100.15, [[667.98, 257.1], [656.07, 323.6]], [[662.03, 290.35]]]  // 67.6 mm
+    ["tail", "tail", "rump", -64.09, [[225.81, 229.38], [209.05, 263.9]], [[217.43, 246.64]]],  // Note 22.
+    ["hip", "hind-leg", "rump", -54.13, [[213.1, 165.86], [260.07, 100.9]], [[236.59, 133.38]]],  // Note 23.
+    ["waist", "rump", "belly", -73.14, [[376.85, 185.48], [337.05, 316.84]], [[366.9, 218.32], [347, 284]]],  // Note 24.
+    ["ribs", "chest", "belly", 121.24, [[544.88, 242.19], [470.84, 364.26]], [[526.37, 272.71], [489.35, 333.75]]],  // Note 25.
+    ["neck", "head", "chest", 159.2, [[516.51, 394.19], [645.9, 345.04]], [[548.86, 381.9], [613.56, 357.32]]],  // Note 26.
+    ["shoulder", "forelegs", "chest", 100.15, [[667.98, 257.1], [656.07, 323.6]], [[662.03, 290.35]]]  // Note 27.
 ];
-magnet_xy = [434.22, 269.62];  // mm, centre of mass of the whole cat
+magnet_xy = [434.22, 269.62];  // Note 28.
 
 piece_names = [for (p = cat_pieces) p[0]];
 assert(len([for (n = piece_names) if (n == piece) n]) == 1, str("unknown piece: ", piece));
@@ -176,9 +162,8 @@ module cat_outline() polygon(bezpath_curve(CAT_BEZ, splinesteps = 24));
 module tab2d() polygon([[-tab_root / 2, -eps], [tab_root / 2, -eps],
                         [tab_tip / 2, tab_depth], [-tab_tip / 2, tab_depth]]);
 
-// Seam-local: x along the seam, +y into the female piece, front face at z = 0.
-// Everything above the 45° ramp that leaves the front band on the seam line and
-// climbs into the female piece; drop lowers it, which is how the socket gets clearance.
+// Note 29.
+
 module above_ramp(drop = 0) {
     a = tab_clearance + 1;
     b = tab_depth + tab_clearance + 1;
@@ -231,7 +216,7 @@ module piece3d(name) {
     }
 }
 
-// Rotated and centred to fit the bed, as exported.
+// Note 30.
 module print_piece(name) {
     row = piece_row(name);
     translate([-row[2][0], -row[2][1], 0]) rotate(row[1]) piece3d(name);
@@ -242,7 +227,7 @@ module magnet_dummy() {
         cylinder(d = magnet_d, h = magnet_h);
 }
 
-// One tab and its socket at production section and clearance. gap = 0 seats them.
+// Note 31.
 module joint_coupon(gap = 2 * tab_depth) {
     w = 2 * tab_tip;
     color(rump_color) union() {
@@ -257,10 +242,8 @@ module joint_coupon(gap = 2 * tab_depth) {
 
 function mean(pts) = [for (i = [0, 1]) sum([for (p = pts) p[i]]) / len(pts)];
 
+// Note 32.
 
-
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
 module feral_default_output_9d48bd35e680() {
 if (show == "assembled") for (n = piece_names) piece3d(n);
 else if (show == "exploded") for (n = piece_names) {
@@ -294,3 +277,86 @@ feral_default_output_9d48bd35e680();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_9d48bd35e680();
 else feral_assembly_view_9d48bd35e680(view == "exploded");
+
+// Notes
+
+// Note 1. A leaping cat that chases the cup-magnet bats: three times their span, 800 mm
+// nose to tail, so it prints as seven flat pieces glued with hidden dovetails.
+// Each piece prints decorative face down. Only the belly carries a magnet, at the
+// whole cat's centre of mass, enclosed exactly as on the bats (pause and insert).
+//
+// At a seam the front band butts on a straight line, so the front shows only that
+// line. Above it each tab rides a 45° ramp that climbs into the neighbouring piece:
+// the ramp hides the dovetail, adds sloped glue face, and is the steepest overhang
+// either piece has face down, so nothing needs support. Every joint assembles
+// straight down onto the face-down neighbour, so pieces can be glued in any order.
+//
+// The outline comes from bat-cat.svg via utils/svg2bez.py --width 800. The seams,
+// tab roots, selection regions and print rotations below were placed for that size
+// and checked outside OpenSCAD (pieces cover the cat exactly, every tab sits 2.5 mm
+// inside the outline, every printed piece fits 200 mm square). Do not rescale.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, decorative plate, same as the bats
+
+// Note 4. mm, rear land over each seam; 8.7 mm total there
+
+// Note 5. mm, land either side of a seam
+
+// Note 6. mm, land stays this far inside the silhouette
+
+// Note 7. mm, tab width at the seam
+
+// Note 8. mm, tab width at its end
+
+// Note 9. mm, how far a tab reaches into its neighbour
+
+// Note 10. mm, front band that butts on the straight visible seam
+
+// Note 11. mm, least tab thickness, at its end above the ramp
+
+// Note 12. mm per face, glue room; the proven wire-shelf dovetail value
+
+// Note 13. mm, measured steel cup outside diameter
+
+// Note 14. mm, measured complete cup thickness
+
+// Note 15. mm, nominal 0.15 mm clearance per side
+
+// Note 16. mm, extra depth above the seated magnet
+
+// Note 17. mm, radial plastic around the pocket
+
+// Note 18. mm, solid rear cover over the magnet's working face
+
+// Note 19. preview only; STLs carry no colour
+
+// Note 20. mm, gap added between pieces in the exploded view
+
+// Note 21. bat-cat.svg: 166 points, 55 cubics, 800.000 x 519.863 mm, y up. bezpath_curve(BEZ, splinesteps = 24)
+
+// Note 22. 38.4 mm
+
+// Note 23. 80.2 mm
+
+// Note 24. 137.3 mm
+
+// Note 25. 142.8 mm
+
+// Note 26. 138.4 mm
+
+// Note 27. 67.6 mm
+
+// Note 28. mm, centre of mass of the whole cat
+
+// Note 29. Seam-local: x along the seam, +y into the female piece, front face at z = 0.
+// Everything above the 45° ramp that leaves the front band on the seam line and
+// climbs into the female piece; drop lowers it, which is how the socket gets clearance.
+
+// Note 30. Rotated and centred to fit the bed, as exported.
+
+// Note 31. One tab and its socket at production section and clearance. gap = 0 seats them.
+
+// Note 32. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

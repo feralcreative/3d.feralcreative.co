@@ -1,4 +1,267 @@
-// TPU door stop.
+// Note 1.
+
+/* [Overall] */
+
+// Note 2.
+/* [Assembly display] */
+// Note 3.
+view = "default"; // [default, together, exploded]
+
+width       = 25;     // Note 4.
+
+length      = 100;    // Note 5.
+
+heel_height = 30;     // Note 6.
+
+ramp_angle  = 12;     // Note 7.
+
+back_rake    = 11.14; // Note 8.
+
+heel_r       = 3;     // Note 9.
+
+tail_r       = 0;     // Note 10.
+
+/* [Toe] */
+
+// Note 11.
+toe_r        = 3;     // Note 12.
+
+toe_lift     = 1.43;  // Note 13.
+
+nose_r       = 56;    // Note 14.
+
+/* [Grip ridges] */
+
+// Note 15.
+
+ridge_count  = 13;
+ridge_r      = 1;     // Note 16.
+
+ridge_pitch  = 7.167; // Note 17.
+
+ridge_first  = 6.046; // Note 18.
+
+/* [Floor grooves] */
+
+// Note 19.
+
+groove_count = 25;
+groove_w     = 2;     // Note 20.
+groove_d     = 1;     // Note 21.
+
+groove_margin = 2;    // Note 22.
+
+groove_pitch = 3.9167;  // Note 23.
+
+/* [Honeycomb] */
+
+// Note 24.
+honeycomb    = true;
+
+// Note 25.
+shell        = 3;     // Note 26.
+
+cell_af      = 6;     // Note 27.
+
+cell_wall    = 1.68;  // Note 28.
+
+cell_min_web = 1.68;  // Note 29.
+
+cell_x0      = 4;     // Note 30.
+cell_z0      = 6.2;   // Note 31.
+
+/* [Output] */
+
+// Note 32.
+
+show         = "part";  // [part, coupon]
+coupon_len   = 10;      // Note 33.
+
+/* [Quality] */
+
+$fa = 4;              // Note 34.
+$fs = 0.3;            // Note 35.
+eps = 0.01;
+
+// Note 36.
+
+heel_pt  = [heel_height * tan(back_rake), heel_height];
+
+// Note 37.
+ramp_dir = [ cos(ramp_angle), -sin(ramp_angle)];
+ramp_out = [ sin(ramp_angle),  cos(ramp_angle)];
+
+// Note 38.
+toe_ctr  = [length - toe_r, toe_lift];
+
+// Note 39.
+
+nose_v   = heel_pt - toe_ctr - nose_r * ramp_out;
+nose_b   = 2 * (nose_v * ramp_dir);
+nose_c   = nose_v * nose_v - (nose_r - toe_r) * (nose_r - toe_r);
+ramp_len = (-nose_b - sqrt(nose_b * nose_b - 4 * nose_c)) / 2;
+
+assert(nose_b * nose_b - 4 * nose_c > 0,
+       "nose_r cannot reach both the ramp line and the toe roll — raise it");
+
+// Note 40.
+
+nose_ctr = heel_pt + ramp_len * ramp_dir - nose_r * ramp_out;
+ramp_pt  = heel_pt + ramp_len * ramp_dir;
+toe_pt   = nose_ctr + nose_r * (toe_ctr - nose_ctr) / norm(toe_ctr - nose_ctr);
+
+function ang_at(ctr, p) = atan2(p.y - ctr.y, p.x - ctr.x);
+
+nose_a1  = ang_at(nose_ctr, ramp_pt);   // Note 41.
+nose_a2  = ang_at(nose_ctr, toe_pt);    // Note 42.
+toe_a2   = ang_at(toe_ctr,  toe_pt);
+
+// Note 43.
+
+top_len  = ramp_len + nose_r * (nose_a1 - nose_a2) * PI / 180;
+
+// Note 44.
+
+ridges  = ridge_count  > 0 ? ridge_count
+                           : floor((top_len - ridge_first) / ridge_pitch) + 1;
+
+grooves = groove_count > 0 ? groove_count
+                           : floor((length - 2 * groove_margin - groove_w)
+                                   / groove_pitch) + 1;
+
+assert(ridge_first + (ridges - 1) * ridge_pitch < top_len,
+       "the last ridge falls past the end of the top face");
+assert(grooves > 1, "the floor is too short for two grooves at this pitch");
+
+// Note 45.
+
+function top_pt(s) =
+    s <= ramp_len
+      ? heel_pt + s * ramp_dir
+      : let (a = nose_a1 - (s - ramp_len) / nose_r * 180 / PI)
+        nose_ctr + nose_r * [cos(a), sin(a)];
+
+// Note 46.
+function arc_pts(ctr, r, a1, a2) =
+    let (n = max(2, ceil(abs(a2 - a1) / $fa),
+                    ceil(abs(a2 - a1) * PI * r / 180 / $fs)))
+    [ for (i = [0 : n]) ctr + r * [cos(a1 + (a2 - a1) * i / n),
+                                   sin(a1 + (a2 - a1) * i / n)] ];
+
+function unit2(v) = v / norm(v);
+
+// Note 47.
+
+function fillet(a, b, c, r) =
+    r <= 0 ? [b] :
+    let (
+        u1  = unit2(a - b),
+        u2  = unit2(c - b),
+        ang = acos(max(-1, min(1, u1 * u2))),
+        t1  = b + u1 * (r / tan(ang / 2)),
+        t2  = b + u2 * (r / tan(ang / 2)),
+        ctr = b + unit2(u1 + u2) * (r / sin(ang / 2)),
+        a1  = atan2(t1.y - ctr.y, t1.x - ctr.x),
+        a2  = atan2(t2.y - ctr.y, t2.x - ctr.x),
+        // Note 48.
+        sw  = ((a2 - a1) + 540) % 360 - 180
+    )
+    arc_pts(ctr, r, a1, a1 + sw);
+
+// Note 49.
+
+profile_pts = concat(
+    fillet(heel_pt, [0, 0], [length, 0], tail_r),
+    [[length, 0], [length, toe_lift]],
+    arc_pts(toe_ctr,  toe_r,  0, toe_a2),
+    arc_pts(nose_ctr, nose_r, nose_a2, nose_a1),
+    fillet(ramp_pt, heel_pt, [0, 0], heel_r)
+);
+
+// Note 50.
+
+module wedge_profile() {
+    polygon(profile_pts);
+}
+
+module grip_ridges() {
+    for (k = [0 : ridges - 1])
+        translate(top_pt(ridge_first + k * ridge_pitch))
+            circle(r = ridge_r);
+}
+
+// Note 51.
+module grooves() {
+    pitch = (length - 2 * groove_margin - groove_w) / (grooves - 1);
+    for (k = [0 : grooves - 1])
+        translate([groove_margin + k * pitch, -eps])
+            square([groove_w, groove_d + eps]);
+}
+
+// Note 52.
+
+module lattice() {
+    p  = cell_af + cell_wall;         // Note 53.
+    dx = p * sqrt(3) / 2;             // Note 54.
+    for (i = [-1 : ceil(length / dx) + 1], j = [-1 : ceil(heel_height / p) + 1])
+        translate([cell_x0 + i * dx,
+                   cell_z0 + j * p + (i % 2 != 0 ? p / 2 : 0)])
+            circle(r = cell_af / sqrt(3), $fn = 6);
+}
+
+// Note 55.
+module core_cut() {
+    offset(r =  cell_min_web / 2)
+        offset(r = -cell_min_web / 2)
+            intersection() {
+                lattice();
+                offset(r = -shell) wedge_profile();
+            }
+}
+
+module tpu_door_stop_profile() {
+    difference() {
+        union() {
+            wedge_profile();
+            grip_ridges();
+        }
+        grooves();
+        if (honeycomb) core_cut();
+    }
+}
+
+module tpu_door_stop() {
+    linear_extrude(height = width) tpu_door_stop_profile();
+}
+
+// Note 56.
+
+module tpu_door_stop_coupon() {
+    intersection() {
+        tpu_door_stop();
+        translate([-eps, -eps, (width - coupon_len) / 2])
+            cube([length + 2 * eps, heel_height + 2 * eps, coupon_len]);
+    }
+}
+
+// Note 57.
+
+module feral_default_output_78af042f4709() {
+if (show == "coupon") tpu_door_stop_coupon();
+else                  tpu_door_stop();
+}
+
+module feral_assembly_view_78af042f4709(explode=false) {
+feral_default_output_78af042f4709();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_78af042f4709();
+else feral_assembly_view_78af042f4709(view == "exploded");
+
+// Notes
+
+// Note 1. TPU door stop.
 //
 // A parametric recreation of _incoming/tpu-door-stop-model_files/tpu_door_stop.stl
 // — "TPU Door Stop" by Kyle Plansinis, published 2024-05-15, CC BY-SA 4.0.
@@ -79,304 +342,169 @@
 // so either it is a 56 mm arc or it is a spline nobody will tell apart.
 // The lattice cell is 6.000 across the flats, flat side up, in both files.
 
-/* [Overall] */
+// Note 2. Extrusion depth — the width of the wedge, and the height it prints at.
 
-// Extrusion depth — the width of the wedge, and the height it prints at.
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
+// Note 3. default preserves the original part, coupon and print selectors.
 
-width       = 25;     // mm
-
+// Note 4. mm
 // Length of the floor, knife edge to toe.
-length      = 100;    // mm
 
+// Note 5. mm
 // Height of the heel, taken to the sharp corner the fillet cuts off.
-heel_height = 30;     // mm
 
+// Note 6. mm
 // Fall of the top face, measured from horizontal. The ridges ride this line.
-ramp_angle  = 12;     // deg
 
+// Note 7. deg
 // Rake of the back face, measured from vertical. It leans toward the toe, so
 // the base runs heel_height * tan(back_rake) behind the heel.
-back_rake    = 11.14; // deg
 
+// Note 8. deg
 // Fillet where the top face rolls over into the back face.
-heel_r       = 3;     // mm
 
+// Note 9. mm
 // The knife edge where the back face meets the floor. Sharp on the reference;
 // give it a radius here to take the point off.
-tail_r       = 0;     // mm
 
-/* [Toe] */
+// Note 10. mm
 
-// Radius of the nose roll at the toe.
-toe_r        = 3;     // mm
+// Note 11. Radius of the nose roll at the toe.
 
+// Note 12. mm
 // Height of the toe's vertical face, below where the nose roll starts. This is
 // also the height of the nose roll's centre.
-toe_lift     = 1.43;  // mm
 
+// Note 13. mm
 // Radius of the long arc that carries the top face down into the toe. It is
 // tangent to the ramp line at one end and to the toe roll at the other, and
 // those two conditions place it — nothing else here needs adjusting when it
 // changes.
-nose_r       = 56;    // mm
 
-/* [Grip ridges] */
+// Note 14. mm
 
-// Half-round ridges standing proud of the top face, spaced along it. They run
+// Note 15. Half-round ridges standing proud of the top face, spaced along it. They run
 // the full width. 13 is the reference's count and it fills the reference's top
 // face exactly; 0 means as many as the pitch fits, which is what a resized
 // wedge wants — see RESIZING in the header.
-ridge_count  = 13;
-ridge_r      = 1;     // mm, and also how far each stands proud
 
+// Note 16. mm, and also how far each stands proud
 // Centre to centre, measured along the top face rather than horizontally, so
 // the spacing holds across the nose arc as well as the straight ramp.
-ridge_pitch  = 7.167; // mm
 
+// Note 17. mm
 // Distance along the top face, from the heel corner, to the first ridge's
 // centre. Measured, not derived — it is what sets the phase of the whole set.
-ridge_first  = 6.046; // mm
 
-/* [Floor grooves] */
+// Note 18. mm
 
-// Square grooves combed across the floor, full width. 25 is the reference's
+// Note 19. Square grooves combed across the floor, full width. 25 is the reference's
 // count; 0 means as many as it takes to hold groove_pitch on a floor of
 // whatever length — again, see RESIZING.
-groove_count = 25;
-groove_w     = 2;     // mm
-groove_d     = 1;     // mm
 
+// Note 20. mm
+
+// Note 21. mm
 // Plastic left at each end of the floor, outside the first and last groove.
 // The pitch falls out of this and the count.
-groove_margin = 2;    // mm
 
+// Note 22. mm
 // Target centre-to-centre spacing, used only when groove_count is 0. The
 // reference's own pitch, which is what 25 grooves come to across 100 mm.
-groove_pitch = 3.9167;  // mm
 
-/* [Honeycomb] */
+// Note 23. mm
 
-// The lattice through the width. false builds the wedge solid.
-honeycomb    = true;
+// Note 24. The lattice through the width. false builds the wedge solid.
 
-// Wall left between the lattice and every outside face.
-shell        = 3;     // mm
+// Note 25. Wall left between the lattice and every outside face.
 
+// Note 26. mm
 // Cell size across the flats. Flat side up, point to point along the length.
-cell_af      = 6;     // mm
 
+// Note 27. mm
 // Wall between two cells. 1.68 is four 0.42 lines on a 0.4 nozzle.
-cell_wall    = 1.68;  // mm
 
+// Note 28. mm
 // Narrowest cut the lattice may leave where it is clipped by the shell.
 // Fragments thinner than this fill in solid; cell corners round by half of it.
 // At cell_wall the rule reads as one sentence — nothing thinner than a wall —
 // and it is enough to clear every scrap the ramp cuts. 0 keeps them all, the
 // way the reference does.
-cell_min_web = 1.68;  // mm
 
+// Note 29. mm
 // Where the lattice sits under the part. Both wrap at one cell pitch, so any
 // value works — these two just slide the pattern until it clips well.
-cell_x0      = 4;     // mm
-cell_z0      = 6.2;   // mm
 
-/* [Output] */
+// Note 30. mm
 
-// "coupon" is a short slice through the width: the whole silhouette, both end
+// Note 31. mm
+
+// Note 32. "coupon" is a short slice through the width: the whole silhouette, both end
 // ridges and a few cells, in one piece that prints in minutes.
-show         = "part";  // [part, coupon]
-coupon_len   = 10;      // mm
 
-/* [Quality] */
+// Note 33. mm
 
-$fa = 4;              // deg, max angle per facet
-$fs = 0.3;            // mm, max chord per facet
-eps = 0.01;
+// Note 34. deg, max angle per facet
 
-// ---------------------------------------------------------------------------
+// Note 35. mm, max chord per facet
 
+// Note 36. ---------------------------------------------------------------------------
 // The heel corner: where the ramp line and the back face would meet if the
 // fillet did not cut them off. The whole top face is measured from here.
-heel_pt  = [heel_height * tan(back_rake), heel_height];
 
-// Down the ramp, and out of it. Unit vectors.
-ramp_dir = [ cos(ramp_angle), -sin(ramp_angle)];
-ramp_out = [ sin(ramp_angle),  cos(ramp_angle)];
+// Note 37. Down the ramp, and out of it. Unit vectors.
 
-// Centre of the toe roll.
-toe_ctr  = [length - toe_r, toe_lift];
+// Note 38. Centre of the toe roll.
 
-// Distance along the ramp line, from the heel corner, to where the nose arc
+// Note 39. Distance along the ramp line, from the heel corner, to where the nose arc
 // takes over. Solved from the two tangencies: the nose arc's centre lies
 // nose_r off the ramp line, and nose_r - toe_r from the toe roll's centre,
 // which is one quadratic in that distance.
-nose_v   = heel_pt - toe_ctr - nose_r * ramp_out;
-nose_b   = 2 * (nose_v * ramp_dir);
-nose_c   = nose_v * nose_v - (nose_r - toe_r) * (nose_r - toe_r);
-ramp_len = (-nose_b - sqrt(nose_b * nose_b - 4 * nose_c)) / 2;
 
-assert(nose_b * nose_b - 4 * nose_c > 0,
-       "nose_r cannot reach both the ramp line and the toe roll — raise it");
-
-// Centre of the nose arc, and the two points it runs between: ramp_pt on the
+// Note 40. Centre of the nose arc, and the two points it runs between: ramp_pt on the
 // ramp line, toe_pt on the toe roll.
-nose_ctr = heel_pt + ramp_len * ramp_dir - nose_r * ramp_out;
-ramp_pt  = heel_pt + ramp_len * ramp_dir;
-toe_pt   = nose_ctr + nose_r * (toe_ctr - nose_ctr) / norm(toe_ctr - nose_ctr);
 
-function ang_at(ctr, p) = atan2(p.y - ctr.y, p.x - ctr.x);
+// Note 41. where the arc leaves the ramp line
 
-nose_a1  = ang_at(nose_ctr, ramp_pt);   // where the arc leaves the ramp line
-nose_a2  = ang_at(nose_ctr, toe_pt);    // where it meets the toe roll
-toe_a2   = ang_at(toe_ctr,  toe_pt);
+// Note 42. where it meets the toe roll
 
-// Total run of the top face, heel corner to the toe roll. The ridges are laid
+// Note 43. Total run of the top face, heel corner to the toe roll. The ridges are laid
 // out along this, not along x.
-top_len  = ramp_len + nose_r * (nose_a1 - nose_a2) * PI / 180;
 
-// Ridges and grooves, counted. Either the number asked for, or as many as the
+// Note 44. Ridges and grooves, counted. Either the number asked for, or as many as the
 // pitch fits — the second is what makes a resized wedge come out right without
 // a second pass of arithmetic.
-ridges  = ridge_count  > 0 ? ridge_count
-                           : floor((top_len - ridge_first) / ridge_pitch) + 1;
 
-grooves = groove_count > 0 ? groove_count
-                           : floor((length - 2 * groove_margin - groove_w)
-                                   / groove_pitch) + 1;
-
-assert(ridge_first + (ridges - 1) * ridge_pitch < top_len,
-       "the last ridge falls past the end of the top face");
-assert(grooves > 1, "the floor is too short for two grooves at this pitch");
-
-// A point s along the top face from the heel corner: on the ramp line while
+// Note 45. A point s along the top face from the heel corner: on the ramp line while
 // the ramp lasts, on the nose arc after that.
-function top_pt(s) =
-    s <= ramp_len
-      ? heel_pt + s * ramp_dir
-      : let (a = nose_a1 - (s - ramp_len) / nose_r * 180 / PI)
-        nose_ctr + nose_r * [cos(a), sin(a)];
 
-// Points along an arc, inclusive of both ends, at the current facet settings.
-function arc_pts(ctr, r, a1, a2) =
-    let (n = max(2, ceil(abs(a2 - a1) / $fa),
-                    ceil(abs(a2 - a1) * PI * r / 180 / $fs)))
-    [ for (i = [0 : n]) ctr + r * [cos(a1 + (a2 - a1) * i / n),
-                                   sin(a1 + (a2 - a1) * i / n)] ];
+// Note 46. Points along an arc, inclusive of both ends, at the current facet settings.
 
-function unit2(v) = v / norm(v);
-
-// The arc that rounds corner b, between a and c, by radius r. Returns [b]
+// Note 47. The arc that rounds corner b, between a and c, by radius r. Returns [b]
 // unrounded when r is zero, so a path can carry a mix of both.
-function fillet(a, b, c, r) =
-    r <= 0 ? [b] :
-    let (
-        u1  = unit2(a - b),
-        u2  = unit2(c - b),
-        ang = acos(max(-1, min(1, u1 * u2))),
-        t1  = b + u1 * (r / tan(ang / 2)),
-        t2  = b + u2 * (r / tan(ang / 2)),
-        ctr = b + unit2(u1 + u2) * (r / sin(ang / 2)),
-        a1  = atan2(t1.y - ctr.y, t1.x - ctr.x),
-        a2  = atan2(t2.y - ctr.y, t2.x - ctr.x),
-        // signed sweep, taken the short way round
-        sw  = ((a2 - a1) + 540) % 360 - 180
-    )
-    arc_pts(ctr, r, a1, a1 + sw);
 
-// Counter-clockwise from the knife edge: along the floor to the toe, up the
+// Note 48. signed sweep, taken the short way round
+
+// Note 49. Counter-clockwise from the knife edge: along the floor to the toe, up the
 // toe face, round the nose, up the long arc, along the ramp, over the heel.
-profile_pts = concat(
-    fillet(heel_pt, [0, 0], [length, 0], tail_r),
-    [[length, 0], [length, toe_lift]],
-    arc_pts(toe_ctr,  toe_r,  0, toe_a2),
-    arc_pts(nose_ctr, nose_r, nose_a2, nose_a1),
-    fillet(ramp_pt, heel_pt, [0, 0], heel_r)
-);
 
-// The wedge with no ridges, no grooves and no lattice. This is the shape the
+// Note 50. The wedge with no ridges, no grooves and no lattice. This is the shape the
 // shell is eroded from — erode the ridged face instead and the lattice follows
 // every bump in it.
-module wedge_profile() {
-    polygon(profile_pts);
-}
 
-module grip_ridges() {
-    for (k = [0 : ridges - 1])
-        translate(top_pt(ridge_first + k * ridge_pitch))
-            circle(r = ridge_r);
-}
+// Note 51. Cut generously below the floor so no cut face is coplanar with it.
 
-// Cut generously below the floor so no cut face is coplanar with it.
-module grooves() {
-    pitch = (length - 2 * groove_margin - groove_w) / (grooves - 1);
-    for (k = [0 : grooves - 1])
-        translate([groove_margin + k * pitch, -eps])
-            square([groove_w, groove_d + eps]);
-}
-
-// Hexes on a true honeycomb lattice, flat side up. circle($fn = 6) puts a
+// Note 52. Hexes on a true honeycomb lattice, flat side up. circle($fn = 6) puts a
 // vertex on +x, which is the orientation wanted: points along the length,
 // flats across it, so no cell ceiling is a bridge in any print orientation.
-module lattice() {
-    p  = cell_af + cell_wall;         // centre to centre, across a wall
-    dx = p * sqrt(3) / 2;             // column pitch
-    for (i = [-1 : ceil(length / dx) + 1], j = [-1 : ceil(heel_height / p) + 1])
-        translate([cell_x0 + i * dx,
-                   cell_z0 + j * p + (i % 2 != 0 ? p / 2 : 0)])
-            circle(r = cell_af / sqrt(3), $fn = 6);
-}
 
-// The lattice, clipped to the inside of the shell and opened to drop slivers.
-module core_cut() {
-    offset(r =  cell_min_web / 2)
-        offset(r = -cell_min_web / 2)
-            intersection() {
-                lattice();
-                offset(r = -shell) wedge_profile();
-            }
-}
+// Note 53. centre to centre, across a wall
 
-module tpu_door_stop_profile() {
-    difference() {
-        union() {
-            wedge_profile();
-            grip_ridges();
-        }
-        grooves();
-        if (honeycomb) core_cut();
-    }
-}
+// Note 54. column pitch
 
-module tpu_door_stop() {
-    linear_extrude(height = width) tpu_door_stop_profile();
-}
+// Note 55. The lattice, clipped to the inside of the shell and opened to drop slivers.
 
-// A slab taken out of the middle of the width. The lattice runs along the
+// Note 56. A slab taken out of the middle of the width. The lattice runs along the
 // width, so this loses nothing but length of hole.
-module tpu_door_stop_coupon() {
-    intersection() {
-        tpu_door_stop();
-        translate([-eps, -eps, (width - coupon_len) / 2])
-            cube([length + 2 * eps, heel_height + 2 * eps, coupon_len]);
-    }
-}
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 57. Assembly display changes placement only; the original output remains the default.
 // Single printed piece: both display modes show the same intact part.
-module feral_default_output_78af042f4709() {
-if (show == "coupon") tpu_door_stop_coupon();
-else                  tpu_door_stop();
-}
-
-module feral_assembly_view_78af042f4709(explode=false) {
-feral_default_output_78af042f4709();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_78af042f4709();
-else feral_assembly_view_78af042f4709(view == "exploded");

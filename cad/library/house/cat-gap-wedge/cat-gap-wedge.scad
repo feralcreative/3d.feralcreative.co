@@ -1,4 +1,184 @@
-// Cat gap wedge — holds the laundry/litter room door open a cat's width.
+// Note 1.
+
+/* [Output] */
+
+// Note 2.
+
+/* [Assembly display] */
+// Note 3.
+view = "default"; // [default, together, exploded]
+
+show = "part";   // [part, coupon]
+// Note 4.
+
+flip = true;
+// Note 5.
+coupon_h = 20.0;
+
+$fa = 4;   // Note 6.
+$fs = 0.4;
+eps = 0.01;
+
+/* [Wedge] */
+
+// Note 7.
+wedge_height = 100.0;
+// Note 8.
+
+wedge_depth = 51.3329;
+// Note 9.
+
+back_thick = 15.4;
+// Note 10.
+
+front_thick = 3.0;
+// Note 11.
+
+edge_r = 1.5;
+
+/* [Door — measured and fitted] */
+
+// Note 12.
+door_width_in = 30;
+// Note 13.
+
+door_corner = 43.0;
+// Note 14.
+
+slot_closed = 4.8;
+
+/* [Knob] */
+
+// Note 15.
+knob_d = 15.0;
+// Note 16.
+
+knob_offset = 0.0;
+// Note 17.
+bore_d = 12.0;
+// Note 18.
+
+bore_comp = 0.0;
+// Note 19.
+
+ring_h = 5.0;
+
+/* [Derived — do not edit] */
+
+half_back = back_thick / 2;
+half_front = front_thick / 2;
+knob_r = knob_d / 2;
+bore_r = (bore_d + bore_comp) / 2;
+knob_x = wedge_depth + knob_offset;
+facet_len = sqrt(wedge_depth * wedge_depth + pow(half_back - half_front, 2));
+taper_angle = 2 * atan((half_back - half_front) / wedge_depth);
+// Note 20.
+function half_width(s) = half_front + (half_back - half_front) * s / wedge_depth;
+// Note 21.
+
+slope = (half_back - half_front) / wedge_depth;
+mouth_s = (-2 * half_front * slope
+           + sqrt(pow(2 * half_front * slope, 2)
+                  - 4 * (1 + slope * slope) * (half_front * half_front - bore_r * bore_r)))
+          / (2 * (1 + slope * slope));
+// Note 22.
+
+stop_rad = max([for (s = [8 : 1 : door_corner]) (2 * half_width(s) - slot_closed) / s]);
+
+// Note 23.
+
+module round_all(rr) {
+  if (rr > 0) offset(r = -rr) offset(r = 2 * rr) offset(r = -rr) children();
+  else children();
+}
+
+module wedge_trapezoid() {
+  polygon([
+    [0, -half_back],                // Note 24.
+    [wedge_depth, -half_front],     // Note 25.
+    [wedge_depth, half_front],
+    [0, half_back],                 // Note 26.
+  ]);
+}
+
+module wedge_rounded() {
+  round_all(edge_r) wedge_trapezoid();
+}
+
+// Note 27.
+
+module lower_profile() {
+  difference() {
+    wedge_rounded();
+    translate([knob_x, 0]) circle(r = bore_r);
+  }
+}
+
+// Note 28.
+
+module upper_profile() {
+  difference() {
+    union() {
+      wedge_rounded();
+      translate([knob_x, 0]) circle(r = knob_r);
+    }
+    translate([knob_x, 0]) circle(r = bore_r);
+  }
+}
+
+// Note 29.
+
+module cat_gap_wedge() {
+  linear_extrude(height = wedge_height - ring_h, convexity = 6)
+    lower_profile();
+  translate([0, 0, wedge_height - ring_h])
+    linear_extrude(height = ring_h, convexity = 6)
+      upper_profile();
+}
+
+// Note 30.
+
+module cat_gap_wedge_oriented() {
+  if (flip) translate([0, 0, wedge_height]) rotate([180, 0, 0]) cat_gap_wedge();
+  else cat_gap_wedge();
+}
+
+echo(str("depth, far face to the pin = ", wedge_depth, " mm"));
+echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
+echo(str("taper angle = ", taper_angle, " deg"));
+echo(str("width at the door's corner (", door_corner, " mm) = ", 2 * half_width(door_corner), " mm"));
+echo(str("predicted crack on a ", door_width_in, " in door = ", door_width_in * stop_rad, " in"));
+echo(str("  ... and per extra mm on the far face = ", door_width_in * (door_corner / wedge_depth) / door_corner, " in"));
+echo(str("neck where the wedge meets the ring's outside = ", 2 * half_width(knob_r), " mm"));
+echo(str("channel floor = ", knob_x - bore_r, " mm from the far face"));
+echo(str("channel mouth = ", knob_x - mouth_s, " mm from the far face, tips ", half_width(mouth_s), " mm off axis"));
+echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
+echo(str("ring from z = ", wedge_height - ring_h, " to ", wedge_height, " mm"));
+
+// Note 31.
+
+module feral_default_output_ed66b086102d() {
+if (show == "coupon") {
+  intersection() {
+    cat_gap_wedge_oriented();
+    translate([-80, -80, 0]) cube([300, 160, coupon_h]);
+  }
+} else {
+  cat_gap_wedge_oriented();
+}
+}
+
+module feral_assembly_view_ed66b086102d(explode=false) {
+feral_default_output_ed66b086102d();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_ed66b086102d();
+else feral_assembly_view_ed66b086102d(view == "exploded");
+
+// Notes
+
+// Note 1. Cat gap wedge — holds the laundry/litter room door open a cat's width.
 //
 // This file is the WEDGE BODY ONLY. The hook is the ring, and it is part of
 // this file; nothing else is needed to hang it.
@@ -23,16 +203,16 @@
 // face at the far end tapering to a 3 mm nose ON the pin, and a 15 mm bored
 // ring around the pin for the top 5 mm.
 //
-//   depth        51.333 mm   far face to the pin
-//   taper angle  13.77 deg   2 * atan(6.2 / 51.333)
-//   overall      58.833 mm   depth + knob_r
+// depth        51.333 mm   far face to the pin
+// taper angle  13.77 deg   2 * atan(6.2 / 51.333)
+// overall      58.833 mm   depth + knob_r
 //
 // WHAT SETS THE GAP. The door binds where the wedge is widest along the door's
 // edge — the door's inside corner, about 43 mm from the pin (a 12 mm barrel
 // outside the face, a 35 mm door) — and only by however much the wedge is
 // wider there than the slot already is with the door closed:
 //
-//   crack  ~  W * (width at the corner - closed slot) / 43
+// crack  ~  W * (width at the corner - closed slot) / 43
 //
 // with W the door's width. The slot has not been measured; it is FITTED. The
 // first coupon, an 11 mm face on a point nose, stopped a 30 in door at just
@@ -67,9 +247,9 @@
 // the channel wall is the very same cylinder as the inside of the ring and
 // runs flush with it. Ziad: "delete the ring but leave the overlap."
 //
-//   channel floor  45.333 mm from the far face
-//   channel mouth  45.741 mm, where the arc meets each facet
-//   mouth tips     2.175 mm off the axis, so a 4.35 mm nose at the mouth
+// channel floor  45.333 mm from the far face
+// channel mouth  45.741 mm, where the arc meets each facet
+// mouth tips     2.175 mm off the axis, so a 4.35 mm nose at the mouth
 //
 // The channel is drawn at the barrel's 12 mm. The coupon went on, so it
 // clears, but it is not a measured clearance.
@@ -98,190 +278,91 @@
 // ledge, not an overhang. It is a 100 mm tower on a 58.8 x 15.4 footprint, so
 // run a brim.
 
-/* [Output] */
-
-// "coupon" is the bottom coupon_h of the printed orientation — the ring and
+// Note 2. "coupon" is the bottom coupon_h of the printed orientation — the ring and
 // the start of the channel — for checking the fit, the bore, and the door
 // angle without printing 100 mm. Build it with --name cat-gap-wedge-coupon.
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
 
-show = "part";   // [part, coupon]
-// Print the part ring-down. The ring is modelled at the top because that is
+// Note 3. default preserves the original part, coupon and print selectors.
+
+// Note 4. Print the part ring-down. The ring is modelled at the top because that is
 // where it belongs on the door; it is printed at the bottom because that is
 // the only way the ring's underside is not a bridge.
-flip = true;
-// Height of the coupon, measured from the bottom of the printed orientation.
-coupon_h = 20.0;
 
-$fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
-$fs = 0.4;
-eps = 0.01;
+// Note 5. Height of the coupon, measured from the bottom of the printed orientation.
 
-/* [Wedge] */
+// Note 6. organic faceting per the 0.4-nozzle rule; no global high $fn
 
-// Height standing on end (mm). The dimension along the door's edge.
-wedge_height = 100.0;
-// Distance from the far face to the ring's axis, which is the pin (mm).
+// Note 7. Height standing on end (mm). The dimension along the door's edge.
+
+// Note 8. Distance from the far face to the ring's axis, which is the pin (mm).
 // 51.3329 is the original 31.3329 plus the 20 Ziad asked for on 2026-09-11.
-wedge_depth = 51.3329;
-// Thickness of the far face, the end away from the hinge (mm). THIS is the
+
+// Note 9. Thickness of the far face, the end away from the hinge (mm). THIS is the
 // lever for the door angle: about 0.6 in at the latch per mm, see WHAT SETS
 // THE GAP. 11 gave 3 in; 15.4 is the 6 in prediction.
-back_thick = 15.4;
-// Thickness of the nose, on the pin (mm). Set for the ring joint, bounded by
+
+// Note 10. Thickness of the nose, on the pin (mm). Set for the ring joint, bounded by
 // the closed slot — see THE NOSE IS 3 mm. 0 makes it a point.
-front_thick = 3.0;
-// Radius on every vertical edge (mm). Rounds convex and concave corners alike.
+
+// Note 11. Radius on every vertical edge (mm). Rounds convex and concave corners alike.
 // 0 leaves them all sharp.
-edge_r = 1.5;
 
-/* [Door — measured and fitted] */
+// Note 12. Width of the door (in). Only used for the predicted crack.
 
-// Width of the door (in). Only used for the predicted crack.
-door_width_in = 30;
-// Distance from the pin to the door's inside corner, where it binds (mm).
+// Note 13. Distance from the pin to the door's inside corner, where it binds (mm).
 // 12 mm barrel outside the face plus a 1-3/8 in door. Estimated, not measured.
-door_corner = 43.0;
-// Gap between the door's hinge edge and the jamb with the door closed (mm).
+
+// Note 14. Gap between the door's hinge edge and the jamb with the door closed (mm).
 // FITTED from the 3 in coupon result, not measured.
-slot_closed = 4.8;
 
-/* [Knob] */
+// Note 15. Diameter of the cylinder running down the front edge (mm).
 
-// Diameter of the cylinder running down the front edge (mm).
-knob_d = 15.0;
-// Position of the knob's axis, measured forward from the nose (mm). 0 centres
+// Note 16. Position of the knob's axis, measured forward from the nose (mm). 0 centres
 // it on the nose.
-knob_offset = 0.0;
-// Diameter of the bore down the knob's axis (mm). 0 leaves it solid.
-bore_d = 12.0;
-// Added to bore_d to cover this machine's bore shrinkage (mm). Left at 0 the
+
+// Note 17. Diameter of the bore down the knob's axis (mm). 0 leaves it solid.
+
+// Note 18. Added to bore_d to cover this machine's bore shrinkage (mm). Left at 0 the
 // hole is drawn at its nominal size.
-bore_comp = 0.0;
-// Height of cylinder kept at the very top as a ring (mm). The rest of it is
+
+// Note 19. Height of cylinder kept at the very top as a ring (mm). The rest of it is
 // subtracted from the wedge and becomes the channel.
-ring_h = 5.0;
 
-/* [Derived — do not edit] */
+// Note 20. Half-width of the wedge at s mm from the pin, towards the far face.
 
-half_back = back_thick / 2;
-half_front = front_thick / 2;
-knob_r = knob_d / 2;
-bore_r = (bore_d + bore_comp) / 2;
-knob_x = wedge_depth + knob_offset;
-facet_len = sqrt(wedge_depth * wedge_depth + pow(half_back - half_front, 2));
-taper_angle = 2 * atan((half_back - half_front) / wedge_depth);
-// Half-width of the wedge at s mm from the pin, towards the far face.
-function half_width(s) = half_front + (half_back - half_front) * s / wedge_depth;
-// Where the bore's arc meets each facet, as a distance from the pin: solve
+// Note 21. Where the bore's arc meets each facet, as a distance from the pin: solve
 // s^2 + half_width(s)^2 = bore_r^2 for s.
-slope = (half_back - half_front) / wedge_depth;
-mouth_s = (-2 * half_front * slope
-           + sqrt(pow(2 * half_front * slope, 2)
-                  - 4 * (1 + slope * slope) * (half_front * half_front - bore_r * bore_r)))
-          / (2 * (1 + slope * slope));
-// The door stops where the wedge outgrows the slot by the most per mm of
-// reach. That is the far corner unless the nose is fatter than the slot.
-stop_rad = max([for (s = [8 : 1 : door_corner]) (2 * half_width(s) - slot_closed) / s]);
 
-// Round every corner of a 2D profile by rr without moving the flats: open by
+// Note 22. The door stops where the wedge outgrows the slot by the most per mm of
+// reach. That is the far corner unless the nose is fatter than the slot.
+
+// Note 23. Round every corner of a 2D profile by rr without moving the flats: open by
 // rr (erode, dilate — rounds the convex corners), then close by rr (dilate,
 // erode — rounds the concave ones). The two dilations merge into one, which is
 // why the middle offset is 2 * rr. Arcs already larger than rr come through
 // untouched, so the channel and the bore are unaffected.
-module round_all(rr) {
-  if (rr > 0) offset(r = -rr) offset(r = 2 * rr) offset(r = -rr) children();
-  else children();
-}
 
-module wedge_trapezoid() {
-  polygon([
-    [0, -half_back],                // far face, right side
-    [wedge_depth, -half_front],     // the nose, on the pin
-    [wedge_depth, half_front],
-    [0, half_back],                 // far face, left side
-  ]);
-}
+// Note 24. far face, right side
 
-module wedge_rounded() {
-  round_all(edge_r) wedge_trapezoid();
-}
+// Note 25. the nose, on the pin
 
-// Below the ring: the wedge with the channel scooped out of its nose. The cut
+// Note 26. far face, left side
+
+// Note 27. Below the ring: the wedge with the channel scooped out of its nose. The cut
 // is the BORE, not the knob — below the top course the ring itself is simply
 // not there, and what continues down is the hole through it. So the channel
 // wall is the same cylinder as the inside of the ring and runs flush with it,
 // rather than standing knob_r - bore_r = 1.5 mm proud of it.
-module lower_profile() {
-  difference() {
-    wedge_rounded();
-    translate([knob_x, 0]) circle(r = bore_r);
-  }
-}
 
-// The ring course. Rounded BEFORE the bore is cut, because the ring wall is
+// Note 28. The ring course. Rounded BEFORE the bore is cut, because the ring wall is
 // only 1.5 mm and an erode of edge_r would delete it outright.
-module upper_profile() {
-  difference() {
-    union() {
-      wedge_rounded();
-      translate([knob_x, 0]) circle(r = knob_r);
-    }
-    translate([knob_x, 0]) circle(r = bore_r);
-  }
-}
 
-// Two constant sections stacked, rather than one extrude cut by a cylinder.
+// Note 29. Two constant sections stacked, rather than one extrude cut by a cylinder.
 // Each course is a plain 2D profile, so the rounding is a 2D offset and the
 // knob's r = 7.5 surface is never both added and subtracted over the same z.
-module cat_gap_wedge() {
-  linear_extrude(height = wedge_height - ring_h, convexity = 6)
-    lower_profile();
-  translate([0, 0, wedge_height - ring_h])
-    linear_extrude(height = ring_h, convexity = 6)
-      upper_profile();
-}
 
-// Printed orientation. The flip is a rotate, not a mirror — the part is
+// Note 30. Printed orientation. The flip is a rotate, not a mirror — the part is
 // symmetric about y = 0, so nothing is handed either way.
-module cat_gap_wedge_oriented() {
-  if (flip) translate([0, 0, wedge_height]) rotate([180, 0, 0]) cat_gap_wedge();
-  else cat_gap_wedge();
-}
 
-
-
-echo(str("depth, far face to the pin = ", wedge_depth, " mm"));
-echo(str("overall depth = ", wedge_depth + knob_offset + knob_r, " mm"));
-echo(str("taper angle = ", taper_angle, " deg"));
-echo(str("width at the door's corner (", door_corner, " mm) = ", 2 * half_width(door_corner), " mm"));
-echo(str("predicted crack on a ", door_width_in, " in door = ", door_width_in * stop_rad, " in"));
-echo(str("  ... and per extra mm on the far face = ", door_width_in * (door_corner / wedge_depth) / door_corner, " in"));
-echo(str("neck where the wedge meets the ring's outside = ", 2 * half_width(knob_r), " mm"));
-echo(str("channel floor = ", knob_x - bore_r, " mm from the far face"));
-echo(str("channel mouth = ", knob_x - mouth_s, " mm from the far face, tips ", half_width(mouth_s), " mm off axis"));
-echo(str("wall around the bore = ", knob_r - bore_r, " mm"));
-echo(str("ring from z = ", wedge_height - ring_h, " to ", wedge_height, " mm"));
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 31. Assembly display changes placement only; the original output remains the default.
 // Single printed piece: both display modes show the same intact part.
-module feral_default_output_ed66b086102d() {
-if (show == "coupon") {
-  intersection() {
-    cat_gap_wedge_oriented();
-    translate([-80, -80, 0]) cube([300, 160, coupon_h]);
-  }
-} else {
-  cat_gap_wedge_oriented();
-}
-}
-
-module feral_assembly_view_ed66b086102d(explode=false) {
-feral_default_output_ed66b086102d();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_ed66b086102d();
-else feral_assembly_view_ed66b086102d(view == "exploded");

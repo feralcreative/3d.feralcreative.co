@@ -1,14 +1,8 @@
-// Adapted from The Magic Magnet Polarity Tool v2 by tjdesign.
-// https://www.printables.com/model/461166-the-magic-magnet-polarity-tool-v2
-// Original meshes: CC BY-NC 4.0. Retain attribution with redistributed remixes.
-// Preserve the four original grips and keyed pin fit. Enlarge only the head
-// and matching covers in XY; retain thread pitch and all axial dimensions.
-// Print one shaft, one head, one pin and one cover per completed tool.
-// Glue the pin/head/shaft and the magnet; leave the threaded cover removable.
+// Note 1.
 
 /* [Output] */
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 show = "plate"; // [plate, shaft-a, shaft-b, shaft-c, shaft-d, cover-smooth, cover-b, cover-c, cover-d, head, pin, assembly, section]
@@ -16,28 +10,28 @@ shaft_style = "A"; // [A, B, C, D]
 cover_style = "Smooth"; // [Smooth, B, C, D]
 
 /* [Magnet] */
-magnet_d = 10;             // mm, nominal magnet diameter
-magnet_h = 2;              // mm, nominal magnet thickness
-magnet_d_clearance = 0.5;  // mm, diametral glue/fit allowance
-magnet_h_clearance = 0.2;  // mm, recess below head rim
-head_nominal_wall = 1.5;   // mm, radial wall at nominal cylindrical tip
+magnet_d = 10;             // Note 3.
+magnet_h = 2;              // Note 4.
+magnet_d_clearance = 0.5;  // Note 5.
+magnet_h_clearance = 0.2;  // Note 6.
+head_nominal_wall = 1.5;   // Note 7.
 
 /* [Measured original dimensions] */
-original_tip_d = 10;       // mm, tip outside diameter before enlargement
-original_pocket_d = 8;     // mm, original pocket diameter
-original_head_h = 11;      // mm, original head from glue face to magnet face
-original_pocket_floor = 8.5; // mm, original pocket floor above glue face
-original_socket_h = 5;    // mm, keyed socket depth in both mating pieces
-original_socket_envelope_r = 4.1; // mm, contains the entire keyed socket
-shaft_base_z = 5;         // mm, original shaft's glue face
-cover_base_z = -6.4;      // mm, original outside working face
-pin_base_z = 0.5;         // mm, original pin bottom
-pin_h = 9;                // mm, original keyed pin length
-thread_pitch = 1.75;      // mm/revolution, measured from original mesh
-cover_seated_angle = 315; // degrees, collision-free assembled thread phase
+original_tip_d = 10;       // Note 8.
+original_pocket_d = 8;     // Note 9.
+original_head_h = 11;      // Note 10.
+original_pocket_floor = 8.5; // Note 11.
+original_socket_h = 5;    // Note 12.
+original_socket_envelope_r = 4.1; // Note 13.
+shaft_base_z = 5;         // Note 14.
+cover_base_z = -6.4;      // Note 15.
+pin_base_z = 0.5;         // Note 16.
+pin_h = 9;                // Note 17.
+thread_pitch = 1.75;      // Note 18.
+cover_seated_angle = 315; // Note 19.
 
 /* [Hidden] */
-pocket_facets = 96;       // Keep bore compensation stable under external use<>.
+pocket_facets = 96;       // Note 20.
 $fn = pocket_facets;
 eps = 0.01;
 source_root = "originals/the-magic-magnet-polarity-tool-v2-model_files/";
@@ -47,7 +41,7 @@ pocket_h = magnet_h + magnet_h_clearance;
 head_scale = (pocket_d + 2*head_nominal_wall) / original_tip_d;
 socket_fill_r = original_socket_envelope_r * head_scale;
 pocket_fill_r = original_pocket_d/2 * head_scale + eps;
-plate_pitch = 26;         // mm, layout spacing, not a mating dimension
+plate_pitch = 26;         // Note 21.
 
 assert(pocket_h < original_head_h-original_socket_h,
        "Magnet pocket must leave solid material above the pin socket");
@@ -57,7 +51,7 @@ module original_head() {
     import(head_source, convexity=10);
 }
 
-// Extract the original non-round key instead of approximating it as a bore.
+// Note 22.
 module socket_profile() {
     difference() {
         circle(r=original_socket_envelope_r);
@@ -70,9 +64,9 @@ module head() {
     difference() {
         union() {
             scale([head_scale,head_scale,1]) original_head();
-            // Restore the original pin socket after enlarging the outside.
+            // Note 23.
             cylinder(r=socket_fill_r, h=original_socket_h+eps);
-            // Close the old magnet recess, then cut the new independent size.
+            // Note 24.
             translate([0,0,original_pocket_floor-eps])
                 cylinder(r=pocket_fill_r,
                          h=original_head_h-original_pocket_floor+eps);
@@ -108,8 +102,8 @@ module pin() {
         import(str(source_root,"Magnet Tool Pin.stl"),convexity=10);
 }
 
-// Assembly uses the originals' shaft glue plane at Z=5. The head flips about
-// X: its socket key is at -Y in print pose, while the shaft/pin key is at +Y.
+// Note 25.
+
 module assembly(style=shaft_style, cap=cover_style) {
     color("silver") translate([0,0,shaft_base_z]) shaft(style);
     color("orange") translate([0,0,shaft_base_z]) rotate([180,0,0]) head();
@@ -129,9 +123,7 @@ module plate() {
     translate([plate_pitch*5,-plate_pitch,0]) pin();
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 26.
 module feral_default_output_9d5b72060754() {
 if (show == "plate") plate();
 else if (show == "head") head();
@@ -164,3 +156,198 @@ color("black") translate([explode ? -20 : 0,0,shaft_base_z-original_head_h+magne
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_9d5b72060754();
 else feral_assembly_view_9d5b72060754(view == "exploded");
+
+// Note 27.
+
+// 1.
+// Note 28.
+
+// 2.
+// Note 29.
+
+// 3.
+// Note 30.
+
+// 4.
+// Note 31.
+
+// 5.
+// Note 32.
+
+// 6.
+// Note 33.
+
+// 7.
+// Note 34.
+
+// 8.
+// Note 35.
+
+// 9.
+// Note 36.
+
+// 10.
+// Note 37.
+
+// 11.
+// Note 38.
+
+// 12.
+// Note 39.
+
+// 13.
+// Note 40.
+
+// 14.
+// Note 41.
+
+// 15.
+// Note 42.
+
+// 16.
+// Note 43.
+
+// 17.
+// Note 44.
+
+// 18.
+// Note 45.
+
+// 19.
+// Note 46.
+
+// 20.
+// Note 47.
+
+// 21.
+// Note 48.
+
+// 22.
+// Note 49.
+
+// 23.
+// Note 50.
+
+// 24.
+// Note 51.
+
+// 25.
+// Note 52.
+
+// 26.
+// Note 53.
+
+// Notes
+
+// Note 1. Note 1.
+
+// Note 2. Note 2.
+
+// Note 3. Note 3.
+
+// Note 4. Note 4.
+
+// Note 5. Note 5.
+
+// Note 6. Note 6.
+
+// Note 7. Note 7.
+
+// Note 8. Note 8.
+
+// Note 9. Note 9.
+
+// Note 10. Note 10.
+
+// Note 11. Note 11.
+
+// Note 12. Note 12.
+
+// Note 13. Note 13.
+
+// Note 14. Note 14.
+
+// Note 15. Note 15.
+
+// Note 16. Note 16.
+
+// Note 17. Note 17.
+
+// Note 18. Note 18.
+
+// Note 19. Note 19.
+
+// Note 20. Note 20.
+
+// Note 21. Note 21.
+
+// Note 22. Note 22.
+
+// Note 23. Note 23.
+
+// Note 24. Note 24.
+
+// Note 25. Note 25.
+
+// Note 26. Note 26.
+
+// Note 27. Notes
+
+// Note 28. Adapted from The Magic Magnet Polarity Tool v2 by tjdesign.
+// https://www.printables.com/model/461166-the-magic-magnet-polarity-tool-v2
+// Original meshes: CC BY-NC 4.0. Retain attribution with redistributed remixes.
+// Preserve the four original grips and keyed pin fit. Enlarge only the head
+// and matching covers in XY; retain thread pitch and all axial dimensions.
+// Print one shaft, one head, one pin and one cover per completed tool.
+// Glue the pin/head/shaft and the magnet; leave the threaded cover removable.
+
+// Note 29. default preserves the original part, coupon and print selectors.
+
+// Note 30. mm, nominal magnet diameter
+
+// Note 31. mm, nominal magnet thickness
+
+// Note 32. mm, diametral glue/fit allowance
+
+// Note 33. mm, recess below head rim
+
+// Note 34. mm, radial wall at nominal cylindrical tip
+
+// Note 35. mm, tip outside diameter before enlargement
+
+// Note 36. mm, original pocket diameter
+
+// Note 37. mm, original head from glue face to magnet face
+
+// Note 38. mm, original pocket floor above glue face
+
+// Note 39. mm, keyed socket depth in both mating pieces
+
+// Note 40. mm, contains the entire keyed socket
+
+// Note 41. mm, original shaft's glue face
+
+// Note 42. mm, original outside working face
+
+// Note 43. mm, original pin bottom
+
+// Note 44. mm, original keyed pin length
+
+// Note 45. mm/revolution, measured from original mesh
+
+// Note 46. degrees, collision-free assembled thread phase
+
+// Note 47. Keep bore compensation stable under external use<>.
+
+// Note 48. mm, layout spacing, not a mating dimension
+
+// Note 49. Extract the original non-round key instead of approximating it as a bore.
+
+// Note 50. Restore the original pin socket after enlarging the outside.
+
+// Note 51. Close the old magnet recess, then cut the new independent size.
+
+// Note 52. Assembly uses the originals' shaft glue plane at Z=5. The head flips about
+// X: its socket key is at -Y in print pose, while the shaft/pin key is at +Y.
+
+// Note 53. Assembly display changes placement only; the original output remains the default.

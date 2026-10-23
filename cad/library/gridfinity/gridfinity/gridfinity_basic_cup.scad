@@ -1,59 +1,57 @@
-// include <gridfinity_modules.scad>
+// Note 1.
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 use <gridfinity_cup_modules.scad>
 
-// X dimension in grid units
+// Note 3.
 width = 2; // [ 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ]
-// Y dimension in grid units
+// Note 4.
 depth = 1; // [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ]
-// Z dimension (multiples of 7mm)
+// Note 5.
 height = 12;
-// (Zack's design uses magnet diameter of 6.5)
+// Note 6.
 magnet_diameter = 0;  // .1
-// (Zack's design uses depth of 6)
+// Note 7.
 screw_depth = 0;
-// Hole overhang remedy is active only when both screws and magnets are nonzero (and this option is selected)
+// Note 8.
 hole_overhang_remedy = true;
-//Only add attachments (magnets and screw) to box corners (prints faster).
+// Note 9.
 box_corner_attachments_only = false;
-// Fill in solid block (overrides all following options)
+// Note 10.
 filled_in = false;
-// X dimension subdivisions
+// Note 11.
 chambers = 1;
-// Include overhang for labeling (and specify left/right/center justification)
+// Note 12.
 withLabel = "disabled"; // ["disabled", "left", "right", "center", "leftchamber", "rightchamber", "centerchamber"]
-// Include larger corner fillet
+// Note 13.
 fingerslide = false;
-// Width of the label in number of units, or zero means full width
+// Note 14.
 labelWidth = 0;  // .01
-// Minimum thickness above cutouts in base (Zack's design is effectively 1.2)
+// Note 15.
 floor_thickness = 0.7;
-// Wall thickness (Zack's design is 0.95)
+// Note 16.
 wall_thickness = 0.95;  // .01
-// Efficient floor option saves material and time, but the floor is not smooth (only applies if no magnets, screws, or finger-slide used)
+// Note 17.
 efficient_floor = false;
-// When enabled, irregular subdivisions have to be defined in code
+// Note 18.
 irregular_subdivisions = false;
-// Enable to subdivide bottom pads to allow half-cell offsets
+// Note 19.
 half_pitch = false;
-// Remove some or all of lip
+// Note 20.
 lip_style = "normal";  // [ "normal", "reduced", "none" ]
 
 module end_of_customizer_opts() {}
 
-// Separator positions are defined in terms of grid units from the left end
+// Note 21.
 separator_positions = [ 0.25, 0.5, 1.4 ];
 
+// Note 22.
 
-
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
 module feral_default_output_ff9cebfaefbb() {
 if (filled_in) {
-  grid_block(width, depth, height, magnet_diameter=magnet_diameter, 
+  grid_block(width, depth, height, magnet_diameter=magnet_diameter,
     screw_depth=screw_depth, hole_overhang_remedy=hole_overhang_remedy,
     half_pitch=half_pitch, box_corner_attachments_only=box_corner_attachments_only);
 }
@@ -105,3 +103,50 @@ feral_default_output_ff9cebfaefbb();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_ff9cebfaefbb();
 else feral_assembly_view_ff9cebfaefbb(view == "exploded");
+
+// Notes
+
+// Note 1. include <gridfinity_modules.scad>
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. X dimension in grid units
+
+// Note 4. Y dimension in grid units
+
+// Note 5. Z dimension (multiples of 7mm)
+
+// Note 6. (Zack's design uses magnet diameter of 6.5)
+
+// Note 7. (Zack's design uses depth of 6)
+
+// Note 8. Hole overhang remedy is active only when both screws and magnets are nonzero (and this option is selected)
+
+// Note 9. Only add attachments (magnets and screw) to box corners (prints faster).
+
+// Note 10. Fill in solid block (overrides all following options)
+
+// Note 11. X dimension subdivisions
+
+// Note 12. Include overhang for labeling (and specify left/right/center justification)
+
+// Note 13. Include larger corner fillet
+
+// Note 14. Width of the label in number of units, or zero means full width
+
+// Note 15. Minimum thickness above cutouts in base (Zack's design is effectively 1.2)
+
+// Note 16. Wall thickness (Zack's design is 0.95)
+
+// Note 17. Efficient floor option saves material and time, but the floor is not smooth (only applies if no magnets, screws, or finger-slide used)
+
+// Note 18. When enabled, irregular subdivisions have to be defined in code
+
+// Note 19. Enable to subdivide bottom pads to allow half-cell offsets
+
+// Note 20. Remove some or all of lip
+
+// Note 21. Separator positions are defined in terms of grid units from the left end
+
+// Note 22. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

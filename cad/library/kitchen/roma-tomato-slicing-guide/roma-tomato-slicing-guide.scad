@@ -1,4 +1,99 @@
-// Roma tomato slicing guide — 5 mm crosswise slices, knife guided both sides.
+// Note 1.
+
+/* [Tomato] */
+
+// Note 2.
+/* [Assembly display] */
+// Note 3.
+view = "default"; // [default, together, exploded]
+
+tomato_d = 58;      // Note 4.
+
+trough_gap = 1;     // Note 5.
+
+/* [Slices] */
+
+// Note 6.
+pitch = 5;          // Note 7.
+
+fin_t = 2.64;       // Note 8.
+
+slot_n = 21;
+
+// Note 9.
+wall_w = 16;        // Note 10.
+
+guide_over = 6;     // Note 11.
+
+end_w = 6;          // Note 12.
+
+lead_w = 0.3;       // Note 13.
+
+lead_h = 2;         // Note 14.
+
+/* [Base] */
+
+// Note 15.
+floor_t = 6;        // Note 16.
+
+floor_kerf = 2;     // Note 17.
+
+/* [Hidden] */
+
+$fn = 96;
+eps = 0.01;
+slot_w = pitch - fin_t;
+trough_r = tomato_d / 2 + trough_gap;
+body_l = 2 * end_w + (slot_n - 1) * pitch + slot_w;
+body_w = 2 * trough_r + 2 * wall_w;
+trough_z = floor_t + trough_r;     // Note 18.
+body_h = floor_t + tomato_d + guide_over;
+
+function slot_x(i) = end_w + slot_w / 2 + i * pitch;
+
+module slot_cut(i) {
+    translate([slot_x(i) - slot_w / 2, -eps, floor_t - floor_kerf])
+        cube([slot_w, body_w + 2 * eps, body_h]);
+    // Note 19.
+    hull() {
+        translate([slot_x(i) - slot_w / 2 - lead_w, -eps, body_h])
+            cube([slot_w + 2 * lead_w, body_w + 2 * eps, eps]);
+        translate([slot_x(i) - slot_w / 2, -eps, body_h - lead_h])
+            cube([slot_w, body_w + 2 * eps, eps]);
+    }
+}
+
+module slicing_guide() {
+    difference() {
+        cube([body_l, body_w, body_h]);
+        // Note 20.
+        translate([-eps, body_w / 2, trough_z])
+            rotate([0, 90, 0])
+                cylinder(r = trough_r, h = body_l + 2 * eps);
+        // Note 21.
+        translate([-eps, body_w / 2 - trough_r, trough_z])
+            cube([body_l + 2 * eps, 2 * trough_r, body_h]);
+        for (i = [0 : slot_n - 1]) slot_cut(i);
+    }
+}
+
+// Note 22.
+
+module feral_default_output_0e513b4eb0af() {
+slicing_guide();
+}
+
+module feral_assembly_view_0e513b4eb0af(explode=false) {
+feral_default_output_0e513b4eb0af();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_0e513b4eb0af();
+else feral_assembly_view_0e513b4eb0af(view == "exploded");
+
+// Notes
+
+// Note 1. Roma tomato slicing guide — 5 mm crosswise slices, knife guided both sides.
 //
 // The tomato lies on its side in a half-round trough cut into a solid block,
 // and the block is sliced through by a row of slots across its width. A knife
@@ -42,103 +137,53 @@
 // ORIENTATION. Printed as drawn, floor down, no supports. The trough is open
 // at the top and every slot is open from the top down.
 
-/* [Tomato] */
+// Note 2. Largest roma diameter the trough should take.
 
-// Largest roma diameter the trough should take.
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
+// Note 3. default preserves the original part, coupon and print selectors.
 
-tomato_d = 58;      // mm
-
+// Note 4. mm
 // Clearance between the tomato and the trough, on the radius.
-trough_gap = 1;     // mm
 
-/* [Slices] */
+// Note 5. mm
 
-// Slice thickness: fin + slot.
-pitch = 5;          // mm
+// Note 6. Slice thickness: fin + slot.
 
+// Note 7. mm
 // Fin thickness along the pitch. 2.64 is a 6-line wall on the 0.4 nozzle.
-fin_t = 2.64;       // mm
 
+// Note 8. mm
 // Number of slots, which is slices + 1. 21 covers a 100 mm tomato.
-slot_n = 21;
 
-// Wall left outside the trough. Widened from 12 when the walls went up.
-wall_w = 16;        // mm
+// Note 9. Wall left outside the trough. Widened from 12 when the walls went up.
 
+// Note 10. mm
 // How far the walls rise above the top of the largest tomato.
-guide_over = 6;     // mm
 
+// Note 11. mm
 // Solid block at each end, unslotted.
-end_w = 6;          // mm
 
+// Note 12. mm
 // Flare at the top of each slot, per side. Leaves a 2.04 tip on each fin.
-lead_w = 0.3;       // mm
 
+// Note 13. mm
 // Height over which the flare closes back to the slot width.
-lead_h = 2;         // mm
 
-/* [Base] */
+// Note 14. mm
 
-// Solid floor under the bottom of the trough.
-floor_t = 6;        // mm
+// Note 15. Solid floor under the bottom of the trough.
 
+// Note 16. mm
 // How far each slot runs below the bottom of the trough.
-floor_kerf = 2;     // mm
 
-/* [Hidden] */
+// Note 17. mm
 
-$fn = 96;
-eps = 0.01;
-slot_w = pitch - fin_t;
-trough_r = tomato_d / 2 + trough_gap;
-body_l = 2 * end_w + (slot_n - 1) * pitch + slot_w;
-body_w = 2 * trough_r + 2 * wall_w;
-trough_z = floor_t + trough_r;     // centre line of the trough
-body_h = floor_t + tomato_d + guide_over;
+// Note 18. centre line of the trough
 
-function slot_x(i) = end_w + slot_w / 2 + i * pitch;
+// Note 19. lead-in flare: a wedge from lead_w wider at the top down to slot_w
 
-module slot_cut(i) {
-    translate([slot_x(i) - slot_w / 2, -eps, floor_t - floor_kerf])
-        cube([slot_w, body_w + 2 * eps, body_h]);
-    // lead-in flare: a wedge from lead_w wider at the top down to slot_w
-    hull() {
-        translate([slot_x(i) - slot_w / 2 - lead_w, -eps, body_h])
-            cube([slot_w + 2 * lead_w, body_w + 2 * eps, eps]);
-        translate([slot_x(i) - slot_w / 2, -eps, body_h - lead_h])
-            cube([slot_w, body_w + 2 * eps, eps]);
-    }
-}
+// Note 20. the round trough the tomato lies in
 
-module slicing_guide() {
-    difference() {
-        cube([body_l, body_w, body_h]);
-        // the round trough the tomato lies in
-        translate([-eps, body_w / 2, trough_z])
-            rotate([0, 90, 0])
-                cylinder(r = trough_r, h = body_l + 2 * eps);
-        // straight sides from the centre line up
-        translate([-eps, body_w / 2 - trough_r, trough_z])
-            cube([body_l + 2 * eps, 2 * trough_r, body_h]);
-        for (i = [0 : slot_n - 1]) slot_cut(i);
-    }
-}
+// Note 21. straight sides from the centre line up
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 22. Assembly display changes placement only; the original output remains the default.
 // Single printed piece: both display modes show the same intact part.
-module feral_default_output_0e513b4eb0af() {
-slicing_guide();
-}
-
-module feral_assembly_view_0e513b4eb0af(explode=false) {
-feral_default_output_0e513b4eb0af();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_0e513b4eb0af();
-else feral_assembly_view_0e513b4eb0af(view == "exploded");

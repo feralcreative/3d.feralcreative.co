@@ -1,76 +1,46 @@
-// can-light-trim.scad
-//
-// A replacement trim and lens for the recessed can light outside the
-// bedroom, which has lost its own. Two printed pieces: a white PETG trim
-// whose collar pushes into the 118 mm hole and whose flange covers the
-// ceiling around it, and a clear PETG lens that drops into the collar from
-// the back before the trim goes up.
-//
-// The lens rests on a ledge at the back of the flange, so in the ceiling
-// gravity holds it against the ledge; six small nubs above it stop it
-// rattling or falling out while the trim is in the hand.
-//
-// The trim holds itself in by friction: the collar is slotted into
-// fingers, and a ridge on each finger stands proud of the hole so the
-// fingers flex in as the collar goes up.
-//
-// ⚠️ ASSUMED: 118 mm is the hole the collar goes into (Ziad, 2026-10-11),
-// and whatever it grips (drywall edge or can wall) is at least as deep as
-// grip_z. Not yet confirmed which it is, or how deep it runs.
-// The lamp is an LED (Ziad, 2026-10-11). PETG softens around 80 °C, so
-// never fit an incandescent or halogen lamp behind this lens.
-// ⚠️ ASSUMED: nothing in the can (lamp, socket) reaches down within
-// collar_h of the ceiling.
-//
-// Axes: print orientation. Z=0 is the visible face, flat on the bed; +Z
-// runs up into the ceiling. The flange's back (Z=flange_t) sits on the
-// ceiling.
-//
-// Build each piece under its own name:
-//   utils/build.sh parts/can-light-trim.scad -D 'show="trim"' --name can-light-trim
-//   utils/build.sh parts/can-light-trim.scad -D 'show="lens"' --name can-light-lens
+// Note 1.
 
 /* [View] */
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 show = "assembly"; // [assembly, section, trim, lens]
 
 /* [Measured] */
-hole_d = 118; // mm, ceiling hole the collar goes into
+hole_d = 118; // Note 3.
 
 /* [Flange] */
-border = 20; // mm, flange width beyond the hole edge
-flange_t = 3.0; // mm, face to ceiling
-edge_chamfer = 1.2; // mm, 45° on the visible outer edge; also beats elephant's foot
-aperture_chamfer = 1.0; // mm, 45° on the visible aperture edge
+border = 20; // Note 4.
+flange_t = 3.0; // Note 5.
+edge_chamfer = 1.2; // Note 6.
+aperture_chamfer = 1.0; // Note 7.
 
 /* [Collar] */
-collar_fit = 0.4; // mm per side, collar to hole, before the ridges
-collar_wall = 2.10; // mm, 5 × 0.42 lines on a 0.4 nozzle
-collar_h = 25; // mm, above the ceiling
-collar_lead = 1.0; // mm, 45° outer chamfer at the top so it finds the hole
+collar_fit = 0.4; // Note 8.
+collar_wall = 2.10; // Note 9.
+collar_h = 25; // Note 10.
+collar_lead = 1.0; // Note 11.
 finger_count = 12;
-finger_slot_w = 2.5; // mm, gap between fingers
-finger_base_h = 8; // mm, solid ring above the flange before the slots start
+finger_slot_w = 2.5; // Note 12.
+finger_base_h = 8; // Note 13.
 
 /* [Grip ridge] */
-grip_interference = 0.8; // mm per side beyond the hole wall
-grip_z = 12; // mm above the ceiling, ridge centre
-grip_flat = 1.0; // mm, flat crest height; flanks are 45°
+grip_interference = 0.8; // Note 14.
+grip_z = 12; // Note 15.
+grip_flat = 1.0; // Note 16.
 
 /* [Lens] */
-lens_t = 2.0; // mm, ten 0.20 layers
-lens_fit = 0.3; // mm per side, lens to collar bore
-lens_ledge = 3.0; // mm, how far the ledge reaches in under the lens
-lens_chamfer = 0.4; // mm, both edges of the lens
+lens_t = 2.0; // Note 17.
+lens_fit = 0.3; // Note 18.
+lens_ledge = 3.0; // Note 19.
+lens_chamfer = 0.4; // Note 20.
 
 /* [Retaining nubs] */
 nub_count = 6;
-nub_depth = 0.8; // mm, inward from the collar bore
-nub_arc = 8; // degrees each
-nub_gap = 0.15; // mm, lens top to nub underside
+nub_depth = 0.8; // Note 21.
+nub_arc = 8; // Note 22.
+nub_gap = 0.15; // Note 23.
 
 /* [Colors] */
 trim_color = "WhiteSmoke";
@@ -79,7 +49,7 @@ lens_color = [0.75, 0.88, 1.0, 0.55];
 /* [Resolution] */
 $fa = 2;
 $fs = 0.4;
-eps = 0.01; // mm, overshoot on cuts
+eps = 0.01; // Note 24.
 
 /* [Derived] */
 hole_r = hole_d / 2;
@@ -89,7 +59,7 @@ aperture_r = collar_ir - lens_ledge;
 flange_r = hole_r + border;
 collar_top = flange_t + collar_h;
 lens_r = collar_ir - lens_fit;
-grip_p = collar_fit + grip_interference; // ridge projection past the collar
+grip_p = collar_fit + grip_interference; // Note 25.
 grip_zc = flange_t + grip_z;
 nub_z = flange_t + lens_t + nub_gap;
 
@@ -174,9 +144,7 @@ module assembly() {
     translate([0, 0, flange_t]) lens();
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 26.
 module feral_default_output_5a0f99d4c6ff() {
 if (show == "trim") trim();
 else if (show == "lens") lens();
@@ -195,3 +163,87 @@ trim(); translate([0,0,flange_t+(explode ? 35 : 0)]) lens();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_5a0f99d4c6ff();
 else feral_assembly_view_5a0f99d4c6ff(view == "exploded");
+
+// Notes
+
+// Note 1. can-light-trim.scad
+//
+// A replacement trim and lens for the recessed can light outside the
+// bedroom, which has lost its own. Two printed pieces: a white PETG trim
+// whose collar pushes into the 118 mm hole and whose flange covers the
+// ceiling around it, and a clear PETG lens that drops into the collar from
+// the back before the trim goes up.
+//
+// The lens rests on a ledge at the back of the flange, so in the ceiling
+// gravity holds it against the ledge; six small nubs above it stop it
+// rattling or falling out while the trim is in the hand.
+//
+// The trim holds itself in by friction: the collar is slotted into
+// fingers, and a ridge on each finger stands proud of the hole so the
+// fingers flex in as the collar goes up.
+//
+// ⚠️ ASSUMED: 118 mm is the hole the collar goes into (Ziad, 2026-10-11),
+// and whatever it grips (drywall edge or can wall) is at least as deep as
+// grip_z. Not yet confirmed which it is, or how deep it runs.
+// The lamp is an LED (Ziad, 2026-10-11). PETG softens around 80 °C, so
+// never fit an incandescent or halogen lamp behind this lens.
+// ⚠️ ASSUMED: nothing in the can (lamp, socket) reaches down within
+// collar_h of the ceiling.
+//
+// Axes: print orientation. Z=0 is the visible face, flat on the bed; +Z
+// runs up into the ceiling. The flange's back (Z=flange_t) sits on the
+// ceiling.
+//
+// Build each piece under its own name:
+// utils/build.sh parts/can-light-trim.scad -D 'show="trim"' --name can-light-trim
+// utils/build.sh parts/can-light-trim.scad -D 'show="lens"' --name can-light-lens
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, ceiling hole the collar goes into
+
+// Note 4. mm, flange width beyond the hole edge
+
+// Note 5. mm, face to ceiling
+
+// Note 6. mm, 45° on the visible outer edge; also beats elephant's foot
+
+// Note 7. mm, 45° on the visible aperture edge
+
+// Note 8. mm per side, collar to hole, before the ridges
+
+// Note 9. mm, 5 × 0.42 lines on a 0.4 nozzle
+
+// Note 10. mm, above the ceiling
+
+// Note 11. mm, 45° outer chamfer at the top so it finds the hole
+
+// Note 12. mm, gap between fingers
+
+// Note 13. mm, solid ring above the flange before the slots start
+
+// Note 14. mm per side beyond the hole wall
+
+// Note 15. mm above the ceiling, ridge centre
+
+// Note 16. mm, flat crest height; flanks are 45°
+
+// Note 17. mm, ten 0.20 layers
+
+// Note 18. mm per side, lens to collar bore
+
+// Note 19. mm, how far the ledge reaches in under the lens
+
+// Note 20. mm, both edges of the lens
+
+// Note 21. mm, inward from the collar bore
+
+// Note 22. degrees each
+
+// Note 23. mm, lens top to nub underside
+
+// Note 24. mm, overshoot on cuts
+
+// Note 25. ridge projection past the collar
+
+// Note 26. Assembly display changes placement only; the original output remains the default.

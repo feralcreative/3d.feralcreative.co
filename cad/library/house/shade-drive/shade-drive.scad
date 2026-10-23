@@ -1,140 +1,127 @@
-// Beaded-chain shade drive: bead sprocket plus a first-pass housing for sizing.
-// Requirements: _PLANS/shade-drive-design-brief-2026-10-15.md (local only).
-// Bought parts and decisions: ~/www/ezzat/home.ezzat.com/docs/shade-drive-plan.md.
-// Architecture, route assumption, and open decisions: docs/architecture.md.
-//
-// The chain values are measured (2026-10-16). The motor and hub come from the
-// Pololu dimension drawings. Everything about the route, wall standoff, pivot,
-// latch, keeper, carrier, and cover is a SIZING pass: it shows how big the unit
-// is, not that it fits a window.
-//
-// Assembly frame: +X along the wall, +Y out from the wall into the room, +Z up,
-// wall face at Y=0. The sprocket axis runs along Y, centred on X=0, Z=0, with
-// the chain wrapped under it and both strands rising to the shade's clutch.
-// Sprocket print frame: axis on Z, each half outer face on the bed.
+// Note 1.
 
 /* [Chain: measured 2026-10-16] */
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
-chain_bead_d = 4.5;        // mm, #10 plastic bead chain
-chain_pitch = 6.0;         // mm bead centre to bead centre
-chain_cord_d = 1.5;        // mm, cord between beads
-chain_joiner_d = 7.6;      // mm, one per loop; cannot seat in a pocket
-chain_joiner_l = 13.25;    // mm
-chain_wrap = 180;          // deg; ASSUMED route, see docs/architecture.md
+chain_bead_d = 4.5;        // Note 3.
+chain_pitch = 6.0;         // Note 4.
+chain_cord_d = 1.5;        // Note 5.
+chain_joiner_d = 7.6;      // Note 6.
+chain_joiner_l = 13.25;    // Note 7.
+chain_wrap = 180;          // Note 8.
 
 /* [Motor: Pololu 37D 131:1 64 CPR #4756, from Pololu drawing 0J1735] */
-mtr_gear_d = 36.8;         // mm gearbox diameter
-mtr_gear_l = 26.5;         // mm gearbox length, 100:1 to 150:1
-mtr_can_d = 34.8;          // mm motor can diameter
-mtr_can_l = 30.7;          // mm
-mtr_enc_d = 34.0;          // mm encoder cap diameter
-mtr_enc_l = 15.4;          // mm
-mtr_shaft_offset = 7.0;    // mm, output shaft off the body axis
-mtr_boss_d = 12.0;         // mm, bearing boss around the shaft
-mtr_boss_l = 6.0;          // mm
-mtr_shaft_d = 6.0;         // mm D-shaft
-mtr_shaft_flat = 5.4;      // mm across the flat
-mtr_shaft_l = 16.0;        // mm beyond the boss
-mtr_hole_r = 15.5;         // mm, 6x M3 on a regular hexagon of 15.5 mm sides
-mtr_screw_max = 3.0;       // mm, deepest a screw may go into the gearbox face
-mtr_lead_keepout = [8, 8, 12];  // mm, X x Y x Z: motor clocked so the leads leave toward +X; ASSUMED
+mtr_gear_d = 36.8;         // Note 9.
+mtr_gear_l = 26.5;         // Note 10.
+mtr_can_d = 34.8;          // Note 11.
+mtr_can_l = 30.7;          // Note 12.
+mtr_enc_d = 34.0;          // Note 13.
+mtr_enc_l = 15.4;          // Note 14.
+mtr_shaft_offset = 7.0;    // Note 15.
+mtr_boss_d = 12.0;         // Note 16.
+mtr_boss_l = 6.0;          // Note 17.
+mtr_shaft_d = 6.0;         // Note 18.
+mtr_shaft_flat = 5.4;      // Note 19.
+mtr_shaft_l = 16.0;        // Note 20.
+mtr_hole_r = 15.5;         // Note 21.
+mtr_screw_max = 3.0;       // Note 22.
+mtr_lead_keepout = [8, 8, 12];  // Note 23.
 
 /* [Hub: Pololu 6 mm hub #1999, from Pololu drawing 0J667] */
-hub_flange_d = 25.4;       // mm
-hub_flange_t = 5.0;        // mm, M3 holes threaded through it
-hub_boss_d = 12.0;         // mm, set-screw boss, faces the motor
-hub_boss_t = 4.2;          // mm
-hub_bolt_r = 9.5;          // mm, 6x M3
-hub_recess = 1.0;          // mm the flange sits into the sprocket for centring
-hub_recess_clear = 0.8;    // mm on DIAMETER of the centring recess; verify by coupon
+hub_flange_d = 25.4;       // Note 24.
+hub_flange_t = 5.0;        // Note 25.
+hub_boss_d = 12.0;         // Note 26.
+hub_boss_t = 4.2;          // Note 27.
+hub_bolt_r = 9.5;          // Note 28.
+hub_recess = 1.0;          // Note 29.
+hub_recess_clear = 0.8;    // Note 30.
 
 /* [Outboard bearing: 625ZZ on an M5-shoulder bolt, optional per plan P5] */
-brg_od = 16;               // mm
-brg_id = 5;                // mm
-brg_w = 5;                 // mm
-brg_show = true;           // reserve and draw the outboard yoke
-brg_insert_d = 5.6;        // mm, M4 heat-set insert hole in the sprocket centre; PLACEHOLDER
-brg_leg_t = 7;             // mm yoke leg thickness along Y around the bearing
-brg_leg_gap = 3;           // mm, sprocket outboard face to yoke leg: button heads stand 1.65
-brg_bolt_head = [8.5, 3];  // mm, shoulder bolt head diameter and height; PLACEHOLDER
+brg_od = 16;               // Note 31.
+brg_id = 5;                // Note 32.
+brg_w = 5;                 // Note 33.
+brg_show = true;           // Note 34.
+brg_insert_d = 5.6;        // Note 35.
+brg_leg_t = 7;             // Note 36.
+brg_leg_gap = 3;           // Note 37.
+brg_bolt_head = [8.5, 3];  // Note 38.
 
 /* [Sprocket: design choices] */
-spr_pockets = 15;          // integer; 15 puts three hub screws midway between pockets
-spr_rim_above = 1.2;       // mm the rim stands radially beyond the bead centres
-spr_side_wall = 1.5;       // mm of wheel beyond the pocket on each face
-spr_mouth_flare = 0.3;     // mm per side the pocket widens toward its mouth
-spr_screw_n = 3;           // M3 button-head screws through both halves into the hub
-spr_shaft_clear_d = 7;     // mm, shaft clearance through the motor-side half
-spr_min_web = 0.84;        // mm, thinnest web allowed between pockets; two lines
+spr_pockets = 15;          // Note 39.
+spr_rim_above = 1.2;       // Note 40.
+spr_side_wall = 1.5;       // Note 41.
+spr_mouth_flare = 0.3;     // Note 42.
+spr_screw_n = 3;           // Note 43.
+spr_shaft_clear_d = 7;     // Note 44.
+spr_min_web = 0.84;        // Note 45.
 
 /* [Fit allowances: verify with the coupon] */
-// Each is a separate number on purpose; do not widen them together.
-// The printer reference measured bores 0.55-0.65 mm small on diameter in PETG.
-spr_pocket_clear = 0.5;    // mm on DIAMETER of each bead pocket
-spr_groove_clear = 0.3;    // mm PER FACE of the cord groove, and below the cord
-screw_d = 3.0;             // mm, M3
-screw_hole_clear = 0.7;    // mm on DIAMETER of M3 clearance holes
-foot_chamfer = 0.5;        // mm, 45 deg on edges that print on the bed
+// Note 46.
+
+spr_pocket_clear = 0.5;    // Note 47.
+spr_groove_clear = 0.3;    // Note 48.
+screw_d = 3.0;             // Note 49.
+screw_hole_clear = 0.7;    // Note 50.
+foot_chamfer = 0.5;        // Note 51.
 
 /* [Pocket coupon] */
-// Complete sprocket pairs that differ ONLY in pocket clearance. Identify each
-// pair by the dimples on its bed faces: one dimple is the first value.
-cpn_pocket_clears = [0.2, 0.35, 0.5, 0.65]; // mm on diameter; 0.65 is the most a 6 mm pitch allows
-cpn_gap = 6;               // mm between parts on the plate
+// Note 52.
+
+cpn_pocket_clears = [0.2, 0.35, 0.5, 0.65]; // Note 53.
+cpn_gap = 6;               // Note 54.
 
 /* [Route and mounting: ASSUMED, unmeasured] */
-asm_chain_y = 30;          // mm, chain plane off the wall; UNMEASURED
-asm_release_deg = 20;      // deg the cartridge swings to lift the sprocket clear
-asm_pivot = [-22, 7];      // mm, X and Z of the cartridge pivot; PLACEHOLDER
-asm_latch = [22, 22];      // mm, X and Z of the release latch; PLACEHOLDER. Above the
-                           // keeper arm's release arc, which crosses Z 4 to 15 at this X
-asm_pin_d = 4;             // mm, pivot and latch pins; PLACEHOLDER
-asm_pillar_d = 7;          // mm, base pillars carrying the pins
-asm_strand_beads = 12;     // beads drawn on each straight strand
-asm_show_wall = false;     // translucent wall slab; it hides the iso view
+asm_chain_y = 30;          // Note 55.
+asm_release_deg = 20;      // Note 56.
+asm_pivot = [-22, 7];      // Note 57.
+asm_latch = [22, 22];      // Note 58.
+
+asm_pin_d = 4;             // Note 59.
+asm_pillar_d = 7;          // Note 60.
+asm_strand_beads = 12;     // Note 61.
+asm_show_wall = false;     // Note 62.
 
 /* [Structure: sizing pass] */
-base_t = 5;                // mm wall plate
-base_slot = [5, 20];       // mm, width and length of the vertical adjustment slots
-cart_t = 4;                // mm cartridge face plate; M3 x 6 gives 2 mm into the gearbox
-cart_bottom_z = -12.5;     // mm, lowest the cartridge plate reaches
-keeper_clear = 1.5;        // mm, bead outer edge to keeper
-keeper_t = 2;              // mm
-cov_wall = 2.5;            // mm
-cov_clear = 1.5;           // mm between the cover and anything inside it
-cov_r = 4;                 // mm outer corner radius
-cov_slot_w = 10;           // mm strand notches: joiner 7.6 plus clearance
+base_t = 5;                // Note 63.
+base_slot = [5, 20];       // Note 64.
+cart_t = 4;                // Note 65.
+cart_bottom_z = -12.5;     // Note 66.
+keeper_clear = 1.5;        // Note 67.
+keeper_t = 2;              // Note 68.
+cov_wall = 2.5;            // Note 69.
+cov_clear = 1.5;           // Note 70.
+cov_r = 4;                 // Note 71.
+cov_slot_w = 10;           // Note 72.
 
 /* [Electronics: sizing pass] */
-ele_board = [30, 60, 1.6]; // mm protoboard X x Y x Z; PLACEHOLDER cut size
-ele_board_x = -6;          // mm, board centre X; puts the XIAO's USB-C near the -X side
-ele_board_y0 = 38;         // mm, board's wall-side edge; clear of the keeper
-ele_socket_h = 8.5;        // mm female header sockets
-ele_pin_h = 3;             // mm of pins below the board
-ele_top_gap = 2;           // mm, tallest module to the cartridge plate
-xiao = [21, 17.5, 4.7];    // mm, XIAO ESP32-S3: long side along X, USB-C on the -X end
-drv = [15.24, 17.78, 3.5]; // mm, Pololu DRV8874 carrier #4035, 0.6 x 0.7 in
-reg = [13, 10, 3];         // mm, Pololu D36V6F5 #3792
-ant_keepout = [8, 40, 10]; // mm, U.FL FPC antenna on the cover's -X wall; PLACEHOLDER
+ele_board = [30, 60, 1.6]; // Note 73.
+ele_board_x = -6;          // Note 74.
+ele_board_y0 = 38;         // Note 75.
+ele_socket_h = 8.5;        // Note 76.
+ele_pin_h = 3;             // Note 77.
+ele_top_gap = 2;           // Note 78.
+xiao = [21, 17.5, 4.7];    // Note 79.
+drv = [15.24, 17.78, 3.5]; // Note 80.
+reg = [13, 10, 3];         // Note 81.
+ant_keepout = [8, 40, 10]; // Note 82.
 
 /* [Controls: sizing pass] */
-btn_d = 12;                // mm panel hole
-btn_bezel = [15, 2];       // mm bezel diameter and proud height; PLACEHOLDER
-btn_body = [13, 20];       // mm body diameter and depth behind the panel; PLACEHOLDER
-btn_pitch = 16;            // mm
-btn_z = -22;               // mm, button row height on the front face
-jack_hole_d = 11;          // mm, 5.5 x 2.1 panel jack; PLACEHOLDER
-jack_body = [13, 16];      // mm body diameter and depth inside; PLACEHOLDER
-jack_xy = [15, 15];        // mm, jack position on the bottom face
+btn_d = 12;                // Note 83.
+btn_bezel = [15, 2];       // Note 84.
+btn_body = [13, 20];       // Note 85.
+btn_pitch = 16;            // Note 86.
+btn_z = -22;               // Note 87.
+jack_hole_d = 11;          // Note 88.
+jack_body = [13, 16];      // Note 89.
+jack_xy = [15, 15];        // Note 90.
 
 /* [Display] */
 show = "print-set";        // [print-set, half-a, half-b, pocket-coupon, section, assembly, assembly-open, release]
 
 /* [Colors] */
-// Preview only; STLs carry no colour. Each printed piece gets its own.
+// Note 91.
 half_a_color = "SteelBlue";
 half_b_color = "DarkOrange";
 base_color = "SeaGreen";
@@ -146,34 +133,33 @@ cover_color = [0.85, 0.85, 0.9, 1];
 bought_color = "DimGray";
 board_color = "DarkGreen";
 chain_color = "WhiteSmoke";
-placeholder_color = [1, 0.15, 0.15, 0.35]; // translucent red: assumed, not a real part
+placeholder_color = [1, 0.15, 0.15, 0.35]; // Note 92.
 wall_color = [0.6, 0.55, 0.5, 0.25];
 
 /* [Hidden] */
-eps = 0.01;                // mm boolean overshoot
-chord_err = 0.02;          // mm, 0.4 nozzle faceting target
+eps = 0.01;                // Note 93.
+chord_err = 0.02;          // Note 94.
 function facets(r) = min(128, max(8, ceil(180 / acos(1 - min(chord_err / r, 0.5)))));
-function r_hole(r) = r / cos(180 / facets(r)); // circumscribe: polygons are inscribed
+function r_hole(r) = r / cos(180 / facets(r)); // Note 95.
 
-// ---- Sprocket, derived. Radii are named for what they measure.
 spr_pitch_ang = 360 / spr_pockets;
-spr_pitch_r = chain_pitch / (2 * sin(180 / spr_pockets)); // bead-centre radius
-spr_rim_r = spr_pitch_r + spr_rim_above;                  // outer radius of the wheel
-spr_bead_out_r = spr_pitch_r + chain_bead_d / 2;          // seated bead's outer edge
+spr_pitch_r = chain_pitch / (2 * sin(180 / spr_pockets)); // Note 96.
+spr_rim_r = spr_pitch_r + spr_rim_above;                  // Note 97.
+spr_bead_out_r = spr_pitch_r + chain_bead_d / 2;          // Note 98.
 function spr_pocket_d(pc) = chain_bead_d + pc;
-function spr_half_w(pc) = spr_pocket_d(pc) / 2 + spr_side_wall; // mid-plane to outer face
-// The cord runs as a chord between seated beads; its midpoint sits closest to the axis.
+function spr_half_w(pc) = spr_pocket_d(pc) / 2 + spr_side_wall; // Note 99.
+
 spr_cord_min_r = spr_pitch_r * cos(180 / spr_pockets);
 spr_groove_root_r = spr_cord_min_r - chain_cord_d / 2 - spr_groove_clear;
 spr_groove_w = chain_cord_d + 2 * spr_groove_clear;
-spr_flare_len = spr_rim_above + 1;                        // pocket channel runs past the rim
+spr_flare_len = spr_rim_above + 1;                        // Note 100.
 function spr_web_pitch(pc) = chain_pitch - spr_pocket_d(pc);
 function spr_web_rim(pc) = 2 * spr_rim_r * sin(180 / spr_pockets)
     - (spr_pocket_d(pc) + 2 * spr_mouth_flare * spr_rim_above / spr_flare_len);
-// Screws sit midway between pockets, 120 deg apart.
+// Note 101.
 spr_screw_ang0 = spr_pitch_ang / 2;
 spr_screw_hole_r = (screw_d + screw_hole_clear) / 2;
-// Wall left between a screw hole and its nearest pocket, both at the mid-plane.
+// Note 102.
 spr_screw_pocket_gap = sqrt(pow(hub_bolt_r, 2) + pow(spr_pitch_r, 2)
     - 2 * hub_bolt_r * spr_pitch_r * cos(spr_pitch_ang / 2))
     - spr_pocket_d(spr_pocket_clear) / 2 - spr_screw_hole_r;
@@ -188,23 +174,23 @@ assert(spr_screw_pocket_gap >= 0.8, str("Hub screws leave ", spr_screw_pocket_ga
 assert(spr_groove_root_r - (hub_bolt_r + spr_screw_hole_r) >= 1.5, "Cord groove runs into the hub screws");
 assert(hub_recess <= spr_side_wall - 0.4, "Hub recess reaches the pockets");
 
-// ---- Assembly, derived. Y stations from the wall out.
-y_spr = asm_chain_y;                                   // chain and sprocket mid-plane
-y_hub_face = y_spr + spr_hw - hub_recess;              // hub flange face; the shaft ends here
-y_boss_face = y_hub_face + mtr_shaft_l;                // gearbox boss face
-y_gear_face = y_boss_face + mtr_boss_l;                // gearbox face, cartridge plate's front
+// Note 103.
+y_spr = asm_chain_y;                                   // Note 104.
+y_hub_face = y_spr + spr_hw - hub_recess;              // Note 105.
+y_boss_face = y_hub_face + mtr_shaft_l;                // Note 106.
+y_gear_face = y_boss_face + mtr_boss_l;                // Note 107.
 y_mtr_back = y_gear_face + mtr_gear_l + mtr_can_l + mtr_enc_l;
-y_leg1 = y_spr - spr_hw - brg_leg_gap;                 // yoke leg, sprocket side
+y_leg1 = y_spr - spr_hw - brg_leg_gap;                 // Note 108.
 y_leg0 = y_leg1 - brg_leg_t;
-mtr_axis = [0, mtr_shaft_offset];                      // X, Z of the motor body axis
+mtr_axis = [0, mtr_shaft_offset];                      // Note 109.
 mtr_r = mtr_gear_d / 2;
-cart_r = mtr_hole_r + 4.5;                             // plate radius around the motor axis
+cart_r = mtr_hole_r + 4.5;                             // Note 110.
 keeper_r = spr_bead_out_r + keeper_clear;
-yoke_w = 2 * (spr_pitch_r - chain_bead_d / 2 - 1.5);   // between the strands
+yoke_w = 2 * (spr_pitch_r - chain_bead_d / 2 - 1.5);   // Note 111.
 yoke_z0 = spr_rim_r + 2;
 yoke_t = 5;
 
-// Release: a point (x, z) swung about the pivot by asm_release_deg.
+// Note 112.
 function swing(p) = let (v = p - asm_pivot, a = -asm_release_deg)
     asm_pivot + [v[0] * cos(a) + v[1] * sin(a), -v[0] * sin(a) + v[1] * cos(a)];
 spr_lift = swing([0, 0])[1];
@@ -212,19 +198,19 @@ swing_top = max(swing(mtr_axis)[1] + mtr_r, swing(mtr_axis)[1] + cart_r,
                 swing([yoke_w / 2, yoke_z0 + yoke_t])[1], swing([-yoke_w / 2, yoke_z0 + yoke_t])[1],
                 swing(asm_latch)[1] + asm_pillar_d / 2 + 1);
 
-// Electronics stack, from the cartridge plate down.
+// Note 113.
 ele_stack_top = cart_bottom_z - ele_top_gap;
 ele_board_top = ele_stack_top - ele_socket_h - max(xiao[2], drv[2], reg[2]);
-ele_floor_z = ele_board_top - ele_board[2] - ele_pin_h - 2;  // carrier floor top
-// Cover interior: everything above plus clearance, then the wall.
+ele_floor_z = ele_board_top - ele_board[2] - ele_pin_h - 2;  // Note 114.
+
 cov_in_x0 = min(asm_pivot[0] - asm_pillar_d / 2, ele_board_x - ele_board[0] / 2,
                 -btn_pitch - btn_bezel[0] / 2, -mtr_r) - cov_clear;
 cov_in_x1 = max(asm_latch[0] + asm_pillar_d / 2, btn_pitch + btn_bezel[0] / 2, mtr_r,
                 mtr_enc_d / 2 - 1 + mtr_lead_keepout[0],
                 spr_pitch_r + cov_slot_w / 2) + cov_clear;
-cov_in_z0 = ele_floor_z - 2 - cov_clear;               // carrier floor is 2 thick
-cov_in_z1 = swing_top + cov_clear;                     // tallest part with the cartridge released
-cov_in_y1 = y_mtr_back + cov_clear + 2;                // 2 mm of lead bend room behind the encoder
+cov_in_z0 = ele_floor_z - 2 - cov_clear;               // Note 115.
+cov_in_z1 = swing_top + cov_clear;                     // Note 116.
+cov_in_y1 = y_mtr_back + cov_clear + 2;                // Note 117.
 cov_box = [cov_in_x1 - cov_in_x0 + 2 * cov_wall, cov_in_y1 + cov_wall,
            cov_in_z1 - cov_in_z0 + 2 * cov_wall];
 
@@ -248,11 +234,8 @@ echo(str("ENVELOPE: chain plane ", asm_chain_y, " mm off the wall (ASSUMED); str
          2 * spr_pitch_r, " mm apart; housing spans Z ", cov_in_z0 - cov_wall, " to ",
          cov_in_z1 + cov_wall, " mm about the sprocket axis"));
 
-// ================================================================ sprocket
+// Note 118.
 
-// One bead pocket, bead centre at the origin, radial along +X, axis along +Z.
-// A seat sphere swept straight out past the rim, widening toward the mouth, so
-// the tangential walls bear on the bead and the chain can articulate in.
 module spr_pocket(pc) {
     d = spr_pocket_d(pc);
     hull() {
@@ -262,7 +245,7 @@ module spr_pocket(pc) {
     }
 }
 
-// The complete wheel, chain mid-plane at Z=0, motor side (half A) toward -Z.
+// Note 119.
 module spr_wheel(pc) {
     hw = spr_half_w(pc);
     difference() {
@@ -278,18 +261,18 @@ module spr_wheel(pc) {
                 translate([hub_bolt_r, 0, 0])
                     cylinder(r = r_hole(spr_screw_hole_r), h = 2 * hw + 1, center = true,
                              $fn = facets(spr_screw_hole_r));
-        // Motor side: hub flange centring recess and shaft clearance.
+        // Note 120.
         translate([0, 0, -hw - eps])
             cylinder(r = r_hole((hub_flange_d + hub_recess_clear) / 2), h = hub_recess + eps,
                      $fn = facets(hub_flange_d / 2));
         translate([0, 0, -hw - 1])
             cylinder(r = r_hole(spr_shaft_clear_d / 2), h = hw + 1 + eps, $fn = facets(spr_shaft_clear_d / 2));
-        // Outboard side: M4 heat-set insert for the bearing's shoulder bolt.
+        // Note 121.
         translate([0, 0, -eps]) cylinder(r = r_hole(brg_insert_d / 2), h = hw + 2 * eps, $fn = facets(brg_insert_d / 2));
     }
 }
 
-// Chamfer the bed edges that mate or rub: the rim, and the recess or insert mouth.
+// Note 122.
 module spr_foot_chamfers(which) {
     c = foot_chamfer;
     translate([0, 0, -eps])
@@ -301,7 +284,7 @@ module spr_foot_chamfers(which) {
     translate([0, 0, -eps]) cylinder(r1 = rr + c, r2 = rr - eps, h = c + eps, $fn = facets(rr));
 }
 
-// A half in print orientation: outer face on Z=0, mid-plane face up.
+// Note 123.
 module spr_half(pc, which, id_dimples = 0) {
     hw = spr_half_w(pc);
     difference() {
@@ -312,8 +295,8 @@ module spr_half(pc, which, id_dimples = 0) {
                     cube([2 * spr_rim_r + 2, 2 * spr_rim_r + 2, hw + 1]);
             }
         spr_foot_chamfers(which);
-        // Coupon identity: N dimples on the bed face, on a pocket's radial line,
-        // clear of the recess, the insert, and the screws.
+        // Note 124.
+
         if (id_dimples > 0)
             for (j = [0 : id_dimples - 1])
                 rotate([0, 0, (j - (id_dimples - 1) / 2) * 9])
@@ -347,21 +330,19 @@ module pocket_coupon() {
     }
 }
 
-// The halves stacked in the wheel frame, mid-plane at Z=0, half A toward -Z.
+// Note 125.
 module spr_assembled(pc = spr_pocket_clear) {
     hw = spr_half_w(pc);
     translate([0, 0, -hw]) spr_half_colored(pc, "a");
     translate([0, 0, hw]) rotate([180, 0, 0]) spr_half_colored(pc, "b");
 }
 
-// Wheel frame into the assembly frame: wheel -Z (motor side) becomes +Y, and a
-// pocket at wheel angle a sits at angle a in the XZ plane.
+// Note 126.
+
 module wheel_to_asm() { translate([0, y_spr, 0]) rotate([90, 0, 0]) children(); }
 
-// ================================================================ bought parts
-// Reference geometry only. Dimensions from the Pololu drawings cited above.
+// Note 127.
 
-// Along +Y from the gearbox face at Y=0, output shaft on the Y axis.
 module motor_37d() {
     color(bought_color) {
         translate([mtr_axis[0], 0, mtr_axis[1]]) rotate([-90, 0, 0]) {
@@ -379,14 +360,14 @@ module motor_37d() {
                 }
         }
     }
-    // Encoder leads and their bend, leaving toward +X: direction ASSUMED.
+    // Note 128.
     color(placeholder_color)
         translate([mtr_axis[0] + mtr_enc_d / 2 - 1, mtr_gear_l + mtr_can_l + 2,
                    mtr_axis[1] - mtr_lead_keepout[2] / 2])
             cube(mtr_lead_keepout);
 }
 
-// Hub on the shaft, flange face at Y=0, boss toward +Y (the motor).
+// Note 129.
 module hub_1999() {
     color("Silver") rotate([-90, 0, 0]) difference() {
         union() {
@@ -399,7 +380,7 @@ module hub_1999() {
     }
 }
 
-// 625ZZ and its shoulder bolt, bearing's sprocket-side face at Y=0, toward -Y.
+// Note 130.
 module bearing_625() {
     color("Silver") rotate([90, 0, 0]) {
         difference() {
@@ -412,7 +393,7 @@ module bearing_625() {
     }
 }
 
-// Protoboard with the three socketed modules, board top at Z=0, wall-side edge at Y=0.
+// Note 131.
 module electronics() {
     b = ele_board;
     color(board_color) translate([-b[0] / 2, 0, -b[2]]) cube(b);
@@ -421,14 +402,14 @@ module electronics() {
         color("Black") translate([x, y, 0]) cube([size[0], size[1], ele_socket_h]);
         color(bought_color) translate([x, y, ele_socket_h]) cube(size);
     }
-    mod(xiao, -b[0] / 2, 2);                                 // USB-C on the -X end
+    mod(xiao, -b[0] / 2, 2);                                 // Note 132.
     mod(drv, -b[0] / 2 + 2, 2 + xiao[1] + 4);
     mod(reg, -b[0] / 2 + 2, 2 + xiao[1] + drv[1] + 8);
-    // Motor and encoder connectors at the front end, under the encoder.
+    // Note 133.
     color("White") translate([-b[0] / 2 + 4, b[1] - 8, 0]) cube([20, 6, 7]);
 }
 
-// Panel button, front face of the panel at Y=0, bezel outward along +Y.
+// Note 134.
 module button() {
     color("Silver") rotate([90, 0, 0]) {
         translate([0, 0, -btn_bezel[1]]) cylinder(d = btn_bezel[0], h = btn_bezel[1], $fn = 32);
@@ -436,8 +417,8 @@ module button() {
     }
 }
 
-// PLACEHOLDER chain in the chain plane: beads seated in the pockets across the
-// bottom of the wheel, strands rising from the tangent points to the clutch.
+// Note 135.
+
 module chain_placeholder() {
     R = spr_pitch_r;
     wrap = [for (i = [0 : spr_pockets]) let (a = i * spr_pitch_ang)
@@ -459,14 +440,14 @@ module chain_placeholder() {
     }
 }
 
-// ================================================================ housing (sizing pass)
+// Note 136.
 
 module rounded_box(size, r) {
     hull() for (x = [r, size[0] - r], z = [r, size[2] - r])
         translate([x, 0, z]) rotate([-90, 0, 0]) cylinder(r = r, h = size[1], $fn = 24);
 }
 
-// P3 wall base: the only thing on the wall. Vertical slots set chain tension.
+// Note 137.
 module base_plate() {
     w = cov_in_x1 - cov_in_x0; h = cov_in_z1 - cov_in_z0;
     color(base_color) {
@@ -477,7 +458,7 @@ module base_plate() {
                     translate([x, -1, z + dz]) rotate([-90, 0, 0])
                         cylinder(d = base_slot[0], h = base_t + 2, $fn = 16);
         }
-        // Pillars carrying the pivot and latch pins out to the cartridge plate.
+        // Note 138.
         for (p = [asm_pivot, asm_latch])
             translate([p[0], base_t - eps, p[1]]) rotate([-90, 0, 0])
                 difference() {
@@ -487,8 +468,8 @@ module base_plate() {
     }
 }
 
-// P2 motor cartridge: face plate on the gearbox's six M3 holes, swinging on the
-// pivot pin, held by the latch pin. Reaction torque goes through both pins.
+// Note 139.
+
 module cartridge() {
     color(cart_color) translate([0, y_gear_face, 0]) rotate([90, 0, 0])
         difference() {
@@ -503,14 +484,14 @@ module cartridge() {
             for (p = [asm_pivot, asm_latch])
                 translate([p[0], p[1], -1]) cylinder(d = asm_pin_d + 0.6, h = cart_t + 2, $fn = 16);
         }
-    // Pins: pivot and latch, PLACEHOLDER mechanism.
+    // Note 140.
     color(placeholder_color) for (p = [asm_pivot, asm_latch])
         translate([p[0], base_t, p[1]]) rotate([-90, 0, 0])
             cylinder(d = asm_pin_d, h = y_gear_face + 3 - base_t, $fn = 16);
 }
 
-// P4 keeper: a band under the wrapped chain, carried on arms from the cartridge
-// so it swings with the sprocket.
+// Note 141.
+
 module keeper() {
     w = 2 * spr_hw;
     color(keeper_color) {
@@ -526,9 +507,8 @@ module keeper() {
     }
 }
 
-// P5 outboard yoke, optional: from the cartridge plate over the top of the
-// sprocket, between the strands, down the wall side to the 625ZZ. It has to come
-// off to load an intact loop over the sprocket's free end.
+// Note 142.
+
 module yoke() {
     color(yoke_color) difference() {
         union() {
@@ -540,7 +520,7 @@ module yoke() {
     }
 }
 
-// P7 electronics carrier: an L-bracket off the wall base, board on standoffs.
+// Note 143.
 module carrier() {
     y1 = ele_board_y0 + ele_board[1] + 2;
     x0 = cov_in_x0 + cov_clear; w = cov_in_x1 - cov_in_x0 - 2 * cov_clear;
@@ -556,9 +536,8 @@ module carrier() {
     }
 }
 
-// P8 cover: open-backed shell pushed on toward the wall. Notches open to its back
-// edge let it pass the strands; the buttons sit on the front face, the jack on
-// the bottom, and a slot on the -X side reaches the XIAO's USB-C.
+// Note 144.
+
 module cover() {
     x0 = cov_in_x0 - cov_wall; z0 = cov_in_z0 - cov_wall;
     y_usb = ele_board_y0 + 2 + xiao[1] / 2;
@@ -574,7 +553,7 @@ module cover() {
                 cylinder(d = btn_d, h = cov_wall + 2, $fn = 32);
         translate([jack_xy[0], jack_xy[1], z0 - 1]) cylinder(d = jack_hole_d, h = cov_wall + 2, $fn = 32);
         translate([x0 - 1, y_usb - 6, z_usb - 2]) cube([cov_wall + 2, 12, 7]);
-        // Vents on the +X side beside the motor can.
+        // Note 145.
         for (k = [0 : 4])
             translate([cov_in_x1 - 1, y_gear_face + mtr_gear_l + 4 + k * 5, mtr_axis[1] - 8])
                 cube([cov_wall + 2, 2.5, 16]);
@@ -595,7 +574,7 @@ module wall() {
         cube([cov_in_x1 - cov_in_x0 + 80, 10, cov_in_z1 - cov_in_z0 + 80 + asm_strand_beads * chain_pitch]);
 }
 
-// Everything the cartridge carries; it moves together on release.
+// Note 146.
 module swinging() {
     wheel_to_asm() spr_assembled();
     translate([0, y_hub_face, 0]) hub_1999();
@@ -627,16 +606,14 @@ module assembly(cover_on, release = false) {
     if (cover_on) { cover(); controls(); }
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 147.
 module feral_default_output_6b62426e78c7() {
 if (show == "print-set") print_set();
 else if (show == "half-a") spr_half_colored(spr_pocket_clear, "a");
 else if (show == "half-b") spr_half_colored(spr_pocket_clear, "b");
 else if (show == "pocket-coupon") pocket_coupon();
 else if (show == "section")
-    // Horizontal cut through the axis, keeping the lower half with the wrapped chain.
+    // Note 148.
     difference() {
         union() { wheel_to_asm() spr_assembled(); chain_placeholder();
                   translate([0, y_hub_face, 0]) hub_1999(); }
@@ -669,3 +646,334 @@ translate([0,explode ? 100 : 0,0]) { cover(); controls(); }
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_6b62426e78c7();
 else feral_assembly_view_6b62426e78c7(view == "exploded");
+
+// Notes
+
+// Note 1. Beaded-chain shade drive: bead sprocket plus a first-pass housing for sizing.
+// Requirements: _PLANS/shade-drive-design-brief-2026-10-15.md (local only).
+// Bought parts and decisions: ~/www/ezzat/home.ezzat.com/docs/shade-drive-plan.md.
+// Architecture, route assumption, and open decisions: docs/architecture.md.
+//
+// The chain values are measured (2026-10-16). The motor and hub come from the
+// Pololu dimension drawings. Everything about the route, wall standoff, pivot,
+// latch, keeper, carrier, and cover is a SIZING pass: it shows how big the unit
+// is, not that it fits a window.
+//
+// Assembly frame: +X along the wall, +Y out from the wall into the room, +Z up,
+// wall face at Y=0. The sprocket axis runs along Y, centred on X=0, Z=0, with
+// the chain wrapped under it and both strands rising to the shade's clutch.
+// Sprocket print frame: axis on Z, each half outer face on the bed.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, #10 plastic bead chain
+
+// Note 4. mm bead centre to bead centre
+
+// Note 5. mm, cord between beads
+
+// Note 6. mm, one per loop; cannot seat in a pocket
+
+// Note 7. mm
+
+// Note 8. deg; ASSUMED route, see docs/architecture.md
+
+// Note 9. mm gearbox diameter
+
+// Note 10. mm gearbox length, 100:1 to 150:1
+
+// Note 11. mm motor can diameter
+
+// Note 12. mm
+
+// Note 13. mm encoder cap diameter
+
+// Note 14. mm
+
+// Note 15. mm, output shaft off the body axis
+
+// Note 16. mm, bearing boss around the shaft
+
+// Note 17. mm
+
+// Note 18. mm D-shaft
+
+// Note 19. mm across the flat
+
+// Note 20. mm beyond the boss
+
+// Note 21. mm, 6x M3 on a regular hexagon of 15.5 mm sides
+
+// Note 22. mm, deepest a screw may go into the gearbox face
+
+// Note 23. mm, X x Y x Z: motor clocked so the leads leave toward +X; ASSUMED
+
+// Note 24. mm
+
+// Note 25. mm, M3 holes threaded through it
+
+// Note 26. mm, set-screw boss, faces the motor
+
+// Note 27. mm
+
+// Note 28. mm, 6x M3
+
+// Note 29. mm the flange sits into the sprocket for centring
+
+// Note 30. mm on DIAMETER of the centring recess; verify by coupon
+
+// Note 31. mm
+
+// Note 32. mm
+
+// Note 33. mm
+
+// Note 34. reserve and draw the outboard yoke
+
+// Note 35. mm, M4 heat-set insert hole in the sprocket centre; PLACEHOLDER
+
+// Note 36. mm yoke leg thickness along Y around the bearing
+
+// Note 37. mm, sprocket outboard face to yoke leg: button heads stand 1.65
+
+// Note 38. mm, shoulder bolt head diameter and height; PLACEHOLDER
+
+// Note 39. integer; 15 puts three hub screws midway between pockets
+
+// Note 40. mm the rim stands radially beyond the bead centres
+
+// Note 41. mm of wheel beyond the pocket on each face
+
+// Note 42. mm per side the pocket widens toward its mouth
+
+// Note 43. M3 button-head screws through both halves into the hub
+
+// Note 44. mm, shaft clearance through the motor-side half
+
+// Note 45. mm, thinnest web allowed between pockets; two lines
+
+// Note 46. Each is a separate number on purpose; do not widen them together.
+// The printer reference measured bores 0.55-0.65 mm small on diameter in PETG.
+
+// Note 47. mm on DIAMETER of each bead pocket
+
+// Note 48. mm PER FACE of the cord groove, and below the cord
+
+// Note 49. mm, M3
+
+// Note 50. mm on DIAMETER of M3 clearance holes
+
+// Note 51. mm, 45 deg on edges that print on the bed
+
+// Note 52. Complete sprocket pairs that differ ONLY in pocket clearance. Identify each
+// pair by the dimples on its bed faces: one dimple is the first value.
+
+// Note 53. mm on diameter; 0.65 is the most a 6 mm pitch allows
+
+// Note 54. mm between parts on the plate
+
+// Note 55. mm, chain plane off the wall; UNMEASURED
+
+// Note 56. deg the cartridge swings to lift the sprocket clear
+
+// Note 57. mm, X and Z of the cartridge pivot; PLACEHOLDER
+
+// Note 58. mm, X and Z of the release latch; PLACEHOLDER. Above the
+// keeper arm's release arc, which crosses Z 4 to 15 at this X
+
+// Note 59. mm, pivot and latch pins; PLACEHOLDER
+
+// Note 60. mm, base pillars carrying the pins
+
+// Note 61. beads drawn on each straight strand
+
+// Note 62. translucent wall slab; it hides the iso view
+
+// Note 63. mm wall plate
+
+// Note 64. mm, width and length of the vertical adjustment slots
+
+// Note 65. mm cartridge face plate; M3 x 6 gives 2 mm into the gearbox
+
+// Note 66. mm, lowest the cartridge plate reaches
+
+// Note 67. mm, bead outer edge to keeper
+
+// Note 68. mm
+
+// Note 69. mm
+
+// Note 70. mm between the cover and anything inside it
+
+// Note 71. mm outer corner radius
+
+// Note 72. mm strand notches: joiner 7.6 plus clearance
+
+// Note 73. mm protoboard X x Y x Z; PLACEHOLDER cut size
+
+// Note 74. mm, board centre X; puts the XIAO's USB-C near the -X side
+
+// Note 75. mm, board's wall-side edge; clear of the keeper
+
+// Note 76. mm female header sockets
+
+// Note 77. mm of pins below the board
+
+// Note 78. mm, tallest module to the cartridge plate
+
+// Note 79. mm, XIAO ESP32-S3: long side along X, USB-C on the -X end
+
+// Note 80. mm, Pololu DRV8874 carrier #4035, 0.6 x 0.7 in
+
+// Note 81. mm, Pololu D36V6F5 #3792
+
+// Note 82. mm, U.FL FPC antenna on the cover's -X wall; PLACEHOLDER
+
+// Note 83. mm panel hole
+
+// Note 84. mm bezel diameter and proud height; PLACEHOLDER
+
+// Note 85. mm body diameter and depth behind the panel; PLACEHOLDER
+
+// Note 86. mm
+
+// Note 87. mm, button row height on the front face
+
+// Note 88. mm, 5.5 x 2.1 panel jack; PLACEHOLDER
+
+// Note 89. mm body diameter and depth inside; PLACEHOLDER
+
+// Note 90. mm, jack position on the bottom face
+
+// Note 91. Preview only; STLs carry no colour. Each printed piece gets its own.
+
+// Note 92. translucent red: assumed, not a real part
+
+// Note 93. mm boolean overshoot
+
+// Note 94. mm, 0.4 nozzle faceting target
+
+// Note 95. circumscribe: polygons are inscribed
+// ---- Sprocket, derived. Radii are named for what they measure.
+
+// Note 96. bead-centre radius
+
+// Note 97. outer radius of the wheel
+
+// Note 98. seated bead's outer edge
+
+// Note 99. mid-plane to outer face
+// The cord runs as a chord between seated beads; its midpoint sits closest to the axis.
+
+// Note 100. pocket channel runs past the rim
+
+// Note 101. Screws sit midway between pockets, 120 deg apart.
+
+// Note 102. Wall left between a screw hole and its nearest pocket, both at the mid-plane.
+
+// Note 103. ---- Assembly, derived. Y stations from the wall out.
+
+// Note 104. chain and sprocket mid-plane
+
+// Note 105. hub flange face; the shaft ends here
+
+// Note 106. gearbox boss face
+
+// Note 107. gearbox face, cartridge plate's front
+
+// Note 108. yoke leg, sprocket side
+
+// Note 109. X, Z of the motor body axis
+
+// Note 110. plate radius around the motor axis
+
+// Note 111. between the strands
+
+// Note 112. Release: a point (x, z) swung about the pivot by asm_release_deg.
+
+// Note 113. Electronics stack, from the cartridge plate down.
+
+// Note 114. carrier floor top
+// Cover interior: everything above plus clearance, then the wall.
+
+// Note 115. carrier floor is 2 thick
+
+// Note 116. tallest part with the cartridge released
+
+// Note 117. 2 mm of lead bend room behind the encoder
+
+// Note 118. ================================================================ sprocket
+// One bead pocket, bead centre at the origin, radial along +X, axis along +Z.
+// A seat sphere swept straight out past the rim, widening toward the mouth, so
+// the tangential walls bear on the bead and the chain can articulate in.
+
+// Note 119. The complete wheel, chain mid-plane at Z=0, motor side (half A) toward -Z.
+
+// Note 120. Motor side: hub flange centring recess and shaft clearance.
+
+// Note 121. Outboard side: M4 heat-set insert for the bearing's shoulder bolt.
+
+// Note 122. Chamfer the bed edges that mate or rub: the rim, and the recess or insert mouth.
+
+// Note 123. A half in print orientation: outer face on Z=0, mid-plane face up.
+
+// Note 124. Coupon identity: N dimples on the bed face, on a pocket's radial line,
+// clear of the recess, the insert, and the screws.
+
+// Note 125. The halves stacked in the wheel frame, mid-plane at Z=0, half A toward -Z.
+
+// Note 126. Wheel frame into the assembly frame: wheel -Z (motor side) becomes +Y, and a
+// pocket at wheel angle a sits at angle a in the XZ plane.
+
+// Note 127. ================================================================ bought parts
+// Reference geometry only. Dimensions from the Pololu drawings cited above.
+// Along +Y from the gearbox face at Y=0, output shaft on the Y axis.
+
+// Note 128. Encoder leads and their bend, leaving toward +X: direction ASSUMED.
+
+// Note 129. Hub on the shaft, flange face at Y=0, boss toward +Y (the motor).
+
+// Note 130. 625ZZ and its shoulder bolt, bearing's sprocket-side face at Y=0, toward -Y.
+
+// Note 131. Protoboard with the three socketed modules, board top at Z=0, wall-side edge at Y=0.
+
+// Note 132. USB-C on the -X end
+
+// Note 133. Motor and encoder connectors at the front end, under the encoder.
+
+// Note 134. Panel button, front face of the panel at Y=0, bezel outward along +Y.
+
+// Note 135. PLACEHOLDER chain in the chain plane: beads seated in the pockets across the
+// bottom of the wheel, strands rising from the tangent points to the clutch.
+
+// Note 136. ================================================================ housing (sizing pass)
+
+// Note 137. P3 wall base: the only thing on the wall. Vertical slots set chain tension.
+
+// Note 138. Pillars carrying the pivot and latch pins out to the cartridge plate.
+
+// Note 139. P2 motor cartridge: face plate on the gearbox's six M3 holes, swinging on the
+// pivot pin, held by the latch pin. Reaction torque goes through both pins.
+
+// Note 140. Pins: pivot and latch, PLACEHOLDER mechanism.
+
+// Note 141. P4 keeper: a band under the wrapped chain, carried on arms from the cartridge
+// so it swings with the sprocket.
+
+// Note 142. P5 outboard yoke, optional: from the cartridge plate over the top of the
+// sprocket, between the strands, down the wall side to the 625ZZ. It has to come
+// off to load an intact loop over the sprocket's free end.
+
+// Note 143. P7 electronics carrier: an L-bracket off the wall base, board on standoffs.
+
+// Note 144. P8 cover: open-backed shell pushed on toward the wall. Notches open to its back
+// edge let it pass the strands; the buttons sit on the front face, the jack on
+// the bottom, and a slot on the -X side reaches the XIAO's USB-C.
+
+// Note 145. Vents on the +X side beside the motor can.
+
+// Note 146. Everything the cartridge carries; it moves together on release.
+
+// Note 147. Assembly display changes placement only; the original output remains the default.
+
+// Note 148. Horizontal cut through the axis, keeping the lower half with the wrapped chain.

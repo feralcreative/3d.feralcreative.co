@@ -1,4 +1,62 @@
-// middle-finger-wrist-emboss.scad
+// Note 1.
+
+/* [Output] */
+flip = true;   // Note 2.
+
+standalone = true;
+
+/* [Mesh] */
+mesh_file  = "originals/middle-finger.stl";
+mesh_scale = 1.0;   // Note 3.
+tilt       = -3;    // Note 4.
+spin       = 0;     // Note 5.
+
+/* [Cut] */
+relief_depth = 16.0;  // Note 6.
+bottom_z     = 1.6;   // Note 7.
+
+/* [Hidden] */
+big = 400;
+
+// Note 8.
+
+art_w_mm  = 62.43;    // Note 9.
+art_h_mm  = 149.94;   // Note 10.
+art_cx_mm = 4.55;     // Note 11.
+art_cz_mm = 76.57;    // Note 12.
+
+back_y = -38.50;
+
+module stood_up() rotate([0, 0, spin]) rotate([tilt, 0, 0])
+  scale(mesh_scale) import(mesh_file, convexity = 10);
+
+// Note 13.
+
+module emboss() {
+  // Note 14.
+
+  rotate([0, 0, 180]) translate([0, -(back_y + relief_depth), 0]) intersection() {
+    stood_up();
+    translate([-big / 2, back_y - 1, bottom_z]) cube([big, relief_depth + 1, big]);
+  }
+}
+
+// Note 15.
+
+module finger_mark(w, d)
+  scale([w / art_w_mm, d / relief_depth, w / art_w_mm])
+    translate([-art_cx_mm, 0, -art_cz_mm]) emboss();
+
+module oriented() {
+  if (flip) rotate([90, 0, 0]) children();   // Note 16.
+  else children();
+}
+
+if (standalone) oriented() emboss();
+
+// Notes
+
+// Note 1. middle-finger-wrist-emboss.scad
 //
 // The middle finger, again, as a relief to stick on the side of things — the
 // same treatment as middle-finger-emboss.scad, on the other hand in
@@ -41,23 +99,23 @@
 // these were BUILT at tilt 0 to watch it fail, rather than argued from the
 // numbers:
 //
-//   15 mm in   the forearm's back is BEHIND the plane, z 8 to 24 is cut away
-//              entirely, and the piece comes out as two shells (Genus: -1)
-//   16 mm in   the forearm survives as a 0.4 mm knife edge, and the flat face
-//              has already given up at z 141.5 — the top 8.5 mm of the finger
-//              is standing off it
-//   18 mm in   the face stops at z 102.4, and that is the whole finger, from
-//              where it leaves the fist, floating clear
+// 15 mm in   the forearm's back is BEHIND the plane, z 8 to 24 is cut away
+// entirely, and the piece comes out as two shells (Genus: -1)
+// 16 mm in   the forearm survives as a 0.4 mm knife edge, and the flat face
+// has already given up at z 141.5 — the top 8.5 mm of the finger
+// is standing off it
+// 18 mm in   the face stops at z 102.4, and that is the whole finger, from
+// where it leaves the fist, floating clear
 //
 // A small negative tilt fixes both ends at once, because it rotates the
 // finger's front and the wrist's back in opposite directions relative to the
 // plane. The usable window for relief_depth, being [deepest the back recedes,
 // shallowest the front reaches] over the whole height:
 //
-//   tilt        0     -1     -2     -3     -4     -5     -6
-//   back     15.6   14.4   13.3   12.1   12.9   17.0   19.3
-//   front     9.9   12.7   14.9   16.6   15.1   17.0   18.8
-//   window   -5.7   -1.8    1.7    4.5    2.2    0.0   -0.5
+// tilt        0     -1     -2     -3     -4     -5     -6
+// back     15.6   14.4   13.3   12.1   12.9   17.0   19.3
+// front     9.9   12.7   14.9   16.6   15.1   17.0   18.8
+// window   -5.7   -1.8    1.7    4.5    2.2    0.0   -0.5
 //
 // A negative window is that disconnected piece; anything under about 2 mm
 // means the slab is a knife edge somewhere. -3 is the peak and it is a real
@@ -109,27 +167,21 @@
 // support. flip = false draws it standing, as mounted, finger up and the flat
 // face at y = 0.
 
-/* [Output] */
-flip = true;   // printed orientation, flat face on the bed; false shows it standing as mounted
-
+// Note 2. printed orientation, flat face on the bed; false shows it standing as mounted
 // False when another part includes this file for finger_mark() and wants the
 // modules without the hand turning up at its origin. Nothing else uses it.
-standalone = true;
 
-/* [Mesh] */
-mesh_file  = "originals/middle-finger.stl";
-mesh_scale = 1.0;   // the mesh is already in millimetres
-tilt       = -3;    // deg about X, to plumb the back of the hand; NOT to stand it up. back_y is measured at THIS angle
-spin       = 0;     // deg about the VERTICAL, after the tilt. Zero: this hand faces square on. back_y is measured at THIS too
+// Note 3. the mesh is already in millimetres
 
-/* [Cut] */
-relief_depth = 16.0;  // the slab's thickness, measured in from the deepest knuckle. Every band of the hand lands at this depth; past 16.63 the fingertip floats, 14 and the forearm peels (mm)
-bottom_z     = 1.6;   // squared-off bottom, in the stood-up frame. Just above the tilted wrist face, which spans 1.18 to 1.52 inside the slab (mm)
+// Note 4. deg about X, to plumb the back of the hand; NOT to stand it up. back_y is measured at THIS angle
 
-/* [Hidden] */
-big = 400;
+// Note 5. deg about the VERTICAL, after the tilt. Zero: this hand faces square on. back_y is measured at THIS too
 
-// The relief's own size, measured off the built mesh: what it comes out wide
+// Note 6. the slab's thickness, measured in from the deepest knuckle. Every band of the hand lands at this depth; past 16.63 the fingertip floats, 14 and the forearm peels (mm)
+
+// Note 7. squared-off bottom, in the stood-up frame. Just above the tilted wrist face, which spans 1.18 to 1.52 inside the slab (mm)
+
+// Note 8. The relief's own size, measured off the built mesh: what it comes out wide
 // and tall, and where the middle of that is. A part that puts this on one of
 // its faces needs them to place and scale it, and OpenSCAD cannot measure an
 // import.
@@ -137,40 +189,27 @@ big = 400;
 // ⚠️ Tied to tilt, spin and relief_depth exactly as back_y is. Change any of
 // them and re-measure these too, or finger_mark() places the artwork off
 // centre and scales it wrong.
-art_w_mm  = 62.43;    // across
-art_h_mm  = 149.94;   // up
-art_cx_mm = 4.55;     // the middle of that, across
-art_cz_mm = 76.57;    // and up
+
+// Note 9. across
+
+// Note 10. up
+
+// Note 11. the middle of that, across
+
+// Note 12. and up
 // The back of the whole hand after the turns: the minimum y of the mesh,
 // measured off it at tilt -3. Tied to tilt — see above.
-back_y = -38.50;
 
-module stood_up() rotate([0, 0, spin]) rotate([tilt, 0, 0])
-  scale(mesh_scale) import(mesh_file, convexity = 10);
-
-// Standing, as mounted: the flat face on y = 0, the knuckles standing out
+// Note 13. Standing, as mounted: the flat face on y = 0, the knuckles standing out
 // toward +y, the finger up.
-module emboss() {
-  // The slab, from the knuckle surface inward; then the flat face to y = 0,
-  // and turned to look at the knuckles rather than the cut.
-  rotate([0, 0, 180]) translate([0, -(back_y + relief_depth), 0]) intersection() {
-    stood_up();
-    translate([-big / 2, back_y - 1, bottom_z]) cube([big, relief_depth + 1, big]);
-  }
-}
 
-// The relief as artwork for another part: centred on the origin across and up,
+// Note 14. The slab, from the knuckle surface inward; then the flat face to y = 0,
+// and turned to look at the knuckles rather than the cut.
+
+// Note 15. The relief as artwork for another part: centred on the origin across and up,
 // its flat face on y = 0, scaled to w wide, and its depth squashed to d rather
 // than scaled with it. Squashing is the point — at full scale a relief w wide
 // stands w * relief_depth / art_w_mm proud, which on anything small is far
 // more than the face it is sitting in can give back.
-module finger_mark(w, d)
-  scale([w / art_w_mm, d / relief_depth, w / art_w_mm])
-    translate([-art_cx_mm, 0, -art_cz_mm]) emboss();
 
-module oriented() {
-  if (flip) rotate([90, 0, 0]) children();   // face (y = 0) to the bed, relief up
-  else children();
-}
-
-if (standalone) oriented() emboss();
+// Note 16. face (y = 0) to the bed, relief up

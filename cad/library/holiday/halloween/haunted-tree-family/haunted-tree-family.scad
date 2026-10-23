@@ -1,11 +1,7 @@
-// DIY Wizard's Cute Haunted Tree Family, adapted for the same LED puck pocket
-// Ziad physically approved in pumpkin-body.scad. Original bark and faces remain
-// imported geometry. Source meshes stay unchanged in originals/.
-// Trees print upright. The default interior fills the unused candle cavity and
-// leaves a cone-roofed light channel to the original face openings.
+// Note 1.
 
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 include <face-openings.scad>
@@ -16,47 +12,47 @@ tree = "grin"; // [grin, oh, sad, teeth, teeth-flat]
 interior = "cone"; // [cone, hollow]
 
 /* [Size] */
-tree_scale = 1.6; // uniform scale of each original tree
-floor_overlap = 0.4; // mm, floor extends into the existing tree wall
-source_taper = 2; // degrees, measured taper of the original candle bore
+tree_scale = 1.6; // Note 3.
+floor_overlap = 0.4; // Note 4.
+source_taper = 2; // Note 5.
 
 /* [Light channel] */
-channel_forward = 8; // mm, cone apex shifted toward the face to shorten the eye passages
-channel_ridge_half = 26; // mm, ridge spans the eyes so the light path stays connected
-channel_roof_angle = 45; // degrees from vertical, maximum inward roof slope
-channel_cap_gap = 0.2; // mm, cone apex below the original interior ceiling
-channel_fill_overlap = 0.25; // mm, joins the filler to the original ceiling
-face_port_length = 80; // mm, face passages run along +X to the outside
-face_port_clear = 0.6; // mm, clearance behind the source face openings
+channel_forward = 8; // Note 6.
+channel_ridge_half = 26; // Note 7.
+channel_roof_angle = 45; // Note 8.
+channel_cap_gap = 0.2; // Note 9.
+channel_fill_overlap = 0.25; // Note 10.
+face_port_length = 80; // Note 11.
+face_port_clear = 0.6; // Note 12.
 
 /* [LED puck—proven pumpkin pocket] */
-puck_d = 59.4; // mm
-puck_h = 8.0; // mm
-puck_fit = 0.15; // mm per side—physically approved in the pumpkin
-puck_depth_extra = 0.1; // mm
-puck_lens_d = 47.6; // mm, lit lens kept clear
-puck_roof = 1.5; // mm, same 45 degree pocket stop as pumpkin
-cable_d = 2.8; // mm
-cable_clear = 0.3; // mm per side
-cable_angle = 180; // degrees, cable exits behind the face, along -X
-cable_length = 120; // mm, exceeds the root footprint
+puck_d = 59.4; // Note 13.
+puck_h = 8.0; // Note 14.
+puck_fit = 0.15; // Note 15.
+puck_depth_extra = 0.1; // Note 16.
+puck_lens_d = 47.6; // Note 17.
+puck_roof = 1.5; // Note 18.
+cable_d = 2.8; // Note 19.
+cable_clear = 0.3; // Note 20.
+cable_angle = 180; // Note 21.
+cable_length = 120; // Note 22.
 
 /* [Gel lens] */
-lens_fit = 0.15; // mm per side, same as the puck pocket
-lens_window_t = 0.42; // mm, 0.30 first layer + one 0.12 layer, the thinnest reliable sheet
-lens_window_d = 50; // mm, rim opening, clears the 47.6 mm puck lens
+lens_fit = 0.15; // Note 23.
+lens_window_t = 0.42; // Note 24.
+lens_window_d = 50; // Note 25.
 
 /* [Diffuser] */
-diffuser_xy_scale = 1.28; // radial scale; passes through the pocket roof
-diffuser_z_scale = 1.4; // shortened to clear the lowest tree cavity roof
-diffuser_collar_d = 55.8; // mm, passes through the 56.7 mm roof opening
-diffuser_collar_h = 1.5; // mm, resting on the puck outside the lens
-diffuser_source_bottom = -36.2; // mm, original cup bottom
-diffuser_source_height = 50.4; // mm, original closed-cap cup height
+diffuser_xy_scale = 1.28; // Note 26.
+diffuser_z_scale = 1.4; // Note 27.
+diffuser_collar_d = 55.8; // Note 28.
+diffuser_collar_h = 1.5; // Note 29.
+diffuser_source_bottom = -36.2; // Note 30.
+diffuser_source_height = 50.4; // Note 31.
 
 /* [Verification] */
-insertion_start = -90; // mm, puck's back fully outside the tree
-diffuser_start = -100; // mm, diffuser fully outside the tree
+insertion_start = -90; // Note 32.
+diffuser_start = -100; // Note 33.
 
 /* [Colors] */
 tree_color = "#805335";
@@ -68,18 +64,18 @@ puck_color = "#C8C8C8";
 $fn = 180;
 eps = 0.01;
 
-source_center = [-1.3, -1.2]; // mm, original candle bore axis
-source_centers = [source_center, source_center, source_center, source_center, [-1.016, -0.911]]; // mm, sad's bore is shifted
+source_center = [-1.3, -1.2]; // Note 34.
+source_centers = [source_center, source_center, source_center, source_center, [-1.016, -0.911]]; // Note 35.
 source_files = ["haunted tree grin.stl", "haunted tree teeth.stl", "Teeth Tree flat snug fit.stl", "haunted-tree-oh.stl", "haunted-tree-sad.stl"];
-// Sad has one root extending 0.332 mm below its main base plane; trim it flat.
-source_bottoms = [-36.5, -36.703853607177734, -37.271156311035156, -36.70000076293945, -36.900001525878906]; // mm
-source_bore_radii = [21.38, 22.49, 21.0, 21.39, 21.2]; // mm at each original base
-source_ceiling_z = [14.666199684143066, 15.665849685668945, 13.822471618652344, 14.666199684143066, 13.787643432617188]; // mm, downward-facing cavity ceilings in source coordinates
+// Note 36.
+source_bottoms = [-36.5, -36.703853607177734, -37.271156311035156, -36.70000076293945, -36.900001525878906]; // Note 37.
+source_bore_radii = [21.38, 22.49, 21.0, 21.39, 21.2]; // Note 38.
+source_ceiling_z = [14.666199684143066, 15.665849685668945, 13.822471618652344, 14.666199684143066, 13.787643432617188]; // Note 39.
 pocket_d = puck_d + 2 * puck_fit;
 pocket_h = puck_h + puck_depth_extra;
 floor_top = pocket_h + puck_roof;
 diffuser_height = diffuser_source_height * diffuser_z_scale;
-clip_size = 400; // mm, exceeds the model envelope
+clip_size = 400; // Note 40.
 
 function tree_index(t) = t == "grin" ? 0 : t == "teeth" ? 1 : t == "teeth-flat" ? 2 : t == "oh" ? 3 : 4;
 function circumscribed(d) = d / cos(180 / $fn);
@@ -101,9 +97,8 @@ module puck_cutouts() {
         translate([0, -cw / 2, -eps]) cube([cable_length, cw, cw + eps]);
 }
 
-// Enclosed holes were extracted from each original front-half projection. Warp
-// their inner ends down by their distance from the bore axis, then shear the
-// extrusion upward toward the face. Every passage roof rises 1:1 along X.
+// Note 41.
+
 module face_ports(t) {
     i = tree_index(t);
     fr = source_bore_radii[i] * tree_scale + floor_overlap;
@@ -164,7 +159,7 @@ module tree_body(t) {
     }
 }
 
-// Located at Z=0 for printing or path checks; assembled bottom is Z=pocket_h.
+// Note 42.
 module diffuser_upright() {
     assert(diffuser_collar_d < pocket_d - 2 * puck_roof - 0.4,
            "Diffuser collar must pass through the pocket roof");
@@ -179,8 +174,8 @@ module diffuser_upright() {
     }
 }
 
-// Fills the empty 45-degree pocket stop above the puck, so no tree changes.
-// Printed window-down; assembled bottom is Z=pocket_h, resting on the puck.
+// Note 43.
+
 module gel_lens() {
     d1 = pocket_d - 2 * lens_fit;
     assert(lens_window_d > puck_lens_d && lens_window_d < d1 - 2 * puck_roof &&
@@ -205,9 +200,8 @@ module puck_dummy() {
     }
 }
 
-// Configuration-space search constrained to the direct bottom-entry translation:
-// swept envelopes connect fully outside to seated and include every intermediate
-// translation, without raster or step-size error.
+// Note 44.
+
 module puck_insertion_envelope() {
     cylinder(d = puck_d, h = puck_h + puck_depth_extra - insertion_start);
     rotate([0, 0, cable_angle])
@@ -247,9 +241,7 @@ module assembly(t) {
     else translate([0, 0, pocket_h]) gel_lens();
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 45.
 module feral_default_output_7ea7d1a17bc4() {
 if (show == "grin" || show == "teeth" || show == "teeth-flat" || show == "oh" || show == "sad") tree_body(show);
 else if (show == "lens") gel_lens();
@@ -277,3 +269,104 @@ else translate([0,0,pocket_h-(explode ? 35 : 0)]) gel_lens();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_7ea7d1a17bc4();
 else feral_assembly_view_7ea7d1a17bc4(view == "exploded");
+
+// Notes
+
+// Note 1. DIY Wizard's Cute Haunted Tree Family, adapted for the same LED puck pocket
+// Ziad physically approved in pumpkin-body.scad. Original bark and faces remain
+// imported geometry. Source meshes stay unchanged in originals/.
+// Trees print upright. The default interior fills the unused candle cavity and
+// leaves a cone-roofed light channel to the original face openings.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. uniform scale of each original tree
+
+// Note 4. mm, floor extends into the existing tree wall
+
+// Note 5. degrees, measured taper of the original candle bore
+
+// Note 6. mm, cone apex shifted toward the face to shorten the eye passages
+
+// Note 7. mm, ridge spans the eyes so the light path stays connected
+
+// Note 8. degrees from vertical, maximum inward roof slope
+
+// Note 9. mm, cone apex below the original interior ceiling
+
+// Note 10. mm, joins the filler to the original ceiling
+
+// Note 11. mm, face passages run along +X to the outside
+
+// Note 12. mm, clearance behind the source face openings
+
+// Note 13. mm
+
+// Note 14. mm
+
+// Note 15. mm per side—physically approved in the pumpkin
+
+// Note 16. mm
+
+// Note 17. mm, lit lens kept clear
+
+// Note 18. mm, same 45 degree pocket stop as pumpkin
+
+// Note 19. mm
+
+// Note 20. mm per side
+
+// Note 21. degrees, cable exits behind the face, along -X
+
+// Note 22. mm, exceeds the root footprint
+
+// Note 23. mm per side, same as the puck pocket
+
+// Note 24. mm, 0.30 first layer + one 0.12 layer, the thinnest reliable sheet
+
+// Note 25. mm, rim opening, clears the 47.6 mm puck lens
+
+// Note 26. radial scale; passes through the pocket roof
+
+// Note 27. shortened to clear the lowest tree cavity roof
+
+// Note 28. mm, passes through the 56.7 mm roof opening
+
+// Note 29. mm, resting on the puck outside the lens
+
+// Note 30. mm, original cup bottom
+
+// Note 31. mm, original closed-cap cup height
+
+// Note 32. mm, puck's back fully outside the tree
+
+// Note 33. mm, diffuser fully outside the tree
+
+// Note 34. mm, original candle bore axis
+
+// Note 35. mm, sad's bore is shifted
+
+// Note 36. Sad has one root extending 0.332 mm below its main base plane; trim it flat.
+
+// Note 37. mm
+
+// Note 38. mm at each original base
+
+// Note 39. mm, downward-facing cavity ceilings in source coordinates
+
+// Note 40. mm, exceeds the model envelope
+
+// Note 41. Enclosed holes were extracted from each original front-half projection. Warp
+// their inner ends down by their distance from the bore axis, then shear the
+// extrusion upward toward the face. Every passage roof rises 1:1 along X.
+
+// Note 42. Located at Z=0 for printing or path checks; assembled bottom is Z=pocket_h.
+
+// Note 43. Fills the empty 45-degree pocket stop above the puck, so no tree changes.
+// Printed window-down; assembled bottom is Z=pocket_h, resting on the puck.
+
+// Note 44. Configuration-space search constrained to the direct bottom-entry translation:
+// swept envelopes connect fully outside to seated and include every intermediate
+// translation, without raster or step-size error.
+
+// Note 45. Assembly display changes placement only; the original output remains the default.

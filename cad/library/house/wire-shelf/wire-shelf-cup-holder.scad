@@ -1,39 +1,38 @@
-// Cup holder using the physically proven box-platform mounting channel.
-// +X runs along the shelf, +Y points away from it, +Z is up in use.
-// Reuse the exact channel cutter; do not redraw or rescale the wire seats.
+// Note 1.
+
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 use <wire-shelf-box-platform.scad>
 use <wire-shelf-dovetail.scad>
 
 /* [Cup] */
-inside_d = 69;           // mm, exact clear inside diameter across the polygon flats
-probe_clearance = 0.5;   // mm per side for the removable test envelope only
-cup_depth = 25;          // mm above the inside floor
+inside_d = 69;           // Note 3.
+probe_clearance = 0.5;   // Note 4.
+cup_depth = 25;          // Note 5.
 
 /* [Body] */
-wall_t = 3.54;           // mm, two 0.42 mm outer lines plus six 0.45 mm inner lines
-floor_t = 4.5;           // mm, same as the tested platform
-brace_run = 34;          // mm forward of the mounting beam
-rib_spacing = 36;        // mm between underside braces
+wall_t = 3.54;           // Note 6.
+floor_t = 4.5;           // Note 7.
+brace_run = 34;          // Note 8.
+rib_spacing = 36;        // Note 9.
 
 /* [Mount] */
-mount_depth = 12;        // mm, retain the tested attachment's outer depth
-deck_z = 38.7;           // mm, retain the tested deck underside elevation
+mount_depth = 12;        // Note 10.
+deck_z = 38.7;           // Note 11.
 
 /* [Shelf floor wires] */
-floor_wire_d = 3.5;      // mm, fits either edge: 3.5 front-to-back, 2.25 left-right wires
-floor_wire_pitch = 20;   // mm centre to centre
-floor_wire_clearance = 0.5; // mm per side and above the wires
-floor_wire_offset = 0;   // mm along X; align the slot pattern with the shelf
+floor_wire_d = 3.5;      // Note 12.
+floor_wire_pitch = 20;   // Note 13.
+floor_wire_clearance = 0.5; // Note 14.
+floor_wire_offset = 0;   // Note 15.
 
 /* [Display] */
 show = "print-set";      // [print-set, holder, body, rail, set-rail, split, assembly, cup-fit, cup-insertion, floor-wire-fit, floor-wire-insertion, joint-fit, joint-insertion, mount, section]
 
 /* [Print set] */
-set_gap = 8;             // mm between the two separately printed pieces
+set_gap = 8;             // Note 16.
 
 /* [Colors] */
 body_color = "SteelBlue";
@@ -41,17 +40,17 @@ rail_color = "DarkOrange";
 
 /* [Hidden] */
 $fn = 64;
-eps = 0.01;              // mm boolean overshoot
-chord_error = 0.02;      // mm, circular facet budget for the 0.4 mm nozzle
+eps = 0.01;              // Note 17.
+chord_error = 0.02;      // Note 18.
 inner_r = inside_d / 2;
 cup_facets = 4 * ceil(180 / acos(1 - chord_error / (inner_r + wall_t)) / 4);
-bore_r = inner_r / cos(180 / cup_facets); // circumscribed: never undersize the opening
+bore_r = inner_r / cos(180 / cup_facets); // Note 19.
 outer_r = (inner_r + wall_t) / cos(180 / cup_facets);
 mount_w = 2 * outer_r;
 cup_y = mount_depth + outer_r;
 floor_top = deck_z + floor_t;
 rim_z = floor_top + cup_depth;
-probe_h = cup_depth + floor_t; // mm, cylindrical cup envelope only
+probe_h = cup_depth + floor_t; // Note 20.
 insertion_travel = rim_z + probe_h;
 
 assert(inside_d > 0 && probe_clearance > 0 && cup_depth > 0);
@@ -138,9 +137,7 @@ module cup_envelope(extra_h = 0) {
                  r = (inner_r - probe_clearance) / cos(180 / cup_facets), $fn = cup_facets);
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 21.
 module feral_default_output_93f430a32545() {
 if (show == "print-set") { holder_body_pose() holder_body(); holder_set_rail_pose() holder_rail(); }
 else if (show == "holder") cup_holder();
@@ -157,7 +154,7 @@ else if (show == "assembly") {
 } else if (show == "cup-fit") {
     intersection() { cup_holder(); cup_envelope(); }
 } else if (show == "cup-insertion") {
-    // Exact continuous vertical swept envelope, from wholly above to seated.
+    // Note 22.
     intersection() { cup_holder(); cup_envelope(insertion_travel); }
 } else if (show == "floor-wire-fit") {
     intersection() {
@@ -198,3 +195,51 @@ color("SteelBlue") translate([0,0,explode ? 35 : 0]) holder_body(); color("DarkO
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_93f430a32545();
 else feral_assembly_view_93f430a32545(view == "exploded");
+
+// Notes
+
+// Note 1. Cup holder using the physically proven box-platform mounting channel.
+// +X runs along the shelf, +Y points away from it, +Z is up in use.
+// Reuse the exact channel cutter; do not redraw or rescale the wire seats.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, exact clear inside diameter across the polygon flats
+
+// Note 4. mm per side for the removable test envelope only
+
+// Note 5. mm above the inside floor
+
+// Note 6. mm, two 0.42 mm outer lines plus six 0.45 mm inner lines
+
+// Note 7. mm, same as the tested platform
+
+// Note 8. mm forward of the mounting beam
+
+// Note 9. mm between underside braces
+
+// Note 10. mm, retain the tested attachment's outer depth
+
+// Note 11. mm, retain the tested deck underside elevation
+
+// Note 12. mm, fits either edge: 3.5 front-to-back, 2.25 left-right wires
+
+// Note 13. mm centre to centre
+
+// Note 14. mm per side and above the wires
+
+// Note 15. mm along X; align the slot pattern with the shelf
+
+// Note 16. mm between the two separately printed pieces
+
+// Note 17. mm boolean overshoot
+
+// Note 18. mm, circular facet budget for the 0.4 mm nozzle
+
+// Note 19. circumscribed: never undersize the opening
+
+// Note 20. mm, cylindrical cup envelope only
+
+// Note 21. Assembly display changes placement only; the original output remains the default.
+
+// Note 22. Exact continuous vertical swept envelope, from wholly above to seated.

@@ -1,55 +1,52 @@
-// Platform for a 128 x 99 mm wooden box; the long edge faces the shelf.
-// Cut the tested hook's inside profile into a continuous rear underside channel.
-// +X runs along the shelf, +Y points away from it, +Z is up in use.
+// Note 1.
+
 // COUPON-COMPONENTS: box-fit=coupon
 // COUPON-PLATE: coupon
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 use <wire-shelf-dovetail.scad>
 
 /* [Box] */
-box_w = 128;             // mm, rear edge along the shelf
-box_d = 99;              // mm, projection away from the shelf
-box_clearance = 1;       // mm per side; footprint was measured approximately
+box_w = 128;             // Note 3.
+box_d = 99;              // Note 4.
+box_clearance = 1;       // Note 5.
 
 /* [Platform] */
-floor_t = 4.5;           // mm
-wall_t = 3.54;           // mm, two 0.42 mm outer lines plus six 0.45 mm inner lines
-lip_h = 6;               // mm above the floor
-rear_t = 4.44;           // mm
-brace_run = 34;          // mm, underside rib projection forward of the mounting beam
-corner_r = 8;            // mm, the two front (+Y) outer corners; the rear sits
-                         // against the shelf, and the pocket stays square for the box
+floor_t = 4.5;           // Note 6.
+wall_t = 3.54;           // Note 7.
+lip_h = 6;               // Note 8.
+rear_t = 4.44;           // Note 9.
+brace_run = 34;          // Note 10.
+corner_r = 8;            // Note 11.
 
 /* [Underside channel] */
-channel_length = 128;    // mm, one continuous hook along the rear edge
-channel_height = 34;     // mm, full original hook height below the platform
-channel_depth = 12;      // mm, original rear attachment's outer width
-hook_scale = 0.1;        // original 3MF build transform
-rib_spacing = 90;        // mm between underside braces; these are not shelf clips
+channel_length = 128;    // Note 12.
+channel_height = 34;     // Note 13.
+channel_depth = 12;      // Note 14.
+hook_scale = 0.1;        // Note 15.
+rib_spacing = 90;        // Note 16.
 
 /* [Shelf floor wires] */
-// PROVEN 2026-10-03: the printed rail coupon fit the shelf perfectly. Every wire
-// shelf part uses floor_wire_reliefs() with these values; do not change them.
-floor_wire_d = 3.5;      // mm, the thicker of the two: 3.5 front-to-back, 2.25 left-right,
-                         // so the same slots fit a shelf's front edge or its side
-floor_wire_pitch = 20;   // mm centre to centre, measured on the 2.25 mm wires
-floor_wire_clearance = 0.5; // mm per side and above the wires
-floor_wire_offset = 0;   // mm along X; align the slot pattern with the shelf
-min_end_web = 3;         // mm; a slot nearer a beam end than this runs out through it
-support_wire_gap = 114;  // mm, measured clear gap between the front edge's support wires;
-                         // parts centre on that gap, so those wires sit at +/-58.75
+// Note 17.
+
+floor_wire_d = 3.5;      // Note 18.
+
+floor_wire_pitch = 20;   // Note 19.
+floor_wire_clearance = 0.5; // Note 20.
+floor_wire_offset = 0;   // Note 21.
+min_end_web = 3;         // Note 22.
+support_wire_gap = 114;  // Note 23.
 
 /* [Box fit coupon] */
-coupon_ledge = 5;        // mm of the original floor retained inside each lip
+coupon_ledge = 5;        // Note 24.
 
 /* [Display] */
 show = "print-set";      // [print-set, platform, deck, rail, set-rail, split, coupon, mount-coupon, assembly, box-fit, box-insertion, floor-wire-fit, floor-wire-insertion, joint-fit, joint-insertion, channel, section]
 
 /* [Print set] */
-set_gap = 8;             // mm between the two separately printed pieces
+set_gap = 8;             // Note 25.
 
 /* [Colors] */
 deck_color = "SteelBlue";
@@ -57,29 +54,28 @@ rail_color = "DarkOrange";
 
 /* [Hidden] */
 $fn = 64;
-eps = 0.01;              // mm boolean overshoot
-hook_origin = [294.9891052246094, 1100, 0]; // original STL coordinates
-hook_bounds = [27, 34, 5];                // mm after normalization/scaling
-// This mask encloses the internal void and stays within solid at the closed end.
-// Its open end extends beyond the original free tips, opening the cut downward.
-void_left = 17.5;        // mm in the normalized source profile
-void_right = 24.5;       // mm
-void_bottom = 2.5;       // mm
+eps = 0.01;              // Note 26.
+hook_origin = [294.9891052246094, 1100, 0]; // Note 27.
+hook_bounds = [27, 34, 5];                // Note 28.
+
+void_left = 17.5;        // Note 29.
+void_right = 24.5;       // Note 30.
+void_bottom = 2.5;       // Note 31.
 inner_w = box_w + 2 * box_clearance;
 inner_d = box_d + 2 * box_clearance;
 outer_w = inner_w + 2 * wall_t;
 outer_d = rear_t + inner_d + wall_t;
-rail_d = 5;             // mm, circular seat diameter in the supplied hook profile
-lower_rail_z = 11;       // mm, original lower seat center after flipping the profile
-upper_rail_z = hook_bounds.y - 6; // mm, original lower seat becomes upper after flipping
-rail_y = hook_bounds.x - (void_left + void_right) / 2; // mm, seat centre; measured span 3.5-8.5
-deck_z = 38.7;           // mm, the printed and physically fitted deck elevation
+rail_d = 5;             // Note 32.
+lower_rail_z = 11;       // Note 33.
+upper_rail_z = hook_bounds.y - 6; // Note 34.
+rail_y = hook_bounds.x - (void_left + void_right) / 2; // Note 35.
+deck_z = 38.7;           // Note 36.
 floor_top = deck_z + floor_t;
 lip_top = floor_top + lip_h;
-box_probe_h = channel_height + floor_t; // envelope only, not measured box height
+box_probe_h = channel_height + floor_t; // Note 37.
 insertion_travel = lip_top + box_probe_h;
 
-// Square pocket corner to the outer arc: keep at least two perimeter lines there.
+// Note 38.
 assert(corner_r - (corner_r - wall_t) * sqrt(2) >= 0.84,
        "Corner radius leaves the corner wall too thin");
 assert(channel_length <= outer_w, "Channel must lie within the platform width");
@@ -89,7 +85,7 @@ assert(channel_height == hook_bounds.y && channel_depth == 12,
 assert(floor_t - shelf_dovetail_depth() >= 1.2, "Retain a solid roof above the groove");
 
 module original_midsection() {
-    // Slice the middle of the original 5 mm thickness, avoiding its outer rounding.
+    // Note 39.
     projection(cut = true)
         translate([0, 0, -hook_bounds.z / 2])
             scale(hook_scale)
@@ -98,8 +94,8 @@ module original_midsection() {
 }
 
 module channel_profile() {
-    // Profile axes are [Y,Z]. Flip the original so its mouth opens DOWN.
-    // Source (u,v) -> mounted (27-u,34-v); both original wire-seat outlines survive.
+    // Note 40.
+
     translate([hook_bounds.x, hook_bounds.y]) rotate(180)
         difference() {
             translate([void_left, void_bottom])
@@ -125,13 +121,13 @@ module underside_ribs() {
                              [channel_depth - eps, deck_z + eps]]);
 }
 
-// Wire centre: resting on the lower rail, so tangent to the top of its seat.
+// Note 41.
 function floor_wire_z(wire_d = floor_wire_d) = lower_rail_z + rail_d / 2 + wire_d / 2;
-// Wire ends: at most the far tangent of the rail they are welded to.
+// Note 42.
 function floor_wire_end() = rail_y + rail_d / 2;
 
-// Slot centres: the 20 mm side-edge pattern plus the front edge's two support
-// wires either side of the part's centre, each kept only if it reaches the part.
+// Note 43.
+
 function wire_xs(width, wire_d, pitch, offset, margin) = concat(
     [for (i = [ceil((-width / 2 - margin - offset) / pitch)
                : floor((width / 2 + margin - offset) / pitch)]) offset + i * pitch],
@@ -142,18 +138,15 @@ module floor_wire_reliefs(width, wire_d = floor_wire_d,
                           pitch = floor_wire_pitch,
                           clearance = floor_wire_clearance,
                           offset = floor_wire_offset) {
-    // Thin wires are welded on TOP of the lower rail, the bottom circular seat.
-    // Open-bottom slots admit them during snap-on; no enclosed drilled holes.
-    // Each slot rises through the lower seat to clear the wire above it.
-    // The wires run from the rail back into the shelf (-Y) and end on the rail,
-    // so slots stop past its far side and the outer jaw stays solid.
+    // Note 44.
+
     slot_w = wire_d + 2 * clearance;
     slot_top = floor_wire_z(wire_d) + wire_d / 2 + clearance;
     slot_end = floor_wire_end() + clearance;
     assert(slot_top < upper_rail_z - rail_d / 2, "Floor-wire slots must stay below the upper seat");
     assert(wire_d > 0 && pitch > slot_w && clearance > 0);
     assert(abs(offset) <= pitch / 2, "Use a floor-wire offset within half a pitch");
-    // A slot that would leave a thin stub at a beam end takes the stub with it.
+    // Note 45.
     for (x = wire_xs(width, wire_d, pitch, offset, slot_w / 2)) {
         x0 = x - slot_w / 2 < -width / 2 + min_end_web ? -width / 2 - eps : x - slot_w / 2;
         x1 = x + slot_w / 2 > width / 2 - min_end_web ? width / 2 + eps : x + slot_w / 2;
@@ -180,7 +173,7 @@ module platform_mount_body() {
 }
 
 module rounded_footprint() {
-    // Round only the deck and lip; the beam and ribs below keep their shapes.
+    // Note 46.
     translate([-outer_w / 2, 0, deck_z - eps])
         linear_extrude(height = floor_t + lip_h + 2 * eps, convexity = 10)
             hull() {
@@ -206,7 +199,7 @@ module box_deck() {
             translate([-outer_w / 2 - eps, -eps, deck_z])
                 cube([outer_w + 2 * eps, outer_d + 2 * eps, floor_t + lip_h + eps]);
         }
-        // Open the groove through both wider deck ends so the rail can slide in.
+        // Note 47.
         shelf_dovetail_groove(outer_w, deck_z, channel_depth);
     }
 }
@@ -234,8 +227,8 @@ module box_set_rail_pose() {
 }
 
 module mount_fit_coupon() {
-    // A literal slice of the production rail spanning three wire slots, with
-    // the deck strip above it that ties the beam together.
+    // Note 48.
+
     coupon_w = 3 * floor_wire_pitch;
     intersection() {
         platform_unsplit();
@@ -250,8 +243,8 @@ module box_envelope(extra_h = 0) {
 }
 
 module box_fit_coupon() {
-    // Cut the actual platform edge, preserving all four corners, the full lip,
-    // and a narrow seating ledge. Remove the middle and every mounting feature.
+    // Note 49.
+
     assert(coupon_ledge > box_clearance && 2 * coupon_ledge < min(inner_w, inner_d),
            "Coupon ledge must support the box and leave an open middle");
     translate([0, 0, -deck_z])
@@ -282,8 +275,8 @@ module floor_wire_envelope(width = channel_length,
 module floor_wire_sweep(width = channel_length,
                         wire_d = floor_wire_d, pitch = floor_wire_pitch,
                         offset = floor_wire_offset) {
-    // Each wire has one connected straight approach from wholly below.
-    // Hull each wire separately: hulling the complete array would fill gaps.
+    // Note 50.
+
     wire_z = floor_wire_z(wire_d);
     for (x = wire_xs(width, wire_d, pitch, offset, 0))
         hull() {
@@ -295,9 +288,7 @@ module floor_wire_sweep(width = channel_length,
         }
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 51.
 module feral_default_output_48d471b6e899() {
 if (show == "print-set") { box_deck_pose() box_deck(); box_set_rail_pose() box_rail(); }
 else if (show == "platform") box_platform();
@@ -321,7 +312,7 @@ else if (show == "assembly") {
 } else if (show == "box-fit") {
     intersection() { box_platform(); box_envelope(); }
 } else if (show == "box-insertion") {
-    // Continuous vertical swept volume, from wholly above the platform to seated.
+    // Note 52.
     intersection() { box_platform(); box_envelope(insertion_travel); }
 } else if (show == "floor-wire-fit") {
     intersection() { box_platform(); floor_wire_envelope(); }
@@ -330,7 +321,7 @@ else if (show == "assembly") {
 } else if (show == "joint-fit") {
     intersection() { box_rail(); box_deck(); }
 } else if (show == "joint-insertion") {
-    // One connected axial path, from wholly outside the deck to seated.
+    // Note 53.
     intersection() {
         box_deck();
         hull() {
@@ -349,3 +340,128 @@ color("SteelBlue") translate([0,0,explode ? 35 : 0]) box_deck(); color("DarkOran
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_48d471b6e899();
 else feral_assembly_view_48d471b6e899(view == "exploded");
+
+// Notes
+
+// Note 1. Platform for a 128 x 99 mm wooden box; the long edge faces the shelf.
+// Cut the tested hook's inside profile into a continuous rear underside channel.
+// +X runs along the shelf, +Y points away from it, +Z is up in use.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, rear edge along the shelf
+
+// Note 4. mm, projection away from the shelf
+
+// Note 5. mm per side; footprint was measured approximately
+
+// Note 6. mm
+
+// Note 7. mm, two 0.42 mm outer lines plus six 0.45 mm inner lines
+
+// Note 8. mm above the floor
+
+// Note 9. mm
+
+// Note 10. mm, underside rib projection forward of the mounting beam
+
+// Note 11. mm, the two front (+Y) outer corners; the rear sits
+// against the shelf, and the pocket stays square for the box
+
+// Note 12. mm, one continuous hook along the rear edge
+
+// Note 13. mm, full original hook height below the platform
+
+// Note 14. mm, original rear attachment's outer width
+
+// Note 15. original 3MF build transform
+
+// Note 16. mm between underside braces; these are not shelf clips
+
+// Note 17. PROVEN 2026-10-03: the printed rail coupon fit the shelf perfectly. Every wire
+// shelf part uses floor_wire_reliefs() with these values; do not change them.
+
+// Note 18. mm, the thicker of the two: 3.5 front-to-back, 2.25 left-right,
+// so the same slots fit a shelf's front edge or its side
+
+// Note 19. mm centre to centre, measured on the 2.25 mm wires
+
+// Note 20. mm per side and above the wires
+
+// Note 21. mm along X; align the slot pattern with the shelf
+
+// Note 22. mm; a slot nearer a beam end than this runs out through it
+
+// Note 23. mm, measured clear gap between the front edge's support wires;
+// parts centre on that gap, so those wires sit at +/-58.75
+
+// Note 24. mm of the original floor retained inside each lip
+
+// Note 25. mm between the two separately printed pieces
+
+// Note 26. mm boolean overshoot
+
+// Note 27. original STL coordinates
+
+// Note 28. mm after normalization/scaling
+// This mask encloses the internal void and stays within solid at the closed end.
+// Its open end extends beyond the original free tips, opening the cut downward.
+
+// Note 29. mm in the normalized source profile
+
+// Note 30. mm
+
+// Note 31. mm
+
+// Note 32. mm, circular seat diameter in the supplied hook profile
+
+// Note 33. mm, original lower seat center after flipping the profile
+
+// Note 34. mm, original lower seat becomes upper after flipping
+
+// Note 35. mm, seat centre; measured span 3.5-8.5
+
+// Note 36. mm, the printed and physically fitted deck elevation
+
+// Note 37. envelope only, not measured box height
+
+// Note 38. Square pocket corner to the outer arc: keep at least two perimeter lines there.
+
+// Note 39. Slice the middle of the original 5 mm thickness, avoiding its outer rounding.
+
+// Note 40. Profile axes are [Y,Z]. Flip the original so its mouth opens DOWN.
+// Source (u,v) -> mounted (27-u,34-v); both original wire-seat outlines survive.
+
+// Note 41. Wire centre: resting on the lower rail, so tangent to the top of its seat.
+
+// Note 42. Wire ends: at most the far tangent of the rail they are welded to.
+
+// Note 43. Slot centres: the 20 mm side-edge pattern plus the front edge's two support
+// wires either side of the part's centre, each kept only if it reaches the part.
+
+// Note 44. Thin wires are welded on TOP of the lower rail, the bottom circular seat.
+// Open-bottom slots admit them during snap-on; no enclosed drilled holes.
+// Each slot rises through the lower seat to clear the wire above it.
+// The wires run from the rail back into the shelf (-Y) and end on the rail,
+// so slots stop past its far side and the outer jaw stays solid.
+
+// Note 45. A slot that would leave a thin stub at a beam end takes the stub with it.
+
+// Note 46. Round only the deck and lip; the beam and ribs below keep their shapes.
+
+// Note 47. Open the groove through both wider deck ends so the rail can slide in.
+
+// Note 48. A literal slice of the production rail spanning three wire slots, with
+// the deck strip above it that ties the beam together.
+
+// Note 49. Cut the actual platform edge, preserving all four corners, the full lip,
+// and a narrow seating ledge. Remove the middle and every mounting feature.
+
+// Note 50. Each wire has one connected straight approach from wholly below.
+// Hull each wire separately: hulling the complete array would fill gaps.
+
+// Note 51. Assembly display changes placement only; the original output remains the default.
+
+// Note 52. Continuous vertical swept volume, from wholly above the platform to seated.
+
+// Note 53. One connected axial path, from wholly outside the deck to seated.

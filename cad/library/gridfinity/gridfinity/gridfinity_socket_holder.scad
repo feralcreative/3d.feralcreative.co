@@ -1,12 +1,10 @@
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 1.
 view = "default"; // [default, together, exploded]
 
 include <gridfinity_modules.scad>
 
 part = 5;
-
-
 
 function inc(v, a=.6) = [for (i = v) i+a ];
 
@@ -37,8 +35,8 @@ module sockets(widths=[], width = 100) {
   }
 }
 
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
+// Note 2.
+
 module feral_default_output_db870e09d7aa() {
 if (part == 1) {
   socket_holder(4, [12,12,12,13,14,16,16,17,21,22], "METRIC");
@@ -67,3 +65,10 @@ feral_default_output_db870e09d7aa();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_db870e09d7aa();
 else feral_assembly_view_db870e09d7aa(view == "exploded");
+
+// Notes
+
+// Note 1. default preserves the original part, coupon and print selectors.
+
+// Note 2. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

@@ -1,111 +1,107 @@
-// Rev-02 beverage station, reconstructed from sketchup/kitchen.
-// Drink-body revision: level packet floors continuous with the pickup tray.
-// Six independent pieces; the baseplate filenames in the archive are swapped.
-// Coffee is on the left, drinks on the right; front is -Y and the bed is Z=0.
-// Dimensions are mm. No archived mesh is needed to render or build this file.
+// Note 1.
 
 /* [View] */
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 show = "drinks-body"; // [assembled, exploded, coffee-body, coffee-lid, coffee-base, drinks-body, drinks-lid, drinks-base, base-fit, base-insertion, coffee-base-fit, coffee-base-insertion, drinks-base-fit, drinks-base-insertion, coffee-lid-fit, coffee-lid-insertion, drinks-lid-fit, drinks-lid-insertion]
-explode_gap = 35; // mm, separation above each seated piece
+explode_gap = 35; // Note 3.
 
 /* [Coffee body] */
-coffee_w = 136; // mm
-coffee_d = 155; // mm
-coffee_h = 110; // mm
-coffee_wall = 2; // mm
-coffee_floor = 2; // mm
-coffee_tray_d = 30; // mm, front face of reservoir
-coffee_tray_h = 22; // mm
-coffee_ramp_back_y = 143; // mm
-coffee_ramp_back_z = 22; // mm
-coffee_outlet_side = 4; // mm
-coffee_outlet_top = 32; // mm
-coffee_outlet_round = 5; // mm, upper corners only
-coffee_window_w = 60; // mm
-coffee_window_h = 32; // mm
-coffee_window_z = 56; // mm
-coffee_label_border = 4; // mm, frame around the viewing opening
-coffee_label_gap = 2; // mm, insert space behind the front wall
-coffee_label_wall = 2; // mm
+coffee_w = 136; // Note 4.
+coffee_d = 155; // Note 5.
+coffee_h = 110; // Note 6.
+coffee_wall = 2; // Note 7.
+coffee_floor = 2; // Note 8.
+coffee_tray_d = 30; // Note 9.
+coffee_tray_h = 22; // Note 10.
+coffee_ramp_back_y = 143; // Note 11.
+coffee_ramp_back_z = 22; // Note 12.
+coffee_outlet_side = 4; // Note 13.
+coffee_outlet_top = 32; // Note 14.
+coffee_outlet_round = 5; // Note 15.
+coffee_window_w = 60; // Note 16.
+coffee_window_h = 32; // Note 17.
+coffee_window_z = 56; // Note 18.
+coffee_label_border = 4; // Note 19.
+coffee_label_gap = 2; // Note 20.
+coffee_label_wall = 2; // Note 21.
 
 /* [Coffee lid] */
-coffee_lid_plug_h = 4; // mm
-coffee_lid_slop = 0.2; // mm per face
-coffee_lid_cap_h = 4; // mm
-coffee_lid_round = 4; // mm
-coffee_stirrer_x = 42.132; // mm, cup axis at cap height
-coffee_stirrer_y = 108.144; // mm
-coffee_stirrer_w = 64.263; // mm, outside ellipse in an XY section
-coffee_stirrer_d = 66.531; // mm
-coffee_stirrer_inner_w = 61.407; // mm
-coffee_stirrer_inner_d = 63.573; // mm
-coffee_stirrer_lean = 0.20612; // mm forward per mm of height
-coffee_stirrer_h = 145.661; // mm, highest rim point above plug bottom
-coffee_filter_x = 76.263; // mm
-coffee_filter_w = 52; // mm
-coffee_filter_wall = 2; // mm
-coffee_filter_front_y = 16; // mm, top of curved front
-coffee_filter_back_y = 150; // mm
-coffee_filter_top_z = 108.191; // mm
-coffee_filter_curve_r = 155.402; // mm, measured circular front contour
-coffee_filter_floor_front_z = 10.691; // mm
-coffee_filter_floor_back_z = 75.691; // mm
+coffee_lid_plug_h = 4; // Note 22.
+coffee_lid_slop = 0.2; // Note 23.
+coffee_lid_cap_h = 4; // Note 24.
+coffee_lid_round = 4; // Note 25.
+coffee_stirrer_x = 42.132; // Note 26.
+coffee_stirrer_y = 108.144; // Note 27.
+coffee_stirrer_w = 64.263; // Note 28.
+coffee_stirrer_d = 66.531; // Note 29.
+coffee_stirrer_inner_w = 61.407; // Note 30.
+coffee_stirrer_inner_d = 63.573; // Note 31.
+coffee_stirrer_lean = 0.20612; // Note 32.
+coffee_stirrer_h = 145.661; // Note 33.
+coffee_filter_x = 76.263; // Note 34.
+coffee_filter_w = 52; // Note 35.
+coffee_filter_wall = 2; // Note 36.
+coffee_filter_front_y = 16; // Note 37.
+coffee_filter_back_y = 150; // Note 38.
+coffee_filter_top_z = 108.191; // Note 39.
+coffee_filter_curve_r = 155.402; // Note 40.
+coffee_filter_floor_front_z = 10.691; // Note 41.
+coffee_filter_floor_back_z = 75.691; // Note 42.
 
 /* [Drink body] */
 drinks_lanes = 6;
-drinks_lane_w = 24; // mm, nominal lane width; scales the measured lane grid
-drinks_span_w = 157.784; // mm, measured body width at nominal lane width
-drinks_wall = 2; // mm
-drinks_d = 155; // mm
-drinks_h = 150; // mm
-drinks_floor = 2.5; // mm
-drinks_front_y = 28; // mm, front face of reservoirs
-drinks_front_thickness = 7; // mm
-drinks_tray_h = 20; // mm
-drinks_pickup_floor = 7.8; // mm, level floor through the tray and all six lanes
-drinks_outlet_shoulder = 32.12; // mm
-drinks_outlet_rise = 7; // mm, elliptical outlet crown
-drinks_window_side = 2.5; // mm, lip within each lane
-drinks_window_z = 50.5; // mm
-drinks_window_rebate_y = 30.5; // mm
-drinks_window_rebate_d = 2.5; // mm
+drinks_lane_w = 24; // Note 43.
+drinks_span_w = 157.784; // Note 44.
+drinks_wall = 2; // Note 45.
+drinks_d = 155; // Note 46.
+drinks_h = 150; // Note 47.
+drinks_floor = 2.5; // Note 48.
+drinks_front_y = 28; // Note 49.
+drinks_front_thickness = 7; // Note 50.
+drinks_tray_h = 20; // Note 51.
+drinks_pickup_floor = 7.8; // Note 52.
+drinks_outlet_shoulder = 32.12; // Note 53.
+drinks_outlet_rise = 7; // Note 54.
+drinks_window_side = 2.5; // Note 55.
+drinks_window_z = 50.5; // Note 56.
+drinks_window_rebate_y = 30.5; // Note 57.
+drinks_window_rebate_d = 2.5; // Note 58.
 
 /* [Drink lid] */
-drinks_lid_slop = 0.5; // mm per face
-drinks_lid_w = 158; // mm, measured cover width
-drinks_lid_plug_h = 2; // mm
-drinks_lid_plug_d = 117; // mm
-drinks_lid_cap_h = 2; // mm
-drinks_lid_ring_r = 22; // mm outside
-drinks_lid_ring_wall = 2; // mm
-drinks_lid_ring_h = 9; // mm
-drinks_lid_ring_side = 23; // mm
-drinks_lid_ring_front_y = 38; // mm relative to cover front
-drinks_lid_ring_back_y = 95; // mm relative to cover front
+drinks_lid_slop = 0.5; // Note 59.
+drinks_lid_w = 158; // Note 60.
+drinks_lid_plug_h = 2; // Note 61.
+drinks_lid_plug_d = 117; // Note 62.
+drinks_lid_cap_h = 2; // Note 63.
+drinks_lid_ring_r = 22; // Note 64.
+drinks_lid_ring_wall = 2; // Note 65.
+drinks_lid_ring_h = 9; // Note 66.
+drinks_lid_ring_side = 23; // Note 67.
+drinks_lid_ring_front_y = 38; // Note 68.
+drinks_lid_ring_back_y = 95; // Note 69.
 
 /* [Baseplates] */
-base_d = 165; // mm
-base_h = 4; // mm
-base_floor = 2; // mm
-base_outer_margin = 4.8; // mm
-base_seam_rim = 0.2; // mm, coffee rim at the joint
-base_body_slop = 0.1; // mm per face
-base_corner_r = 5; // mm, two outside corners
-base_roof_round = 4; // mm, quarter-round outer edge
-base_seam_gap = 0.2; // mm, assembled plate spacing
-base_tail_centres = [34.053, 82.5, 132.5]; // mm from plate front
-base_tail_mouth = 15; // mm
-base_tail_head = 25; // mm
-base_tail_depth = 5; // mm
-base_first_tail_mouth = 15.4; // mm, measured first tooth
-base_first_tail_depth = 4.8; // mm
-base_socket_mouth = 16.366; // mm
-base_socket_head = 25.966; // mm
-base_socket_depth = 4.8; // mm
+base_d = 165; // Note 70.
+base_h = 4; // Note 71.
+base_floor = 2; // Note 72.
+base_outer_margin = 4.8; // Note 73.
+base_seam_rim = 0.2; // Note 74.
+base_body_slop = 0.1; // Note 75.
+base_corner_r = 5; // Note 76.
+base_roof_round = 4; // Note 77.
+base_seam_gap = 0.2; // Note 78.
+base_tail_centres = [34.053, 82.5, 132.5]; // Note 79.
+base_tail_mouth = 15; // Note 80.
+base_tail_head = 25; // Note 81.
+base_tail_depth = 5; // Note 82.
+base_first_tail_mouth = 15.4; // Note 83.
+base_first_tail_depth = 4.8; // Note 84.
+base_socket_mouth = 16.366; // Note 85.
+base_socket_head = 25.966; // Note 86.
+base_socket_depth = 4.8; // Note 87.
 
 /* [Colors] */
 coffee_body_color = "DarkOrange";
@@ -118,13 +114,13 @@ drinks_base_color = "MediumPurple";
 /* [Resolution] */
 $fn = 96;
 curve_steps = 48;
-eps = 0.01; // mm, Boolean cut overshoot
+eps = 0.01; // Note 88.
 
 /* [Hidden] */
 drinks_profile_scale = drinks_lane_w/24;
 drinks_w = drinks_span_w * drinks_profile_scale;
-// The archive's three middle partitions are 2.212..2.214 mm, and its
-// middle chambers are 23.786..23.788 mm. Preserve that measured topology.
+// Note 89.
+
 drinks_lane_starts = [1.996, 27.998, 53.998, 80, 105.998, 131.786];
 drinks_lane_ends = [26, 51.786, 77.786, 103.786, 129.786, 155.788];
 drinks_pitch = drinks_lane_w + drinks_wall;
@@ -136,14 +132,10 @@ body_x = base_outer_margin + base_body_slop;
 drinks_body_x = body_x+(drinks_lid_w-drinks_w)/2;
 coffee_cap_z = coffee_lid_plug_h + coffee_lid_cap_h;
 drinks_cap_z = drinks_lid_plug_h + drinks_lid_cap_h;
-// The archive plugs start at Y=30.5 and collide with the front wall.
-// Y=35.5 places each 117 mm plug inside its 118 mm chamber.
-drinks_lid_plug_y = drinks_front_y+drinks_front_thickness+drinks_lid_slop;
-insertion_clear = 1; // mm beyond bounding-box separation
+// Note 90.
 
-// Profile data below preserves the archive's rounded pickup lips and the
-// stirrer cup's curved rim. Each contour is in mm; the remaining geometry
-// is constructed from the dimensions above. These are contours, not meshes.
+drinks_lid_plug_y = drinks_front_y+drinks_front_thickness+drinks_lid_slop;
+insertion_clear = 1; // Note 91.
 
 coffee_lip_profile = [
     [1.933, 22.0], [2.0, 22.0], [2.25, 21.986], [2.496, 21.943],
@@ -222,7 +214,7 @@ module top_round_box(w, d, h, r, left = true, right = true) {
 module coffee_body() {
     color(coffee_body_color) union() {
         cube([coffee_w, coffee_d, coffee_floor]);
-        // Sloping floor feeding the front pickup opening.
+        // Note 92.
         extrude_x(coffee_w) polygon([
             [coffee_tray_d + coffee_wall, 0], [coffee_d, 0],
             [coffee_d, coffee_ramp_back_z],
@@ -241,12 +233,12 @@ module coffee_body() {
             translate([(coffee_w-coffee_window_w)/2, coffee_tray_d-eps, coffee_window_z])
                 cube([coffee_window_w, coffee_wall+2*eps, coffee_window_h]);
         }
-        // Tray sides and the original scooped front lip.
+        // Note 93.
         for (x = [0, coffee_w-coffee_wall])
             translate([x, 0, 0]) cube([coffee_wall, coffee_tray_d, coffee_tray_h]);
         extrude_y(coffee_wall)
             polygon([for (p = coffee_lip_profile) [p[0]*coffee_w/135.998, p[1]*coffee_tray_h/22]]);
-        // Open-top label pocket behind the viewing opening.
+        // Note 94.
         translate([(coffee_w-coffee_window_w)/2-coffee_label_border,
                 coffee_tray_d+coffee_wall, coffee_window_z-coffee_label_border])
             difference() {
@@ -282,7 +274,7 @@ module coffee_filter_holder() {
 }
 
 module coffee_stirrer_cup() {
-    // Straight sheared elliptical tube, trimmed to the measured curved rim.
+    // Note 95.
     intersection() {
         translate([coffee_stirrer_x, coffee_stirrer_y, coffee_cap_z-eps])
             multmatrix([[1, 0, 0, 0], [0, 1, -coffee_stirrer_lean, 0],
@@ -324,7 +316,7 @@ module drinks_outlet_profile(width) {
 module drinks_body() {
     color(drinks_body_color) union() {
         cube([drinks_w, drinks_d, drinks_floor]);
-        // One continuous plane avoids both the original slope and its front drop.
+        // Note 96.
         translate([0, drinks_wall, 0])
             cube([drinks_w, drinks_d-drinks_wall, drinks_pickup_floor]);
         difference() {
@@ -339,7 +331,7 @@ module drinks_body() {
                 translate([x, drinks_front_y-eps, 0])
                     extrude_y(drinks_front_thickness+2*eps) drinks_outlet_profile(width);
                 translate([x+drinks_window_side, drinks_front_y-eps, drinks_window_z])
-                    // Open-top label channel, with the original 2 mm back.
+                    // Note 97.
                     cube([width-2*drinks_window_side,
                         drinks_window_rebate_y-drinks_front_y+eps,
                         drinks_h-drinks_window_z+eps]);
@@ -384,7 +376,7 @@ module drinks_lid() {
 
 module base_outer_plan(w, outside_right) {
     r = base_corner_r;
-    // Avoid a corner vertex coincident with the two roof fillets' seam.
+    // Note 98.
     steps = curve_steps+1;
     polygon(outside_right ? concat([[0, 0], [w-r, 0]],
         arc(w-r, r, r, -90, 0, steps), arc(w-r, base_d-r, r, 0, 90, steps), [[0, base_d]]) :
@@ -453,8 +445,8 @@ module station(exploded = false) {
 }
 
 module vertical_sweep(distance) {
-    // All mates enter vertically. Union of the two endpoints' convex hull
-    // is exact for each convex component; sweep children after decomposition.
+    // Note 99.
+
     hull() {
         children();
         translate([0, 0, distance]) children();
@@ -465,8 +457,8 @@ module fit_check(which, insertion = false) {
     if (which == "base") intersection() {
         translate([drinks_base_x, 0, 0]) drinks_base();
         if (insertion) {
-            // The tray body is to the left of the mating plate throughout;
-            // only the three convex teeth enter it.
+            // Note 100.
+
             for (i = [0:len(base_tail_centres)-1]) {
                 mouth = i == 0 ? base_first_tail_mouth : base_tail_mouth;
                 depth = i == 0 ? base_first_tail_depth : base_tail_depth;
@@ -485,8 +477,8 @@ module fit_check(which, insertion = false) {
         if (lid) intersection() {
             positioned_body(side);
             if (insertion) {
-                // Only lid plugs enter the body; everything above the cap
-                // starts and remains above the reservoir's top plane.
+                // Note 101.
+
                 translate([body_x+(side == "coffee" ? 0 : drinks_base_x), body_y,
                     base_floor+(side == "coffee" ? coffee_h-coffee_lid_plug_h : drinks_h-drinks_lid_plug_h)])
                     if (side == "coffee")
@@ -503,8 +495,8 @@ module fit_check(which, insertion = false) {
         else intersection() {
             if (side == "coffee") coffee_base();
             else translate([drinks_base_x, 0, 0]) drinks_base();
-            // The convex outside envelope proves clearance of every body
-            // wall and floor throughout the whole drop into its tray.
+            // Note 102.
+
             translate([side == "coffee" ? body_x : drinks_body_x+drinks_base_x, body_y, base_floor])
                 cube([side == "coffee" ? coffee_w : drinks_w,
                     side == "coffee" ? coffee_d : drinks_d,
@@ -536,9 +528,7 @@ module beverage_station() {
     else assert(false, str("Unknown show: ", show));
 }
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 103.
 module feral_default_output_0052e1c1606e() {
 beverage_station();
 }
@@ -550,3 +540,224 @@ station(explode);
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_0052e1c1606e();
 else feral_assembly_view_0052e1c1606e(view == "exploded");
+
+// Notes
+
+// Note 1. Rev-02 beverage station, reconstructed from sketchup/kitchen.
+// Drink-body revision: level packet floors continuous with the pickup tray.
+// Six independent pieces; the baseplate filenames in the archive are swapped.
+// Coffee is on the left, drinks on the right; front is -Y and the bed is Z=0.
+// Dimensions are mm. No archived mesh is needed to render or build this file.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm, separation above each seated piece
+
+// Note 4. mm
+
+// Note 5. mm
+
+// Note 6. mm
+
+// Note 7. mm
+
+// Note 8. mm
+
+// Note 9. mm, front face of reservoir
+
+// Note 10. mm
+
+// Note 11. mm
+
+// Note 12. mm
+
+// Note 13. mm
+
+// Note 14. mm
+
+// Note 15. mm, upper corners only
+
+// Note 16. mm
+
+// Note 17. mm
+
+// Note 18. mm
+
+// Note 19. mm, frame around the viewing opening
+
+// Note 20. mm, insert space behind the front wall
+
+// Note 21. mm
+
+// Note 22. mm
+
+// Note 23. mm per face
+
+// Note 24. mm
+
+// Note 25. mm
+
+// Note 26. mm, cup axis at cap height
+
+// Note 27. mm
+
+// Note 28. mm, outside ellipse in an XY section
+
+// Note 29. mm
+
+// Note 30. mm
+
+// Note 31. mm
+
+// Note 32. mm forward per mm of height
+
+// Note 33. mm, highest rim point above plug bottom
+
+// Note 34. mm
+
+// Note 35. mm
+
+// Note 36. mm
+
+// Note 37. mm, top of curved front
+
+// Note 38. mm
+
+// Note 39. mm
+
+// Note 40. mm, measured circular front contour
+
+// Note 41. mm
+
+// Note 42. mm
+
+// Note 43. mm, nominal lane width; scales the measured lane grid
+
+// Note 44. mm, measured body width at nominal lane width
+
+// Note 45. mm
+
+// Note 46. mm
+
+// Note 47. mm
+
+// Note 48. mm
+
+// Note 49. mm, front face of reservoirs
+
+// Note 50. mm
+
+// Note 51. mm
+
+// Note 52. mm, level floor through the tray and all six lanes
+
+// Note 53. mm
+
+// Note 54. mm, elliptical outlet crown
+
+// Note 55. mm, lip within each lane
+
+// Note 56. mm
+
+// Note 57. mm
+
+// Note 58. mm
+
+// Note 59. mm per face
+
+// Note 60. mm, measured cover width
+
+// Note 61. mm
+
+// Note 62. mm
+
+// Note 63. mm
+
+// Note 64. mm outside
+
+// Note 65. mm
+
+// Note 66. mm
+
+// Note 67. mm
+
+// Note 68. mm relative to cover front
+
+// Note 69. mm relative to cover front
+
+// Note 70. mm
+
+// Note 71. mm
+
+// Note 72. mm
+
+// Note 73. mm
+
+// Note 74. mm, coffee rim at the joint
+
+// Note 75. mm per face
+
+// Note 76. mm, two outside corners
+
+// Note 77. mm, quarter-round outer edge
+
+// Note 78. mm, assembled plate spacing
+
+// Note 79. mm from plate front
+
+// Note 80. mm
+
+// Note 81. mm
+
+// Note 82. mm
+
+// Note 83. mm, measured first tooth
+
+// Note 84. mm
+
+// Note 85. mm
+
+// Note 86. mm
+
+// Note 87. mm
+
+// Note 88. mm, Boolean cut overshoot
+
+// Note 89. The archive's three middle partitions are 2.212..2.214 mm, and its
+// middle chambers are 23.786..23.788 mm. Preserve that measured topology.
+
+// Note 90. The archive plugs start at Y=30.5 and collide with the front wall.
+// Y=35.5 places each 117 mm plug inside its 118 mm chamber.
+
+// Note 91. mm beyond bounding-box separation
+// Profile data below preserves the archive's rounded pickup lips and the
+// stirrer cup's curved rim. Each contour is in mm; the remaining geometry
+// is constructed from the dimensions above. These are contours, not meshes.
+
+// Note 92. Sloping floor feeding the front pickup opening.
+
+// Note 93. Tray sides and the original scooped front lip.
+
+// Note 94. Open-top label pocket behind the viewing opening.
+
+// Note 95. Straight sheared elliptical tube, trimmed to the measured curved rim.
+
+// Note 96. One continuous plane avoids both the original slope and its front drop.
+
+// Note 97. Open-top label channel, with the original 2 mm back.
+
+// Note 98. Avoid a corner vertex coincident with the two roof fillets' seam.
+
+// Note 99. All mates enter vertically. Union of the two endpoints' convex hull
+// is exact for each convex component; sweep children after decomposition.
+
+// Note 100. The tray body is to the left of the mating plate throughout;
+// only the three convex teeth enter it.
+
+// Note 101. Only lid plugs enter the body; everything above the cap
+// starts and remains above the reservoir's top plane.
+
+// Note 102. The convex outside envelope proves clearance of every body
+// wall and floor throughout the whole drop into its tray.
+
+// Note 103. Assembly display changes placement only; the original output remains the default.

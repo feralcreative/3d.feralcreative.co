@@ -1,102 +1,74 @@
-/*
- * Copyright 2022 Code and Make (codeandmake.com)
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-/*
- * Stackable Storage Caddies by Code and Make (https://codeandmake.com/)
- *
- * https://codeandmake.com/post/stackable-storage-caddies
- *
- * Stackable Storage Caddies v1.4 (5 August 2022)
- */
+/* Note 1. */
 
 /* [General] */
 
-// Part to display
+// Note 2.
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 3.
 view = "default"; // [default, together, exploded]
 
 Part = 1; // [1: Container, 2: Lid, 3: Container Corner Section - For Testing, 4: Lid Corner Section - For Testing, 5: All - Preview Only]
 
-// Inner length
+// Note 4.
 Inside_Length = 150; // [10:1:300]
 
-// Inner width
+// Note 5.
 Inside_Width = 120; // [10:1:300]
 
-// Inner height
+// Note 6.
 Inside_Height = 60; // [10:1:300]
 
-// Inner corner radius
+// Note 7.
 Inside_Corner_Radius = 10; // [0:1:20]
 
-// Front type
+// Note 8.
 Front = 1; // [0:Solid, 1: Cutout, 2: Pattern]
 
-// Bottom type
+// Note 9.
 Bottom = 1; // [0:Solid, 1: Pattern]
 
-// Side type
+// Note 10.
 Sides = 1; // [0:Solid, 1: Pattern]
 
-// Rear type
+// Note 11.
 Rear = 1; // [0:Solid, 1: Pattern]
 
-// Thickness of the walls and base
+// Note 12.
 Material_Thickness = 4; // [2.5:0.1:10]
 
 /* [Cutout] */
 
-// Width of front cutout as a percentage
+// Note 13.
 Front_Cutout_Width_Percent = 90; // [0:1:100]
 
-// Width of front cutout as a percentage
+// Note 14.
 Front_Cutout_Height_Percent = 90; // [0:1:100]
 
 /* [Lip] */
 
-// Should a lip and lip recess be added
+// Note 15.
 Lip = 1; // [0: No, 1: Yes]
 
-// Gap between the lip and the recess
+// Note 16.
 Lip_Gap = 0.6; // [0.1:0.1:1]
 
 /* [Pattern] */
 
-// Type of pattern
+// Note 17.
 Pattern_Type = 6; // [0: None, 1: Hole, 2: Lines, 3: Triangles, 4: Diamonds, 5: Circles, 6: Hexagons, 7: Stars, 8: Hearts]
 
-// Amount of padding around the pattern
+// Note 18.
 Pattern_Padding = 0; // [0:1:100]
 
-// The width of the pattern elements
+// Note 19.
 Pattern_Width = 5; // [1:1:100]
 
-// Minimum pattern material thickness
+// Note 20.
 Pattern_Material_Thickness = 2; // [2:0.1:10]
 
 /* [Preview] */
 
-// Amount to split the parts (preview only)
+// Note 21.
 Split_Parts_In_Preview = 10; // [0:1:100]
 
 module caddy() {
@@ -220,7 +192,7 @@ module caddy() {
     yIterations = ceil(length / (diameter + materialThickness));
     totalWidth = baseOffset * xIterations;
     totalLength = baseOffset * yIterations;
-    // base facets on circumference, clamp between 20 and 60
+    // Note 22.
     fn = ceil(min(max(diameter * PI, 20), 60));
 
     translate([-((totalWidth - width) / 2), -((totalLength - length) / 2), 0]) {
@@ -294,7 +266,7 @@ module caddy() {
     topTranslateY = (topDiameter / 2) - (altitude / 2);
     bottomTranslateY = altitude / 2;
 
-    // base facets on altitude, clamp between 20 and 60
+    // Note 23.
     fn = ceil(min(max(altitude * PI, 20), 60));
 
     hull() {
@@ -348,35 +320,35 @@ module caddy() {
 
   module patternMask(width, length) {
     if (Pattern_Type == 1) {
-      // hole
+      // Note 24.
       square(size=[width, length]);
     }
     else if (Pattern_Type == 2) {
-      // lines
+      // Note 25.
       linesPatternProfile(width, length, Pattern_Width, Pattern_Material_Thickness);
     }
     else if (Pattern_Type == 3) {
-      // triangles
+      // Note 26.
       trianglePatternProfile(width, length, Pattern_Width, Pattern_Material_Thickness);
     }
     else if (Pattern_Type == 4) {
-      // diamonds
+      // Note 27.
       diamondPatternProfile(width, length, Pattern_Width, Pattern_Material_Thickness);
     }
     else if (Pattern_Type == 5) {
-      // circles
+      // Note 28.
       circlePatternProfile(width, length, Pattern_Width, Pattern_Material_Thickness);
     }
     else if (Pattern_Type == 6) {
-      // hexagons
+      // Note 29.
       hexPatternProfile(width, length, Pattern_Width, Pattern_Material_Thickness);
     }
     else if (Pattern_Type == 7) {
-      // stars
+      // Note 30.
       starPatternProfile(width, length, Pattern_Width, Pattern_Material_Thickness);
     }
     else if (Pattern_Type == 8) {
-      // hearts
+      // Note 31.
       heartPatternProfile(width, length, Pattern_Width, Pattern_Material_Thickness);
     }
   }
@@ -390,12 +362,12 @@ module caddy() {
   module containerBody() {
     bottom();
 
-    // walls
+    // Note 32.
     linear_extrude(height = Material_Thickness + Inside_Height, convexity = 10) {
       wallProfile();
     }
 
-    // lip
+    // Note 33.
     if (Lip) {
       linear_extrude(height = Material_Thickness + Inside_Height + lipHeight, convexity = 10) {
         lipProfile();
@@ -409,7 +381,7 @@ module caddy() {
     roundingRadius = min(width / 2, height / 2, insideCornerRadius) - 0.00001;
     depth = Material_Thickness + 1;
     lipRoundingRadius = min(lipHeight, (Inside_Width - width) / 2, height - roundingRadius);
-    
+
     translate([Material_Thickness + (Inside_Width / 2), depth, Material_Thickness + Inside_Height + lipHeight - height]) {
       rotate([90, 0, 0]) {
         linear_extrude(height = depth + 1, convexity = 10) {
@@ -449,7 +421,7 @@ module caddy() {
         bottom();
       }
 
-      // lip recess (underneath)
+      // Note 34.
       if (Lip) {
         translate([0, 0, -0.01]) {
           linear_extrude(height = lipRecessHeight + 0.01, convexity = 10) {
@@ -458,7 +430,7 @@ module caddy() {
         }
       }
 
-      // bottom pattern
+      // Note 35.
       if (Bottom == 1) {
         translate([0, 0, -0.5]) {
           linear_extrude(height = Material_Thickness + 1, convexity = 10) {
@@ -502,7 +474,7 @@ module caddy() {
           }
         }
 
-        // side pattern
+        // Note 36.
         if (Sides == 1) {
           translate([-0.5, Material_Thickness, Material_Thickness]) {
             rotate([90, 0, 90]) {
@@ -527,7 +499,7 @@ module caddy() {
           }
         }
 
-        // rear pattern
+        // Note 37.
         if (Rear == 1) {
           translate([Material_Thickness, Inside_Length + (Material_Thickness * 2) + 0.5, Material_Thickness]) {
             rotate([90, 0, 0]) {
@@ -624,10 +596,8 @@ module caddy() {
   }
 }
 
-
-
 echo("\r\tThis design is completely free and shared under a permissive license.\r\tYour support is hugely appreciated: codeandmake.com/support\r");
-// Assembly display changes placement only; the original output remains the default.
+// Note 38.
 module feral_default_output_714e668148a7() {
 caddy();
 }
@@ -639,3 +609,104 @@ caddy();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_714e668148a7();
 else feral_assembly_view_714e668148a7(view == "exploded");
+
+// Notes
+
+// Note 1. Copyright 2022 Code and Make (codeandmake.com)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// Stackable Storage Caddies by Code and Make (https://codeandmake.com/)
+//
+// https://codeandmake.com/post/stackable-storage-caddies
+//
+// Stackable Storage Caddies v1.4 (5 August 2022)
+
+// Note 2. Part to display
+
+// Note 3. default preserves the original part, coupon and print selectors.
+
+// Note 4. Inner length
+
+// Note 5. Inner width
+
+// Note 6. Inner height
+
+// Note 7. Inner corner radius
+
+// Note 8. Front type
+
+// Note 9. Bottom type
+
+// Note 10. Side type
+
+// Note 11. Rear type
+
+// Note 12. Thickness of the walls and base
+
+// Note 13. Width of front cutout as a percentage
+
+// Note 14. Width of front cutout as a percentage
+
+// Note 15. Should a lip and lip recess be added
+
+// Note 16. Gap between the lip and the recess
+
+// Note 17. Type of pattern
+
+// Note 18. Amount of padding around the pattern
+
+// Note 19. The width of the pattern elements
+
+// Note 20. Minimum pattern material thickness
+
+// Note 21. Amount to split the parts (preview only)
+
+// Note 22. base facets on circumference, clamp between 20 and 60
+
+// Note 23. base facets on altitude, clamp between 20 and 60
+
+// Note 24. hole
+
+// Note 25. lines
+
+// Note 26. triangles
+
+// Note 27. diamonds
+
+// Note 28. circles
+
+// Note 29. hexagons
+
+// Note 30. stars
+
+// Note 31. hearts
+
+// Note 32. walls
+
+// Note 33. lip
+
+// Note 34. lip recess (underneath)
+
+// Note 35. bottom pattern
+
+// Note 36. side pattern
+
+// Note 37. rear pattern
+
+// Note 38. Assembly display changes placement only; the original output remains the default.

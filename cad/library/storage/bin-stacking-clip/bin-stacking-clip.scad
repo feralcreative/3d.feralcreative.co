@@ -1,45 +1,41 @@
-// Tray-corner stacking clip, reconstructed from the supplied STL.
-// Two concentric skirts straddle the tray wall; the inside skirt leans inward.
-// The cap joins both skirts; the outside skirt has a bottom-open tab gap.
-// Nominal source dimensions were measured from the mesh, not the tray.
-// Tray insertion, retention and load stability remain physical fit trials.
+// Note 1.
 
 /* [Fit] */
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
-side_clearance = 2;      // outward shift of the original skirt profile (mm)
-outer_extension = 7;     // extend outside pillars downward from their previous bottoms (mm)
-inner_extension = 10;    // extend inside skirt downward from its previous bottom (mm)
-outer_wall = 3;          // outer pillar thickness, added toward the outside (mm)
-bottom_round = 0.5;      // inner skirt bottom-edge radius (mm)
-outer_bottom_round = 1;  // outer pillar bottom-edge radius (mm)
-outer_vertical_round = 1; // exposed outer vertical corners of the back tabs (mm)
-top_round = 1;           // cap perimeter radius (mm)
-inner_vertical_round = 0.5; // inward-facing inner wall end corners only (mm)
-rim_slot_height = 4;     // reference slit height locating the top of the bottom-open gap (mm)
-slot_fraction = 0.5;     // fraction of the original quarter-circle slot span
-skirt_gap = 4;          // clear radial distance between the two skirts (mm)
-inner_lean = 2.5;       // inward lean about the inner skirt's top inside edge (degrees)
-skirt_trim = 10;         // remove this much from the original skirt's bottom (mm)
-seat_diameter = 17;      // actual top opening, including the previous rounded entry (mm)
-seat_taper = 2;          // diameter reduction from top to recess floor (mm)
-seat_entry_round = 0.5;  // blend the tapered wall into the top surface (mm)
-cap_wedge_angle = 100;   // top platform angle; skirts retain their existing fit (degrees)
+side_clearance = 2;      // Note 3.
+outer_extension = 7;     // Note 4.
+inner_extension = 10;    // Note 5.
+outer_wall = 3;          // Note 6.
+bottom_round = 0.5;      // Note 7.
+outer_bottom_round = 1;  // Note 8.
+outer_vertical_round = 1; // Note 9.
+top_round = 1;           // Note 10.
+inner_vertical_round = 0.5; // Note 11.
+rim_slot_height = 4;     // Note 12.
+slot_fraction = 0.5;     // Note 13.
+skirt_gap = 4;          // Note 14.
+inner_lean = 2.5;       // Note 15.
+skirt_trim = 10;         // Note 16.
+seat_diameter = 17;      // Note 17.
+seat_taper = 2;          // Note 18.
+seat_entry_round = 0.5;  // Note 19.
+cap_wedge_angle = 100;   // Note 20.
 
 /* [Measured source geometry] */
-source_outer_radius = 22; // outside radius of the curved wall (mm)
-wall = 2;                // inner wall thickness and original outer wall thickness (mm)
-arc_origin = 2;          // arc centre from both open-end cut planes (mm)
-source_height = 27;      // original overall height before trimming the skirt (mm)
-source_slot_center = 21; // centre of the previous 3 mm slot before skirt trimming (mm)
-cap_thickness = 3;       // solid cap thickness before the stacking recess (mm)
-cap_corner_radius = 9;   // rounding at the inner corner of the cap (mm)
-seat_anchor_diameter = 15; // diameter used when the existing recess centre was positioned (mm)
-source_seat_diameter = 13; // original upper tray foot recess diameter (mm)
-seat_depth = 2;          // foot recess depth (mm)
-seat_offset = 9;         // original recess centre from each open-end cut plane (mm)
+source_outer_radius = 22; // Note 21.
+wall = 2;                // Note 22.
+arc_origin = 2;          // Note 23.
+source_height = 27;      // Note 24.
+source_slot_center = 21; // Note 25.
+cap_thickness = 3;       // Note 26.
+cap_corner_radius = 9;   // Note 27.
+seat_anchor_diameter = 15; // Note 28.
+source_seat_diameter = 13; // Note 29.
+seat_depth = 2;          // Note 30.
+seat_offset = 9;         // Note 31.
 
 /* [Display] */
 orient = "source";       // [source, cap_down]
@@ -47,14 +43,14 @@ $fn = 200;
 
 /* [Hidden] */
 eps = 0.01;
-top_round_steps = 24;    // segments along the quarter-circle top round-over
+top_round_steps = 24;    // Note 32.
 height = source_height - skirt_trim;
 outer_skirt_height = height - cap_thickness + outer_extension;
 inner_skirt_height = height - cap_thickness + inner_extension;
 lowest_z = -max(outer_extension, inner_extension);
 slot_center = source_slot_center - skirt_trim;
 slot_top = slot_center + rim_slot_height / 2;
-// Preserve the centre established before rounding and tapering the entry.
+// Note 33.
 seat_shift = (seat_anchor_diameter - source_seat_diameter) / (2 * sqrt(2));
 seat_bottom_diameter = seat_diameter - seat_taper;
 seat_center = seat_offset + seat_shift;
@@ -97,7 +93,7 @@ module bottom_rounded_section(radius = bottom_round) {
     union() {
         offset(r = radius)
             offset(delta = -radius) children();
-        // Restore the top corners so the cap joint stays unchanged.
+        // Note 34.
         intersection() {
             children();
             translate([0, 2 * radius]) square([2 * extent, height - lowest_z]);
@@ -117,7 +113,7 @@ module outer_skirt() {
     }
 }
 
-// Bottom round-over at an open end, with material on the +Y side.
+// Note 35.
 module bottom_end_cut(length, radius = bottom_round) {
     difference() {
         translate([-eps, -eps, -eps])
@@ -128,7 +124,7 @@ module bottom_end_cut(length, radius = bottom_round) {
 }
 
 module bottom_end_cuts() {
-    // Each skirt's end rounds follow its own new bottom elevation.
+    // Note 36.
     translate([0, 0, -inner_extension])
         intersection() {
             union() {
@@ -151,7 +147,7 @@ module bottom_end_cuts() {
                         circle(r = outer_inside_radius - eps);
                     }
         }
-        // The exposed ends beside the outer pillars' central gap.
+        // Note 37.
         translate([arc_origin, arc_origin, 0]) {
             rotate([0, 0, slot_start])
                 translate([outer_inside_radius - eps, 0, 0])
@@ -164,8 +160,8 @@ module bottom_end_cuts() {
 }
 
 module cap_profile() {
-    // Open the two top-platform sides symmetrically about the diagonal.
-    // Retain the outer arc and the corner's true circular fillet.
+    // Note 38.
+
     intersection() {
         translate([arc_origin, arc_origin]) circle(r = outer_radius);
         polygon([
@@ -185,7 +181,7 @@ module cap_profile() {
 }
 
 module vertical_corner_cut_profile(center_y) {
-    // Circle tangent to the end plane and to the outer curved face.
+    // Note 39.
     radius = outer_vertical_round;
     center_x = sqrt(pow(outer_radius - radius, 2) - pow(radius - center_y, 2));
     tangent_y = center_y + (radius - center_y) * outer_radius / (outer_radius - radius);
@@ -203,19 +199,19 @@ module vertical_corner_cut(center_y, cut_height) {
 }
 
 module cap_rounded_corner_profile() {
-    // Round the widened cap's new end corners before its top sweep.
+    // Note 40.
     offset(r = outer_vertical_round)
         offset(delta = -outer_vertical_round) cap_profile();
 }
 
 module outer_vertical_round_cuts() {
-    // Keep the original skirt ends; the wider cap has its own end rounds.
+    // Note 41.
     translate([arc_origin, 0, 0])
         vertical_corner_cut(arc_origin, height - cap_thickness);
     mirror([1, -1, 0])
         translate([arc_origin, 0, 0])
             vertical_corner_cut(arc_origin, height - cap_thickness);
-    // The two exposed outside corners beside the central gap.
+    // Note 42.
     translate([arc_origin, arc_origin, 0]) {
         rotate([0, 0, slot_start])
             mirror([0, 1, 0]) vertical_corner_cut(0, slot_top);
@@ -228,8 +224,8 @@ module rounded_cap() {
     translate([0, 0, height - cap_thickness])
         linear_extrude(height = cap_thickness - top_round, convexity = 10)
             cap_rounded_corner_profile();
-    // The cap profile is convex: hull each pair of inset sections to
-    // follow a quarter-circle without changing the lower perimeter.
+    // Note 43.
+
     for (i = [0 : top_round_steps - 1])
         hull()
             for (j = [i, i + 1]) {
@@ -248,9 +244,8 @@ module tapered_seat_cut() {
     radius = seat_entry_round;
     dr = top_radius - bottom_radius;
     dz = seat_depth - radius;
-    // Tangent from the fixed floor edge to the circular entry blend.
-    // Both specified diameters include the round-over, rather than
-    // adding the rounding outside the requested top opening.
+    // Note 44.
+
     tangent_angle = acos(radius / sqrt(dr * dr + dz * dz)) - atan2(dz, dr);
     translate([seat_center, seat_center, 0])
         rotate_extrude(convexity = 10)
@@ -269,9 +264,8 @@ function inner_corner_center_x(z) =
                       - pow(inner_vertical_round - arc_origin, 2)) + eps;
 
 module inner_vertical_corner_cut() {
-    // Sweep a circular corner cut along the inclined inside edge. Extend
-    // its tail slightly past tangency so it remains an open cut across
-    // the wall's polygonal facets. It never reaches the bin-contact face.
+    // Note 45.
+
     z0 = -inner_extension - eps;
     z1 = height - cap_thickness;
     x0 = inner_corner_center_x(z0);
@@ -292,7 +286,7 @@ module flange_slot() {
     translate([arc_origin, arc_origin, 0])
         rotate([0, 0, slot_start])
             rotate_extrude(angle = slot_span, convexity = 10)
-                // Carry the existing slit down through the skirt's bottom.
+                // Note 46.
                 translate([outer_inside_radius - eps, -outer_extension - eps])
                     square([outer_wall + 2 * eps, slot_top + outer_extension + eps]);
 }
@@ -304,8 +298,8 @@ module inner_skirt() {
     radial_thickness = wall / cos(inner_lean);
     bottom_radius = pivot_radius - skirt_height * lean_slope;
     joined_radius = pivot_radius + eps * lean_slope;
-    // Tilt the radial section about its top inside edge. Keep 2 mm normal
-    // thickness and trim the ends level with the bottom and cap overlap.
+    // Note 47.
+
     translate([0, 0, -inner_extension])
     intersection() {
         translate([arc_origin, arc_origin, 0])
@@ -324,8 +318,8 @@ module inner_skirt() {
 module bin_stacking_clip() {
     difference() {
         union() {
-            // End both skirts inside the cap to give each a solid joint.
-            // The skirts stay separate below the cap.
+            // Note 48.
+
             outer_skirt();
             inner_skirt();
             rounded_cap();
@@ -347,10 +341,8 @@ module posed_clip() {
         translate([-pose_offset, -pose_offset, -lowest_z]) bin_stacking_clip();
 }
 
+// Note 49.
 
-
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
 module feral_default_output_ac1d13a78fcd() {
 posed_clip();
 }
@@ -362,3 +354,116 @@ feral_default_output_ac1d13a78fcd();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_ac1d13a78fcd();
 else feral_assembly_view_ac1d13a78fcd(view == "exploded");
+
+// Notes
+
+// Note 1. Tray-corner stacking clip, reconstructed from the supplied STL.
+// Two concentric skirts straddle the tray wall; the inside skirt leans inward.
+// The cap joins both skirts; the outside skirt has a bottom-open tab gap.
+// Nominal source dimensions were measured from the mesh, not the tray.
+// Tray insertion, retention and load stability remain physical fit trials.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. outward shift of the original skirt profile (mm)
+
+// Note 4. extend outside pillars downward from their previous bottoms (mm)
+
+// Note 5. extend inside skirt downward from its previous bottom (mm)
+
+// Note 6. outer pillar thickness, added toward the outside (mm)
+
+// Note 7. inner skirt bottom-edge radius (mm)
+
+// Note 8. outer pillar bottom-edge radius (mm)
+
+// Note 9. exposed outer vertical corners of the back tabs (mm)
+
+// Note 10. cap perimeter radius (mm)
+
+// Note 11. inward-facing inner wall end corners only (mm)
+
+// Note 12. reference slit height locating the top of the bottom-open gap (mm)
+
+// Note 13. fraction of the original quarter-circle slot span
+
+// Note 14. clear radial distance between the two skirts (mm)
+
+// Note 15. inward lean about the inner skirt's top inside edge (degrees)
+
+// Note 16. remove this much from the original skirt's bottom (mm)
+
+// Note 17. actual top opening, including the previous rounded entry (mm)
+
+// Note 18. diameter reduction from top to recess floor (mm)
+
+// Note 19. blend the tapered wall into the top surface (mm)
+
+// Note 20. top platform angle; skirts retain their existing fit (degrees)
+
+// Note 21. outside radius of the curved wall (mm)
+
+// Note 22. inner wall thickness and original outer wall thickness (mm)
+
+// Note 23. arc centre from both open-end cut planes (mm)
+
+// Note 24. original overall height before trimming the skirt (mm)
+
+// Note 25. centre of the previous 3 mm slot before skirt trimming (mm)
+
+// Note 26. solid cap thickness before the stacking recess (mm)
+
+// Note 27. rounding at the inner corner of the cap (mm)
+
+// Note 28. diameter used when the existing recess centre was positioned (mm)
+
+// Note 29. original upper tray foot recess diameter (mm)
+
+// Note 30. foot recess depth (mm)
+
+// Note 31. original recess centre from each open-end cut plane (mm)
+
+// Note 32. segments along the quarter-circle top round-over
+
+// Note 33. Preserve the centre established before rounding and tapering the entry.
+
+// Note 34. Restore the top corners so the cap joint stays unchanged.
+
+// Note 35. Bottom round-over at an open end, with material on the +Y side.
+
+// Note 36. Each skirt's end rounds follow its own new bottom elevation.
+
+// Note 37. The exposed ends beside the outer pillars' central gap.
+
+// Note 38. Open the two top-platform sides symmetrically about the diagonal.
+// Retain the outer arc and the corner's true circular fillet.
+
+// Note 39. Circle tangent to the end plane and to the outer curved face.
+
+// Note 40. Round the widened cap's new end corners before its top sweep.
+
+// Note 41. Keep the original skirt ends; the wider cap has its own end rounds.
+
+// Note 42. The two exposed outside corners beside the central gap.
+
+// Note 43. The cap profile is convex: hull each pair of inset sections to
+// follow a quarter-circle without changing the lower perimeter.
+
+// Note 44. Tangent from the fixed floor edge to the circular entry blend.
+// Both specified diameters include the round-over, rather than
+// adding the rounding outside the requested top opening.
+
+// Note 45. Sweep a circular corner cut along the inclined inside edge. Extend
+// its tail slightly past tangency so it remains an open cut across
+// the wall's polygonal facets. It never reaches the bin-contact face.
+
+// Note 46. Carry the existing slit down through the skirt's bottom.
+
+// Note 47. Tilt the radial section about its top inside edge. Keep 2 mm normal
+// thickness and trim the ends level with the bottom and cap overlap.
+
+// Note 48. End both skirts inside the cap to give each a solid joint.
+// The skirts stay separate below the cap.
+
+// Note 49. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

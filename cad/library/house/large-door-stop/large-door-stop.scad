@@ -1,4 +1,224 @@
-// Large door stop.
+// Note 1.
+
+/* [Overall] */
+
+// Note 2.
+/* [Assembly display] */
+// Note 3.
+view = "default"; // [default, together, exploded]
+
+width       = 50.8;   // Note 4.
+
+ramp_angle  = 30;     // Note 5.
+
+ramp_height = 63.5;   // Note 6.
+
+arm_thick   = 19.05;  // Note 7.
+
+heel_height = 19.05;  // Note 8.
+
+heel_back   = 6.35;   // Note 9.
+
+corner_r    = 3;      // Note 10.
+
+heel_corner_r = 0;    // Note 11.
+
+/* [Grip serrations] */
+
+// Note 12.
+
+ridge_count = 6;
+ridge_pitch = 18;     // Note 13.
+ridge_land  = 7;      // Note 14.
+ridge_rise  = 2;      // Note 15.
+ridge_r     = 1;      // Note 16.
+
+ridge_first = 11.7206;   // Note 17.
+
+/* [Shell] */
+
+// Note 18.
+wall = 3;             // Note 19.
+
+/* [Rubber pad recess] */
+
+// Note 20.
+
+pad_pocket   = true;
+
+// Note 21.
+
+pad_depth    = 1.0;   // Note 22.
+
+pad_border   = 4.0;   // Note 23.
+
+pad_corner_r = 2.0;   // Note 24.
+
+/* [Output] */
+
+// Note 25.
+
+show = "part";        // [part, coupon]
+
+// Note 26.
+coupon_len  = 10;     // Note 27.
+
+coupon_axis = "width";   // [width, length]
+
+/* [Quality] */
+
+$fa = 4;              // Note 28.
+$fs = 0.3;            // Note 29.
+eps = 0.01;
+
+// Note 30.
+
+tip_x   = ramp_height / tan(ramp_angle);
+
+// Note 31.
+
+notch_x = (ramp_height - arm_thick - heel_height) / tan(ramp_angle);
+
+// Note 32.
+
+bottom_len  = heel_back + tip_x - corner_r / tan(ramp_angle / 2);
+
+// Note 33.
+
+overall_len = bottom_len + corner_r;
+
+assert(!pad_pocket || wall == 0 || pad_depth < wall,
+       "pad_depth must stay inside the shell wall or the recess opens into the void");
+assert(!pad_pocket || (bottom_len - 2 * pad_border > 2 * pad_corner_r &&
+                       width      - 2 * pad_border > 2 * pad_corner_r),
+       "pad_border leaves no room for a recess on the bottom face");
+
+// Note 34.
+function ramp_pt(t, v) = [
+    t * cos(ramp_angle) + v * sin(ramp_angle),
+    ramp_height - t * sin(ramp_angle) + v * cos(ramp_angle)
+];
+
+function unit2(v) = v / norm(v);
+
+// Note 35.
+
+function fillet(a, b, c, r) =
+    r <= 0 ? [b] :
+    let (
+        u1  = unit2(a - b),
+        u2  = unit2(c - b),
+        ang = acos(max(-1, min(1, u1 * u2))),
+        t1  = b + u1 * (r / tan(ang / 2)),
+        t2  = b + u2 * (r / tan(ang / 2)),
+        ctr = b + unit2(u1 + u2) * (r / sin(ang / 2)),
+        a1  = atan2(t1.y - ctr.y, t1.x - ctr.x),
+        a2  = atan2(t2.y - ctr.y, t2.x - ctr.x),
+        // Note 36.
+        sw  = ((a2 - a1) + 540) % 360 - 180,
+        n   = max(2, ceil(abs(sw) / $fa), ceil(abs(sw) * PI * r / 180 / $fs))
+    )
+    [ for (i = [0 : n]) ctr + r * [cos(a1 + sw * i / n), sin(a1 + sw * i / n)] ];
+
+function round_path(pts, radii) =
+    let (n = len(pts))
+    [ for (i = [0 : n - 1])
+        each fillet(pts[(i + n - 1) % n], pts[i], pts[(i + 1) % n], radii[i]) ];
+
+// Note 37.
+
+function ridge_pts(k) =
+    let (t_dn = ridge_first + ridge_land + k * ridge_pitch,
+         t_up = ridge_first + k * ridge_pitch)
+    [ ramp_pt(t_dn, 0), ramp_pt(t_dn, ridge_rise),
+      ramp_pt(t_up, ridge_rise), ramp_pt(t_up, 0) ];
+
+// Note 38.
+
+sharp_pts = concat(
+    [[-heel_back, 0], [tip_x, 0]],
+    [ for (k = [ridge_count - 1 : -1 : 0]) each ridge_pts(k) ],
+    [[0, ramp_height],
+     [0, ramp_height - arm_thick],
+     [notch_x, heel_height],
+     [-heel_back, heel_height]]
+);
+
+sharp_radii = concat(
+    [heel_corner_r, corner_r],
+    [ for (k = [1 : ridge_count * 4]) ridge_r ],
+    [corner_r, corner_r, corner_r, corner_r]
+);
+
+module door_stop_profile() {
+    polygon(round_path(sharp_pts, sharp_radii));
+}
+
+module door_stop_body() {
+    // Note 39.
+    translate([heel_back, 0, 0])
+        linear_extrude(height = width)
+            if (wall > 0)
+                difference() {
+                    door_stop_profile();
+                    offset(r = -wall) door_stop_profile();
+                }
+            else
+                door_stop_profile();
+}
+
+// Note 40.
+
+module pad_recess() {
+    translate([0, pad_depth, 0])
+        rotate([90, 0, 0])
+            linear_extrude(height = pad_depth + eps)
+                offset(r = pad_corner_r)
+                    translate([pad_border + pad_corner_r, pad_border + pad_corner_r])
+                        square([bottom_len - 2 * (pad_border + pad_corner_r),
+                                width      - 2 * (pad_border + pad_corner_r)]);
+}
+
+module door_stop() {
+    difference() {
+        door_stop_body();
+        if (pad_pocket) pad_recess();
+    }
+}
+
+// Note 41.
+
+module door_stop_coupon() {
+    over = ramp_height + corner_r;
+    intersection() {
+        door_stop();
+        if (coupon_axis == "length")
+            translate([(overall_len - coupon_len) / 2, -eps, -eps])
+                cube([coupon_len, over, width + 2 * eps]);
+        else
+            translate([-eps, -eps, (width - coupon_len) / 2])
+                cube([overall_len + 2 * eps, over, coupon_len]);
+    }
+}
+
+// Note 42.
+
+module feral_default_output_0c911c45941c() {
+if (show == "coupon") door_stop_coupon();
+else                  door_stop();
+}
+
+module feral_assembly_view_0c911c45941c(explode=false) {
+feral_default_output_0c911c45941c();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_0c911c45941c();
+else feral_assembly_view_0c911c45941c(view == "exploded");
+
+// Notes
+
+// Note 1. Large door stop.
 //
 // A parametric recreation of _incoming/Large+Door+Stop.stl, a 9,388-triangle
 // binary mesh with no editable history. Every number below was measured off
@@ -78,84 +298,76 @@
 // version worth keeping: a uniform wall is what a shell is for, and the extra
 // 1.7 mm of plastic in the reference's corners buys nothing.
 
-/* [Overall] */
+// Note 2. Extrusion depth. 2 in on the reference.
 
-// Extrusion depth. 2 in on the reference.
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
+// Note 3. default preserves the original part, coupon and print selectors.
 
-width       = 50.8;   // mm
-
+// Note 4. mm
 // Fall of the top face, measured from horizontal.
-ramp_angle  = 30;     // deg
 
+// Note 5. deg
 // Height of the ramp line where it crosses the nose face. 2.5 in.
-ramp_height = 63.5;   // mm
 
+// Note 6. mm
 // Vertical thickness of the tapered arm, nose face to notch cut. 0.75 in.
-arm_thick   = 19.05;  // mm
 
+// Note 7. mm
 // Height of the heel ledge behind the nose. 0.75 in on the reference, which is
 // the same number as arm_thick by coincidence of drawing, not by construction.
-heel_height = 19.05;  // mm
 
+// Note 8. mm
 // How far the heel stands proud of the nose face. 0.25 in.
-heel_back   = 6.35;   // mm
 
+// Note 9. mm
 // Fillet on every body corner.
-corner_r    = 3;      // mm
 
+// Note 10. mm
 // The bottom-back corner is square on the reference. Give it a radius here to
 // break the edge.
-heel_corner_r = 0;    // mm
 
-/* [Grip serrations] */
+// Note 11. mm
 
-// Raised lands along the ramp. These are the sharp-cornered figures; each
+// Note 12. Raised lands along the ramp. These are the sharp-cornered figures; each
 // corner loses ridge_r to its fillet, so a 7 mm land reads as 5 mm of flat.
-ridge_count = 6;
-ridge_pitch = 18;     // mm, land start to land start, measured along the ramp
-ridge_land  = 7;      // mm, length of one land along the ramp
-ridge_rise  = 2;      // mm, how far a land stands proud of the ramp line
-ridge_r     = 1;      // mm, fillet at each of the four corners of a land
 
+// Note 13. mm, land start to land start, measured along the ramp
+
+// Note 14. mm, length of one land along the ramp
+
+// Note 15. mm, how far a land stands proud of the ramp line
+
+// Note 16. mm, fillet at each of the four corners of a land
 // Distance along the ramp, from the nose face, to the first land's leading
 // corner. Measured 11.7206 off the reference by averaging all six lands; it is
 // not a round number and not a multiple of anything else here, so it is
 // recorded rather than derived. Change it to slide the whole set along.
-ridge_first = 11.7206;   // mm
 
-/* [Shell] */
+// Note 17. mm
 
-// Wall thickness of the hollow shell. 0 builds it solid.
-wall = 3;             // mm
+// Note 18. Wall thickness of the hollow shell. 0 builds it solid.
 
-/* [Rubber pad recess] */
+// Note 19. mm
 
-// A recess in the flat bottom for a self-adhesive rubber pad, bordered on all
+// Note 20. A recess in the flat bottom for a self-adhesive rubber pad, bordered on all
 // four sides so friction cannot get under the pad's edge.
-pad_pocket   = true;
 
-// Depth of the recess. At the pad's own thickness the pad finishes flush.
+// Note 21. Depth of the recess. At the pad's own thickness the pad finishes flush.
 // Shallower leaves it proud — more grip, less shelter for its edge.
-pad_depth    = 1.0;   // mm
 
+// Note 22. mm
 // Plastic left between the recess and each edge of the bottom face.
-pad_border   = 4.0;   // mm
 
+// Note 23. mm
 // Corner radius of the recess. Small, so a squarely cut pad still drops in.
-pad_corner_r = 2.0;   // mm
 
-/* [Output] */
+// Note 24. mm
 
-// "coupon" is a 10 mm section cut from the middle for a test print. Not the
+// Note 25. "coupon" is a 10 mm section cut from the middle for a test print. Not the
 // part — it is open where the cut went through, on two sides of the recess.
-show = "part";        // [part, coupon]
 
-// Thickness of the coupon.
-coupon_len  = 10;     // mm
+// Note 26. Thickness of the coupon.
 
+// Note 27. mm
 // Which way the cut runs. "width" takes a 10 mm slice through the 2-inch
 // width: the whole silhouette, every ridge, the notch, the heel, the 3 mm wall
 // and the recess with both of its end borders, in one closed shell that prints
@@ -167,163 +379,48 @@ coupon_len  = 10;     // mm
 // honest, not a bug: the void runs clean through the width, so a cross-section
 // at mid-length is the bottom wall and the top wall with nothing joining them.
 // Only useful with wall = 0.
-coupon_axis = "width";   // [width, length]
 
-/* [Quality] */
+// Note 28. deg, max angle per facet
 
-$fa = 4;              // deg, max angle per facet
-$fs = 0.3;            // mm, max chord per facet
-eps = 0.01;
+// Note 29. mm, max chord per facet
 
-// ---------------------------------------------------------------------------
-
+// Note 30. ---------------------------------------------------------------------------
 // Where the ramp line, extended, would meet the bottom. The tip fillet cuts
 // this corner off, so the part never actually reaches it.
-tip_x   = ramp_height / tan(ramp_angle);
 
-// Where the arm's underside, extended, would meet the heel ledge. Same story:
+// Note 31. Where the arm's underside, extended, would meet the heel ledge. Same story:
 // the notch fillet cuts it off.
-notch_x = (ramp_height - arm_thick - heel_height) / tan(ramp_angle);
 
-// The flat run of the bottom face, from the heel's back face to where the tip
+// Note 32. The flat run of the bottom face, from the heel's back face to where the tip
 // fillet starts lifting it off the plate. The recess is laid out inside this,
 // not inside the overall length.
-bottom_len  = heel_back + tip_x - corner_r / tan(ramp_angle / 2);
 
-// Overall length: the tip fillet's centre sits at the end of the flat run, so
+// Note 33. Overall length: the tip fillet's centre sits at the end of the flat run, so
 // the part reaches one radius past it.
-overall_len = bottom_len + corner_r;
 
-assert(!pad_pocket || wall == 0 || pad_depth < wall,
-       "pad_depth must stay inside the shell wall or the recess opens into the void");
-assert(!pad_pocket || (bottom_len - 2 * pad_border > 2 * pad_corner_r &&
-                       width      - 2 * pad_border > 2 * pad_corner_r),
-       "pad_border leaves no room for a recess on the bottom face");
+// Note 34. A point on the ramp, t along it from the nose face and v out from it.
 
-// A point on the ramp, t along it from the nose face and v out from it.
-function ramp_pt(t, v) = [
-    t * cos(ramp_angle) + v * sin(ramp_angle),
-    ramp_height - t * sin(ramp_angle) + v * cos(ramp_angle)
-];
-
-function unit2(v) = v / norm(v);
-
-// The arc that rounds corner b, between a and c, by radius r. Returns [b]
+// Note 35. The arc that rounds corner b, between a and c, by radius r. Returns [b]
 // unrounded when r is zero, so a path can carry a mix of both.
-function fillet(a, b, c, r) =
-    r <= 0 ? [b] :
-    let (
-        u1  = unit2(a - b),
-        u2  = unit2(c - b),
-        ang = acos(max(-1, min(1, u1 * u2))),
-        t1  = b + u1 * (r / tan(ang / 2)),
-        t2  = b + u2 * (r / tan(ang / 2)),
-        ctr = b + unit2(u1 + u2) * (r / sin(ang / 2)),
-        a1  = atan2(t1.y - ctr.y, t1.x - ctr.x),
-        a2  = atan2(t2.y - ctr.y, t2.x - ctr.x),
-        // signed sweep, taken the short way round
-        sw  = ((a2 - a1) + 540) % 360 - 180,
-        n   = max(2, ceil(abs(sw) / $fa), ceil(abs(sw) * PI * r / 180 / $fs))
-    )
-    [ for (i = [0 : n]) ctr + r * [cos(a1 + sw * i / n), sin(a1 + sw * i / n)] ];
 
-function round_path(pts, radii) =
-    let (n = len(pts))
-    [ for (i = [0 : n - 1])
-        each fillet(pts[(i + n - 1) % n], pts[i], pts[(i + 1) % n], radii[i]) ];
+// Note 36. signed sweep, taken the short way round
 
-// One land, walked from the tip end toward the nose, so t runs downhill:
+// Note 37. One land, walked from the tip end toward the nose, so t runs downhill:
 // up off the ramp line, along the land, back down. k counts from the nose.
-function ridge_pts(k) =
-    let (t_dn = ridge_first + ridge_land + k * ridge_pitch,
-         t_up = ridge_first + k * ridge_pitch)
-    [ ramp_pt(t_dn, 0), ramp_pt(t_dn, ridge_rise),
-      ramp_pt(t_up, ridge_rise), ramp_pt(t_up, 0) ];
 
-// Counter-clockwise from the bottom-back corner: along the bottom to the tip,
+// Note 38. Counter-clockwise from the bottom-back corner: along the bottom to the tip,
 // up the serrated ramp, down the nose face, down the arm's underside, back
 // along the heel ledge.
-sharp_pts = concat(
-    [[-heel_back, 0], [tip_x, 0]],
-    [ for (k = [ridge_count - 1 : -1 : 0]) each ridge_pts(k) ],
-    [[0, ramp_height],
-     [0, ramp_height - arm_thick],
-     [notch_x, heel_height],
-     [-heel_back, heel_height]]
-);
 
-sharp_radii = concat(
-    [heel_corner_r, corner_r],
-    [ for (k = [1 : ridge_count * 4]) ridge_r ],
-    [corner_r, corner_r, corner_r, corner_r]
-);
+// Note 39. Sit the part in the positive quadrant, bottom-back corner on the origin.
 
-module door_stop_profile() {
-    polygon(round_path(sharp_pts, sharp_radii));
-}
-
-module door_stop_body() {
-    // Sit the part in the positive quadrant, bottom-back corner on the origin.
-    translate([heel_back, 0, 0])
-        linear_extrude(height = width)
-            if (wall > 0)
-                difference() {
-                    door_stop_profile();
-                    offset(r = -wall) door_stop_profile();
-                }
-            else
-                door_stop_profile();
-}
-
-// The recess, as a solid to subtract. Drawn flat and stood up, so its 2D x is
+// Note 40. The recess, as a solid to subtract. Drawn flat and stood up, so its 2D x is
 // the part's length and its 2D y is the part's width. It starts eps below the
 // bottom face so no cut face is coplanar with it.
-module pad_recess() {
-    translate([0, pad_depth, 0])
-        rotate([90, 0, 0])
-            linear_extrude(height = pad_depth + eps)
-                offset(r = pad_corner_r)
-                    translate([pad_border + pad_corner_r, pad_border + pad_corner_r])
-                        square([bottom_len - 2 * (pad_border + pad_corner_r),
-                                width      - 2 * (pad_border + pad_corner_r)]);
-}
 
-module door_stop() {
-    difference() {
-        door_stop_body();
-        if (pad_pocket) pad_recess();
-    }
-}
-
-// A slab taken out of the middle. Cut generously past the part in the two
+// Note 41. A slab taken out of the middle. Cut generously past the part in the two
 // directions it is not slicing, so the only faces the cube contributes are the
 // two it is meant to.
-module door_stop_coupon() {
-    over = ramp_height + corner_r;
-    intersection() {
-        door_stop();
-        if (coupon_axis == "length")
-            translate([(overall_len - coupon_len) / 2, -eps, -eps])
-                cube([coupon_len, over, width + 2 * eps]);
-        else
-            translate([-eps, -eps, (width - coupon_len) / 2])
-                cube([overall_len + 2 * eps, over, coupon_len]);
-    }
-}
 
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 42. Assembly display changes placement only; the original output remains the default.
 // Single printed piece: both display modes show the same intact part.
-module feral_default_output_0c911c45941c() {
-if (show == "coupon") door_stop_coupon();
-else                  door_stop();
-}
-
-module feral_assembly_view_0c911c45941c(explode=false) {
-feral_default_output_0c911c45941c();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_0c911c45941c();
-else feral_assembly_view_0c911c45941c(view == "exploded");

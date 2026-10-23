@@ -1,85 +1,76 @@
-// Friction-fit light shield for the 55 mm square nightlight.
-// Service axes: X right, Y up, Z out into the room; light face is Z=0.
-// The outlet opens through the -Y underside; the +Z front has only the sensor hole.
-// The external scoop is trimmed at the front plane, leaving its back and sides.
-// There is no internal light duct.
-// Lower outside corners are square; the mating cavity retains its traced round.
-// Front corners follow the user's 55 mm-calibrated physical outline trace.
-// The rear-body size remains a product-photo estimate, not a measurement.
-// Export with utils/build.sh parts/nightlight-floor-hood.scad --backend=CGAL.
-// CGAL preserves clean binary-STL topology at the full-width corner joins.
+// Note 1.
 
 /* [View] */
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 show = "part"; // [part, assembly, section, fitcheck, body-sweep, body, rib]
-flip = true; // Front face flat on the bed; false gives service axes.
+flip = true; // Note 3.
 
 /* [Measured nightlight] */
-light_w = 55; // mm, overall width
-light_h = 55; // mm, overall height
-rim_depth = 12.2; // mm, front face to rear shoulder
-sensor_d = 9; // mm, sensor opening diameter
-wall_standoff = 24; // mm, measured from the nightlight's front face to the wall
+light_w = 55; // Note 4.
+light_h = 55; // Note 5.
+rim_depth = 12.2; // Note 6.
+sensor_d = 9; // Note 7.
+wall_standoff = 24; // Note 8.
 
 /* [Traced front outline] */
-light_corner_r = 13.5; // mm, circular fit to photographed pencil trace; approximate
+light_corner_r = 13.5; // Note 9.
 
 /* [Photo estimates] */
-rear_body_w = 46; // mm, mating model only
-rear_body_h = 46; // mm, mating model only
-rear_corner_r = 12; // mm, retain the initial rear-body estimate independently
+rear_body_w = 46; // Note 10.
+rear_body_h = 46; // Note 11.
+rear_corner_r = 12; // Note 12.
 
 /* [Cover] */
-fit = 0.15; // mm per side, reduced after user reported a slightly loose fit
-wall = 1.74; // mm, 0.42 + 0.45 + 0.45 + 0.42
+fit = 0.15; // Note 13.
+wall = 1.74; // Note 14.
 
 /* [Sensor] */
-sensor_clearance = 0.30; // mm radial allowance
-sensor_wall = 1.74; // mm, opaque tube wall
-sensor_gap = 0.30; // mm, tube end clearance from light face
-sensor_x = 0; // mm, centred in the photo
-sensor_y = 0; // mm, centred in the photo
-sensor_facets = 64; // Circumscribed bore, not a high global facet count
+sensor_clearance = 0.30; // Note 15.
+sensor_wall = 1.74; // Note 16.
+sensor_gap = 0.30; // Note 17.
+sensor_x = 0; // Note 18.
+sensor_y = 0; // Note 19.
+sensor_facets = 64; // Note 20.
 
 /* [Outlet] */
-outlet_angle = 45; // degrees, external scoop axis downward from horizontal
-outlet_h = 8; // mm, clear thickness perpendicular to the beam axis
-outlet_front_margin = 0; // mm, 0 puts the opening's forward edge at the front/bottom corner
-scoop_drop = 12; // mm, external scoop extension below the cover
-scoop_root_overlap = 4; // mm, reach into rounded lower corners; cavity removes internal material
+outlet_angle = 45; // Note 21.
+outlet_h = 8; // Note 22.
+outlet_front_margin = 0; // Note 23.
+scoop_drop = 12; // Note 24.
+scoop_root_overlap = 4; // Note 25.
 
 /* [Friction rib] */
-grip_projection = 0.25; // mm inward from the cavity, 0.10 mm interference beyond the 0.15 mm fit
-grip_width = 1.20; // mm, axial width of the rounded bump
-grip_z = -9.00; // mm, moved 2.50 mm toward the front from -11.50
-grip_steps = 12; // Segments along the smoothly rounded lead-in and lead-out
-// Verification only: assumed outward normal movement of the rib and sleeve.
-grip_open = 0; // mm; keep 0 for the printed part
+grip_projection = 0.25; // Note 26.
+grip_width = 1.20; // Note 27.
+grip_z = -9.00; // Note 28.
+grip_steps = 12; // Note 29.
+
+grip_open = 0; // Note 30.
 
 /* [Resolution] */
 $fa = 4;
 $fs = 0.4;
-eps = 0.01; // mm, overshoot on cuts
+eps = 0.01; // Note 31.
 
 /* [Derived] */
 cavity_w = light_w + 2*fit;
 cavity_h = light_h + 2*fit;
-outlet_w = cavity_w; // mm, edge-to-edge clear width between the cover's side walls
-// A true offset of the traced outline: clearance grows the flats AND radius.
+outlet_w = cavity_w; // Note 32.
+
 cavity_corner_r = light_corner_r + fit;
 outer_w = cavity_w + 2*wall;
 outer_h = cavity_h + 2*wall;
-face_depth = wall; // mm, panel back is Z=0, directly against the light face
-sleeve_rear_z = grip_z-grip_width/2; // mm, trim flush with the back of the friction ring
+face_depth = wall; // Note 33.
+sleeve_rear_z = grip_z-grip_width/2; // Note 34.
 opening_z_span = outlet_h / sin(outlet_angle);
 outlet_front_z = face_depth - outlet_front_margin;
 outlet_back_z = outlet_front_z - opening_z_span;
 outlet_outer_y = -outer_h/2;
-inlet_top_y = -cavity_h/2 + outlet_h; // mm, full-width inlet reaches into the cavity
-// End before the ramp crosses the front trim plane, avoiding a solid mouth lip.
+inlet_top_y = -cavity_h/2 + outlet_h; // Note 35.
+
 scoop_actual_drop = min(scoop_drop,(opening_z_span-eps)*tan(outlet_angle));
 scoop_tip_y = outlet_outer_y - scoop_actual_drop;
 print_front_z = face_depth;
@@ -101,7 +92,7 @@ module rounded_rect(w, h, r) {
     offset(r=r) square([w-2*r, h-2*r], center=true);
 }
 
-// Extrude a Y,Z polygon along X. Winding is corrected by OpenSCAD.
+// Note 36.
 module across_x(width, profile) {
     multmatrix([[0,0,1,0],[1,0,0,0],[0,1,0,0],[0,0,0,1]])
         linear_extrude(height=width, center=true, convexity=10)
@@ -109,8 +100,8 @@ module across_x(width, profile) {
 }
 
 module outlet_cut() {
-    // One continuous full-width void, with a single 45-degree back surface.
-    // The inner opening meets the scoop without a mask, step, or front lip.
+    // Note 37.
+
     y0 = scoop_tip_y-eps;
     y1 = inlet_top_y+eps;
     shift0 = (y0-outlet_outer_y)/tan(outlet_angle);
@@ -119,7 +110,7 @@ module outlet_cut() {
         [y0,outlet_back_z-shift0],
         [y0,outlet_front_z-shift0+eps],
         [outlet_outer_y,outlet_front_z],
-        // Preserve the front panel above its bottom edge.
+        // Note 38.
         [outlet_outer_y,0],
         [y1,0],
         [y1,outlet_back_z-shift1]
@@ -127,9 +118,8 @@ module outlet_cut() {
 }
 
 module exterior_scoop() {
-    // Swept rectangle below the light. The main cavity subtraction removes
-    // every portion inside the cover. Clip at the face to remove the front
-    // scoop wall and trim the side walls, retaining the sloping back ramp.
+    // Note 39.
+
     y0 = scoop_tip_y;
     scoop_w = outlet_w+2*wall;
     module span(width, x, y1) {
@@ -151,12 +141,12 @@ module exterior_scoop() {
 
 module cover_outline() {
     rounded_rect(outer_w,outer_h,cavity_corner_r+wall);
-    // Fill only the lower exterior corners; the cavity is subtracted separately.
+    // Note 40.
     translate([-outer_w/2,-outer_h/2])
         square([outer_w,cavity_corner_r+wall+eps]);
 }
 
-// Smooth axial crest with rounded lead-in from either direction.
+// Note 41.
 function grip_bump(z) = grip_projection *
     pow(cos(180*(z-grip_z)/grip_width),2);
 
@@ -172,7 +162,7 @@ module grip_rib() {
     z0 = grip_z-grip_width/2;
     z1 = grip_z+grip_width/2;
     difference() {
-        // Full shell-width root on the remaining mating walls.
+        // Note 42.
         translate([0,0,z0])
             linear_extrude(height=grip_width,convexity=10)
                 rounded_rect(outer_w+2*grip_open,outer_h+2*grip_open,
@@ -185,7 +175,7 @@ module grip_rib() {
                 grip_cavity_slice(zb);
             }
         }
-        // The smooth channel takes priority over the ring's lower segment.
+        // Note 43.
         outlet_cut();
     }
 }
@@ -207,7 +197,7 @@ module fixed_body() {
             cylinder(h=wall+2*eps, d=sensor_bore_d/cos(180/sensor_facets),
                      $fn=sensor_facets);
     }
-    // Isolated ambient-light passage from the centre eye to the room.
+    // Note 44.
     translate([sensor_x,sensor_y,sensor_gap])
         difference() {
             cylinder(h=face_depth-sensor_gap, d=sensor_outer_d,$fn=sensor_facets);
@@ -247,8 +237,8 @@ module selected_view() {
     } else if (show == "fitcheck") {
         intersection() { hood(); mating_light(); }
     } else if (show == "body-sweep") {
-        // Continuous conservative envelope from entirely outside to seated.
-        // The rib is checked separately in translation/normal-opening space.
+        // Note 45.
+
         intersection() {
             fixed_body();
             hull() {
@@ -261,8 +251,6 @@ module selected_view() {
     else hood();
 }
 
-
-
 echo(str("Clear cavity: ",cavity_w," x ",cavity_h," mm; rim ",rim_depth," mm"));
 echo(str("Panel back against light at Z=0; rear sleeve flush with ring back at Z=",sleeve_rear_z,
          " mm; total printed depth ",face_depth-sleeve_rear_z," mm"));
@@ -274,8 +262,8 @@ echo(str("Rounded friction rib, cleared from channel: ",grip_projection," mm pro
 echo(str("Trace-derived front corner radius: ",light_corner_r," mm; cavity radius: ",cavity_corner_r," mm"));
 echo("Front radius is fitted from a photographed trace; rear body is photo-estimated. Physical fit still requires a trial.");
 
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
+// Note 46.
+
 module feral_default_output_ff6c59a5a5c5() {
 if (flip) translate([0,0,print_front_z]) rotate([0,180,0]) selected_view();
 else selected_view();
@@ -288,3 +276,114 @@ feral_default_output_ff6c59a5a5c5();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_ff6c59a5a5c5();
 else feral_assembly_view_ff6c59a5a5c5(view == "exploded");
+
+// Notes
+
+// Note 1. Friction-fit light shield for the 55 mm square nightlight.
+// Service axes: X right, Y up, Z out into the room; light face is Z=0.
+// The outlet opens through the -Y underside; the +Z front has only the sensor hole.
+// The external scoop is trimmed at the front plane, leaving its back and sides.
+// There is no internal light duct.
+// Lower outside corners are square; the mating cavity retains its traced round.
+// Front corners follow the user's 55 mm-calibrated physical outline trace.
+// The rear-body size remains a product-photo estimate, not a measurement.
+// Export with utils/build.sh parts/nightlight-floor-hood.scad --backend=CGAL.
+// CGAL preserves clean binary-STL topology at the full-width corner joins.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. Front face flat on the bed; false gives service axes.
+
+// Note 4. mm, overall width
+
+// Note 5. mm, overall height
+
+// Note 6. mm, front face to rear shoulder
+
+// Note 7. mm, sensor opening diameter
+
+// Note 8. mm, measured from the nightlight's front face to the wall
+
+// Note 9. mm, circular fit to photographed pencil trace; approximate
+
+// Note 10. mm, mating model only
+
+// Note 11. mm, mating model only
+
+// Note 12. mm, retain the initial rear-body estimate independently
+
+// Note 13. mm per side, reduced after user reported a slightly loose fit
+
+// Note 14. mm, 0.42 + 0.45 + 0.45 + 0.42
+
+// Note 15. mm radial allowance
+
+// Note 16. mm, opaque tube wall
+
+// Note 17. mm, tube end clearance from light face
+
+// Note 18. mm, centred in the photo
+
+// Note 19. mm, centred in the photo
+
+// Note 20. Circumscribed bore, not a high global facet count
+
+// Note 21. degrees, external scoop axis downward from horizontal
+
+// Note 22. mm, clear thickness perpendicular to the beam axis
+
+// Note 23. mm, 0 puts the opening's forward edge at the front/bottom corner
+
+// Note 24. mm, external scoop extension below the cover
+
+// Note 25. mm, reach into rounded lower corners; cavity removes internal material
+
+// Note 26. mm inward from the cavity, 0.10 mm interference beyond the 0.15 mm fit
+
+// Note 27. mm, axial width of the rounded bump
+
+// Note 28. mm, moved 2.50 mm toward the front from -11.50
+
+// Note 29. Segments along the smoothly rounded lead-in and lead-out
+// Verification only: assumed outward normal movement of the rib and sleeve.
+
+// Note 30. mm; keep 0 for the printed part
+
+// Note 31. mm, overshoot on cuts
+
+// Note 32. mm, edge-to-edge clear width between the cover's side walls
+// A true offset of the traced outline: clearance grows the flats AND radius.
+
+// Note 33. mm, panel back is Z=0, directly against the light face
+
+// Note 34. mm, trim flush with the back of the friction ring
+
+// Note 35. mm, full-width inlet reaches into the cavity
+// End before the ramp crosses the front trim plane, avoiding a solid mouth lip.
+
+// Note 36. Extrude a Y,Z polygon along X. Winding is corrected by OpenSCAD.
+
+// Note 37. One continuous full-width void, with a single 45-degree back surface.
+// The inner opening meets the scoop without a mask, step, or front lip.
+
+// Note 38. Preserve the front panel above its bottom edge.
+
+// Note 39. Swept rectangle below the light. The main cavity subtraction removes
+// every portion inside the cover. Clip at the face to remove the front
+// scoop wall and trim the side walls, retaining the sloping back ramp.
+
+// Note 40. Fill only the lower exterior corners; the cavity is subtracted separately.
+
+// Note 41. Smooth axial crest with rounded lead-in from either direction.
+
+// Note 42. Full shell-width root on the remaining mating walls.
+
+// Note 43. The smooth channel takes priority over the ring's lower segment.
+
+// Note 44. Isolated ambient-light passage from the centre eye to the room.
+
+// Note 45. Continuous conservative envelope from entirely outside to seated.
+// The rib is checked separately in translation/normal-opening space.
+
+// Note 46. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

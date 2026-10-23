@@ -1,4 +1,210 @@
-// sofa-monitor-stand.scad
+// Note 1.
+
+/* [Output] */
+// Note 2.
+
+/* [Assembly display] */
+// Note 3.
+view = "default"; // [default, together, exploded]
+
+show = "base";  // [top, base, plug, coupon, base-slice]
+
+/* [Top] */
+stand_top_d      = 160.8;  // Note 4.
+stand_top_h      = 20.0;   // Note 5.
+stand_dish_d     = 150.8;  // Note 6.
+stand_dish_depth = 10.0;   // Note 7.
+stand_lip_r      = 5.0;    // Note 8.
+
+/* [Socket and plug] */
+stand_socket_w     = 75.4;  // Note 9.
+stand_socket_depth = 5.4;   // Note 10.
+stand_fit          = 0.20;  // Note 11.
+stand_seat         = 0.40;  // Note 12.
+
+/* [Socket coupon] */
+stand_coupon_w   = 90.0;  // Note 13.
+stand_coupon_gap = 8.0;   // Note 14.
+
+/* [Base — the arm, measured] */
+base_arm_w     = 180.0;  // Note 15.
+base_arm_crown = 10.0;   // Note 16.
+base_clearance = 0.5;    // Note 17.
+
+/* [Base — the saddle] */
+base_flip     = true;   // Note 18.
+base_leg_drop = 90.0;   // Note 19.
+base_leg_t    = 6.66;   // Note 20.
+base_deck_t   = 10.0;   // Note 21.
+base_depth    = 95.0;   // Note 22.
+base_round_r  = 10.0;   // Note 23.
+base_bend_r   = 5.0;    // Note 24.
+base_foot_r   = 2.0;    // Note 25.
+
+/* [Base — arm coupon] */
+base_slice_depth = 10.0;  // Note 26.
+base_slice_leg   = 20.0;  // Note 27.
+
+/* [Quality] */
+// Note 28.
+$fn = 144;
+
+/* [Hidden] */
+eps = 0.01;
+
+// Note 29.
+
+stand_plug_w = stand_socket_w - 2 * stand_fit;      // 75.0
+stand_plug_h = stand_socket_depth - stand_seat;     // 5.0
+stand_top_r  = stand_top_d / 2;
+stand_dish_r = stand_dish_d / 2;
+stand_lip_w  = stand_top_r - stand_dish_r;           // 5.0
+stand_dish_z = stand_top_h - stand_dish_depth;       // Note 30.
+
+base_cavity_w = base_arm_w + 2 * base_clearance;                 // 181.0
+base_w        = base_cavity_w + 2 * base_leg_t;                  // 194.32
+base_h        = base_leg_drop + base_arm_crown + base_deck_t;    // Note 31.
+
+base_crown_r  = (base_cavity_w * base_cavity_w / 4 + base_arm_crown * base_arm_crown) / (2 * base_arm_crown);   // 414.5
+
+// Note 32.
+
+module stand_top_profile() {
+  difference() {
+    union() {
+      square([stand_top_r, stand_top_h - stand_lip_r]);
+      square([stand_top_r - stand_lip_r, stand_top_h]);
+      translate([stand_top_r - stand_lip_r, stand_top_h - stand_lip_r])
+        circle(r = stand_lip_r);
+    }
+    translate([-eps, stand_dish_z])
+      square([stand_dish_r + eps, stand_dish_depth + eps]);
+  }
+}
+
+module stand_socket() {
+  translate([-stand_socket_w / 2, -stand_socket_w / 2, -eps])
+    cube([stand_socket_w, stand_socket_w, stand_socket_depth + eps]);
+}
+
+module stand_top() {
+  difference() {
+    rotate_extrude() stand_top_profile();
+    stand_socket();
+  }
+}
+
+module stand_plug() {
+  translate([-stand_plug_w / 2, -stand_plug_w / 2, 0])
+    cube([stand_plug_w, stand_plug_w, stand_plug_h]);
+}
+
+// Note 33.
+
+module stand_coupon() {
+  intersection() {
+    stand_top();
+    translate([-stand_coupon_w / 2, -stand_coupon_w / 2, -eps])
+      cube([stand_coupon_w, stand_coupon_w, stand_dish_z + eps]);
+  }
+  translate([stand_coupon_w / 2 + stand_coupon_gap + stand_plug_w / 2, 0, 0])
+    stand_plug();
+}
+
+// Note 34.
+
+module base_cavity_profile(h) {
+  offset(r = base_bend_r) offset(delta = -base_bend_r) union() {
+    translate([-base_cavity_w / 2, -base_bend_r - 1]) square([base_cavity_w, h + base_bend_r + 1]);
+    intersection() {
+      translate([0, h + base_arm_crown - base_crown_r]) circle(r = base_crown_r, $fn = 1440);
+      translate([-base_cavity_w / 2, h - 1]) square([base_cavity_w, base_arm_crown + 1]);
+    }
+  }
+}
+
+// Note 35.
+
+module base_outer_body() {
+  hull() for (sx = [-1, 1], sy = [-1, 1])
+    translate([sx * (base_w / 2 - base_round_r), sy * (base_depth / 2 - base_round_r), 0]) {
+      translate([0, 0, base_h - base_round_r]) sphere(r = base_round_r);
+      translate([0, 0, base_foot_r]) cylinder(r = base_round_r, h = base_h - base_round_r - base_foot_r);
+      translate([0, 0, base_foot_r]) rotate_extrude() translate([base_round_r - base_foot_r, 0]) circle(r = base_foot_r);
+    }
+}
+
+// Note 36.
+module stand_base() {
+  assert(base_deck_t >= base_round_r, "base_round_r deeper than the deck: it would cut into the cavity ceiling");
+  assert(base_foot_r < base_leg_t, "base_foot_r not less than base_leg_t: the foot would have no flat to stand on");
+  assert(base_foot_r <= base_round_r, "base_foot_r larger than base_round_r: the foot torus would not fit inside the plan round");
+  difference() {
+    base_outer_body();
+    rotate([90, 0, 0])
+      linear_extrude(base_depth + 2 * eps, center = true, convexity = 4)
+        base_cavity_profile(base_leg_drop);
+  }
+  // Note 37.
+
+  translate([0, 0, base_h - base_round_r * (1 - cos(180 / $fn)) - eps]) stand_plug();
+}
+
+// Note 38.
+
+module base_rounded_box(w, h, r_top, r_bot) {
+  hull() {
+    for (sx = [-1, 1]) {
+      translate([sx * (w / 2 - r_top), h - r_top]) circle(r = r_top);
+      translate([sx * (w / 2 - r_bot), r_bot]) circle(r = r_bot);
+    }
+  }
+}
+
+// Note 39.
+
+module stand_base_slice() {
+  h = base_slice_leg + base_arm_crown + base_deck_t;
+  linear_extrude(base_slice_depth, convexity = 4)
+    difference() {
+      base_rounded_box(base_w, h, base_round_r, base_foot_r);
+      base_cavity_profile(base_slice_leg);
+    }
+}
+
+module base_oriented() {
+  if (base_flip) translate([0, 0, base_h + stand_plug_h]) rotate([180, 0, 0]) children();
+  else children();
+}
+
+// Note 40.
+
+echo(str("plug = ", stand_plug_w, " sq x ", stand_plug_h, " mm; socket = ",
+         stand_socket_w, " sq x ", stand_socket_depth, " mm"));
+echo(str("saddle = ", base_w, " x ", base_depth, " x ", base_h + stand_plug_h,
+         " mm over the plug; cavity = ", base_cavity_w, " wide x ", base_leg_drop,
+         " deep at the sides, ", base_leg_drop + base_arm_crown, " at the crown"));
+
+// Note 41.
+module feral_default_output_6105d24796e4() {
+if (show == "top")        stand_top();
+if (show == "base")       base_oriented() stand_base();
+if (show == "plug")       stand_plug();
+if (show == "coupon")     stand_coupon();
+if (show == "base-slice") stand_base_slice();
+}
+
+module feral_assembly_view_6105d24796e4(explode=false) {
+color("SlateGray") stand_base(); color("SteelBlue") translate([0,0,base_h+(explode ? 45 : 0)]) stand_top();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_6105d24796e4();
+else feral_assembly_view_6105d24796e4(view == "exploded");
+
+// Notes
+
+// Note 1. sofa-monitor-stand.scad
 //
 // The monitor stand that lives on the sofa arm, in two pieces: a round TOP
 // the monitor's foot sits in, and a BASE that straddles the arm and carries a
@@ -80,148 +286,94 @@
 // a quarter-round has to be as deep as it is wide, and one deeper than the
 // deck would come out under it as a knife edge.
 
-/* [Output] */
-// top         — the disc, as printed
+// Note 2. top         — the disc, as printed
 // base        — the saddle, complete, plug on
 // plug        — the plug alone, standing on z = 0: a fit coupon for the socket
 // coupon      — the socket cut out of the disc as a 90 mm square block, with
-//               the plug beside it; tests the joint without printing 160 mm
-//               of disc
+// the plug beside it; tests the joint without printing 160 mm
+// of disc
 // base-slice  — an arm-fit coupon: the saddle's section through the middle,
-//               legs cut down to base_slice_leg, no plug, lying flat with
-//               base_slice_depth as its height. Everything that matters to
-//               the arm fit — cavity width, crown, bend radius, deck and leg
-//               thickness — is in that section; the leg length proves
-//               nothing but costs most of the print
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
+// legs cut down to base_slice_leg, no plug, lying flat with
+// base_slice_depth as its height. Everything that matters to
+// the arm fit — cavity width, crown, bend radius, deck and leg
+// thickness — is in that section; the leg length proves
+// nothing but costs most of the print
 
-show = "base";  // [top, base, plug, coupon, base-slice]
+// Note 3. default preserves the original part, coupon and print selectors.
 
-/* [Top] */
-stand_top_d      = 160.8;  // disc diameter (mm)
-stand_top_h      = 20.0;   // disc thickness, bottom face to lip crest (mm)
-stand_dish_d     = 150.8;  // dish diameter; the lip is what is left outside it (mm)
-stand_dish_depth = 10.0;   // dish floor below the lip crest (mm)
-stand_lip_r      = 5.0;    // quarter-round on the lip's outer edge (mm)
+// Note 4. disc diameter (mm)
 
-/* [Socket and plug] */
-stand_socket_w     = 75.4;  // socket, square, across flats (mm)
-stand_socket_depth = 5.4;   // socket ceiling above the disc's bottom face (mm)
-stand_fit          = 0.20;  // air between plug and socket, per side (mm)
-stand_seat         = 0.40;  // socket deeper than the plug, so the disc seats on the base (mm)
+// Note 5. disc thickness, bottom face to lip crest (mm)
 
-/* [Socket coupon] */
-stand_coupon_w   = 90.0;  // square block cut from the disc around the socket (mm)
-stand_coupon_gap = 8.0;   // clear air between block and plug on the plate (mm)
+// Note 6. dish diameter; the lip is what is left outside it (mm)
 
-/* [Base — the arm, measured] */
-base_arm_w     = 180.0;  // sofa arm, across (mm)
-base_arm_crown = 10.0;   // how much higher the arm's top is at the centre than at its edges (mm)
-base_clearance = 0.5;    // air between arm and leg, per side (mm)
+// Note 7. dish floor below the lip crest (mm)
 
-/* [Base — the saddle] */
-base_flip     = true;   // printed orientation, plug down on the bed; false draws it in use
-base_leg_drop = 90.0;   // legs below the deck's underside at the sides (mm)
-base_leg_t    = 6.66;   // leg plate, fifteen loops on the 0.4 nozzle; was 4.44 and Ziad thought a hard push would snap it (mm)
-base_deck_t   = 10.0;   // deck at the crown, underside to the face the disc sits on; not less than base_round_r (mm)
-base_depth    = 95.0;   // run along the arm; what the old base had (mm)
-base_round_r  = 10.0;   // every outside edge above the feet, corners spherical; not more than base_deck_t (mm)
-base_bend_r   = 5.0;    // the inside bends, arch to leg (mm)
-base_foot_r   = 2.0;    // the outside edge of each foot, ends and corners included; less than base_leg_t (mm)
+// Note 8. quarter-round on the lip's outer edge (mm)
 
-/* [Base — arm coupon] */
-base_slice_depth = 10.0;  // height of the coupon as it lies on the bed (mm)
-base_slice_leg   = 20.0;  // legs kept below the deck's underside, enough to grip the arm (mm)
+// Note 9. socket, square, across flats (mm)
 
-/* [Quality] */
-// 144 facets on an 80.4 mm radius is a 0.02 mm chord, the 0.4 nozzle's figure.
-$fn = 144;
+// Note 10. socket ceiling above the disc's bottom face (mm)
 
-/* [Hidden] */
-eps = 0.01;
+// Note 11. air between plug and socket, per side (mm)
 
-// ---- derived ---------------------------------------------------------------
+// Note 12. socket deeper than the plug, so the disc seats on the base (mm)
 
-stand_plug_w = stand_socket_w - 2 * stand_fit;      // 75.0
-stand_plug_h = stand_socket_depth - stand_seat;     // 5.0
-stand_top_r  = stand_top_d / 2;
-stand_dish_r = stand_dish_d / 2;
-stand_lip_w  = stand_top_r - stand_dish_r;           // 5.0
-stand_dish_z = stand_top_h - stand_dish_depth;       // dish floor, 10.0
+// Note 13. square block cut from the disc around the socket (mm)
 
-base_cavity_w = base_arm_w + 2 * base_clearance;                 // 181.0
-base_w        = base_cavity_w + 2 * base_leg_t;                  // 194.32
-base_h        = base_leg_drop + base_arm_crown + base_deck_t;    // 110.0, foot of the legs to the deck face
+// Note 14. clear air between block and plug on the plate (mm)
+
+// Note 15. sofa arm, across (mm)
+
+// Note 16. how much higher the arm's top is at the centre than at its edges (mm)
+
+// Note 17. air between arm and leg, per side (mm)
+
+// Note 18. printed orientation, plug down on the bed; false draws it in use
+
+// Note 19. legs below the deck's underside at the sides (mm)
+
+// Note 20. leg plate, fifteen loops on the 0.4 nozzle; was 4.44 and Ziad thought a hard push would snap it (mm)
+
+// Note 21. deck at the crown, underside to the face the disc sits on; not less than base_round_r (mm)
+
+// Note 22. run along the arm; what the old base had (mm)
+
+// Note 23. every outside edge above the feet, corners spherical; not more than base_deck_t (mm)
+
+// Note 24. the inside bends, arch to leg (mm)
+
+// Note 25. the outside edge of each foot, ends and corners included; less than base_leg_t (mm)
+
+// Note 26. height of the coupon as it lies on the bed (mm)
+
+// Note 27. legs kept below the deck's underside, enough to grip the arm (mm)
+
+// Note 28. 144 facets on an 80.4 mm radius is a 0.02 mm chord, the 0.4 nozzle's figure.
+
+// Note 29. ---- derived ---------------------------------------------------------------
+
+// Note 30. dish floor, 10.0
+
+// Note 31. 110.0, foot of the legs to the deck face
 // The arch: a circle through the cavity's two top corners and base_arm_crown
 // above their chord.
-base_crown_r  = (base_cavity_w * base_cavity_w / 4 + base_arm_crown * base_arm_crown) / (2 * base_arm_crown);   // 414.5
 
-// ---- the top ---------------------------------------------------------------
-
+// Note 32. ---- the top ---------------------------------------------------------------
 // The disc's half profile, r along x and z along y, for rotate_extrude. The
 // quarter-round's centre sits on the dish wall at lip crest minus its radius,
 // so with stand_lip_r equal to the lip's width the round spans the whole lip.
-module stand_top_profile() {
-  difference() {
-    union() {
-      square([stand_top_r, stand_top_h - stand_lip_r]);
-      square([stand_top_r - stand_lip_r, stand_top_h]);
-      translate([stand_top_r - stand_lip_r, stand_top_h - stand_lip_r])
-        circle(r = stand_lip_r);
-    }
-    translate([-eps, stand_dish_z])
-      square([stand_dish_r + eps, stand_dish_depth + eps]);
-  }
-}
 
-module stand_socket() {
-  translate([-stand_socket_w / 2, -stand_socket_w / 2, -eps])
-    cube([stand_socket_w, stand_socket_w, stand_socket_depth + eps]);
-}
-
-module stand_top() {
-  difference() {
-    rotate_extrude() stand_top_profile();
-    stand_socket();
-  }
-}
-
-module stand_plug() {
-  translate([-stand_plug_w / 2, -stand_plug_w / 2, 0])
-    cube([stand_plug_w, stand_plug_w, stand_plug_h]);
-}
-
-// The block is the disc between its bottom face and the dish floor, so it
+// Note 33. The block is the disc between its bottom face and the dish floor, so it
 // carries the socket and its full-thickness ceiling and nothing above.
-module stand_coupon() {
-  intersection() {
-    stand_top();
-    translate([-stand_coupon_w / 2, -stand_coupon_w / 2, -eps])
-      cube([stand_coupon_w, stand_coupon_w, stand_dish_z + eps]);
-  }
-  translate([stand_coupon_w / 2 + stand_coupon_gap + stand_plug_w / 2, 0, 0])
-    stand_plug();
-}
 
-// ---- the base --------------------------------------------------------------
-
+// Note 34. ---- the base --------------------------------------------------------------
 // The cavity in section: base_cavity_w wide, legs h tall, the ceiling arched
 // base_arm_crown above that at the centre, and the two corners where arch
 // meets leg rounded base_bend_r. Open at the bottom, well past y = 0, so the
 // rounding pass never reaches the feet.
-module base_cavity_profile(h) {
-  offset(r = base_bend_r) offset(delta = -base_bend_r) union() {
-    translate([-base_cavity_w / 2, -base_bend_r - 1]) square([base_cavity_w, h + base_bend_r + 1]);
-    intersection() {
-      translate([0, h + base_arm_crown - base_crown_r]) circle(r = base_crown_r, $fn = 1440);
-      translate([-base_cavity_w / 2, h - 1]) square([base_cavity_w, base_arm_crown + 1]);
-    }
-  }
-}
 
-// The outside, before the cavity: a block with every edge above the feet
+// Note 35. The outside, before the cavity: a block with every edge above the feet
 // rounded base_round_r and the corners spherical, and the bottom edge
 // rounded base_foot_r all the way round, corners included — a hull of four
 // spheres over four posts standing on four tori. Because the plan corners
@@ -230,91 +382,24 @@ module base_cavity_profile(h) {
 // thickness must; the ends do no work and the edge is vertical, so it
 // prints as a wall. The cavity cut leaves the INSIDE foot edge square, so
 // each foot keeps a flat base_leg_t - base_foot_r wide to stand on.
-module base_outer_body() {
-  hull() for (sx = [-1, 1], sy = [-1, 1])
-    translate([sx * (base_w / 2 - base_round_r), sy * (base_depth / 2 - base_round_r), 0]) {
-      translate([0, 0, base_h - base_round_r]) sphere(r = base_round_r);
-      translate([0, 0, base_foot_r]) cylinder(r = base_round_r, h = base_h - base_round_r - base_foot_r);
-      translate([0, 0, base_foot_r]) rotate_extrude() translate([base_round_r - base_foot_r, 0]) circle(r = base_foot_r);
-    }
-}
 
-// In use: z = 0 at the foot of the legs, plug on top.
-module stand_base() {
-  assert(base_deck_t >= base_round_r, "base_round_r deeper than the deck: it would cut into the cavity ceiling");
-  assert(base_foot_r < base_leg_t, "base_foot_r not less than base_leg_t: the foot would have no flat to stand on");
-  assert(base_foot_r <= base_round_r, "base_foot_r larger than base_round_r: the foot torus would not fit inside the plan round");
-  difference() {
-    base_outer_body();
-    rotate([90, 0, 0])
-      linear_extrude(base_depth + 2 * eps, center = true, convexity = 4)
-        base_cavity_profile(base_leg_drop);
-  }
-  // Sunk into the deck by the sphere's polar gap: an OpenSCAD sphere has no
-  // vertex at its pole, its top ring sits at r * cos(180 / $fn), so the
-  // hull's top face is a hair under base_h and a plug set exactly there is
-  // a second shell. That plus eps off 5 mm of plug, against a 0.4 mm seat,
-  // is nothing.
-  translate([0, 0, base_h - base_round_r * (1 - cos(180 / $fn)) - eps]) stand_plug();
-}
+// Note 36. In use: z = 0 at the foot of the legs, plug on top.
 
-// A w-wide, h-tall rectangle standing on y = 0, top corners rounded r_top
+// Note 37. Sunk into the deck by the sphere's polar gap: an OpenSCAD sphere has no
+// vertex at its pole, its top ring sits at r * cos(180 / $fn), so the
+// hull's top face is a hair under base_h and a plug set exactly there is
+// a second shell. That plus eps off 5 mm of plug, against a 0.4 mm seat,
+// is nothing.
+
+// Note 38. A w-wide, h-tall rectangle standing on y = 0, top corners rounded r_top
 // and bottom corners r_bot: the saddle's outside in elevation, through the
 // middle where the plan rounds do not reach.
-module base_rounded_box(w, h, r_top, r_bot) {
-  hull() {
-    for (sx = [-1, 1]) {
-      translate([sx * (w / 2 - r_top), h - r_top]) circle(r = r_top);
-      translate([sx * (w / 2 - r_bot), r_bot]) circle(r = r_bot);
-    }
-  }
-}
 
-// The arm coupon: the section drawn flat in XY and extruded base_slice_depth
+// Note 39. The arm coupon: the section drawn flat in XY and extruded base_slice_depth
 // up, so it prints as a short U outline in one go. Not a slice of
 // stand_base — that would be plug-down or standing on its feet, and either
 // way tall.
-module stand_base_slice() {
-  h = base_slice_leg + base_arm_crown + base_deck_t;
-  linear_extrude(base_slice_depth, convexity = 4)
-    difference() {
-      base_rounded_box(base_w, h, base_round_r, base_foot_r);
-      base_cavity_profile(base_slice_leg);
-    }
-}
 
-module base_oriented() {
-  if (base_flip) translate([0, 0, base_h + stand_plug_h]) rotate([180, 0, 0]) children();
-  else children();
-}
+// Note 40. ---- output ----------------------------------------------------------------
 
-// ---- output ----------------------------------------------------------------
-
-
-
-
-
-
-
-echo(str("plug = ", stand_plug_w, " sq x ", stand_plug_h, " mm; socket = ",
-         stand_socket_w, " sq x ", stand_socket_depth, " mm"));
-echo(str("saddle = ", base_w, " x ", base_depth, " x ", base_h + stand_plug_h,
-         " mm over the plug; cavity = ", base_cavity_w, " wide x ", base_leg_drop,
-         " deep at the sides, ", base_leg_drop + base_arm_crown, " at the crown"));
-
-// Assembly display changes placement only; the original output remains the default.
-module feral_default_output_6105d24796e4() {
-if (show == "top")        stand_top();
-if (show == "base")       base_oriented() stand_base();
-if (show == "plug")       stand_plug();
-if (show == "coupon")     stand_coupon();
-if (show == "base-slice") stand_base_slice();
-}
-
-module feral_assembly_view_6105d24796e4(explode=false) {
-color("SlateGray") stand_base(); color("SteelBlue") translate([0,0,base_h+(explode ? 45 : 0)]) stand_top();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_6105d24796e4();
-else feral_assembly_view_6105d24796e4(view == "exploded");
+// Note 41. Assembly display changes placement only; the original output remains the default.

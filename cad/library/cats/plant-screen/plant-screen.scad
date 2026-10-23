@@ -1,4 +1,335 @@
-// Plant screen — a lattice cylinder that drops over a spider plant so Max
+// Note 1.
+
+// COUPON-COMPONENTS: fit=coupon
+// COUPON-PLATE: coupon
+
+/* [Output] */
+
+// Note 2.
+
+/* [Assembly display] */
+// Note 3.
+view = "default"; // [default, together, exploded]
+
+show = "part";   // [part, cut, coupon, stack, fitcheck]
+// Note 4.
+
+fitcheck_offset = 0;
+
+$fa = 4;   // Note 5.
+$fs = 0.4;
+eps = 0.01;
+
+/* [Envelope] */
+
+// Note 6.
+
+outer_d = 205.00;
+// Note 7.
+total_h = 215.00;
+
+/* [Bands] */
+
+// Note 8.
+
+band_t = 2.10;
+// Note 9.
+
+top_band_h = 8.00;
+// Note 10.
+
+foot_band_h = 2.00;
+
+/* [Lattice] */
+
+// Note 11.
+
+strut_t = 1.74;
+// Note 12.
+
+strut_w = 1.74;
+// Note 13.
+
+strut_inset = 0.05;
+// Note 14.
+
+opening = 36.0;
+// Note 15.
+
+slice_deg = 1.5;
+// Note 16.
+bury = 1.0;
+// Note 17.
+
+fork = true;
+fork_frac = fork ? 0.25 : 0;            // Note 18.
+
+hand_skew = 0.10;
+// Note 19.
+
+round_ends = true;
+
+/* [Joint] */
+
+// Note 20.
+
+spigot_h = 6.00;
+// Note 21.
+
+spigot_clear = 0.60;
+// Note 22.
+
+foot_chamfer = 0.50;
+// Note 23.
+
+seat_cham = 1.00;
+
+/* [Coupon] */
+
+// Note 24.
+
+coupon_h = 45.00;
+
+/* [Quality] */
+
+// Note 25.
+chord_err = 0.02;
+
+/* [Hidden] */
+
+// Note 26.
+function facets(r, e = chord_err) = ceil(180 / acos(1 - e / r));
+
+R      = outer_d / 2;
+R_in   = R - band_t;                    // Note 27.
+nseg   = facets(R);
+
+bar_ro = R - strut_inset;               // Note 28.
+bar_ri = bar_ro - strut_t;              // Note 29.
+R_smid = bar_ro - strut_t / 2;          // Note 30.
+
+crank  = band_t + spigot_clear;         // Note 31.
+foot_h = spigot_h + crank + foot_band_h;
+sp_ro  = R_in - spigot_clear;           // Note 32.
+sp_ri  = sp_ro - band_t;                // Note 33.
+
+island     = strut_w * sqrt(2);         // Note 34.
+N          = max(8, round(2 * PI * R_smid / (opening + island)));
+p          = 2 * PI * R_smid / N;       // Note 35.
+half       = p / 2;                     // Note 36.
+clear_diag = p - island;                // Note 37.
+bridge_gap = (fork ? p / 4 : half) - island;   // Note 38.
+
+stack_pitch = total_h - (spigot_h + spigot_clear + seat_cham);
+
+// Note 39.
+
+function zone_of(h)   = h - top_band_h - foot_h;
+function rows_of(h)   = floor(zone_of(h) / half - fork_frac);
+function pitch_of(h)  = zone_of(h) / (rows_of(h) + fork_frac);
+function vis_of(h)    = rows_of(h) * pitch_of(h);
+function fork_of(h)   = fork_frac * pitch_of(h);
+function rate_of(h)   = half / pitch_of(h);                // Note 40.
+function angle_of(h)  = atan(rate_of(h));
+function ext_of(h)    = vis_of(h) + fork_of(h) + 2 * bury;
+function twist_of(h)  = ext_of(h) * rate_of(h) / R_smid * 180 / PI;
+function slices_of(h) = ceil(twist_of(h) / slice_deg);
+function phase_of(h)  = 180 / N - 2 * twist_of(h) * bury / ext_of(h);
+function genus_of(h)  = 1 + N * (rows_of(h) + 2) + (fork ? 2 * N : 0);
+// Note 41.
+
+function top_turn(h)  = twist_of(h) * (vis_of(h) + bury) / ext_of(h);
+
+// Note 42.
+
+function lattice_vol(h) = 2 * N * strut_t * island * (vis_of(h) + 2 * fork_of(h))
+                        - N * rows_of(h) * strut_t * island * island / (2 * rate_of(h));
+function ring_vol(ro, ri, hh) = PI * (ro * ro - ri * ri) * hh;
+function bands_vol(h) = ring_vol(sp_ro, sp_ri, spigot_h)
+                      + ring_vol(R_in + crank / 2, sp_ri + crank / 2, crank)
+                      + ring_vol(R, R_in, foot_band_h)
+                      + ring_vol(R, R_in, top_band_h);
+function unit_vol(h) = lattice_vol(h) + bands_vol(h);
+
+assert(outer_d <= 205.0,
+       "outer_d is outside the 205 safe envelope");
+assert(total_h <= 215.0,
+       "total_h is above SAFE_Z 215");
+assert(strut_t >= 0.84,
+       "strut_t is under two lines: raise it");
+assert(strut_w >= 0.84,
+       "strut_w is under two lines: raise it");
+assert(N >= 8,
+       "fewer than 8 struts per hand: reduce opening");
+assert(clear_diag > 0,
+       "the struts fill the wall: raise opening or reduce strut_w");
+assert(angle_of(total_h) <= 45 + 1e-9,
+       "the strut angle is over 45 degrees, which cannot happen: check rows_of");
+assert(sqrt(bar_ro * bar_ro + island * island / 4) < R * cos(180 / nseg),
+       "bar corners poke out through the band's flats: raise strut_inset");
+assert(bar_ri - hand_skew > R_in,
+       "the struts' inner face is inside the band's bore: reduce strut_t or raise strut_inset");
+assert(hand_skew > 0,
+       "hand_skew has to be positive; identical hands make a degenerate mesh");
+assert(spigot_clear > 0,
+       "spigot_clear must be positive");
+assert(spigot_h + spigot_clear + seat_cham < top_band_h,
+       str("the spigot hangs ", spigot_h + spigot_clear + seat_cham,
+           " below the rim and the band is only ", top_band_h, ": raise top_band_h"));
+assert(seat_cham < band_t,
+       "seat_cham is deeper than the band wall");
+assert(foot_chamfer < spigot_h,
+       "foot_chamfer is taller than the spigot");
+assert(bridge_gap <= 30,
+       str("the top band would bridge ", bridge_gap, " mm: reduce opening"));
+assert(rows_of(total_h) >= 1,
+       "the lattice is shorter than one node row: raise total_h");
+assert(rows_of(coupon_h) >= 1,
+       str("the coupon needs more than ", foot_h + top_band_h + (1 + fork_frac) * half,
+           " to hold one node row"));
+
+// Note 43.
+
+module bars(skew = 0) {
+    r = strut_t / 2;
+    for (i = [0 : N - 1])
+        rotate(i * 360 / N)
+            if (skew == 0 && round_ends)
+                hull() {
+                    translate([bar_ri + r, -island / 2 + r]) circle(r = r, $fn = 12);
+                    translate([bar_ri + r,  island / 2 - r]) circle(r = r, $fn = 12);
+                }
+            else
+                translate([bar_ri - skew, -island / 2 - skew])
+                    square([strut_t, island + 2 * skew]);
+}
+
+// Note 44.
+
+module lattice(h) {
+    tw = twist_of(h);
+    sl = slices_of(h);
+    translate([0, 0, foot_h - bury]) {
+        linear_extrude(height = ext_of(h), twist = tw, slices = sl,
+                       segments = 1, convexity = 10)
+            bars();
+        linear_extrude(height = ext_of(h), twist = -tw, slices = sl,
+                       segments = 1, convexity = 10)
+            rotate(phase_of(h)) bars(hand_skew);
+    }
+}
+
+// Note 45.
+
+module forks(h) {
+    fh = fork_of(h) + bury;
+    tw = fh * rate_of(h) / R_smid * 180 / PI;
+    sl = max(2, ceil(tw / slice_deg));
+    translate([0, 0, foot_h + vis_of(h)]) {
+        rotate(-top_turn(h))
+            linear_extrude(height = fh, twist = -tw, slices = sl,
+                           segments = 1, convexity = 10)
+                bars(hand_skew);
+        rotate(-top_turn(h) + 180 / N)
+            linear_extrude(height = fh, twist = tw, slices = sl,
+                           segments = 1, convexity = 10)
+                bars();
+    }
+}
+
+// Note 46.
+
+module foot() {
+    pts = [
+        [sp_ri,                0],
+        [sp_ro - foot_chamfer, 0],
+        [sp_ro,                foot_chamfer],
+        [sp_ro,                spigot_h],
+        [R,                    spigot_h + crank],
+        [R,                    foot_h],
+        [R_in,                 foot_h],
+        [R_in,                 spigot_h + crank],
+        [sp_ri,                spigot_h]
+    ];
+    rotate_extrude(angle = 360, $fn = nseg) polygon(pts);
+}
+
+// Note 47.
+module top_band(h) {
+    pts = [
+        [R_in,             h - top_band_h],
+        [R,                h - top_band_h],
+        [R,                h],
+        [R_in + seat_cham, h],
+        [R_in,             h - seat_cham]
+    ];
+    rotate_extrude(angle = 360, $fn = nseg) polygon(pts);
+}
+
+module unit(h) {
+    union() {
+        foot();
+        lattice(h);
+        if (fork) forks(h);
+        top_band(h);
+    }
+}
+
+// Note 48.
+module stack(dz = 0) {
+    unit(total_h);
+    translate([0, 0, stack_pitch + dz]) unit(total_h);
+}
+
+echo(str("plant screen: Ø", outer_d, " x ", total_h, ", bore Ø", 2 * R_in,
+         ", spigot Ø", 2 * sp_ro, " over Ø", 2 * sp_ri,
+         " (the bottom clear opening), stack pitch ", stack_pitch));
+echo(str("lattice: ", N, " struts per hand, pitch ", p, ", clear diagonal ",
+         clear_diag, ", strut ", strut_t, " x ", island, " island; ",
+         rows_of(total_h), " node rows at ", angle_of(total_h),
+         " degrees, pitch ", pitch_of(total_h), ", forks ", fork_of(total_h),
+         " tall, twist ", twist_of(total_h), " over ", slices_of(total_h),
+         " slices, phase ", phase_of(total_h), "; top band bridges ",
+         bridge_gap, "; expect genus ", genus_of(total_h)));
+echo(str("coupon: ", coupon_h, " tall, ", rows_of(coupon_h), " node row at ",
+         angle_of(coupon_h), " degrees; expect genus ", genus_of(coupon_h)));
+echo(str("volume estimate: unit ", round(unit_vol(total_h) / 100) / 10,
+         " cm3 (", round(unit_vol(total_h) * 1.27 / 100) / 10, " g PETG), coupon ",
+         round(unit_vol(coupon_h) / 100) / 10, " cm3 (",
+         round(unit_vol(coupon_h) * 1.27 / 100) / 10, " g)"));
+
+// Note 49.
+module feral_default_output_39cf3076f0e1() {
+if (show == "coupon")
+    unit(coupon_h);
+else if (show == "cut")
+    difference() {
+        unit(total_h);
+        translate([-R - 1, -R - 1, -eps]) cube([2 * R + 2, R + 1, total_h + 1]);
+    }
+else if (show == "stack")
+    stack();
+else if (show == "fitcheck")
+    intersection() {
+        unit(total_h);
+        translate([0, 0, stack_pitch + fitcheck_offset]) unit(total_h);
+    }
+else if (show == "part")
+    unit(total_h);
+}
+
+module feral_assembly_view_39cf3076f0e1(explode=false) {
+color("DarkSeaGreen") unit(total_h);
+color("MediumSeaGreen") translate([0,0,stack_pitch+(explode ? 35 : 0)]) unit(total_h);
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_39cf3076f0e1();
+else feral_assembly_view_39cf3076f0e1(view == "exploded");
+
+// Notes
+
+// Note 1. Plant screen — a lattice cylinder that drops over a spider plant so Max
 // cannot chew the leaves, and stacks on itself when the plant outgrows it.
 //
 // A tube whose wall is a diamond lattice of helical struts, with a solid band
@@ -79,77 +410,59 @@
 // The coupon is the only thing here a plate can answer, and there is one
 // variant for it, so the plate and the component are the same. Keep the
 // names stable — utils/coupon.sh reads these and knows nothing about the part.
-//
-// COUPON-COMPONENTS: fit=coupon
-// COUPON-PLATE: coupon
 
-/* [Output] */
-
-// "cut" is a half-section for reading the foot and the seat. Not for printing.
+// Note 2. "cut" is a half-section for reading the foot and the seat. Not for printing.
 // "coupon" is the fit test, see [Coupon]. "stack" draws two units seated on
 // each other, for the render. "fitcheck" is their intersection in that pose
 // and must build empty; see fitcheck_offset.
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
 
-show = "part";   // [part, cut, coupon, stack, fitcheck]
-// Added to the stack pitch for the fitcheck (mm). 0 is the seated pose and
+// Note 3. default preserves the original part, coupon and print selectors.
+
+// Note 4. Added to the stack pitch for the fitcheck (mm). 0 is the seated pose and
 // must give nothing; -0.2 must give something, or the check is not looking.
-fitcheck_offset = 0;
 
-$fa = 4;   // organic faceting per the 0.4-nozzle rule; no global high $fn
-$fs = 0.4;
-eps = 0.01;
+// Note 5. organic faceting per the 0.4-nozzle rule; no global high $fn
 
-/* [Envelope] */
-
-// Outside diameter (mm). The reference's safe build envelope is 205 x 205,
+// Note 6. Outside diameter (mm). The reference's safe build envelope is 205 x 205,
 // and a ring this size sits inside the probed mesh with 2.5 mm to spare.
-outer_d = 205.00;
-// Overall height of one unit (mm). SAFE_Z.
-total_h = 215.00;
 
-/* [Bands] */
+// Note 7. Overall height of one unit (mm). SAFE_Z.
 
-// Wall of the top and bottom bands, and of the spigot (mm). 2.10: four loops
+// Note 8. Wall of the top and bottom bands, and of the spigot (mm). 2.10: four loops
 // and one line of gap fill, which a rim can use.
-band_t = 2.10;
-// Height of the top band (mm). It has to swallow the spigot of the unit above:
+
+// Note 9. Height of the top band (mm). It has to swallow the spigot of the unit above:
 // spigot_h + spigot_clear + seat_cham, asserted.
-top_band_h = 8.00;
-// Plain full-radius band between the crank and the lattice (mm). A flat ring
+
+// Note 10. Plain full-radius band between the crank and the lattice (mm). A flat ring
 // for the struts to spring from.
-foot_band_h = 2.00;
 
-/* [Lattice] */
-
-// Strut thickness through the wall (mm). 1.74 is four lines at the slicer's
+// Note 11. Strut thickness through the wall (mm). 1.74 is four lines at the slicer's
 // 0.42 / 0.45 widths; see THE STRUT IS FOUR LINES.
-strut_t = 1.74;
-// Strut width across its own axis at 45 degrees (mm). The horizontal island
+
+// Note 12. Strut width across its own axis at 45 degrees (mm). The horizontal island
 // the slicer sees is this times root two, and that island is held constant
 // whatever the angle does, so the coupon slices the same strut as the part.
-strut_w = 1.74;
-// How far the struts' outer face sits inside the band's outer radius (mm).
+
+// Note 13. How far the struts' outer face sits inside the band's outer radius (mm).
 // A bar is a flat chord and its corners stand 0.007 proud of the arc; the
 // band is a polygon whose flats sit 0.02 inside it. Without this the buried
 // strut ends poke 0.03 mm slivers out through the band.
-strut_inset = 0.05;
-// Target clear diagonal of each diamond (mm), across the opening. Sets N.
+
+// Note 14. Target clear diagonal of each diamond (mm), across the opening. Sets N.
 // Was 18, which sliced as 62 islands a layer and a 9.5 hour job; 36 halves
 // the islands and the time, and Max is not a small cat (Ziad, 2026-09-19).
-opening = 36.0;
-// Degrees of twist per slice of the extrusion. 1.5 puts the helix's chord
+
+// Note 15. Degrees of twist per slice of the extrusion. 1.5 puts the helix's chord
 // error under 0.01 mm at this radius.
-slice_deg = 1.5;
-// How far each end of the lattice is buried in its band (mm).
-bury = 1.0;
-// Fork every strut top a quarter pitch under the top band, see THE STRUTS
+
+// Note 16. How far each end of the lattice is buried in its band (mm).
+
+// Note 17. Fork every strut top a quarter pitch under the top band, see THE STRUTS
 // FORK UNDER THE RIM. false is the plain lattice with a 16 mm span under the
 // band, for comparison.
-fork = true;
-fork_frac = fork ? 0.25 : 0;            // of a pitch, the height of the forks
+
+// Note 18. of a pitch, the height of the forks
 // How much bigger the left-hand struts are drawn than the right-hand ones, on
 // every face (mm), and the right-hand struts have rounded ends. At a node the
 // two hands sit at the same angle with the same section, so with identical
@@ -165,66 +478,55 @@ fork_frac = fork ? 0.25 : 0;            // of a pitch, the height of the forks
 // the island between them necks down to nothing and the slicer starves that
 // neck — 1.2% of the lattice's wall segments, all at nodes, where the
 // material is doubled anyway. Every X crossing sliced flat does this.
-hand_skew = 0.10;
-// Round the right-hand struts' ends (see hand_skew). false leaves them flat,
+
+// Note 19. Round the right-hand struts' ends (see hand_skew). false leaves them flat,
 // for comparison; it is not the shipping shape.
-round_ends = true;
 
-/* [Joint] */
-
-// Height of the spigot (mm), the part of the foot that drops into the band
+// Note 20. Height of the spigot (mm), the part of the foot that drops into the band
 // below.
-spigot_h = 6.00;
-// Radial clearance between the spigot's outside and the band's bore (mm).
+
+// Note 21. Radial clearance between the spigot's outside and the band's bore (mm).
 // See the ⚠️ in the header.
-spigot_clear = 0.60;
-// 45-degree chamfer on the spigot's outer bottom edge (mm). The reference's
+
+// Note 22. 45-degree chamfer on the spigot's outer bottom edge (mm). The reference's
 // minimum for PETG on the textured plate. The inner edge mates with nothing
 // and is left square so the first layer stays 1.6 wide.
-foot_chamfer = 0.50;
-// 45-degree chamfer on the top band's inner edge (mm): the seat the unit
+
+// Note 23. 45-degree chamfer on the top band's inner edge (mm): the seat the unit
 // above's crank cone lands on.
-seat_cham = 1.00;
 
-/* [Coupon] */
-
-// Height of the fit coupon (mm): the whole foot, one row of nodes, and the
+// Note 24. Height of the fit coupon (mm): the whole foot, one row of nodes, and the
 // whole top band. Print two and stack them.
-coupon_h = 45.00;
 
-/* [Quality] */
+// Note 25. Chord error target (mm). 0.02 is the 0.4-nozzle figure.
 
-// Chord error target (mm). 0.02 is the 0.4-nozzle figure.
-chord_err = 0.02;
+// Note 26. Facets for a target chord error on a given radius.
 
-/* [Hidden] */
+// Note 27. the bands' bore
 
-// Facets for a target chord error on a given radius.
-function facets(r, e = chord_err) = ceil(180 / acos(1 - e / r));
+// Note 28. struts' outer face
 
-R      = outer_d / 2;
-R_in   = R - band_t;                    // the bands' bore
-nseg   = facets(R);
+// Note 29. struts' inner face
 
-bar_ro = R - strut_inset;               // struts' outer face
-bar_ri = bar_ro - strut_t;              // struts' inner face
-R_smid = bar_ro - strut_t / 2;          // struts' mid radius, where the pitch is measured
+// Note 30. struts' mid radius, where the pitch is measured
 
-crank  = band_t + spigot_clear;         // radial shift of the foot's crank, and its height
-foot_h = spigot_h + crank + foot_band_h;
-sp_ro  = R_in - spigot_clear;           // spigot outer radius
-sp_ri  = sp_ro - band_t;                // spigot bore, the bottom clear opening
+// Note 31. radial shift of the foot's crank, and its height
 
-island     = strut_w * sqrt(2);         // a strut's horizontal width at 45 degrees
-N          = max(8, round(2 * PI * R_smid / (opening + island)));
-p          = 2 * PI * R_smid / N;       // node pitch round the ring
-half       = p / 2;                     // node-row pitch up the tube, at 45 degrees
-clear_diag = p - island;                // clear diagonal of a diamond at 45 degrees
-bridge_gap = (fork ? p / 4 : half) - island;   // what the top band's underside crosses
+// Note 32. spigot outer radius
 
-stack_pitch = total_h - (spigot_h + spigot_clear + seat_cham);
+// Note 33. spigot bore, the bottom clear opening
 
-// Per-height lattice numbers, so the part and the coupon share one set of
+// Note 34. a strut's horizontal width at 45 degrees
+
+// Note 35. node pitch round the ring
+
+// Note 36. node-row pitch up the tube, at 45 degrees
+
+// Note 37. clear diagonal of a diamond at 45 degrees
+
+// Note 38. what the top band's underside crosses
+
+// Note 39. Per-height lattice numbers, so the part and the coupon share one set of
 // rules. The zone between the bands is the visible lattice — whole node rows
 // with half a pitch above and below — plus the forks, a quarter pitch more.
 // Whole rows, the pitch that makes them fit exactly (never under half, so the
@@ -232,217 +534,39 @@ stack_pitch = total_h - (spigot_h + spigot_clear + seat_cham);
 // through the forks and a bury into each band), and the half-pitch phase of
 // the left-hand set, corrected for the bury so the lattice's ends sit midway
 // between rows. Positive twist turns the profile clockwise seen from +Z.
-function zone_of(h)   = h - top_band_h - foot_h;
-function rows_of(h)   = floor(zone_of(h) / half - fork_frac);
-function pitch_of(h)  = zone_of(h) / (rows_of(h) + fork_frac);
-function vis_of(h)    = rows_of(h) * pitch_of(h);
-function fork_of(h)   = fork_frac * pitch_of(h);
-function rate_of(h)   = half / pitch_of(h);                // tan of the strut angle
-function angle_of(h)  = atan(rate_of(h));
-function ext_of(h)    = vis_of(h) + fork_of(h) + 2 * bury;
-function twist_of(h)  = ext_of(h) * rate_of(h) / R_smid * 180 / PI;
-function slices_of(h) = ceil(twist_of(h) / slice_deg);
-function phase_of(h)  = 180 / N - 2 * twist_of(h) * bury / ext_of(h);
-function genus_of(h)  = 1 + N * (rows_of(h) + 2) + (fork ? 2 * N : 0);
-// Degrees the right-hand struts have turned clockwise by the top of the
-// visible lattice, where the forks spring; the left-hand set is 180 / N on.
-function top_turn(h)  = twist_of(h) * (vis_of(h) + bury) / ext_of(h);
 
-// Volume estimate (mm3): sheared prisms are base times height, less the node
+// Note 40. tan of the strut angle
+
+// Note 41. Degrees the right-hand struts have turned clockwise by the top of the
+// visible lattice, where the forks spring; the left-hand set is 180 / N on.
+
+// Note 42. Volume estimate (mm3): sheared prisms are base times height, less the node
 // overlaps, plus the bands as plain rings. The slicer's grams are the real
 // figure; this is for the echo.
-function lattice_vol(h) = 2 * N * strut_t * island * (vis_of(h) + 2 * fork_of(h))
-                        - N * rows_of(h) * strut_t * island * island / (2 * rate_of(h));
-function ring_vol(ro, ri, hh) = PI * (ro * ro - ri * ri) * hh;
-function bands_vol(h) = ring_vol(sp_ro, sp_ri, spigot_h)
-                      + ring_vol(R_in + crank / 2, sp_ri + crank / 2, crank)
-                      + ring_vol(R, R_in, foot_band_h)
-                      + ring_vol(R, R_in, top_band_h);
-function unit_vol(h) = lattice_vol(h) + bands_vol(h);
 
-assert(outer_d <= 205.0,
-       "outer_d is outside the 205 safe envelope");
-assert(total_h <= 215.0,
-       "total_h is above SAFE_Z 215");
-assert(strut_t >= 0.84,
-       "strut_t is under two lines: raise it");
-assert(strut_w >= 0.84,
-       "strut_w is under two lines: raise it");
-assert(N >= 8,
-       "fewer than 8 struts per hand: reduce opening");
-assert(clear_diag > 0,
-       "the struts fill the wall: raise opening or reduce strut_w");
-assert(angle_of(total_h) <= 45 + 1e-9,
-       "the strut angle is over 45 degrees, which cannot happen: check rows_of");
-assert(sqrt(bar_ro * bar_ro + island * island / 4) < R * cos(180 / nseg),
-       "bar corners poke out through the band's flats: raise strut_inset");
-assert(bar_ri - hand_skew > R_in,
-       "the struts' inner face is inside the band's bore: reduce strut_t or raise strut_inset");
-assert(hand_skew > 0,
-       "hand_skew has to be positive; identical hands make a degenerate mesh");
-assert(spigot_clear > 0,
-       "spigot_clear must be positive");
-assert(spigot_h + spigot_clear + seat_cham < top_band_h,
-       str("the spigot hangs ", spigot_h + spigot_clear + seat_cham,
-           " below the rim and the band is only ", top_band_h, ": raise top_band_h"));
-assert(seat_cham < band_t,
-       "seat_cham is deeper than the band wall");
-assert(foot_chamfer < spigot_h,
-       "foot_chamfer is taller than the spigot");
-assert(bridge_gap <= 30,
-       str("the top band would bridge ", bridge_gap, " mm: reduce opening"));
-assert(rows_of(total_h) >= 1,
-       "the lattice is shorter than one node row: raise total_h");
-assert(rows_of(coupon_h) >= 1,
-       str("the coupon needs more than ", foot_h + top_band_h + (1 + fork_frac) * half,
-           " to hold one node row"));
-
-// One hand of the lattice in 2D: N radial bars, each strut_t through the wall
+// Note 43. One hand of the lattice in 2D: N radial bars, each strut_t through the wall
 // and island wide, on a ring. The right hand (skew = 0) is a stadium, its
 // ends half-rounds of the strut's own half thickness; the left is a plain
 // rectangle drawn skew bigger and skew further in, so no face of it ever lies
 // in, or runs parallel and close to, a face of the right. See hand_skew.
-module bars(skew = 0) {
-    r = strut_t / 2;
-    for (i = [0 : N - 1])
-        rotate(i * 360 / N)
-            if (skew == 0 && round_ends)
-                hull() {
-                    translate([bar_ri + r, -island / 2 + r]) circle(r = r, $fn = 12);
-                    translate([bar_ri + r,  island / 2 - r]) circle(r = r, $fn = 12);
-                }
-            else
-                translate([bar_ri - skew, -island / 2 - skew])
-                    square([strut_t, island + 2 * skew]);
-}
 
-// Both hands, twisted opposite ways over the visible lattice plus the bury at
+// Note 44. Both hands, twisted opposite ways over the visible lattice plus the bury at
 // each end. segments = 1 keeps each bar edge a single segment per slice;
 // without it OpenSCAD re-segments every edge at $fs and the mesh is ten times
 // the size for no change in shape.
-module lattice(h) {
-    tw = twist_of(h);
-    sl = slices_of(h);
-    translate([0, 0, foot_h - bury]) {
-        linear_extrude(height = ext_of(h), twist = tw, slices = sl,
-                       segments = 1, convexity = 10)
-            bars();
-        linear_extrude(height = ext_of(h), twist = -tw, slices = sl,
-                       segments = 1, convexity = 10)
-            rotate(phase_of(h)) bars(hand_skew);
-    }
-}
 
-// The forks: on every right-hand strut top a left-hand bar, and on every
+// Note 45. The forks: on every right-hand strut top a left-hand bar, and on every
 // left-hand top a right-hand one, each starting where the visible lattice
 // ends and running the fork height plus a bury into the band. Same section,
 // same rate, the other twist, so each crosses its parent like a node, and the
 // opposite hand's shape keeps their faces off each other (see hand_skew).
-module forks(h) {
-    fh = fork_of(h) + bury;
-    tw = fh * rate_of(h) / R_smid * 180 / PI;
-    sl = max(2, ceil(tw / slice_deg));
-    translate([0, 0, foot_h + vis_of(h)]) {
-        rotate(-top_turn(h))
-            linear_extrude(height = fh, twist = -tw, slices = sl,
-                           segments = 1, convexity = 10)
-                bars(hand_skew);
-        rotate(-top_turn(h) + 180 / N)
-            linear_extrude(height = fh, twist = tw, slices = sl,
-                           segments = 1, convexity = 10)
-                bars();
-    }
-}
 
-// The foot, one section spun round: spigot bore, spigot's chamfered outer
+// Note 46. The foot, one section spun round: spigot bore, spigot's chamfered outer
 // bottom edge, spigot outside, the crank out to full radius, the plain band,
 // then back down the inside.
-module foot() {
-    pts = [
-        [sp_ri,                0],
-        [sp_ro - foot_chamfer, 0],
-        [sp_ro,                foot_chamfer],
-        [sp_ro,                spigot_h],
-        [R,                    spigot_h + crank],
-        [R,                    foot_h],
-        [R_in,                 foot_h],
-        [R_in,                 spigot_h + crank],
-        [sp_ri,                spigot_h]
-    ];
-    rotate_extrude(angle = 360, $fn = nseg) polygon(pts);
-}
 
-// The top band with the seat chamfer on its inner top edge.
-module top_band(h) {
-    pts = [
-        [R_in,             h - top_band_h],
-        [R,                h - top_band_h],
-        [R,                h],
-        [R_in + seat_cham, h],
-        [R_in,             h - seat_cham]
-    ];
-    rotate_extrude(angle = 360, $fn = nseg) polygon(pts);
-}
+// Note 47. The top band with the seat chamfer on its inner top edge.
 
-module unit(h) {
-    union() {
-        foot();
-        lattice(h);
-        if (fork) forks(h);
-        top_band(h);
-    }
-}
+// Note 48. Two units seated, the upper one a stack pitch up.
 
-// Two units seated, the upper one a stack pitch up.
-module stack(dz = 0) {
-    unit(total_h);
-    translate([0, 0, stack_pitch + dz]) unit(total_h);
-}
-
-echo(str("plant screen: Ø", outer_d, " x ", total_h, ", bore Ø", 2 * R_in,
-         ", spigot Ø", 2 * sp_ro, " over Ø", 2 * sp_ri,
-         " (the bottom clear opening), stack pitch ", stack_pitch));
-echo(str("lattice: ", N, " struts per hand, pitch ", p, ", clear diagonal ",
-         clear_diag, ", strut ", strut_t, " x ", island, " island; ",
-         rows_of(total_h), " node rows at ", angle_of(total_h),
-         " degrees, pitch ", pitch_of(total_h), ", forks ", fork_of(total_h),
-         " tall, twist ", twist_of(total_h), " over ", slices_of(total_h),
-         " slices, phase ", phase_of(total_h), "; top band bridges ",
-         bridge_gap, "; expect genus ", genus_of(total_h)));
-echo(str("coupon: ", coupon_h, " tall, ", rows_of(coupon_h), " node row at ",
-         angle_of(coupon_h), " degrees; expect genus ", genus_of(coupon_h)));
-echo(str("volume estimate: unit ", round(unit_vol(total_h) / 100) / 10,
-         " cm3 (", round(unit_vol(total_h) * 1.27 / 100) / 10, " g PETG), coupon ",
-         round(unit_vol(coupon_h) / 100) / 10, " cm3 (",
-         round(unit_vol(coupon_h) * 1.27 / 100) / 10, " g)"));
-
-
-
-// Assembly display changes placement only; the original output remains the default.
-module feral_default_output_39cf3076f0e1() {
-if (show == "coupon")
-    unit(coupon_h);
-else if (show == "cut")
-    difference() {
-        unit(total_h);
-        translate([-R - 1, -R - 1, -eps]) cube([2 * R + 2, R + 1, total_h + 1]);
-    }
-else if (show == "stack")
-    stack();
-else if (show == "fitcheck")
-    intersection() {
-        unit(total_h);
-        translate([0, 0, stack_pitch + fitcheck_offset]) unit(total_h);
-    }
-else if (show == "part")
-    unit(total_h);
-}
-
-module feral_assembly_view_39cf3076f0e1(explode=false) {
-color("DarkSeaGreen") unit(total_h);
-color("MediumSeaGreen") translate([0,0,stack_pitch+(explode ? 35 : 0)]) unit(total_h);
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_39cf3076f0e1();
-else feral_assembly_view_39cf3076f0e1(view == "exploded");
+// Note 49. Assembly display changes placement only; the original output remains the default.

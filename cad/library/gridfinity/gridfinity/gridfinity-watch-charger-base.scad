@@ -1,35 +1,31 @@
-// gridfinity-watch-charger-base.scad — a flat 1x1 Gridfinity deck carrying a solid
-// rectangular block. The block is 32.5 mm along X, 27.7 mm along Y, and 12 mm
-// tall, centred on the cell and standing on the flat top of a one-unit base.
-// The stacking lip is omitted so the deck is a plain flat surface.
-// Rear is +Y: the 32.5 mm face has a cable channel that scoops upward.
+// Note 1.
 
 /* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
+// Note 2.
 view = "default"; // [default, together, exploded]
 
 include <gridfinity-magnets.scad>
 include <../../../lib/BOSL2/std.scad>
 
 /* [Block] */
-block_x = 32.5;        // mm
-block_y = 27.7;        // mm
-block_h = 12;          // mm, above the deck
-block_edge_r = 1;      // mm, roundover on the block and channel lips
+block_x = 32.5;        // Note 3.
+block_y = 27.7;        // Note 4.
+block_h = 12;          // Note 5.
+block_edge_r = 1;      // Note 6.
 
 /* [Cable] */
-cable_d = 3.5;         // mm, measured cord diameter
-cable_groove_w = 6;    // mm, wider channel for larger cables
-cable_groove_depth = block_y / 2; // mm, total reach from rear face to centerline
-cable_offset_x = 0;    // mm from the center of the rear 32.5 mm face
+cable_d = 3.5;         // Note 7.
+cable_groove_w = 6;    // Note 8.
+cable_groove_depth = block_y / 2; // Note 9.
+cable_offset_x = 0;    // Note 10.
 
 /* [Base] */
-units_z = 1;           // 7 mm units; deck ends at 7 mm, without a stacking lip
+units_z = 1;           // Note 11.
 
 /* [Magnets] */
-magnet_hole_d = 10.5;   // mm, four enclosed cavities for 10 mm discs
-magnet_cav_h = 2.2;     // mm, accommodates 2 mm thick magnets
-magnet_skin = 0.4;     // mm below the cavities; insert at the usual print pause
+magnet_hole_d = 10.5;   // Note 12.
+magnet_cav_h = 2.2;     // Note 13.
+magnet_skin = 0.4;     // Note 14.
 
 $fn = 64;
 eps = 0.01;
@@ -41,9 +37,8 @@ module cable_scoop() {
   rear_y = block_y / 2;
   inner_y = rear_y - cable_groove_depth;
   arc_steps = $fn;
-  // Rise over the entire channel length, easing into both the deck and top.
-  // The cosine ramp reaches the top exactly at the block centerline; there
-  // is no flat passage followed by a separate bend or upright inner wall.
+  // Note 15.
+
   scoop_profile = concat(
     [[rear_y + eps, deck_h]],
     [for (i = [0:arc_steps])
@@ -60,8 +55,8 @@ module cable_scoop() {
 }
 
 module rounded_block() {
-  // Round only the raised block, after carving the channel, so its convex
-  // lips soften too. The base and buried magnet interfaces are separate.
+  // Note 16.
+
   round3d(or = block_edge_r,
           size = 2 * max(block_x, block_y, deck_h + block_h), $fn = 24)
   difference() {
@@ -87,8 +82,8 @@ module block_base() {
 
   difference() {
     union() {
-      // Start one unit taller so trimming removes the entire stacking recess,
-      // including its 0.1 mm overlap below the nominal deck.
+      // Note 17.
+
       intersection() {
         grid_block(1, 1, units_z + 1, magnet_diameter = 0, screw_depth = 0, center = true);
         translate([-gridfinity_pitch / 2, -gridfinity_pitch / 2, -eps])
@@ -103,10 +98,8 @@ module block_base() {
   }
 }
 
+// Note 18.
 
-
-// Assembly display changes placement only; the original output remains the default.
-// Single printed piece: both display modes show the same intact part.
 module feral_default_output_fc65883d7c1b() {
 block_base();
 }
@@ -118,3 +111,50 @@ feral_default_output_fc65883d7c1b();
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
 if(view == "default") feral_default_output_fc65883d7c1b();
 else feral_assembly_view_fc65883d7c1b(view == "exploded");
+
+// Notes
+
+// Note 1. gridfinity-watch-charger-base.scad — a flat 1x1 Gridfinity deck carrying a solid
+// rectangular block. The block is 32.5 mm along X, 27.7 mm along Y, and 12 mm
+// tall, centred on the cell and standing on the flat top of a one-unit base.
+// The stacking lip is omitted so the deck is a plain flat surface.
+// Rear is +Y: the 32.5 mm face has a cable channel that scoops upward.
+
+// Note 2. default preserves the original part, coupon and print selectors.
+
+// Note 3. mm
+
+// Note 4. mm
+
+// Note 5. mm, above the deck
+
+// Note 6. mm, roundover on the block and channel lips
+
+// Note 7. mm, measured cord diameter
+
+// Note 8. mm, wider channel for larger cables
+
+// Note 9. mm, total reach from rear face to centerline
+
+// Note 10. mm from the center of the rear 32.5 mm face
+
+// Note 11. 7 mm units; deck ends at 7 mm, without a stacking lip
+
+// Note 12. mm, four enclosed cavities for 10 mm discs
+
+// Note 13. mm, accommodates 2 mm thick magnets
+
+// Note 14. mm below the cavities; insert at the usual print pause
+
+// Note 15. Rise over the entire channel length, easing into both the deck and top.
+// The cosine ramp reaches the top exactly at the block centerline; there
+// is no flat passage followed by a separate bend or upright inner wall.
+
+// Note 16. Round only the raised block, after carving the channel, so its convex
+// lips soften too. The base and buried magnet interfaces are separate.
+
+// Note 17. Start one unit taller so trimming removes the entire stacking recess,
+// including its 0.1 mm overlap below the nominal deck.
+
+// Note 18. Assembly display changes placement only; the original output remains the default.
+// Single printed piece: both display modes show the same intact part.

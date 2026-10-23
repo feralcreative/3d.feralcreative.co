@@ -1,4 +1,125 @@
-// marks.scad — the logo library.
+// Note 1.
+
+/* [Hidden] */
+
+// Note 2.
+HOBBS_BOX      = [[  0.000, 0.180], [705.551, 471.131]];  // Note 3.
+HOBBS_WORD_BOX = [[121.237, 0.180], [401.015,  75.219]];  // Note 4.
+FERAL_BOX      = [[  0.000, 0.000], [292.453, 342.019]];
+FERAL_FAVICON_BOX = [[  5.293, 17.286], [342.193, 318.204]];
+VMC_BOX        = [[  0.000, 3.845], [352.777, 256.928]];
+ZR_BOX         = [[  0.000, 0.000], [333.309, 270.705]];
+ZR_MONO_BOX    = [[  0.000, 0.000], [181.150, 123.472]];
+// Note 5.
+
+WAGON_QUEEN_BOX       = [[  0.000,   0.349], [746.806, 1613.609]];
+WAGON_QUEEN_CREST_BOX = [[ 86.405, 673.100], [606.804,  940.858]];
+WAGON_QUEEN_WORD_BOX  = [[  0.000,   0.349], [746.806,  569.034]];
+
+// Note 6.
+
+function mark_height(box, width)   = width * box[1][1] / box[1][0];
+function hobbs_mark_height(width)  = mark_height(HOBBS_BOX, width);
+function hobbs_word_height(width)  = mark_height(HOBBS_WORD_BOX, width);
+function feral_logo_height(width)  = mark_height(FERAL_BOX, width);
+function feral_favicon_height(width) = mark_height(FERAL_FAVICON_BOX, width);
+function vmc_rocker_height(width)  = mark_height(VMC_BOX, width);
+function zr_mark_height(width)     = mark_height(ZR_BOX, width);
+function zr_monogram_height(width) = mark_height(ZR_MONO_BOX, width);
+function wagon_queen_height(width)       = mark_height(WAGON_QUEEN_BOX, width);
+function wagon_queen_crest_height(width) = mark_height(WAGON_QUEEN_CREST_BOX, width);
+function wagon_queen_word_height(width)  = mark_height(WAGON_QUEEN_WORD_BOX, width);
+
+// Note 7.
+module place_mark(box, width) {
+    scale(width / box[1][0])
+        translate(-(box[0] + box[1] / 2))
+            children();
+}
+
+// Note 8.
+
+module hobbs_mark(width = 30, $fn = 0) {
+    place_mark(HOBBS_BOX, width) {
+        import("hobbs-mark-figure.svg");
+        import("hobbs-mark-word.svg");
+    }
+}
+
+module hobbs_mark_figure(width = 30, $fn = 0) {
+    place_mark(HOBBS_BOX, width) import("hobbs-mark-figure.svg");
+}
+
+module hobbs_mark_word(width = 30, $fn = 0) {
+    place_mark(HOBBS_BOX, width) import("hobbs-mark-word.svg");
+}
+
+// Note 9.
+
+module hobbs_word_alone(width = 30, $fn = 0) {
+    place_mark(HOBBS_WORD_BOX, width) import("hobbs-mark-word.svg");
+}
+
+module feral_logo(width = 30, $fn = 0) {
+    place_mark(FERAL_BOX, width) import("feral-creative-logo.svg");
+}
+
+// Note 10.
+
+module feral_favicon(width = 30, $fn = 0) {
+    place_mark(FERAL_FAVICON_BOX, width) import("favicon.svg");
+}
+
+module vmc_top_rocker(width = 30, $fn = 0) {
+    place_mark(VMC_BOX, width) import("vmc-top-rocker.svg");
+}
+
+// Note 11.
+
+module zr_mark(width = 30, $fn = 0) {
+    place_mark(ZR_BOX, width) import("logo-zr.svg");
+}
+
+// Note 12.
+
+module zr_monogram(width = 30, $fn = 0) {
+    place_mark(ZR_MONO_BOX, width) import("monogram-zr.svg");
+}
+
+// Note 13.
+
+WAGON_QUEEN_SPLIT = 621.25;   // Note 14.
+
+module wagon_queen_half(upper) intersection() {
+    import("logo-wagon-queen.svg");
+    translate([-1000, upper ? WAGON_QUEEN_SPLIT : WAGON_QUEEN_SPLIT - 3000])
+        square([3000, 3000]);
+}
+
+// Note 15.
+module wagon_queen(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_BOX, width) import("logo-wagon-queen.svg");
+}
+
+// Note 16.
+
+module wagon_queen_crest(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_BOX, width) wagon_queen_half(true);
+}
+
+module wagon_queen_word(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_BOX, width) wagon_queen_half(false);
+}
+
+// Note 17.
+
+module wagon_queen_crest_alone(width = 30, $fn = 0) {
+    place_mark(WAGON_QUEEN_CREST_BOX, width) wagon_queen_half(true);
+}
+
+// Notes
+
+// Note 1. marks.scad — the logo library.
 //
 // Every mark in here is a 2D shape, centred on the origin and scaled so its
 // bounding box comes out `width` millimetres across. What you extrude it into
@@ -6,8 +127,8 @@
 // a relief, run it through a wall and it is a stencil. The library has no
 // opinion about which.
 //
-//   include <../logos/marks.scad>
-//   linear_extrude(0.8) hobbs_mark(48);
+// include <../logos/marks.scad>
+// linear_extrude(0.8) hobbs_mark(48);
 //
 // USE THIS RATHER THAN import(). Three things go wrong when a part imports the
 // SVG itself, and every one of them had already gone wrong at least once before
@@ -49,24 +170,17 @@
 // replaced; a wrong box here shows up as a mark that is off-centre everywhere at
 // once.
 
-/* [Hidden] */
+// Note 2. [[min corner], [size]], in the millimetres OpenSCAD produces on import.
 
-// [[min corner], [size]], in the millimetres OpenSCAD produces on import.
-HOBBS_BOX      = [[  0.000, 0.180], [705.551, 471.131]];  // figure and word together
-HOBBS_WORD_BOX = [[121.237, 0.180], [401.015,  75.219]];  // the wordmark on its own
-FERAL_BOX      = [[  0.000, 0.000], [292.453, 342.019]];
-FERAL_FAVICON_BOX = [[  5.293, 17.286], [342.193, 318.204]];
-VMC_BOX        = [[  0.000, 3.845], [352.777, 256.928]];
-ZR_BOX         = [[  0.000, 0.000], [333.309, 270.705]];
-ZR_MONO_BOX    = [[  0.000, 0.000], [181.150, 123.472]];
-// The Wagon Queen lockup: crest over lettering, in one file. All three boxes
+// Note 3. figure and word together
+
+// Note 4. the wordmark on its own
+
+// Note 5. The Wagon Queen lockup: crest over lettering, in one file. All three boxes
 // are measured off the same import, so the two halves share the lockup's
 // registration exactly the way the Hobbs pair do.
-WAGON_QUEEN_BOX       = [[  0.000,   0.349], [746.806, 1613.609]];
-WAGON_QUEEN_CREST_BOX = [[ 86.405, 673.100], [606.804,  940.858]];
-WAGON_QUEEN_WORD_BOX  = [[  0.000,   0.349], [746.806,  569.034]];
 
-// What a mark stands to when it is placed `width` across.
+// Note 6. What a mark stands to when it is placed `width` across.
 //
 // ⚠️ EACH ONE ANSWERS FOR ITS OWN BOX, which is not always the module of the
 // same name. hobbs_word_height and wagon_queen_crest_height describe the
@@ -76,74 +190,27 @@ WAGON_QUEEN_WORD_BOX  = [[  0.000,   0.349], [746.806,  569.034]];
 // delivers exactly that, and wagon_queen_crest delivers 32.50 x 50.39 because
 // it is still holding the lettering's place. wagon_queen_word is the harmless
 // case — its box is the full lockup width, so both readings agree at 30.48.
-function mark_height(box, width)   = width * box[1][1] / box[1][0];
-function hobbs_mark_height(width)  = mark_height(HOBBS_BOX, width);
-function hobbs_word_height(width)  = mark_height(HOBBS_WORD_BOX, width);
-function feral_logo_height(width)  = mark_height(FERAL_BOX, width);
-function feral_favicon_height(width) = mark_height(FERAL_FAVICON_BOX, width);
-function vmc_rocker_height(width)  = mark_height(VMC_BOX, width);
-function zr_mark_height(width)     = mark_height(ZR_BOX, width);
-function zr_monogram_height(width) = mark_height(ZR_MONO_BOX, width);
-function wagon_queen_height(width)       = mark_height(WAGON_QUEEN_BOX, width);
-function wagon_queen_crest_height(width) = mark_height(WAGON_QUEEN_CREST_BOX, width);
-function wagon_queen_word_height(width)  = mark_height(WAGON_QUEEN_WORD_BOX, width);
 
-// Scale to width, centre on the origin.
-module place_mark(box, width) {
-    scale(width / box[1][0])
-        translate(-(box[0] + box[1] / 2))
-            children();
-}
+// Note 7. Scale to width, centre on the origin.
 
-// The Hobbs maker's mark: both layers, or either alone. All three share one
+// Note 8. The Hobbs maker's mark: both layers, or either alone. All three share one
 // registration, so they can be mixed on the same part and still line up.
-module hobbs_mark(width = 30, $fn = 0) {
-    place_mark(HOBBS_BOX, width) {
-        import("hobbs-mark-figure.svg");
-        import("hobbs-mark-word.svg");
-    }
-}
 
-module hobbs_mark_figure(width = 30, $fn = 0) {
-    place_mark(HOBBS_BOX, width) import("hobbs-mark-figure.svg");
-}
-
-module hobbs_mark_word(width = 30, $fn = 0) {
-    place_mark(HOBBS_BOX, width) import("hobbs-mark-word.svg");
-}
-
-// The wordmark used ON ITS OWN, registered to its own bounding box, so `width`
+// Note 9. The wordmark used ON ITS OWN, registered to its own bounding box, so `width`
 // is the width of the lettering rather than of the pair it was cut from. Reach
 // for this one whenever the figure is not on the part as well — ask
 // hobbs_mark_word for a 40 mm mark and you get 22.7 mm of lettering, because it
 // is still holding the figure's place beside it.
-module hobbs_word_alone(width = 30, $fn = 0) {
-    place_mark(HOBBS_WORD_BOX, width) import("hobbs-mark-word.svg");
-}
 
-module feral_logo(width = 30, $fn = 0) {
-    place_mark(FERAL_BOX, width) import("feral-creative-logo.svg");
-}
-
-// The feral favicon: the logo's frame and notch as one solid silhouette, no
+// Note 10. The feral favicon: the logo's frame and notch as one solid silhouette, no
 // lettering. Small enough marks lose the wordmark anyway; this is the one to
 // use as an inline glyph or a bullet.
-module feral_favicon(width = 30, $fn = 0) {
-    place_mark(FERAL_FAVICON_BOX, width) import("favicon.svg");
-}
 
-module vmc_top_rocker(width = 30, $fn = 0) {
-    place_mark(VMC_BOX, width) import("vmc-top-rocker.svg");
-}
-
-// The ZR mark: heavy, blocky, no counters. The one to reach for on a material
+// Note 11. The ZR mark: heavy, blocky, no counters. The one to reach for on a material
 // that swallows fine detail, and — with the monogram below and the Hobbs figure
 // — one of the three here that survives a through-cut.
-module zr_mark(width = 30, $fn = 0) {
-    place_mark(ZR_BOX, width) import("logo-zr.svg");
-}
 
-// The ZR monogram: the same two letters as a high-contrast serif, four disjoint
+// Note 12. The ZR monogram: the same two letters as a high-contrast serif, four disjoint
 // pieces and no counters.
 //
 // ⚠️ IT IS A HAIRLINE DESIGN and the thins are what set its size. They are
@@ -153,11 +220,8 @@ module zr_mark(width = 30, $fn = 0) {
 // and let the thicks carry the extra: +0.25 takes a 50 mm mark's thins to
 // 1.20 mm while the heavy diagonal only goes 4.2 to 4.7, which at reading
 // distance is the same drawing. parts/deck-door-stop.scad does exactly that.
-module zr_monogram(width = 30, $fn = 0) {
-    place_mark(ZR_MONO_BOX, width) import("monogram-zr.svg");
-}
 
-// THE WAGON QUEEN LOCKUP — a three-balled crown over five bars and a rule,
+// Note 13. THE WAGON QUEEN LOCKUP — a three-balled crown over five bars and a rule,
 // with "Wagon Queen" in script beneath it. Crown, bars and rule together are
 // what the modules below call the crest. Tall: 2.16 times its own width, so
 // `width` buys a lot less than it does on the other marks here. Ask for 40 and
@@ -183,36 +247,21 @@ module zr_monogram(width = 30, $fn = 0) {
 //
 // Measured, not assumed: the boxes above and the counter counts come from
 // extruding each half and reading the mesh back.
-WAGON_QUEEN_SPLIT = 621.25;   // the empty band, in imported millimetres
 
+// Note 14. the empty band, in imported millimetres
 // Either half of the lockup, clipped out of the one import. The band it cuts
 // through is 103.7 mm of nothing, from 569.4 to 673.1, so this line has about
 // 45 mm of slack in each direction — moving it anywhere inside the band gives
 // a bit-identical result, which is what makes a hardcoded number safe here.
 // Remeasure it along with the boxes if the SVG is ever replaced.
-module wagon_queen_half(upper) intersection() {
-    import("logo-wagon-queen.svg");
-    translate([-1000, upper ? WAGON_QUEEN_SPLIT : WAGON_QUEEN_SPLIT - 3000])
-        square([3000, 3000]);
-}
 
-// The whole lockup. Counters: deboss or raise, never cut through.
-module wagon_queen(width = 30, $fn = 0) {
-    place_mark(WAGON_QUEEN_BOX, width) import("logo-wagon-queen.svg");
-}
+// Note 15. The whole lockup. Counters: deboss or raise, never cut through.
 
-// The two halves ON THE LOCKUP'S registration, so they can be mixed on one
+// Note 16. The two halves ON THE LOCKUP'S registration, so they can be mixed on one
 // part — crest cut through a wall and lettering debossed below it, say — and
 // still line up the way they do in the artwork.
-module wagon_queen_crest(width = 30, $fn = 0) {
-    place_mark(WAGON_QUEEN_BOX, width) wagon_queen_half(true);
-}
 
-module wagon_queen_word(width = 30, $fn = 0) {
-    place_mark(WAGON_QUEEN_BOX, width) wagon_queen_half(false);
-}
-
-// The crest USED ON ITS OWN, registered to its own box, so `width` is the
+// Note 17. The crest USED ON ITS OWN, registered to its own box, so `width` is the
 // width of the crest rather than of the lockup it was cut from. Ask
 // wagon_queen_crest for a 40 mm mark and you get 32.5 mm of crest, because it
 // is still holding the lettering's place below it.
@@ -221,6 +270,3 @@ module wagon_queen_word(width = 30, $fn = 0) {
 // the full width of the lockup — both boxes are 746.806 across — so registered
 // and alone would differ only in where the origin sits, and wagon_queen_word
 // is already the answer.
-module wagon_queen_crest_alone(width = 30, $fn = 0) {
-    place_mark(WAGON_QUEEN_CREST_BOX, width) wagon_queen_half(true);
-}

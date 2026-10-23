@@ -1,4 +1,129 @@
-// ZR monogram stamp, 2026.
+// Note 1.
+
+/* [Assembly display] */
+// Note 2.
+view = "default"; // [default, together, exploded]
+
+include <../../../logos/marks.scad>
+
+/* [Tile] */
+
+width       = 50.8;   // Note 3.
+thickness   = 10;     // Note 4.
+
+corner_r    = 5;      // Note 5.
+
+edge_r      = 1.5;    // Note 6.
+
+margin      = 4.4;    // Note 7.
+
+gap         = 5;      // Note 8.
+
+/* [Stamp] */
+
+// Note 9.
+mirrored    = true;
+
+// Note 10.
+
+relief      = 6;      // Note 11.
+
+draft       = 3;      // Note 12.
+
+draft_steps = 6;
+
+/* [Marks] */
+
+// Note 13.
+mark_width  = 42;     // Note 14.
+
+mono_swell  = 1.0;    // Note 15.
+
+year        = "2026";
+year_font   = "Arial:style=Bold";
+
+// Note 16.
+
+mark_color  = "SlateBlue";
+
+/* [Hidden] */
+
+$fn = 64;
+eps = 0.01;
+
+// Note 17.
+YEAR_BOX  = [[0.3456, -0.1728], [30.0593, 10.1568]];
+YEAR_SIZE = 10;
+
+year_h = mark_height(YEAR_BOX, mark_width);
+mono_h = zr_monogram_height(mark_width);
+height = margin + mono_h + gap + year_h + margin;
+
+echo(str("tile ", width, " x ", height, " x ", thickness, " mm; monogram ",
+         mono_h, " tall, year ", year_h, " tall; thins ",
+         0.014 * mono_h + 2 * mono_swell, " mm at the base, ",
+         0.014 * mono_h + 2 * (mono_swell - relief * tan(draft)), " at the top"));
+
+// Note 18.
+module year_mark() {
+    place_mark(YEAR_BOX, mark_width)
+        text(year, size = YEAR_SIZE, font = year_font);
+}
+
+// Note 19.
+
+module raised() {
+    step  = relief / draft_steps;
+    erode = step * tan(draft);
+    color(mark_color)
+        translate([0, 0, thickness])
+            for (k = [0 : draft_steps - 1])
+                translate([0, 0, k * step - eps])
+                    linear_extrude(height = step + eps, convexity = 10)
+                        offset(delta = -k * erode)
+                            mirror([mirrored ? 1 : 0, 0, 0])
+                                children();
+}
+
+// Note 20.
+
+module tile() {
+    minkowski() {
+        translate([0, 0, edge_r])
+            linear_extrude(height = thickness - 2 * edge_r)
+                offset(r = corner_r - edge_r) offset(delta = -corner_r)
+                    square([width, height]);
+        sphere(r = edge_r);
+    }
+}
+
+module zr_stamp() {
+    union() {
+        tile();
+        translate([width / 2, height - margin - mono_h / 2, 0])
+            raised() offset(delta = mono_swell) zr_monogram(mark_width);
+        translate([width / 2, margin + year_h / 2, 0])
+            raised() year_mark();
+    }
+}
+
+// Note 21.
+
+module feral_default_output_1bb8322b6e76() {
+zr_stamp();
+}
+
+module feral_assembly_view_1bb8322b6e76(explode=false) {
+feral_default_output_1bb8322b6e76();
+}
+
+assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
+if(view == "default") feral_default_output_1bb8322b6e76();
+else feral_assembly_view_1bb8322b6e76(view == "exploded");
+
+// Notes
+
+// Note 1. ZR monogram stamp, 2026.
 //
 // A 2 in wide, 10 mm thick tile carrying the ZR monogram over "2026" as a
 // stamp for fresh concrete: the artwork is MIRRORED so the impression reads
@@ -27,138 +152,60 @@
 // at size 10 was read once with it and is pinned below, the same way
 // marks.scad pins the SVG boxes. Change the string or the font and remeasure:
 //
-//   openscad --enable=textmetrics -o /dev/null <<< 'echo(textmetrics("2026", size = 10, font = "Arial:style=Bold"));'
+// openscad --enable=textmetrics -o /dev/null <<< 'echo(textmetrics("2026", size = 10, font = "Arial:style=Bold"));'
 
-/* [Assembly display] */
-// default preserves the original part, coupon and print selectors.
-view = "default"; // [default, together, exploded]
+// Note 2. default preserves the original part, coupon and print selectors.
 
-include <../../../logos/marks.scad>
+// Note 3. mm — 2 in
 
-/* [Tile] */
-
-width       = 50.8;   // mm — 2 in
-thickness   = 10;     // mm
-
+// Note 4. mm
 // Radius on the tile's four vertical corners.
-corner_r    = 5;      // mm
 
+// Note 5. mm
 // Radius on the edges of the top and bottom faces.
-edge_r      = 1.5;    // mm
 
+// Note 6. mm
 // Border around the artwork on every side. 4.4 is what a 42 mm mark leaves on
 // a 50.8 mm tile, so the top and bottom match the sides.
-margin      = 4.4;    // mm
 
+// Note 7. mm
 // Air between the bottom of the monogram and the top of the year.
-gap         = 5;      // mm
 
-/* [Stamp] */
+// Note 8. mm
 
-// Mirror the artwork so the impression reads correctly. Off gives a plaque.
-mirrored    = true;
+// Note 9. Mirror the artwork so the impression reads correctly. Off gives a plaque.
 
-// How far the artwork stands off the face — the deepest the stamp can go
+// Note 10. How far the artwork stands off the face — the deepest the stamp can go
 // before the tile itself touches the concrete.
-relief      = 6;      // mm
 
+// Note 11. mm
 // Taper on every stroke's side wall so the stamp releases. 0 is straight.
-draft       = 3;      // deg
 
+// Note 12. deg
 // Slices the draft is built from. More is smoother and slower.
-draft_steps = 6;
 
-/* [Marks] */
+// Note 13. Width of both the monogram and the year across the face.
 
-// Width of both the monogram and the year across the face.
-mark_width  = 42;     // mm
-
+// Note 14. mm
 // Uniform outward swell of the monogram before extrusion. See the header.
-mono_swell  = 1.0;    // mm
 
-year        = "2026";
-year_font   = "Arial:style=Bold";
+// Note 15. mm
 
-// Preview only — colour() is ignored by the STL export, it is there so the
+// Note 16. Preview only — colour() is ignored by the STL export, it is there so the
 // raised work reads against the tile in OpenSCAD and the renders.
-mark_color  = "SlateBlue";
 
-/* [Hidden] */
+// Note 17. [[min corner], [size]] of `year` in `year_font` at size 10, per textmetrics.
 
-$fn = 64;
-eps = 0.01;
+// Note 18. The year scaled to mark_width and centred on the origin, like place_mark.
 
-// [[min corner], [size]] of `year` in `year_font` at size 10, per textmetrics.
-YEAR_BOX  = [[0.3456, -0.1728], [30.0593, 10.1568]];
-YEAR_SIZE = 10;
-
-year_h = mark_height(YEAR_BOX, mark_width);
-mono_h = zr_monogram_height(mark_width);
-height = margin + mono_h + gap + year_h + margin;
-
-echo(str("tile ", width, " x ", height, " x ", thickness, " mm; monogram ",
-         mono_h, " tall, year ", year_h, " tall; thins ",
-         0.014 * mono_h + 2 * mono_swell, " mm at the base, ",
-         0.014 * mono_h + 2 * (mono_swell - relief * tan(draft)), " at the top"));
-
-// The year scaled to mark_width and centred on the origin, like place_mark.
-module year_mark() {
-    place_mark(YEAR_BOX, mark_width)
-        text(year, size = YEAR_SIZE, font = year_font);
-}
-
-// The 2D child stood off the face as a drafted relief, mirrored if the part is
+// Note 19. The 2D child stood off the face as a drafted relief, mirrored if the part is
 // a stamp. Each slice starts eps inside the one below (and the first inside
 // the tile) so no two share a face.
-module raised() {
-    step  = relief / draft_steps;
-    erode = step * tan(draft);
-    color(mark_color)
-        translate([0, 0, thickness])
-            for (k = [0 : draft_steps - 1])
-                translate([0, 0, k * step - eps])
-                    linear_extrude(height = step + eps, convexity = 10)
-                        offset(delta = -k * erode)
-                            mirror([mirrored ? 1 : 0, 0, 0])
-                                children();
-}
 
-// The rounded block: the outline with the vertical corners rounded, shrunk by
+// Note 20. The rounded block: the outline with the vertical corners rounded, shrunk by
 // edge_r all round and then grown back with a sphere, so every edge of the
 // top and bottom faces carries edge_r and the vertical corners stay at
 // corner_r. Convex, so the minkowski is cheap.
-module tile() {
-    minkowski() {
-        translate([0, 0, edge_r])
-            linear_extrude(height = thickness - 2 * edge_r)
-                offset(r = corner_r - edge_r) offset(delta = -corner_r)
-                    square([width, height]);
-        sphere(r = edge_r);
-    }
-}
 
-module zr_stamp() {
-    union() {
-        tile();
-        translate([width / 2, height - margin - mono_h / 2, 0])
-            raised() offset(delta = mono_swell) zr_monogram(mark_width);
-        translate([width / 2, margin + year_h / 2, 0])
-            raised() year_mark();
-    }
-}
-
-
-
-// Assembly display changes placement only; the original output remains the default.
+// Note 21. Assembly display changes placement only; the original output remains the default.
 // Single printed piece: both display modes show the same intact part.
-module feral_default_output_1bb8322b6e76() {
-zr_stamp();
-}
-
-module feral_assembly_view_1bb8322b6e76(explode=false) {
-feral_default_output_1bb8322b6e76();
-}
-
-assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
-if(view == "default") feral_default_output_1bb8322b6e76();
-else feral_assembly_view_1bb8322b6e76(view == "exploded");
