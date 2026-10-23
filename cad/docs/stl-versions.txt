@@ -20,7 +20,7 @@ bong-stabilizer-screw 6
 bong-stabilizer-screw-set 6
 bookshelf-lid-clip-mount 1
 bookshelf-lid-clip-platform 2
-bookshelf-lid-clip-print-set 4
+bookshelf-lid-clip-print-set 5
 can-holder-12oz-standard 1
 can-holder-12oz-standard-coupon 1
 can-holder-12oz-standard-tile 2
@@ -108,6 +108,8 @@ haunted-tree-sad-led 2
 haunted-tree-teeth-flat-led 4
 haunted-tree-teeth-led 3
 hobbs-chalk-holder-coupon 5
+kaiser-bottle-rack 2
+kaiser-bottle-rack-coupon 3
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-bottom 4
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-coupon-bottom 3
 kirkland-13gal-tall-kitchen-garbage-bag-dispenser-coupon-top 3

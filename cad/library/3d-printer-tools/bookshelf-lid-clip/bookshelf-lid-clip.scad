@@ -10,7 +10,8 @@ show_shelf = true;
 
 /* [Shelf] */
 shelf_t = 19;
-shelf_clearance = 0.6;
+shelf_clearance = 0;
+shelf_mouth_gap = 18; // mm, relaxed gap at the open end.
 clip_width = 40;
 clip_depth = 38;
 wall = 5.4;
@@ -54,6 +55,7 @@ pad_root_z = 5;
 pad_mid_y = pad_start+platform_length*cos(platform_angle)/2;
 pad_mid_z = pad_root_z-platform_length*sin(platform_angle)/2;
 pivot_y = contact_back-pad_mid_y;
+sleeve_lean = (slot_hi-slot_lo-shelf_mouth_gap)/(2*clip_depth);
 eye_z = -contact_drop-pad_mid_z;
 stop_z = eye_z+eye_h+axial_clearance;
 head_top = eye_z-axial_clearance;
@@ -65,26 +67,44 @@ assert(stop_z+1.2<clip_lo,"Increase contact_drop for room above the pivot");
 assert(flex_root<clip_lo-0.3,"Increase contact_drop or shorten flex_length");
 assert(head_d>post_d+pivot_clearance+0.4);
 assert(platform_angle>0 && platform_angle<80);
-module sleeve() {
+module straight_sleeve() {
     difference() {
         translate([0,(clip_depth-wall)/2,(clip_hi+clip_lo)/2])
             cuboid([clip_width,clip_depth+wall,clip_hi-clip_lo],rounding=edge_r);
         translate([-clip_width,0,slot_lo])
             cube([2*clip_width,clip_depth+2,slot_hi-slot_lo]);
-        translate([-clip_width,clip_depth-1,slot_lo-1])
-            rotate([90,0,90]) linear_extrude(2*clip_width)
-                polygon([[0,1],[2,1],[2,-1]]);
-        translate([-clip_width,clip_depth-1,slot_hi])
-            rotate([90,0,90]) linear_extrude(2*clip_width)
-                polygon([[0,0],[2,0],[2,2]]);
     }
+}
+
+module sleeve(mouth_gap=shelf_mouth_gap) {
+    // Leave the closed back intact; shear both arms equally toward the
+    // centre. Inner and outer faces lean together, retaining wall thickness.
+    lean = (slot_hi-slot_lo-mouth_gap)/(2*clip_depth);
+    mid = (slot_hi+slot_lo)/2;
+    assert(mouth_gap>0 && mouth_gap<=slot_hi-slot_lo);
+    intersection() {
+        straight_sleeve();
+        translate([-clip_width,-wall-eps,clip_lo-eps])
+            cube([2*clip_width,wall+eps,clip_hi-clip_lo+2*eps]);
+    }
+    for(side=[-1,1])
+        multmatrix([[1,0,0,0],[0,1,0,0],[0,-side*lean,1,0],[0,0,0,1]])
+            intersection() {
+                straight_sleeve();
+                translate([-clip_width,0,side<0 ? clip_lo-eps : mid])
+                    cube([2*clip_width,clip_depth+eps,
+                          (clip_hi-clip_lo)/2+eps]);
+            }
 }
 
 module post() { // Note 2.
     difference() {
         union() {
-            translate([0,0,head_top]) cylinder(d=post_d,h=clip_lo-head_top+eps);
-            translate([0,0,clip_lo-2]) cylinder(d1=post_d,d2=18,h=2+eps);
+            translate([0,0,head_top])
+                cylinder(d=post_d,h=clip_lo+sleeve_lean*(pivot_y+post_d/2)-head_top+eps);
+            // Follow the leaning lower arm at the root; retain the snap interface.
+            multmatrix([[1,0,0,0],[0,1,0,0],[0,sleeve_lean,1,sleeve_lean*pivot_y],[0,0,0,1]])
+                translate([0,0,clip_lo-2]) cylinder(d1=post_d,d2=18,h=2+eps);
             translate([0,0,stop_z]) cylinder(d=16,h=1.2);
             translate([0,0,head_bottom]) cylinder(d1=max(post_d-2,core_d+1.8),d2=head_d,h=head_h-0.8);
             translate([0,0,head_top-0.8]) cylinder(d=head_d,h=0.8+eps);
@@ -98,8 +118,8 @@ module post() { // Note 2.
     }
 }
 
-module clip() {
-    sleeve();
+module clip(mouth_gap=shelf_mouth_gap) {
+    sleeve(mouth_gap);
     translate([0,pivot_y,0]) post();
 }
 
@@ -172,7 +192,9 @@ module print_set() {
 }
 
 module fitcheck() {
-    intersection() { clip(); shelf(); }
+    // Geometric clearance with the arms spread to the shelf thickness.
+    // The relaxed sleeve intentionally interferes with the shelf.
+    intersection() { clip(shelf_t); shelf(); }
     intersection() {
         clip();
         translate([0,pivot_y,eye_z]) rotate([0,0,turn]) platform();
@@ -225,7 +247,9 @@ module snapcheck() {
 
 module insertioncheck() {
     intersection() {
-        clip();
+        // Swept straight insertion with each arm spread 0.5 mm at the tip.
+        // This is a clearance envelope, not a prediction of elastic strain.
+        clip(shelf_t);
         translate([-60,eps,0]) cube([120,160,shelf_t]);
     }
     snapcheck();
