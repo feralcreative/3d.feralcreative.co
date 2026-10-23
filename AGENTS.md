@@ -10,6 +10,7 @@ Run commands from the repository root. Read the verification limits below before
 
 | Task | Command | Verification |
 |---|---|---|
+| Set up repository-local Git LFS | `git lfs install --local` | Configures local filters and the pre-push hook. Files over 100,000,000 bytes are tracked by exact path in `.gitattributes`; add new paths with `git lfs track --filename <path>`. |
 | Install dependencies without lifecycle scripts | `npm install --ignore-scripts --no-audit --no-fund --package-lock=false --fetch-retries=0` | Passed with registry access on 2026-10-20; a clean-checkout install remains unverified. |
 | Frontend only | `BROWSER=none npm run dev -- --host 127.0.0.1 --strictPort` | Requires sandbox permission to bind the local port; local HTTP verification passed on 2026-10-20. |
 | Development stack with Sass watchers | `npm start` | Compiles expanded/minified CSS, then watches both outputs alongside Vite and the development proxy. Requires private runtime setup. |
@@ -92,6 +93,7 @@ Run commands from the repository root. Read the verification limits below before
 - Keep `config.js`, `server.js`, and `printer-proxy-server.js` private under their existing ignore rules.
 - Keep the private deployment scripts under `utils/deploy/` ignored.
 - Keep uploads, logs, model payloads, build output, and journal cursor files out of commits.
+- Keep retired pumpkin ZIP archives under `cad/library/holiday/halloween/fence-pumpkins/originals/retired-*.zip` local and ignored; do not add them to Git LFS. Active retained CAD files over 100,000,000 bytes use Git LFS. Tracking a new path does not migrate its existing Git history.
 - Do not force-add an ignored directory to publish one documentation file.
 
 ### Credential handling

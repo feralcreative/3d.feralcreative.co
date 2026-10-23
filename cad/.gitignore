@@ -339,6 +339,9 @@ _PLANS
 library/**/_work/
 _work/
 
+# Local pumpkin retirement archives are kept on disk, outside Git and Git LFS.
+/library/holiday/halloween/fence-pumpkins/originals/retired-*.zip
+
 # BOSL2 is expected at lib/BOSL2 as a git submodule.
 # If you'd rather vendor it as a plain clone instead, uncomment:
 # lib/BOSL2/
