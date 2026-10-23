@@ -8,6 +8,7 @@ view = "default"; // [default, together, exploded]
 show = "assembled"; // [assembled, exploded]
 door_explode = 60; // Note 3.
 stem_explode = 45; // Note 4.
+light_explode = 45; // Note 19.
 
 /* [LED cork placeholder] */
 preview_light = true; // Note 5.
@@ -55,9 +56,9 @@ module led_cork_placeholder() translate([0, light_axis_y, light_seat_z]) {
             cube([light_head_w - 2 * light_panel_inset, light_head_w - 2 * light_panel_inset, light_panel_t]);
 }
 
-module door_with_light() {
+module door_with_light(light_up = 0) {
     door();
-    if (preview_light && $preview) led_cork_placeholder();
+    if (preview_light && $preview) translate([0, 0, light_up]) led_cork_placeholder();
 }
 
 assert(show == "assembled" || show == "exploded", "Choose assembled or exploded");
@@ -65,13 +66,13 @@ assert(show == "assembled" || show == "exploded", "Choose assembled or exploded"
 // Note 18.
 module feral_default_output_e4c9a7891833() {
 body();
-translate([0, show == "exploded" ? door_explode : 0, 0]) door_with_light();
+translate([0, show == "exploded" ? door_explode : 0, 0]) door_with_light(show == "exploded" ? light_explode : 0);
 translate([0, 0, show == "exploded" ? stem_explode : 0]) stem();
 }
 
 module feral_assembly_view_e4c9a7891833(explode=false) {
 body();
-translate([0,explode ? door_explode : 0,0]) door_with_light();
+translate([0,explode ? door_explode : 0,0]) door_with_light(explode ? light_explode : 0);
 translate([0,0,explode ? stem_explode : 0]) stem();
 }
 
@@ -122,3 +123,5 @@ else feral_assembly_view_e4c9a7891833(view == "exploded");
 // Note 17. Display accessory only: $preview keeps it out of F6/STL geometry.
 
 // Note 18. Assembly display changes placement only; the original output remains the default.
+
+// Note 19. mm upward along +Z, lifting the cork light clear of its bore in the exploded view

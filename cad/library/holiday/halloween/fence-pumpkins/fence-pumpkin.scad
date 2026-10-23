@@ -100,6 +100,7 @@ show = "assembled"; // [assembled, exploded, body, door, cap, stem, print-body, 
 door_explode = 60;         // Note 61.
 stem_explode = 45;         // Note 62.
 cap_explode = 25;          // Note 63.
+light_explode = 45;        // Note 89.
 preview_light = true;      // Note 64.
 fused_roof = true;        // Note 65.
 
@@ -371,11 +372,11 @@ module solar_light() {
     }
 }
 
-module assembly(door_out = 0, stem_up = 0, cap_up = 0) {
+module assembly(door_out = 0, stem_up = 0, cap_up = 0, light_up = 0) {
     body();
     translate([0, door_out, 0]) {
         door();
-        if (preview_light) solar_light();
+        if (preview_light) translate([0, 0, light_up]) solar_light();
     }
     if (!fused_roof) translate([0, 0, cap_up]) cap();
     translate([0, 0, stem_up]) stem();
@@ -384,7 +385,7 @@ module assembly(door_out = 0, stem_up = 0, cap_up = 0) {
 // Note 88.
 module feral_default_output_36c8510442e2() {
 if (show == "assembled") assembly();
-else if (show == "exploded") assembly(door_explode, stem_explode, cap_explode);
+else if (show == "exploded") assembly(door_explode, stem_explode, cap_explode, light_explode);
 else if (show == "body") body();
 else if (show == "door") door();
 else if (show == "cap") cap();
@@ -405,7 +406,7 @@ else assert(false, str("unknown show: ", show));
 }
 
 module feral_assembly_view_36c8510442e2(explode=false) {
-assembly(explode ? door_explode : 0,explode ? stem_explode : 0,explode ? cap_explode : 0);
+assembly(explode ? door_explode : 0,explode ? stem_explode : 0,explode ? cap_explode : 0,explode ? light_explode : 0);
 }
 
 assert(view == "default" || view == "together" || view == "exploded", "Unknown assembly display");
@@ -620,3 +621,5 @@ else feral_assembly_view_36c8510442e2(view == "exploded");
 // sliding door its full curved crown, so that edge is removed from the cap.
 
 // Note 88. Assembly display changes placement only; the original output remains the default.
+
+// Note 89. mm upward displacement, lifting the solar light out of its bore in the exploded view
