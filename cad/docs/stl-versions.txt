@@ -137,10 +137,12 @@ patio-leg-spacer-shim 6
 phone-shower-holder 8
 phone-shower-holder-assembled 1
 phone-shower-holder-coupon 3
-phone-shower-holder-cradle 5
-phone-shower-holder-hook 5
-phone-shower-holder-print 1
-phone-shower-holder-spine 4
+phone-shower-holder-cradle 6
+phone-shower-holder-cradle-horn 6
+phone-shower-holder-hook 7
+phone-shower-holder-print 2
+phone-shower-holder-print-horn 7
+phone-shower-holder-spine 5
 plant-screen 7
 plant-screen-130 1
 plant-screen-130-coupon 1

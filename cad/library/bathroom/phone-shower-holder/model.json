@@ -11,7 +11,9 @@
     "phone-shower-holder-hook",
     "phone-shower-holder-print",
     "phone-shower-holder-spine",
-    "phone-shower-holder"
+    "phone-shower-holder",
+    "phone-shower-holder-cradle-horn",
+    "phone-shower-holder-print-horn"
   ],
   "aliases": {
     "parts/phone-shower-holder.scad": "phone-shower-holder.scad",
@@ -59,8 +61,7 @@
     "phone-shower-holder-cradle",
     "phone-shower-holder-hook",
     "phone-shower-holder-print",
-    "phone-shower-holder-spine",
-    "phone-shower-holder"
+    "phone-shower-holder-spine"
   ],
   "protected_assets": [
     "originals/bathroom/phone-shower-holder-bottom-ORIGINAL.stl",
@@ -104,5 +105,12 @@
   ],
   "website": {
     "default_view": "assembled"
-  }
+  },
+  "draft_exports": [
+    "phone-shower-holder-cradle-horn",
+    "phone-shower-holder-print-horn"
+  ],
+  "publication_excluded_exports": [
+    "phone-shower-holder"
+  ]
 }
