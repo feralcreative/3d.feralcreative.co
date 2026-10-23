@@ -1,0 +1,15 @@
+{
+    "initial_layer_line_width": "0.5",
+    "enable_support": "1",
+    "support_on_build_plate_only": "1",
+    "support_top_z_distance": "0.4",
+    "support_type": "tree(auto)",
+    "support_bottom_z_distance": "0.2",
+    "post_process": [],
+    "from": "User",
+    "inherits": "0.20mm Standard @Flashforge AD5M Pro 0.4 Nozzle",
+    "name": "0.20mm Standard @AD5M Pro 0.4 - Pumpkin Door Release Trial",
+    "print_settings_id": "0.20mm Standard @AD5M Pro 0.4 - Pumpkin Door Release Trial",
+    "version": "2.4.2.0",
+    "type": "process"
+}

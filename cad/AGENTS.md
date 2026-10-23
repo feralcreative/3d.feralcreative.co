@@ -36,6 +36,8 @@ Parametric 3D-printed parts written in OpenSCAD, printed on one specific machine
 | Turn a one-path SVG trace into a BOSL2 bezpath to paste into a part        | `utils/svg2bez.py "_incoming/<trace>.svg" --height 80` (or `--width`)                                          |
 | Split a scanned STL into its overlapping shells so a part can union them   | `utils/stl-shells.py "_incoming/<thing>/mesh.stl"` (then `import()` each shell; see Gotchas)                    |
 | Fill a hollow mesh's section into a solid outline, for a flat wall or door  | `utils/section-outline.py "<mesh>.stl" --axis y --at 25 --name back_outline -o back-outline.scad` (`for (p = back_outline) polygon(p)`; needs numpy; shapely optional for complex contours) |
+| Regenerate the original pumpkin outer volume for its closed rear door | `python3 utils/pumpkin-solid.py --output library/holiday/halloween/fence-pumpkins/pumpkin-outer-solid.scad` (NumPy required; see the model's `docs/fence-pumpkin.md`) |
+| Prepare an upright one-piece pumpkin door project | `python3 utils/pumpkin-door-project.py --mesh <checked-upright.stl> --settings <flattened-project-settings.json> --process 'docs/profiles/process/0.20mm Standard @AD5M Pro 0.4 - Pumpkin Closed Door.json' --output <editable.3mf>` |
 | Bend budget for the screen-fence clip's legs                                | `utils/legcheck.py`                                                                                               |
 | Compare leg section options                                                 | `utils/legcheck.py --sweep`                                                                                       |
 | Slice and verify the job                                                    | `utils/slice.sh <model-folder>/<output>.stl` or `utils/slice.sh <source.scad>`                                             |
@@ -68,6 +70,8 @@ For a print-setting change (rare—see Prohibitions):
 1. Change the value in `docs/profiles/`, not in a script and not only in the GUI.
 2. `utils/profiles-check.sh --install`, then restart Flash Studio.
 3. `utils/slice.sh …` and confirm the value in the probe output. The G-code is the only place a setting is real.
+
+A deliberately retained, self-contained 3MF may embed its resolved project-specific preset instead of installing it into Flash Studio. Keep the preset source in `docs/profiles/`, verify the effective settings and actual G-code after slicing, and do not claim the installed app presets were updated. The closed pumpkin door projects use this path.
 
 Not required: nothing here needs a full print to be considered done by you. Printing is Ziad's step, and one variable at a time.
 

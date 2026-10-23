@@ -1,10 +1,4 @@
-// Measured selector outlines for the stem base, from the original stem-lid.stl.
-// Coordinates are in the unscaled source lid XY frame; apply the same XY scale
-// as lid(). Four bands follow the lobes below the circular selector at Z=31.5,
-// enclosing the stem while missing the surrounding dish. This is selector data,
-// not extra material: intersection with lid() preserves the original surface.
-// Sampled every 0.005 mm in Z; 0.008 mm outward margin, simplified by 0.003 mm,
-// then expanded 0.003 mm. Lowest measured clearance to the dish: 0.01 mm.
+// Note 1.
 
 stem_base_bands = [
     [0.00000, 0.05000, [
@@ -459,3 +453,13 @@ stem_base_bands = [
         [-9.82542, 3.66108]
     ]]
 ];
+
+// Notes
+
+// Note 1. Measured selector outlines for the stem base, from the original stem-lid.stl.
+// Coordinates are in the unscaled source lid XY frame; apply the same XY scale
+// as lid(). Four bands follow the lobes below the circular selector at Z=31.5,
+// enclosing the stem while missing the surrounding dish. This is selector data,
+// not extra material: intersection with lid() preserves the original surface.
+// Sampled every 0.005 mm in Z; 0.008 mm outward margin, simplified by 0.003 mm,
+// then expanded 0.003 mm. Lowest measured clearance to the dish: 0.01 mm.
