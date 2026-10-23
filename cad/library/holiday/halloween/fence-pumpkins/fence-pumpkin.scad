@@ -4,11 +4,11 @@
 // Note 2.
 view = "default"; // [default, together, exploded]
 
-include <complete-back-outline.scad>
-include <complete-back-crown.scad>
-include <stem-base-selector.scad>
-include <cork-collar-blend.scad>
-include <pumpkin-outer-solid.scad>
+include <includes/complete-back-outline.scad>
+include <includes/complete-back-crown.scad>
+include <includes/stem-base-selector.scad>
+include <includes/cork-collar-blend.scad>
+include <includes/pumpkin-outer-solid.scad>
 
 /* [Seat] */
 lid_grow = -0.15;          // Note 3.

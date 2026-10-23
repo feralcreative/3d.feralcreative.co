@@ -19,7 +19,7 @@ Both final binary meshes have one connected closed surface, Euler 0/genus 1, zer
 `rear_interior="closed"` and `flat_underside=true` are the authoring defaults. `rear_interior="hollow"` with `flat_underside=false` retains the earlier support-dependent geometry/orientation. `pumpkin-outer-solid.scad` preserves only the outer connected surface of the original blank shell and its lid, so the fill follows the lobes rather than a convex hull. Regenerate that helper with NumPy available:
 
 ```bash
-python3 cad/utils/pumpkin-solid.py --output cad/library/holiday/halloween/fence-pumpkins/pumpkin-outer-solid.scad
+python3 cad/utils/pumpkin-solid.py --output cad/library/holiday/halloween/fence-pumpkins/includes/pumpkin-outer-solid.scad
 utils/build.sh cad/library/holiday/halloween/fence-pumpkins/fence-pumpkin-door-fix.scad --name fence-pumpkin-door-fix --no-version
 utils/build.sh fence-pumpkins --name fence-pumpkin-door --no-version -D 'show="print-door"' -D 'fused_roof=true' -D 'disc_cover=true'
 ```
@@ -108,7 +108,7 @@ Build output remains under `_work/stl/` until deliberately promoted to the retai
 The inward-rounding helper is generated from the protected blank shell. Regenerate it before building if `rear_gusset_round`, `rear_seam` or `rear_gusset_inner_x` changes; the authoring source asserts that these dimensions match. Run from the unified root, with NumPy available in the selected Python:
 
 ```bash
-/usr/bin/python3 cad/utils/pumpkin-backing.py --output cad/library/holiday/halloween/fence-pumpkins/backing-inset.scad
+/usr/bin/python3 cad/utils/pumpkin-backing.py --output cad/library/holiday/halloween/fence-pumpkins/includes/backing-inset.scad
 ```
 
 The binary door export can contain collapsed float32 triangles at imported-shell intersections despite an OpenSCAD `NoError` result. Re-import the candidate and intersect an enclosing cube, then independently verify the cleaned mesh before promotion. The checked final door has one surface, Euler −2, zero collapsed triangles, bad edges and winding errors; the cleanup changed volume by less than 0.000001 mm³. The final cleanup source and reports are retained under `_work/inward-rounded-backing/`. The assembly/download SCAD still needs only the three final STL companions.
@@ -236,7 +236,7 @@ The door retains its 40 mm width, 1.8 mm V tongues with 45° flanks, 0.3 mm slid
 Regenerate the crown from the repository root if the original contours change:
 
 ```bash
-python3 utils/pumpkin-crown.py --output library/holiday/halloween/fence-pumpkins/back-crown.scad
+python3 utils/pumpkin-crown.py --output library/holiday/halloween/fence-pumpkins/includes/back-crown.scad
 ```
 
 The data is fixed to Y=20.2..25, X=−24..24, and a Z=19.9 floor. Source assertions require regeneration if the back-wall dimensions change. `back-outline.scad` still supplies the lower wall outline at Y=25; regenerate it with `utils/section-outline.py` if that cut plane changes.
