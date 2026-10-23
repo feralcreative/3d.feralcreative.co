@@ -2,6 +2,10 @@
 
 Source: [fence-pumpkin.scad](../fence-pumpkin.scad). Adapted from "LED tea light jack-o-lantern pumpkins" by artwells (Printables model 1835966), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); original files remain unchanged in `led-tea-light-jack-o-lantern-pumpkins-model_files/`.
 
+## Print status—2026-10-22
+
+Ziad reported that the pumpkin has been printed and everything fits.
+
 ## Closed, upright one-piece doors—2026-10-21
 
 The current `fence-pumpkin-door-fix.stl` and `fence-pumpkin-door.stl` close the hollow rear lobes into a solid CAD volume for normal slicer infill. Each door is one piece. Ziad chose a flat underside for upright printing: the rear is trimmed at the existing guide stop, source Z=−17, and the supplied STL rests on that plane at print Z=0. The cork opening faces upward. The lower rear outline is deliberately flat; the rest follows the original pumpkin surface. The body and stem STLs remain byte-identical, and the original overnight 3MF is untouched.

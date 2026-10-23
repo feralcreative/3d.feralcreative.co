@@ -98,10 +98,6 @@
       {
         "title": "Door",
         "text": "Print upright as supplied with 15% grid infill and no supports. Thread the light’s wire through, slide the door down, and push in the cork light."
-      },
-      {
-        "title": "Status",
-        "text": "Not yet printed: the closed doors, disc fit, and magnet strength."
       }
     ],
     "parts": [
@@ -114,7 +110,7 @@
       {
         "name": "Fence-side magnet",
         "quantity": "1",
-        "specification": "Holding strength untested.",
+        "specification": "Cup magnet for the fence side.",
         "url": "https://www.amazon.com/dp/B0CS6MX8FP"
       },
       {
