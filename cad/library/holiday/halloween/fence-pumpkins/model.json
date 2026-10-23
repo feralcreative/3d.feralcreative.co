@@ -76,51 +76,51 @@
   ],
   "title": "Fence-post pumpkin",
   "website": {
-    "description": "A fence-post jack-o’-lantern with a sculpted body, a sliding rear door, a solar cork-light holder, a separate stem, and an internal steel disc for magnetic mounting. Both door variants have a closed rear volume for slicer infill and a flat underside for upright one-piece printing. A separate door fix fits the previously printed body.",
+    "description": "Fence-post jack-o’-lantern with a sliding rear door, a solar cork-light holder, and a hidden steel disc for magnetic mounting.",
     "default_view": "assembled",
     "view_labels": {
       "assembled": "Together",
       "exploded": "Exploded",
-      "fence-pumpkin-body": "Complete-set body",
-      "fence-pumpkin-door": "Complete-set door",
+      "fence-pumpkin-body": "Body",
+      "fence-pumpkin-door": "Door",
       "fence-pumpkin-stem": "Stem",
-      "fence-pumpkin-door-fix": "Door fix—existing pumpkins"
+      "fence-pumpkin-door-fix": "Door fix"
     },
     "instructions": [
       {
-        "title": "Files and assembly views",
-        "text": "For a new pumpkin, use the complete-set body, complete-set door, and stem. Download their STLs and assembly SCAD into one folder, retaining the filenames. The SCAD shows the matching complete set together or exploded. The roof is integral. For a previously printed pumpkin, use only the separate door-fix STL; its joint matches the older body. The two door versions fit different bodies. Each door is one piece and its STL is already upright on its flat underside."
+        "title": "Which files",
+        "text": "New pumpkin: print the body, door, and stem. Already printed a body? Print only the door fix."
       },
       {
-        "title": "Steel disc insertion",
-        "text": "Use one 25 mm diameter × 2 mm thick steel disc. This body captures the disc under a printed cover, so insert it during a print pause before the cover begins. The disc top is 4.10 mm above the bed; set and verify the pause in the actual sliced job before the first cover layer. Do not reuse a layer number from a different slicing profile."
+        "title": "Steel disc",
+        "text": "Pause the print when the disc pocket is complete (disc top at 4.10 mm), drop in the disc, and resume. Check the pause layer in your own slice."
       },
       {
-        "title": "Door printing and assembly",
-        "text": "Both doors have a closed rear volume and a flat underside at the guide stop. Print upright in the supplied STL orientation using 15% grid infill and supports disabled; the prepared 0.20 mm PETG Pro toolpaths contain no supports. Preserve the top cork opening and the 6 mm wire passage. Feed the strand through both passages, slide the door down from above, then fit the cork light with its supplied silicone sheath. Printing, bridge quality and physical fit of this revision remain unverified."
+        "title": "Door",
+        "text": "Print upright as supplied with 15% grid infill and no supports. Thread the light’s wire through, slide the door down, and push in the cork light."
       },
       {
-        "title": "Fit and mounting",
-        "text": "The complete-set body and door follow the original pumpkin surface, with a 0.3 mm fitting joint and a deliberately flat door underside. The door fix preserves the older body guides and rounded side-lobe backing. Both retain the previously printed and tested 18.5 mm cork bore and 22 mm insertion depth. Closed-mesh and continuous insertion-clearance checks pass. These closed-door revisions have not been printed; disc fit and magnetic holding strength require physical checks."
+        "title": "Status",
+        "text": "Not yet printed: the closed doors, disc fit, and magnet strength."
       }
     ],
     "parts": [
       {
         "name": "Nickel-plated steel disc",
         "quantity": "1",
-        "specification": "25 mm diameter × 2 mm thick. Fits the modelled internal disc pocket.",
+        "specification": "25 × 2 mm.",
         "url": "https://www.amazon.com/dp/B0CYSZTN79"
       },
       {
         "name": "Fence-side magnet",
         "quantity": "1",
-        "specification": "Fence-side cup magnet for the internal steel disc. Holding strength with the printed pumpkin has not been physically verified.",
+        "specification": "Holding strength untested.",
         "url": "https://www.amazon.com/dp/B0CS6MX8FP"
       },
       {
         "name": "Solar cork light",
         "quantity": "1",
-        "specification": "Uses the previously printed and tested 18.5 mm bore and 22 mm insertion depth with its supplied silicone sheath. Fits through the sculpted rear shell's top opening; the relocated holder is not yet physically tested.",
+        "specification": "Fits the 18.5 mm bore with its silicone sheath.",
         "url": "https://www.amazon.com/dp/B07SWZKQDM"
       }
     ],
