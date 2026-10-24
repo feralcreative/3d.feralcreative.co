@@ -3,9 +3,10 @@
 
 /* [Display] */
 view = "default"; // [default, together, exploded]
-show = "assembled"; // [assembled, exploded, tray, bracket]
+show = "pair"; // [pair, assembled, exploded, tray, bracket]
 side = "left"; // [left, right]
 explode_gap = 40; // mm, tray lift in the exploded view.
+pair_gap = 60; // mm, between the left and right sets in the pair view.
 
 /* [Tray body] */
 tray_w = 155.2; // mm, side to side.
@@ -72,7 +73,6 @@ bracket_color = "#5e35b1";
 $fn = 120;
 eps = 0.01;
 dovetail_tip = dovetail_root + 2*dovetail_depth*tan(dovetail_angle);
-mirrored = side == "right";
 
 // ----- Tray -----
 
@@ -151,15 +151,16 @@ module tray_left() {
     }
 }
 
-module tray() {
+module tray(s = side) {
     color(tray_color)
-        if (mirrored) translate([tray_w, 0, 0]) mirror([1, 0, 0]) tray_left();
+        if (s == "right") translate([tray_w, 0, 0]) mirror([1, 0, 0]) tray_left();
         else tray_left();
 }
 
 // ----- Bracket, in print orientation: shelf on the bed, wall and lip up -----
 
-module plate_outline() {
+module plate_outline(s = side) {
+    mirrored = s == "right";
     corner_y = mirrored ? plate_w - plate_corner_r : plate_corner_r;
     hull() {
         translate([plate_corner_r, corner_y]) circle(r = plate_corner_r);
@@ -200,11 +201,11 @@ module gusset() {
     ]);
 }
 
-module bracket() {
+module bracket(s = side) {
     color(bracket_color) {
-        linear_extrude(plate_t) plate_outline();
+        linear_extrude(plate_t) plate_outline(s);
         translate([0, plate_w, 0]) rotate([90, 0, 0]) linear_extrude(plate_w) rail_profile();
-        for (y = mirrored ? gusset_y_right : gusset_y_left) translate([0, y + gusset_t, 0]) gusset();
+        for (y = s == "right" ? gusset_y_right : gusset_y_left) translate([0, y + gusset_t, 0]) gusset();
     }
 }
 
@@ -213,22 +214,29 @@ module bracket() {
 // The bracket turns over so the wall and lip hang down either side of the
 // rail; its outer edge meets the skirt's back wall. A proper rotation, so
 // each bracket is used exactly as printed. See Note 2.
-module bracket_in_use() {
+module bracket_in_use(s = side) {
     multmatrix([
         [0, -1, 0, rim_t + tray_fit_clearance/2 + plate_w],
         [-1, 0, 0, tray_d - rim_t],
         [0, 0, -1, rim_h],
         [0, 0, 0, 1]
-    ]) bracket();
+    ]) bracket(s);
 }
 
-module assembled(gap = 0) {
-    translate([0, 0, gap]) tray();
-    bracket_in_use();
+module assembled(gap = 0, s = side) {
+    translate([0, 0, gap]) tray(s);
+    bracket_in_use(s);
+}
+
+// Both bedsides, left set on the left, as mirror images of each other.
+module pair() {
+    assembled(s = "left");
+    translate([tray_w + pair_gap, 0, 0]) assembled(s = "right");
 }
 
 if (view == "together") assembled();
 else if (view == "exploded") assembled(explode_gap);
+else if (show == "pair") pair();
 else if (show == "bracket") bracket();
 else if (show == "assembled") assembled();
 else if (show == "exploded") assembled(explode_gap);
