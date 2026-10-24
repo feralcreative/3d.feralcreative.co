@@ -9,12 +9,14 @@
   "exports": [
     "bedside-caddy-tray-left",
     "bedside-caddy-bracket-left",
-    "bedside-caddy-bracket-right"
+    "bedside-caddy-bracket-right",
+    "bedside-caddy-tray-right"
   ],
   "draft_exports": [
     "bedside-caddy-tray-left",
     "bedside-caddy-bracket-left",
-    "bedside-caddy-bracket-right"
+    "bedside-caddy-bracket-right",
+    "bedside-caddy-tray-right"
   ],
   "aliases": {
     "_originals/bedroom/bedside-caddy-bottom-left.3mf": "bedside-caddy-bottom-left.3mf",
@@ -44,7 +46,8 @@
     "bedside-caddy-test-03.stl",
     "bedside-caddy.skp",
     "bedside-caddy~.skp",
-    "originals/bedside-caddy-round-bottom.stl"
+    "originals/bedside-caddy-round-bottom.stl",
+    "originals/bedside-caddy-working.stl"
   ],
   "additional_scad_files": [],
   "licenses": [],

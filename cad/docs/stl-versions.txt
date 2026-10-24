@@ -2,9 +2,10 @@
 awl-sheath 3
 awl-sheath-coupon 5
 batleth 6
-bedside-caddy-bracket-left 1
-bedside-caddy-bracket-right 1
+bedside-caddy-bracket-left 2
+bedside-caddy-bracket-right 2
 bedside-caddy-tray-left 1
+bedside-caddy-tray-right 1
 beverage-station-coffee-base 1
 beverage-station-coffee-body 1
 beverage-station-coffee-lid 1
