@@ -1,6 +1,7 @@
 // Bedside caddy: a two-half organizer tray on two brackets that hook over a
 // bed rail. The halves join with a sliding dovetail. Remade from the
-// SketchUp-era meshes in this folder; see Notes 1 and 3.
+// SketchUp-era meshes in this folder; see Notes 1 and 3. The front is -y
+// in the assembled views, the side face at x = 0 in each half's own frame.
 
 /* [Display] */
 view = "default"; // [default, together, exploded]
@@ -22,8 +23,8 @@ rim_h = 5; // mm, skirt depth; matches the bracket's shelf thickness.
 
 /* [Dovetail] */
 dovetail_z = 29.86; // mm, center height above the tray bottom.
-dovetail_root = 9.54; // mm, height where it meets the front face.
-dovetail_depth = 4.13; // mm, projection from the front face.
+dovetail_root = 9.54; // mm, height where it meets the joint face.
+dovetail_depth = 4.13; // mm, projection from the joint face.
 dovetail_angle = 30; // degrees, flank flare.
 groove_root = 10; // mm, female groove height at the right half's joint face.
 groove_depth = 4.33; // mm, female groove depth into the right half.
@@ -60,7 +61,7 @@ clip_back_t = 2; // mm, wall closing the slot's inner end.
 slot_w = 15; // mm
 slot_r = 2; // mm, corner radius.
 slot_floor = 10; // mm, above the tray bottom.
-slot_long_xy = [10.2, 13]; // mm, front-left corner.
+slot_long_xy = [10.2, 13]; // mm, corner nearest the front and the joint.
 slot_long_len = 132; // mm
 slot_short_xy = [30.2, 60]; // mm
 slot_short_len = 85; // mm
@@ -74,7 +75,7 @@ cup_small_xy = [131.17, 25.52]; // mm
 cup_small_d = 28; // mm
 cup_small_floor = 10; // mm
 hex_xy = [46.04, 35.91]; // mm
-hex_corners = 27; // mm, across corners, corners pointing front and back.
+hex_corners = 27; // mm, across corners, corners pointing along the rail.
 hex_floor = 20; // mm
 
 /* [Brackets] */
@@ -318,13 +319,16 @@ module bracket_in_use(s = side) {
     ]) bracket(s);
 }
 
-// The whole caddy. Exploded lifts both halves and pulls the right half
-// back from the joint so the dovetail shows.
+// The whole caddy, turned a quarter turn so the x = 0 side faces -y, the
+// front, with the left half on the left. Exploded lifts both halves and
+// pulls the right half away from the joint so the dovetail shows.
 module assembled(gap = 0) {
-    translate([0, 0, gap]) tray("left");
-    translate([0, -gap/2, gap]) tray("right");
-    bracket_in_use("left");
-    bracket_in_use("right");
+    rotate([0, 0, 90]) {
+        translate([0, 0, gap]) tray("left");
+        translate([0, -gap/2, gap]) tray("right");
+        bracket_in_use("left");
+        bracket_in_use("right");
+    }
 }
 
 if (view == "together") assembled();
