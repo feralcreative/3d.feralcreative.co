@@ -3,7 +3,7 @@
 
 /* [Display] */
 view = "default"; // [default, together, exploded]
-show = "tray"; // [tray, bracket, assembled, exploded]
+show = "assembled"; // [assembled, exploded, tray, bracket]
 side = "left"; // [left, right]
 explode_gap = 40; // mm, tray lift in the exploded view.
 
