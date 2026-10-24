@@ -1,10 +1,21 @@
 {
   "id": "bedside-caddy",
   "origin": "legacy",
-  "status": "unreviewed",
-  "scad": null,
-  "scad_files": [],
-  "exports": [],
+  "status": "draft",
+  "scad": "bedside-caddy.scad",
+  "scad_files": [
+    "bedside-caddy.scad"
+  ],
+  "exports": [
+    "bedside-caddy-tray-left",
+    "bedside-caddy-bracket-left",
+    "bedside-caddy-bracket-right"
+  ],
+  "draft_exports": [
+    "bedside-caddy-tray-left",
+    "bedside-caddy-bracket-left",
+    "bedside-caddy-bracket-right"
+  ],
   "aliases": {
     "_originals/bedroom/bedside-caddy-bottom-left.3mf": "bedside-caddy-bottom-left.3mf",
     "_originals/bedroom/bedside-caddy-bottom-left.stl": "bedside-caddy-bottom-left.stl",
@@ -36,5 +47,31 @@
     "originals/bedside-caddy-round-bottom.stl"
   ],
   "additional_scad_files": [],
-  "licenses": []
+  "licenses": [],
+  "assembly_view_sources": {
+    "bedside-caddy.scad": {
+      "kind": "assembly"
+    }
+  },
+  "presentations": [
+    {
+      "id": "assembled",
+      "label": "Together",
+      "scad": "bedside-caddy.scad",
+      "defines": {
+        "view": "together"
+      }
+    },
+    {
+      "id": "exploded",
+      "label": "Exploded",
+      "scad": "bedside-caddy.scad",
+      "defines": {
+        "view": "exploded"
+      }
+    }
+  ],
+  "website": {
+    "default_view": "assembled"
+  }
 }

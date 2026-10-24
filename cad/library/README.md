@@ -60,7 +60,7 @@ Generate this index with `python3 utils/library.py catalog`. Filter the inventor
 | [toothpastekey555](bathroom/toothpastekey555/) | bathroom | legacy | — | 3MF, STL | unreviewed |
 | [tube-roller](bathroom/tube-roller/) | bathroom | imported | — | SKP, STL | unreviewed |
 | [apple-watch-stand](bedroom/apple-watch-stand/) | bedroom | imported | — | PDF, STL | unreviewed |
-| [bedside-caddy](bedroom/bedside-caddy/) | bedroom | legacy | — | 3MF, SKP, STL | unreviewed |
+| [bedside-caddy](bedroom/bedside-caddy/) | bedroom | legacy | [SCAD](bedroom/bedside-caddy/bedside-caddy.scad) (1) | 3MF, SCAD, SKP, STL | draft |
 | [charging-stand](bedroom/charging-stand/) | bedroom | legacy | — | STL | unreviewed |
 | [cpap-accessories](bedroom/cpap-accessories/) | bedroom | imported | — | 3MF, PDF, SKP, STL | unreviewed |
 | [glasses-stand-larger-slot](bedroom/glasses-stand-larger-slot/) | bedroom | legacy | — | STL | unreviewed |
